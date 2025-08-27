@@ -297,18 +297,22 @@ impl AnimeEndpoint {
         Ok(anime)
     }
 
-    /// Searches for anime by title with pagination support.
+    /// Searches for anime by title with advanced filtering and pagination support.
     /// 
     /// Performs a fuzzy search across anime titles in multiple languages (romaji, english, native)
     /// and returns matching results sorted by relevance. The search is case-insensitive and 
-    /// supports partial matches.
+    /// supports partial matches. Advanced filtering options allow for more precise searches.
     /// 
     /// # Parameters
     /// 
     /// * `search` - The search query string. Can be partial titles, alternative titles, or keywords.
-    ///   Supports searches in romaji, English, and native languages.
+    ///   Supports searches in romaji, English, and native languages. Optional - if None, returns all results.
     /// * `page` - The page number to retrieve (1-based indexing). Must be positive.
     /// * `per_page` - Number of results to return per page (1-50). Higher values may impact performance.
+    /// * `genre` - Filter by specific genre (e.g., "Action", "Comedy"). Optional.
+    /// * `year` - Filter by release year. Optional.
+    /// * `season` - Filter by season ("WINTER", "SPRING", "SUMMER", "FALL"). Optional.
+    /// * `format` - Filter by format ("TV", "MOVIE", "OVA", "ONA", "SPECIAL", "MUSIC"). Optional.
     /// 
     /// # Returns
     /// 
@@ -330,81 +334,121 @@ impl AnimeEndpoint {
     /// 
     /// let client = AniListClient::new();
     /// 
-    /// // Search for anime with "attack" in the title
-    /// let results = client.anime().search("attack", 1, 10).await?;
-    /// for anime in results {
-    ///     println!("Found: {} (ID: {})", anime.title.romaji, anime.id);
-    /// }
+    /// // Basic search
+    /// let results = client.anime().search_anime(
+    ///     Some("Attack on Titan"), 1, 10, None, None, None, None
+    /// ).await?;
     /// 
-    /// // Search for specific anime
-    /// let specific = client.anime().search("Attack on Titan", 1, 5).await?;
+    /// // Advanced search with filters
+    /// let action_anime_2023 = client.anime().search_anime(
+    ///     None, 1, 10, Some("Action"), Some(2023), Some("FALL"), Some("TV")
+    /// ).await?;
     /// 
-    /// // Search in different languages
-    /// let japanese = client.anime().search("進撃の巨人", 1, 5).await?;
+    /// // Search for movies only
+    /// let movies = client.anime().search_anime(
+    ///     Some("Studio Ghibli"), 1, 10, None, None, None, Some("MOVIE")
+    /// ).await?;
     /// ```
     /// 
     /// # Search Tips
     /// 
     /// - Use specific keywords for better results
+    /// - Combine filters for more precise searches
     /// - Try alternative titles if initial search doesn't yield expected results
     /// - Search supports both romaji and native script titles
     /// - Partial matches are supported (e.g., "attack" will match "Attack on Titan")
+    /// 
+    /// # Available Formats
+    /// 
+    /// - "TV" - Television series
+    /// - "MOVIE" - Theatrical films
+    /// - "OVA" - Original Video Animation
+    /// - "ONA" - Original Net Animation
+    /// - "SPECIAL" - Special episodes
+    /// - "MUSIC" - Music videos
+    /// 
+    /// # Available Seasons
+    /// 
+    /// - "WINTER" - January-March
+    /// - "SPRING" - April-June  
+    /// - "SUMMER" - July-September
+    /// - "FALL" - October-December
     /// 
     /// # Note
     /// 
     /// Search results are ranked by AniList's relevance algorithm, which considers
     /// title similarity, popularity, and other factors.
+    pub async fn search_anime(
+        &self,
+        search: Option<&str>,
+        page: i32,
+        per_page: i32,
+        genre: Option<&str>,
+        year: Option<i32>,
+        season: Option<&str>,
+        format: Option<&str>,
+    ) -> Result<Vec<Anime>, AniListError> {
+        let query = queries::anime::SEARCH;
+
+        let mut variables = HashMap::new();
+        variables.insert("page".to_string(), json!(page));
+        variables.insert("perPage".to_string(), json!(per_page));
+        
+        if let Some(search_term) = search {
+            variables.insert("search".to_string(), json!(search_term));
+        }
+        if let Some(genre_filter) = genre {
+            variables.insert("genre".to_string(), json!(genre_filter));
+        }
+        if let Some(year_filter) = year {
+            variables.insert("year".to_string(), json!(year_filter));
+        }
+        if let Some(season_filter) = season {
+            variables.insert("season".to_string(), json!(season_filter));
+        }
+        if let Some(format_filter) = format {
+            variables.insert("format".to_string(), json!(format_filter));
+        }
+
+        let response = self.client.query(query, Some(variables)).await?;
+        let data = response["data"]["Page"]["media"].clone();
+        let anime_list: Vec<Anime> = serde_json::from_value(data)?;
+        Ok(anime_list)
+    }
+
+    /// Searches for anime by title with pagination support (legacy method).
+    /// 
+    /// This is a simplified version of [`search_anime`] that only supports basic title search.
+    /// For advanced filtering capabilities, use [`search_anime`] instead.
+    /// 
+    /// # Parameters
+    /// 
+    /// * `search` - The search query string. Can be partial titles, alternative titles, or keywords.
+    /// * `page` - The page number to retrieve (1-based indexing). Must be positive.
+    /// * `per_page` - Number of results to return per page (1-50). Higher values may impact performance.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns a vector of [`Anime`] objects that match the search criteria,
+    /// sorted by relevance to the search query.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use anilist_moe::AniListClient;
+    /// 
+    /// let client = AniListClient::new();
+    /// 
+    /// // Search for anime with "attack" in the title
+    /// let results = client.anime().search("attack", 1, 10).await?;
+    /// ```
     pub async fn search(
         &self,
         search: &str,
         page: i32,
         per_page: i32,
     ) -> Result<Vec<Anime>, AniListError> {
-        let query = r#"
-            query ($search: String, $page: Int, $perPage: Int) {
-                Page(page: $page, perPage: $perPage) {
-                    media(type: ANIME, search: $search) {
-                        id
-                        title {
-                            romaji
-                            english
-                            native
-                            userPreferred
-                        }
-                        description
-                        format
-                        status
-                        season
-                        seasonYear
-                        episodes
-                        duration
-                        genres
-                        averageScore
-                        meanScore
-                        popularity
-                        favourites
-                        coverImage {
-                            extraLarge
-                            large
-                            medium
-                            color
-                        }
-                        bannerImage
-                        siteUrl
-                    }
-                }
-            }
-        "#;
-
-        let mut variables = HashMap::new();
-        variables.insert("search".to_string(), json!(search));
-        variables.insert("page".to_string(), json!(page));
-        variables.insert("perPage".to_string(), json!(per_page));
-
-        let response = self.client.query(query, Some(variables)).await?;
-        let data = response["data"]["Page"]["media"].clone();
-        let anime_list: Vec<Anime> = serde_json::from_value(data)?;
-        Ok(anime_list)
+        self.search_anime(Some(search), page, per_page, None, None, None, None).await
     }
 
     /// Get anime by season and year

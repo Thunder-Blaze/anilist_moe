@@ -15,6 +15,12 @@ pub mod anime {
     pub const SEARCH: &str = include_str!("anime/search.graphql");
 }
 
+/// Manga-related GraphQL queries
+pub mod manga {
+    /// Search manga query
+    pub const SEARCH: &str = include_str!("manga/search.graphql");
+}
+
 /// User-related GraphQL queries
 pub mod user {
     /// Toggle follow/unfollow user mutation

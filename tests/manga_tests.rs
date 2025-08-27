@@ -62,6 +62,7 @@ async fn test_search_manga() {
     
     let client = AniListClient::new();
     let result = client.manga().search("One Piece", 1, 5).await;
+    println!("{:?}", result);
 
     assert!(result.is_ok());
     let manga_list = result.unwrap();

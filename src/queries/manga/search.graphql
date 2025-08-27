@@ -1,4 +1,4 @@
-query ($page: Int, $perPage: Int, $search: String, $genre: String, $year: Int, $season: MediaSeason, $format: MediaFormat) {
+query ($page: Int, $perPage: Int, $search: String, $genre: String, $year: FuzzyDateInt, $format: MediaFormat, $status: MediaStatus) {
     Page (page: $page, perPage: $perPage) {
         pageInfo {
             total
@@ -7,7 +7,7 @@ query ($page: Int, $perPage: Int, $search: String, $genre: String, $year: Int, $
             hasNextPage
             perPage
         }
-        media (search: $search, genre: $genre, seasonYear: $year, season: $season, format: $format, type: ANIME) {
+        media (search: $search, genre: $genre, startDate_greater: $year, format: $format, status: $status, type: MANGA) {
             id
             title {
                 romaji
@@ -28,10 +28,8 @@ query ($page: Int, $perPage: Int, $search: String, $genre: String, $year: Int, $
                 month
                 day
             }
-            season
-            seasonYear
-            episodes
-            duration
+            chapters
+            volumes
             genres
             averageScore
             meanScore
