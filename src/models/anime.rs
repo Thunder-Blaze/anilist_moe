@@ -8,47 +8,29 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Anime {
     pub id: i32,
-    
     pub title: Option<MediaTitle>,
-    
     pub description: Option<String>,
-    
     pub format: Option<MediaFormat>,
-    
     pub status: Option<MediaStatus>,
-    
     #[serde(rename = "startDate")]
     pub start_date: Option<FuzzyDate>,
-    
     #[serde(rename = "endDate")]
     pub end_date: Option<FuzzyDate>,
-    
     pub season: Option<MediaSeason>,
-    
     #[serde(rename = "seasonYear")]
     pub season_year: Option<i32>,
-    
     pub episodes: Option<i32>,
-    
     pub duration: Option<i32>,
-    
     pub genres: Option<Vec<String>>,
-    
     #[serde(rename = "averageScore")]
     pub average_score: Option<i32>,
-    
     #[serde(rename = "meanScore")]
     pub mean_score: Option<i32>,
-    
     pub popularity: Option<i32>,
-    
     pub favourites: Option<i32>,
-    
     pub hashtag: Option<String>,
-    
     #[serde(rename = "countryOfOrgin")]
     pub country_of_origin: Option<String>,
-    
     #[serde(rename = "isAdult")]
     pub is_adult: Option<bool>,
     #[serde(rename = "nextAiringEpisode")]
