@@ -13,7 +13,6 @@ impl CharacterEndpoint {
         Self { client }
     }
 
-    /// Get popular characters
     pub async fn get_popular(
         &self,
         page: i32,
@@ -67,7 +66,6 @@ impl CharacterEndpoint {
         Ok(characters)
     }
 
-    /// Get character by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Character, AniListError> {
         let query = r#"
             query ($id: Int) {
@@ -114,7 +112,6 @@ impl CharacterEndpoint {
         Ok(character)
     }
 
-    /// Search characters by name
     pub async fn search(
         &self,
         search: &str,
@@ -168,7 +165,6 @@ impl CharacterEndpoint {
         Ok(characters)
     }
 
-    /// Get characters who have birthday today
     pub async fn get_today_birthday(
         &self,
         page: i32,
@@ -219,7 +215,6 @@ impl CharacterEndpoint {
         Ok(characters)
     }
 
-    /// Get most favorited characters
     pub async fn get_most_favorited(
         &self,
         page: i32,

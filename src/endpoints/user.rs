@@ -15,7 +15,6 @@ impl UserEndpoint {
         Self { client }
     }
 
-    /// Get the currently authenticated user (requires token)
     pub async fn get_current_user(&self) -> Result<User, AniListError> {
         let query = r#"
             query {
@@ -128,7 +127,6 @@ impl UserEndpoint {
         Ok(user)
     }
 
-    /// Get the current user's anime list (requires token)
     pub async fn get_current_user_anime_list(&self, status: Option<&str>) -> Result<Vec<MediaList>, AniListError> {
         // For now, we'll use a simpler approach
         let query = r#"
@@ -214,7 +212,6 @@ impl UserEndpoint {
         Ok(all_entries)
     }
 
-    /// Get user by ID
     pub async fn get_by_id(&self, id: i32) -> Result<User, AniListError> {
         let query = r#"
             query ($id: Int) {
@@ -333,7 +330,6 @@ impl UserEndpoint {
         Ok(user)
     }
 
-    /// Get user by name
     pub async fn get_by_name(&self, name: &str) -> Result<User, AniListError> {
         let query = r#"
             query ($name: String) {
@@ -452,7 +448,6 @@ impl UserEndpoint {
         Ok(user)
     }
 
-    /// Search users by name
     pub async fn search(
         &self,
         search: &str,
@@ -505,7 +500,6 @@ impl UserEndpoint {
         Ok(users)
     }
 
-    /// Get users with most anime watched
     pub async fn get_most_anime_watched(
         &self,
         page: i32,
@@ -553,7 +547,6 @@ impl UserEndpoint {
         Ok(users)
     }
 
-    /// Get users with most manga read
     pub async fn get_most_manga_read(
         &self,
         page: i32,
@@ -601,24 +594,6 @@ impl UserEndpoint {
         Ok(users)
     }
 
-    /// Toggle follow/unfollow a user (requires authentication)
-    /// 
-    /// # Arguments
-    /// * `user_id` - The ID of the user to follow/unfollow
-    /// 
-    /// # Returns
-    /// Returns the updated User object with follow status
-    /// 
-    /// # Errors
-    /// * `AniListError::Unauthorized` - If no authentication token is provided
-    /// * `AniListError::Network` - If there's a network connectivity issue
-    /// * `AniListError::ApiError` - If the AniList API returns an error
-    /// 
-    /// # Example
-    /// ```rust
-    /// let user = client.user().toggle_follow(123456).await?;
-    /// println!("User {} follow status: {}", user.name, user.is_following.unwrap_or(false));
-    /// ```
     pub async fn toggle_follow(&self, user_id: i32) -> Result<User, AniListError> {
         let query = queries::user::TOGGLE_FOLLOW;
 
@@ -631,29 +606,6 @@ impl UserEndpoint {
         Ok(user)
     }
 
-    /// Toggle favorite anime/manga for the authenticated user
-    /// 
-    /// # Arguments
-    /// * `anime_id` - The ID of the anime to favorite/unfavorite (optional)
-    /// * `manga_id` - The ID of the manga to favorite/unfavorite (optional)
-    /// 
-    /// # Returns
-    /// Returns a simple boolean indicating success
-    /// 
-    /// # Errors
-    /// * `AniListError::Unauthorized` - If no authentication token is provided
-    /// * `AniListError::InvalidInput` - If neither anime_id nor manga_id is provided
-    /// * `AniListError::Network` - If there's a network connectivity issue
-    /// * `AniListError::ApiError` - If the AniList API returns an error
-    /// 
-    /// # Example
-    /// ```rust
-    /// // Favorite an anime
-    /// let success = client.user().toggle_favorite(Some(21), None).await?;
-    /// 
-    /// // Favorite a manga
-    /// let success = client.user().toggle_favorite(None, Some(30013)).await?;
-    /// ```
     pub async fn toggle_favorite(&self, anime_id: Option<i32>, manga_id: Option<i32>) -> Result<bool, AniListError> {
         if anime_id.is_none() && manga_id.is_none() {
             return Err(AniListError::BadRequest { 

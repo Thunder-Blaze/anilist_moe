@@ -14,7 +14,6 @@ impl ActivityEndpoint {
         Self { client }
     }
 
-    /// Get recent activities from the global feed
     pub async fn get_recent_activities(&self, page: i32, per_page: i32) -> Result<Vec<Activity>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
@@ -99,7 +98,6 @@ impl ActivityEndpoint {
         Ok(activities)
     }
 
-    /// Get activities from following users (requires authentication)
     pub async fn get_following_activities(&self, page: i32, per_page: i32) -> Result<Vec<Activity>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
@@ -157,7 +155,6 @@ impl ActivityEndpoint {
         Ok(activities)
     }
 
-    /// Get user activities by user ID
     pub async fn get_user_activities(&self, user_id: i32, page: i32, per_page: i32) -> Result<Vec<Activity>, AniListError> {
         let query = r#"
             query ($userId: Int, $page: Int, $perPage: Int) {
@@ -216,7 +213,6 @@ impl ActivityEndpoint {
         Ok(activities)
     }
 
-    /// Get text activities
     pub async fn get_text_activities(&self, page: i32, per_page: i32) -> Result<Vec<TextActivity>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
@@ -256,7 +252,6 @@ impl ActivityEndpoint {
         Ok(activities)
     }
 
-    /// Get activity by ID
     pub async fn get_activity_by_id(&self, id: i32) -> Result<Activity, AniListError> {
         let query = r#"
             query ($id: Int) {
@@ -338,7 +333,6 @@ impl ActivityEndpoint {
         Ok(activity)
     }
 
-    /// Get activity replies
     pub async fn get_activity_replies(&self, activity_id: i32, page: i32, per_page: i32) -> Result<Vec<ActivityReply>, AniListError> {
         let query = r#"
             query ($activityId: Int, $page: Int, $perPage: Int) {
@@ -375,7 +369,6 @@ impl ActivityEndpoint {
         Ok(replies)
     }
 
-    /// Create a text activity (requires authentication)
     pub async fn create_text_activity(&self, text: &str) -> Result<TextActivity, AniListError> {
         let query = r#"
             mutation ($text: String) {
@@ -410,7 +403,6 @@ impl ActivityEndpoint {
         Ok(activity)
     }
 
-    /// Post a reply to an activity (requires authentication)
     pub async fn post_activity_reply(&self, activity_id: i32, text: &str) -> Result<ActivityReply, AniListError> {
         let query = queries::activity::REPLY_TO_ACTIVITY;
 
@@ -424,7 +416,6 @@ impl ActivityEndpoint {
         Ok(reply)
     }
 
-    /// Toggle like on an activity (requires authentication)
     pub async fn toggle_activity_like(&self, id: i32) -> Result<Activity, AniListError> {
         let query = queries::activity::TOGGLE_LIKE;
 
@@ -438,7 +429,6 @@ impl ActivityEndpoint {
         Ok(activity)
     }
 
-    /// Toggle like on an activity reply (requires authentication)
     pub async fn toggle_activity_reply_like(&self, id: i32) -> Result<ActivityReply, AniListError> {
         let query = r#"
             mutation ($id: Int, $type: LikeableType) {
@@ -463,7 +453,6 @@ impl ActivityEndpoint {
         Ok(reply)
     }
 
-    /// Delete an activity (requires authentication and ownership)
     pub async fn delete_activity(&self, id: i32) -> Result<bool, AniListError> {
         let query = r#"
             mutation ($id: Int) {

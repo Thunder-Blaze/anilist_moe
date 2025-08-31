@@ -160,7 +160,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Handle and explain different types of API errors
 fn handle_api_error(error: &AniListError) {
     match error {
         AniListError::RateLimit { limit, remaining, reset_at, retry_after } => {

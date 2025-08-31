@@ -13,7 +13,6 @@ impl StaffEndpoint {
         Self { client }
     }
 
-    /// Get popular staff
     pub async fn get_popular(&self, page: i32, per_page: i32) -> Result<Vec<Staff>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
@@ -71,7 +70,6 @@ impl StaffEndpoint {
         Ok(staff_list)
     }
 
-    /// Get staff by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Staff, AniListError> {
         let query = r#"
             query ($id: Int) {
@@ -126,7 +124,6 @@ impl StaffEndpoint {
         Ok(staff)
     }
 
-    /// Search staff by name
     pub async fn search(
         &self,
         search: &str,
@@ -181,7 +178,6 @@ impl StaffEndpoint {
         Ok(staff_list)
     }
 
-    /// Get staff by birthday (today)
     pub async fn get_today_birthday(
         &self,
         page: i32,
@@ -233,7 +229,6 @@ impl StaffEndpoint {
         Ok(staff_list)
     }
 
-    /// Get most favorited staff
     pub async fn get_most_favorited(
         &self,
         page: i32,

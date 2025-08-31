@@ -14,7 +14,6 @@ impl ForumEndpoint {
         Self { client }
     }
 
-    /// Get recent threads
     pub async fn get_recent_threads(&self, page: i32, per_page: i32) -> Result<Vec<Thread>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
@@ -75,7 +74,6 @@ impl ForumEndpoint {
         Ok(threads)
     }
 
-    /// Get thread by ID
     pub async fn get_thread_by_id(&self, id: i32) -> Result<Thread, AniListError> {
         let query = r#"
             query ($id: Int) {
@@ -133,7 +131,6 @@ impl ForumEndpoint {
         Ok(thread)
     }
 
-    /// Search threads
     pub async fn search_threads(&self, search: &str, page: i32, per_page: i32) -> Result<Vec<Thread>, AniListError> {
         let query = r#"
             query ($search: String, $page: Int, $perPage: Int) {
@@ -177,7 +174,6 @@ impl ForumEndpoint {
         Ok(threads)
     }
 
-    /// Get thread comments
     pub async fn get_thread_comments(&self, thread_id: i32, page: i32, per_page: i32) -> Result<Vec<ThreadComment>, AniListError> {
         let query = r#"
             query ($threadId: Int, $page: Int, $perPage: Int) {
@@ -218,7 +214,6 @@ impl ForumEndpoint {
         Ok(comments)
     }
 
-    /// Create a new thread (requires authentication)
     pub async fn create_thread(&self, title: &str, body: &str, categories: Option<Vec<i32>>) -> Result<Thread, AniListError> {
         let query = r#"
             mutation ($title: String, $body: String, $categories: [Int]) {
@@ -264,7 +259,6 @@ impl ForumEndpoint {
         Ok(thread)
     }
 
-    /// Post a comment on a thread (requires authentication)
     pub async fn post_comment(&self, thread_id: i32, comment: &str) -> Result<ThreadComment, AniListError> {
         let query = queries::forum::COMMENT_ON_THREAD;
 
@@ -278,7 +272,6 @@ impl ForumEndpoint {
         Ok(thread_comment)
     }
 
-    /// Toggle like on a thread (requires authentication)
     pub async fn toggle_thread_like(&self, id: i32) -> Result<Thread, AniListError> {
         let query = r#"
             mutation ($id: Int, $type: LikeableType) {
@@ -304,7 +297,6 @@ impl ForumEndpoint {
         Ok(thread)
     }
 
-    /// Toggle like on a thread comment (requires authentication)
     pub async fn toggle_comment_like(&self, id: i32) -> Result<ThreadComment, AniListError> {
         let query = queries::forum::LIKE_THREAD_COMMENT;
 

@@ -3,7 +3,6 @@ use dotenv::dotenv;
 use std::env;
 use tokio::time::{sleep, Duration};
 
-/// Helper function to add rate limiting between test requests
 async fn rate_limit() {
     sleep(Duration::from_secs(1)).await;
 }

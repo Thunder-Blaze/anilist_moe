@@ -13,7 +13,6 @@ impl AiringEndpoint {
         Self { client }
     }
 
-    /// Get upcoming airing episodes
     pub async fn get_upcoming_episodes(&self, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int, $airingAtGreater: Int, $sort: [AiringSort]) {
@@ -65,7 +64,6 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    /// Get airing episodes for today
     pub async fn get_today_episodes(&self, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -121,7 +119,6 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    /// Get recently aired episodes
     pub async fn get_recently_aired(&self, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
         let current_timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -173,7 +170,6 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    /// Get airing schedule for a specific media
     pub async fn get_schedule_for_media(&self, media_id: i32, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
         let query = r#"
             query ($mediaId: Int, $page: Int, $perPage: Int, $sort: [AiringSort]) {
@@ -220,7 +216,6 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    /// Get airing schedule by ID
     pub async fn get_schedule_by_id(&self, id: i32) -> Result<AiringSchedule, AniListError> {
         let query = r#"
             query ($id: Int) {
@@ -262,7 +257,6 @@ impl AiringEndpoint {
         Ok(schedule)
     }
 
-    /// Get airing episodes for a specific day range
     pub async fn get_episodes_in_range(
         &self,
         start_timestamp: i64,
@@ -316,7 +310,6 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    /// Get next episode for specific anime (helper method)
     pub async fn get_next_episode(&self, media_id: i32) -> Result<Option<AiringSchedule>, AniListError> {
         let current_timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
