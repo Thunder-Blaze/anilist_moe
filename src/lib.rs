@@ -139,6 +139,8 @@ pub mod endpoints;
 pub mod error;
 pub mod models;
 pub mod enums;
+pub mod objects;
+pub mod unions;
 pub mod utils;
 pub mod queries;
 
