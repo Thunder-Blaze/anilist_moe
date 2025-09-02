@@ -7,7 +7,7 @@ pub enum ActivitySort {
     #[serde(rename = "ID_DESC")]
     IdDesc,
     #[serde(rename = "PINNED")]
-    Pinned
+    Pinned,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

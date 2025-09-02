@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::{character::CharacterRole, submission::SubmissionStatus}, objects::{character::Character, common::PageInfo, staff::Staff, user::User}};
+use crate::{
+    enums::{character::CharacterRole, submission::SubmissionStatus},
+    objects::{character::Character, common::PageInfo, staff::Staff, user::User},
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CharacterSubmission {

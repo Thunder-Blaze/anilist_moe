@@ -1,5 +1,5 @@
 //! # Utility Functions
-//! 
+//!
 //! This module provides utility functions for handling rate limiting, retries,
 //! and other common operations when working with the AniList API.
 
@@ -10,11 +10,11 @@ use tokio::time::sleep;
 #[derive(Debug, Clone)]
 pub struct RetryConfig {
     pub max_retries: u32,
-    
+
     pub base_delay_ms: u64,
-    
+
     pub exponential_backoff: bool,
-    
+
     pub max_delay_ms: u64,
 }
 

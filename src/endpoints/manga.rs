@@ -199,7 +199,7 @@ impl MangaEndpoint {
         let mut variables = HashMap::new();
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
-        
+
         if let Some(search_term) = search {
             variables.insert("search".to_string(), json!(search_term));
         }
@@ -225,7 +225,8 @@ impl MangaEndpoint {
         page: i32,
         per_page: i32,
     ) -> Result<Vec<Manga>, AniListError> {
-        self.search_manga(Some(search), page, per_page, None, None, None).await
+        self.search_manga(Some(search), page, per_page, None, None, None)
+            .await
     }
 
     pub async fn get_top_rated(

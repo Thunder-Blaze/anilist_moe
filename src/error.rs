@@ -9,11 +9,11 @@ pub enum AniListError {
     Json(#[from] serde_json::Error),
 
     #[error("GraphQL error: {message}")]
-    GraphQL { 
-        message: String 
-    },
+    GraphQL { message: String },
 
-    #[error("Rate limit exceeded. Limit: {limit}, Remaining: {remaining}, Reset at: {reset_at}, Retry after: {retry_after} seconds")]
+    #[error(
+        "Rate limit exceeded. Limit: {limit}, Remaining: {remaining}, Reset at: {reset_at}, Retry after: {retry_after} seconds"
+    )]
     RateLimit {
         limit: u32,
         remaining: u32,
@@ -37,13 +37,8 @@ pub enum AniListError {
     AccessDenied,
 
     #[error("Bad request: {message}")]
-    BadRequest { 
-        message: String 
-    },
+    BadRequest { message: String },
 
     #[error("Server error: {status} - {message}")]
-    ServerError { 
-        status: u16, 
-        message: String 
-    },
+    ServerError { status: u16, message: String },
 }

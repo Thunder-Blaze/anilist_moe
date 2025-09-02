@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
 use crate::{
-    enums::{activity::ActivityType},
+    enums::activity::ActivityType,
     objects::{media::Media, user::User},
 };
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActivityReply {

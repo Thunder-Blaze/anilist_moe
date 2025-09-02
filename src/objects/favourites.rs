@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::objects::{character::CharacterConnection, media::MediaConnection, staff::StaffConnection, studio::StudioConnection};
+use crate::objects::{
+    character::CharacterConnection, media::MediaConnection, staff::StaffConnection,
+    studio::StudioConnection,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Favourites {

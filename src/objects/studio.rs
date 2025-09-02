@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::objects::{common::PageInfo, media::MediaConnection};
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Studio {
     pub id: Option<i32>,
     pub name: Option<String>,
@@ -16,7 +16,7 @@ pub struct Studio {
     pub favourites: Option<i32>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StudioConnection {
     pub edges: Option<Vec<StudioEdge>>,
     pub nodes: Option<Vec<Studio>>,
@@ -24,7 +24,7 @@ pub struct StudioConnection {
     pub page_info: Option<PageInfo>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StudioEdge {
     pub node: Option<Studio>,
     pub id: Option<i32>,

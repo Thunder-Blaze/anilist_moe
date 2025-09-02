@@ -14,7 +14,11 @@ impl ForumEndpoint {
         Self { client }
     }
 
-    pub async fn get_recent_threads(&self, page: i32, per_page: i32) -> Result<Vec<Thread>, AniListError> {
+    pub async fn get_recent_threads(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Thread>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -131,7 +135,12 @@ impl ForumEndpoint {
         Ok(thread)
     }
 
-    pub async fn search_threads(&self, search: &str, page: i32, per_page: i32) -> Result<Vec<Thread>, AniListError> {
+    pub async fn search_threads(
+        &self,
+        search: &str,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Thread>, AniListError> {
         let query = r#"
             query ($search: String, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -174,7 +183,12 @@ impl ForumEndpoint {
         Ok(threads)
     }
 
-    pub async fn get_thread_comments(&self, thread_id: i32, page: i32, per_page: i32) -> Result<Vec<ThreadComment>, AniListError> {
+    pub async fn get_thread_comments(
+        &self,
+        thread_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<ThreadComment>, AniListError> {
         let query = r#"
             query ($threadId: Int, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -214,7 +228,12 @@ impl ForumEndpoint {
         Ok(comments)
     }
 
-    pub async fn create_thread(&self, title: &str, body: &str, categories: Option<Vec<i32>>) -> Result<Thread, AniListError> {
+    pub async fn create_thread(
+        &self,
+        title: &str,
+        body: &str,
+        categories: Option<Vec<i32>>,
+    ) -> Result<Thread, AniListError> {
         let query = r#"
             mutation ($title: String, $body: String, $categories: [Int]) {
                 SaveThread(title: $title, body: $body, categories: $categories) {
@@ -259,7 +278,11 @@ impl ForumEndpoint {
         Ok(thread)
     }
 
-    pub async fn post_comment(&self, thread_id: i32, comment: &str) -> Result<ThreadComment, AniListError> {
+    pub async fn post_comment(
+        &self,
+        thread_id: i32,
+        comment: &str,
+    ) -> Result<ThreadComment, AniListError> {
         let query = queries::forum::COMMENT_ON_THREAD;
 
         let mut variables = HashMap::new();

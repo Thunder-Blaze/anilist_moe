@@ -1,6 +1,13 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::character::CharacterRole, objects::{common::{FuzzyDate, PageInfo}, media::{Media, MediaConnection}, staff::{Staff, StaffRoleType}}};
+use crate::{
+    enums::character::CharacterRole,
+    objects::{
+        common::{FuzzyDate, PageInfo},
+        media::{Media, MediaConnection},
+        staff::{Staff, StaffRoleType},
+    },
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Character {

@@ -1,5 +1,5 @@
 use anilist_moe::client::AniListClient;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 async fn rate_limit() {
     sleep(Duration::from_secs(1)).await;

@@ -1,6 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::{media::{CountryCode, MediaFormat}, media_list::MediaListStatus}, objects::{common::PageInfo, media::MediaTag, staff::Staff, studio::Studio, user::UserActivityHistory}};
+use crate::{
+    enums::{
+        media::{CountryCode, MediaFormat},
+        media_list::MediaListStatus,
+    },
+    objects::{
+        common::PageInfo, media::MediaTag, staff::Staff, studio::Studio, user::UserActivityHistory,
+    },
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FormatStats {

@@ -1,5 +1,5 @@
 //! # Anime Data Models
-//! 
+//!
 //! This module contains data structures representing anime information
 //! as returned by the AniList API.
 

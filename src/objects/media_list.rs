@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
-use serde_json::{Value as Json};
+use serde_json::Value as Json;
 
 use crate::{
-    enums::{media_list::MediaListStatus, score::ScoreFormat}, 
-    objects::{common::FuzzyDate, media::Media, user::User}
+    enums::{media_list::MediaListStatus, score::ScoreFormat},
+    objects::{common::FuzzyDate, media::Media, user::User},
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

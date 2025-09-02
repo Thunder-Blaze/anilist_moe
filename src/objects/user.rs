@@ -1,7 +1,16 @@
 use serde::{Deserialize, Serialize};
-use serde_json::{Value as Json};
+use serde_json::Value as Json;
 
-use crate::{enums::{mods::ModRole, user::{UserStaffNameLanguage, UserTitleLanguage}}, objects::{activity::ListActivityOption, favourites::Favourites, media_list::MediaListOptions, notification::NotificationOption, stats::UserStatisticTypes}};
+use crate::{
+    enums::{
+        mods::ModRole,
+        user::{UserStaffNameLanguage, UserTitleLanguage},
+    },
+    objects::{
+        activity::ListActivityOption, favourites::Favourites, media_list::MediaListOptions,
+        notification::NotificationOption, stats::UserStatisticTypes,
+    },
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct User {

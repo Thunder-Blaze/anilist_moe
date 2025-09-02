@@ -36,4 +36,4 @@ pub enum NotificationType {
     MediaMerge,
     #[serde(rename = "MEDIA_DELETION")]
     MediaDeletion,
-} 
+}

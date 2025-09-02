@@ -1,8 +1,14 @@
-use serde::{Deserialize, Serialize};
 use crate::{
     enums::notification::NotificationType,
-    objects::{activity::MessageActivity, media::Media, thread::{Thread, ThreadComment}, user::User}, unions::activity::ActivityUnion,
+    objects::{
+        activity::MessageActivity,
+        media::Media,
+        thread::{Thread, ThreadComment},
+        user::User,
+    },
+    unions::activity::ActivityUnion,
 };
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActivityNotification {
@@ -47,7 +53,7 @@ pub struct AiringNotification {
     pub contexts: Option<Vec<String>>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<i32>,
-    pub media: Option<Media>
+    pub media: Option<Media>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

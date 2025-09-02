@@ -13,7 +13,11 @@ impl AiringEndpoint {
         Self { client }
     }
 
-    pub async fn get_upcoming_episodes(&self, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
+    pub async fn get_upcoming_episodes(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<AiringSchedule>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int, $airingAtGreater: Int, $sort: [AiringSort]) {
                 Page(page: $page, perPage: $perPage) {
@@ -64,12 +68,16 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    pub async fn get_today_episodes(&self, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
+    pub async fn get_today_episodes(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<AiringSchedule>, AniListError> {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs() as i64;
-        
+
         let start_of_day = now - (now % 86400); // Beginning of today
         let end_of_day = start_of_day + 86400; // End of today
 
@@ -119,7 +127,11 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    pub async fn get_recently_aired(&self, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
+    pub async fn get_recently_aired(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<AiringSchedule>, AniListError> {
         let current_timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
@@ -170,7 +182,12 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    pub async fn get_schedule_for_media(&self, media_id: i32, page: i32, per_page: i32) -> Result<Vec<AiringSchedule>, AniListError> {
+    pub async fn get_schedule_for_media(
+        &self,
+        media_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<AiringSchedule>, AniListError> {
         let query = r#"
             query ($mediaId: Int, $page: Int, $perPage: Int, $sort: [AiringSort]) {
                 Page(page: $page, perPage: $perPage) {
@@ -310,7 +327,10 @@ impl AiringEndpoint {
         Ok(schedules)
     }
 
-    pub async fn get_next_episode(&self, media_id: i32) -> Result<Option<AiringSchedule>, AniListError> {
+    pub async fn get_next_episode(
+        &self,
+        media_id: i32,
+    ) -> Result<Option<AiringSchedule>, AniListError> {
         let current_timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
@@ -342,14 +362,14 @@ impl AiringEndpoint {
 
         let response = self.client.query(query, Some(variables)).await?;
         let schedules_array = response["data"]["Page"]["airingSchedules"].as_array();
-        
+
         if let Some(schedules) = schedules_array {
             if !schedules.is_empty() {
                 let schedule: AiringSchedule = serde_json::from_value(schedules[0].clone())?;
                 return Ok(Some(schedule));
             }
         }
-        
+
         Ok(None)
     }
 }

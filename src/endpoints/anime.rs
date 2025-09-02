@@ -1,5 +1,5 @@
 //! # Anime Endpoints
-//! 
+//!
 //! This module provides access to all anime-related functionality in the AniList API.
 //! It includes methods for searching, browsing, and retrieving detailed information
 //! about anime series and movies.
@@ -184,7 +184,7 @@ impl AnimeEndpoint {
         let mut variables = HashMap::new();
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
-        
+
         if let Some(search_term) = search {
             variables.insert("search".to_string(), json!(search_term));
         }
@@ -213,7 +213,8 @@ impl AnimeEndpoint {
         page: i32,
         per_page: i32,
     ) -> Result<Vec<Anime>, AniListError> {
-        self.search_anime(Some(search), page, per_page, None, None, None, None).await
+        self.search_anime(Some(search), page, per_page, None, None, None, None)
+            .await
     }
 
     pub async fn get_by_season(

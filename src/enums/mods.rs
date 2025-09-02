@@ -17,7 +17,7 @@ pub enum ModActionType {
     #[serde(rename = "RESET")]
     Reset,
     #[serde(rename = "ANON")]
-    Anon	
+    Anon,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

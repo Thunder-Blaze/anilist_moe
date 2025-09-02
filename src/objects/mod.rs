@@ -16,5 +16,5 @@ pub mod staff;
 pub mod stats;
 pub mod studio;
 pub mod submission;
-pub mod user;
 pub mod thread;
+pub mod user;

@@ -1,6 +1,29 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::{character::CharacterRole, external_link::ExternalLinkType, media::{CountryCode, MediaFormat, MediaRankType, MediaRelation, MediaSeason, MediaSource, MediaStatus, MediaType}, notification::NotificationType, submission::SubmissionStatus}, objects::{airing::{AiringSchedule, AiringScheduleConnection}, character::{Character, CharacterConnection}, common::{FuzzyDate, Json, PageInfo}, media_list::MediaList, recommendation::RecommendationConnection, review::ReviewConnection, staff::{Staff, StaffConnection, StaffEdge, StaffRoleType}, stats::MediaStats, studio::{Studio, StudioConnection, StudioEdge}, user::User}};
+use crate::{
+    enums::{
+        character::CharacterRole,
+        external_link::ExternalLinkType,
+        media::{
+            CountryCode, MediaFormat, MediaRankType, MediaRelation, MediaSeason, MediaSource,
+            MediaStatus, MediaType,
+        },
+        notification::NotificationType,
+        submission::SubmissionStatus,
+    },
+    objects::{
+        airing::{AiringSchedule, AiringScheduleConnection},
+        character::{Character, CharacterConnection},
+        common::{FuzzyDate, Json, PageInfo},
+        media_list::MediaList,
+        recommendation::RecommendationConnection,
+        review::ReviewConnection,
+        staff::{Staff, StaffConnection, StaffEdge, StaffRoleType},
+        stats::MediaStats,
+        studio::{Studio, StudioConnection, StudioEdge},
+        user::User,
+    },
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Media {
@@ -85,7 +108,7 @@ pub struct Media {
     #[serde(rename = "isReviewBlocked")]
     pub is_review_blocked: Option<bool>,
     #[serde(rename = "modNotes")]
-    pub mod_notes: Option<String>
+    pub mod_notes: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -108,7 +131,7 @@ pub struct MediaConnection {
     edges: Option<Vec<MediaEdge>>,
     nodes: Option<Vec<Media>>,
     #[serde(rename = "pageInfo")]
-    page_info: Option<PageInfo>
+    page_info: Option<PageInfo>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -131,7 +154,7 @@ pub struct MediaDataChangeNotification {
     pub reason: Option<String>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<i32>,
-    pub media: Option<Media>
+    pub media: Option<Media>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -204,7 +227,7 @@ pub struct MediaMergeNotification {
     pub reason: Option<String>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<i32>,
-    pub media: Option<Media>
+    pub media: Option<Media>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

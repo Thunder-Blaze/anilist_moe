@@ -62,7 +62,12 @@ impl StudioEndpoint {
         Ok(studio)
     }
 
-    pub async fn search(&self, search: &str, page: i32, per_page: i32) -> Result<Vec<Studio>, AniListError> {
+    pub async fn search(
+        &self,
+        search: &str,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Studio>, AniListError> {
         let query = r#"
             query ($search: String, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -89,7 +94,11 @@ impl StudioEndpoint {
         Ok(studios)
     }
 
-    pub async fn get_most_favorited(&self, page: i32, per_page: i32) -> Result<Vec<Studio>, AniListError> {
+    pub async fn get_most_favorited(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Studio>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {

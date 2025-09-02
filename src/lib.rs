@@ -136,13 +136,13 @@
 
 pub mod client;
 pub mod endpoints;
+pub mod enums;
 pub mod error;
 pub mod models;
-pub mod enums;
 pub mod objects;
+pub mod queries;
 pub mod unions;
 pub mod utils;
-pub mod queries;
 
 pub use client::AniListClient;
 pub use error::AniListError;

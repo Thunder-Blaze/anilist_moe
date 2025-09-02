@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::recommendation::RecommendationRating, objects::{common::PageInfo, media::Media, user::User}};
+use crate::{
+    enums::recommendation::RecommendationRating,
+    objects::{common::PageInfo, media::Media, user::User},
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Recommendation {

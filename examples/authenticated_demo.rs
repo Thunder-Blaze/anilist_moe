@@ -1,6 +1,6 @@
 use anilist_moe::client::AniListClient;
 use anilist_moe::error::AniListError;
-use anilist_moe::utils::{retry_with_backoff, RetryConfig, rate_limit_delay};
+use anilist_moe::utils::{RetryConfig, rate_limit_delay, retry_with_backoff};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -11,18 +11,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🔓 Unauthenticated Client Example");
     println!("=================================");
     let client = AniListClient::new();
-    
+
     // Demonstrate proper error handling
     match client.anime().get_popular(1, 3).await {
         Ok(popular_anime) => {
             println!("✅ Popular anime (first 3):");
             for anime in popular_anime {
                 if let Some(title) = &anime.title {
-                    println!("  - {} (ID: {})", 
-                        title.user_preferred.as_ref()
+                    println!(
+                        "  - {} (ID: {})",
+                        title
+                            .user_preferred
+                            .as_ref()
                             .or(title.english.as_ref())
                             .or(title.romaji.as_ref())
-                            .unwrap_or(&"Unknown".to_string()), 
+                            .unwrap_or(&"Unknown".to_string()),
                         anime.id
                     );
                 }
@@ -40,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Example with retry logic
     println!("\n🔄 Example with Retry Logic");
     println!("===========================");
-    
+
     let retry_config = RetryConfig {
         max_retries: 3,
         base_delay_ms: 1000,
@@ -50,12 +53,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let search_result = retry_with_backoff(
         || async {
-            client.anime().search("Attack on Titan", 1, 2).await
+            client
+                .anime()
+                .search("Attack on Titan", 1, 2)
+                .await
                 .map_err(|e| e)
                 .map(|results| {
                     if results.is_empty() {
-                        Err(AniListError::GraphQL { 
-                            message: "No search results found".to_string() 
+                        Err(AniListError::GraphQL {
+                            message: "No search results found".to_string(),
                         })
                     } else {
                         Ok(results)
@@ -64,18 +70,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .unwrap_or_else(Err)
         },
         retry_config,
-    ).await;
+    )
+    .await;
 
     match search_result {
         Ok(search_results) => {
             println!("✅ Search results for 'Attack on Titan':");
             for anime in search_results {
                 if let Some(title) = &anime.title {
-                    println!("  - {} (ID: {})", 
-                        title.user_preferred.as_ref()
+                    println!(
+                        "  - {} (ID: {})",
+                        title
+                            .user_preferred
+                            .as_ref()
                             .or(title.english.as_ref())
                             .or(title.romaji.as_ref())
-                            .unwrap_or(&"Unknown".to_string()), 
+                            .unwrap_or(&"Unknown".to_string()),
                         anime.id
                     );
                 }
@@ -92,22 +102,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Example of using authenticated client
     println!("\n🔐 Authenticated Client Example");
     println!("================================");
-    
+
     // Check if we have a token
     if let Ok(token) = std::env::var("ANILIST_TOKEN") {
         let authenticated_client = AniListClient::with_token(token);
-        
+
         match authenticated_client.user().get_current_user().await {
             Ok(user) => {
                 println!("✅ Current user: {}", user.name);
                 if let Some(stats) = user.statistics {
                     if let Some(anime_stats) = stats.anime {
-                        println!("   📺 Anime watched: {} episodes", 
-                            anime_stats.episodes_watched.unwrap_or(0));
+                        println!(
+                            "   📺 Anime watched: {} episodes",
+                            anime_stats.episodes_watched.unwrap_or(0)
+                        );
                     }
                     if let Some(manga_stats) = stats.manga {
-                        println!("   📚 Manga read: {} chapters", 
-                            manga_stats.chapters_read.unwrap_or(0));
+                        println!(
+                            "   📚 Manga read: {} chapters",
+                            manga_stats.chapters_read.unwrap_or(0)
+                        );
                     }
                 }
             }
@@ -134,10 +148,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("✅ Popular characters:");
             for character in popular_characters {
                 if let Some(name) = &character.name {
-                    println!("  - {} (ID: {})", 
-                        name.user_preferred.as_ref()
+                    println!(
+                        "  - {} (ID: {})",
+                        name.user_preferred
+                            .as_ref()
                             .or(name.full.as_ref())
-                            .unwrap_or(&"Unknown".to_string()), 
+                            .unwrap_or(&"Unknown".to_string()),
                         character.id
                     );
                 }
@@ -162,7 +178,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn handle_api_error(error: &AniListError) {
     match error {
-        AniListError::RateLimit { limit, remaining, reset_at, retry_after } => {
+        AniListError::RateLimit {
+            limit,
+            remaining,
+            reset_at,
+            retry_after,
+        } => {
             println!("   ⏰ Rate limit details:");
             println!("      - Limit: {} requests/minute", limit);
             println!("      - Remaining: {}", remaining);

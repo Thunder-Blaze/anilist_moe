@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StudioSort {
     #[serde(rename = "ID")]
-    Id,	
+    Id,
     #[serde(rename = "ID_DESC")]
     IdDesc,
     #[serde(rename = "NAME")]

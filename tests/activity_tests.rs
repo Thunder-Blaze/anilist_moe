@@ -1,5 +1,5 @@
 use anilist_moe::client::AniListClient;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 async fn rate_limit() {
     sleep(Duration::from_secs(1)).await;
@@ -9,33 +9,33 @@ async fn rate_limit() {
 async fn test_get_recent_activities() {
     let client = AniListClient::new();
     let result = client.activity().get_recent_activities(1, 5).await;
-    
+
     assert!(result.is_ok());
     let activities = result.unwrap();
     // Note: This might be empty based on privacy settings
-    
+
     for activity in &activities {
         assert!(activity.id > 0);
     }
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_text_activities() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let result = client.activity().get_text_activities(1, 5).await;
-    
+
     assert!(result.is_ok());
     let activities = result.unwrap();
     // Note: This might be empty based on privacy settings
-    
+
     for activity in &activities {
         assert!(activity.id > 0);
     }
-    
+
     rate_limit().await;
 }
 
@@ -44,7 +44,7 @@ async fn test_get_user_activities() {
     let client = AniListClient::new();
     // Test with a known user ID (this might fail if the user doesn't exist or has private activities)
     let result = client.activity().get_user_activities(1, 1, 5).await;
-    
+
     // We just check that the call doesn't panic
     match result {
         Ok(activities) => {
@@ -63,7 +63,7 @@ async fn test_get_activity_by_id() {
     let client = AniListClient::new();
     // This test might fail if the specific activity doesn't exist
     let result = client.activity().get_activity_by_id(1).await;
-    
+
     // We just check that the call doesn't panic
     match result {
         Ok(activity) => {
@@ -80,7 +80,7 @@ async fn test_get_activity_replies() {
     let client = AniListClient::new();
     // This test might fail if the specific activity doesn't exist or has no replies
     let result = client.activity().get_activity_replies(1, 1, 5).await;
-    
+
     // We just check that the call doesn't panic
     match result {
         Ok(replies) => {

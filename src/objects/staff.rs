@@ -1,8 +1,13 @@
 use serde::{Deserialize, Serialize};
 
-use crate::objects::{character::CharacterConnection, common::{FuzzyDate, PageInfo}, media::MediaConnection, user::User};
+use crate::objects::{
+    character::CharacterConnection,
+    common::{FuzzyDate, PageInfo},
+    media::MediaConnection,
+    user::User,
+};
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Staff {
     pub id: i32,
     pub name: Option<StaffName>,
@@ -46,7 +51,7 @@ pub struct Staff {
     pub mod_notes: Option<String>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaffConnection {
     pub edges: Option<Vec<StaffEdge>>,
     pub nodes: Option<Vec<Staff>>,
@@ -54,7 +59,7 @@ pub struct StaffConnection {
     pub total_count: Option<i32>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaffEdge {
     pub node: Option<Staff>,
     pub id: Option<i32>,
@@ -63,13 +68,13 @@ pub struct StaffEdge {
     pub favourite_order: Option<i32>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaffImage {
     pub large: Option<String>,
     pub medium: Option<String>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaffName {
     pub first: Option<String>,
     pub middle: Option<String>,
@@ -81,7 +86,7 @@ pub struct StaffName {
     pub user_preferred: Option<String>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaffRoleType {
     #[serde(rename = "voiceActor")]
     pub voice_actor: Option<Staff>,

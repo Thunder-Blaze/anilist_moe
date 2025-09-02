@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::objects::{common::Json, media::Media, user::User};
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Thread {
     pub id: i32,
     pub title: Option<String>,
@@ -44,13 +44,13 @@ pub struct Thread {
     pub media_categories: Option<Vec<Media>>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThreadCategory {
     pub id: i32,
     pub name: Option<String>,
 }
 
-#[derive(Debug, Clone,  Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThreadComment {
     pub id: i32,
     #[serde(rename = "userId")]
