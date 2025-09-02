@@ -103,3 +103,10 @@ pub struct MessageActivity {
     pub replies: Option<Vec<ActivityReply>>,
     pub likes: Option<Vec<User>>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListActivityOption {
+    pub disabled: Option<bool>,
+    #[serde(rename = "type")]
+    pub activity_type: Option<ActivityType>,
+}

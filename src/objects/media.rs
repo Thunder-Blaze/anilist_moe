@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::{media::{MediaFormat, MediaRankType, MediaSeason, MediaSource, MediaStatus, MediaType}, notification::NotificationType}, objects::common::{FuzzyDate, PageInfo}};
+use crate::{enums::{character::CharacterRole, external_link::ExternalLinkType, media::{CountryCode, MediaFormat, MediaRankType, MediaRelation, MediaSeason, MediaSource, MediaStatus, MediaType}, notification::NotificationType, submission::SubmissionStatus}, objects::{airing::{AiringSchedule, AiringScheduleConnection}, character::{Character, CharacterConnection}, common::{FuzzyDate, Json, PageInfo}, media_list::MediaList, recommendation::RecommendationConnection, review::ReviewConnection, staff::{Staff, StaffConnection, StaffEdge, StaffRoleType}, stats::MediaStats, studio::{Studio, StudioConnection, StudioEdge}, user::User}};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Media {
@@ -72,7 +72,7 @@ pub struct Media {
     pub streaming_episodes: Option<Vec<MediaStreamingEpisode>>,
     pub rankings: Option<Vec<MediaRank>>,
     #[serde(rename = "mediaListEntry")]
-    pub media_list_entry: Option<MediaList>,
+    pub media_list_entry: Option<Box<MediaList>>,
     pub reviews: Option<ReviewConnection>,
     pub recommendations: Option<RecommendationConnection>,
     pub stats: Option<MediaStats>,

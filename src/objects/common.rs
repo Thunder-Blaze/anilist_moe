@@ -22,3 +22,13 @@ pub struct PageInfo {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Json(serde_json::Value);
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Deleted {
+    pub deleted: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ParsedMarkdown {
+    pub html: Option<String>,
+}

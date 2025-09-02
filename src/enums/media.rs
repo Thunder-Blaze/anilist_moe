@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::ser;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MediaFormat {
@@ -238,4 +239,16 @@ pub enum MediaType {
     Anime,
     #[serde(rename = "MANGA")]
     Manga,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum CountryCode {
+    #[serde(rename = "CN")]
+    China,
+    #[serde(rename = "TWN")]
+    Taiwan,
+    #[serde(rename = "JP")]
+    Japan,
+    #[serde(rename = "KR")]
+    SouthKorea,
 }

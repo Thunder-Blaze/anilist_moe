@@ -1,6 +1,30 @@
 use serde::{Deserialize, Serialize};
 
-use crate::enums::media_list::MediaListStatus;
+use crate::{enums::{media::{CountryCode, MediaFormat}, media_list::MediaListStatus}, objects::{common::PageInfo, media::MediaTag, staff::Staff, studio::Studio, user::UserActivityHistory}};
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct FormatStats {
+    pub format: Option<MediaFormat>,
+    pub amount: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct GenreStats {
+    pub genre: Option<String>,
+    pub amount: Option<i32>,
+    #[serde(rename = "meanScore")]
+    pub mean_score: Option<i32>,
+    #[serde(rename = "timeWatched")]
+    pub time_watched: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ListScoreStats {
+    #[serde(rename = "meanScore")]
+    pub mean_score: Option<i32>,
+    #[serde(rename = "standardDeviation")]
+    pub standard_deviation: Option<i32>,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MediaStats {
@@ -20,6 +44,67 @@ pub struct ScoreDistribution {
 pub struct StatusDistribution {
     pub status: Option<MediaListStatus>,
     pub amount: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SiteStatistics {
+    pub users: Option<SiteTrendConnection>,
+    pub anime: Option<SiteTrendConnection>,
+    pub manga: Option<SiteTrendConnection>,
+    pub characters: Option<SiteTrendConnection>,
+    pub staff: Option<SiteTrendConnection>,
+    pub studios: Option<SiteTrendConnection>,
+    pub reviews: Option<SiteTrendConnection>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SiteTrend {
+    pub date: i32,
+    pub count: i32,
+    pub change: i32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SiteTrendConnection {
+    pub edges: Option<Vec<SiteTrendEdge>>,
+    pub nodes: Option<Vec<SiteTrend>>,
+    #[serde(rename = "pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SiteTrendEdge {
+    pub node: Option<SiteTrend>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StaffStats {
+    pub staff: Option<Staff>,
+    pub amount: Option<i32>,
+    #[serde(rename = "meanScore")]
+    pub mean_score: Option<i32>,
+    #[serde(rename = "timeWatched")]
+    pub time_watched: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StudioStats {
+    pub studio: Option<Studio>,
+    pub amount: Option<i32>,
+    #[serde(rename = "meanScore")]
+    pub mean_score: Option<i32>,
+    #[serde(rename = "timeWatched")]
+    pub time_watched: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TagStats {
+    pub tag: Option<MediaTag>,
+    pub amount: Option<i32>,
+    #[serde(rename = "meanScore")]
+    pub mean_score: Option<i32>,
+    #[serde(rename = "timeWatched")]
+    pub time_watched: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
