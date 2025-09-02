@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Value as Json};
 
+use crate::{enums::user::{UserStaffNameLanguage, UserTitleLanguage}, objects::{media_list::MediaListOptions, stats::UserStatisticTypes}};
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: i32,

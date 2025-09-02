@@ -19,3 +19,6 @@ pub struct PageInfo {
     #[serde(rename = "hasNextPage")]
     has_next_page: Option<bool>,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Json(serde_json::Value);

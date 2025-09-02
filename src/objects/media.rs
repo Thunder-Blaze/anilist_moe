@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{enums::{media::{MediaFormat, MediaSeason, MediaSource, MediaStatus, MediaType}, notification::NotificationType}, objects::common::{FuzzyDate, PageInfo}};
+use crate::{enums::{media::{MediaFormat, MediaRankType, MediaSeason, MediaSource, MediaStatus, MediaType}, notification::NotificationType}, objects::common::{FuzzyDate, PageInfo}};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Media {
@@ -89,15 +89,6 @@ pub struct Media {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct  MediaTitle {
-    pub romaji: Option<String>,
-    pub english: Option<String>,
-    pub native: Option<String>,
-    #[serde(rename = "userPreferred")]
-    pub user_preferred: Option<String>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MediaCharacter {
     pub id: Option<i32>,
     pub role: Option<CharacterRole>,
@@ -181,4 +172,186 @@ pub struct MediaEdge {
     pub voice_actor_roles: Option<Vec<StaffRoleType>>,
     #[serde(rename = "favouriteOrder")]
     pub favourite_order: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaExternalLink {
+    id: i32,
+    url: Option<String>,
+    site: String,
+    #[serde(rename = "siteId")]
+    site_id: Option<i32>,
+    #[serde(rename = "type")]
+    link_type: Option<ExternalLinkType>,
+    pub language: Option<String>,
+    pub color: Option<String>,
+    pub icon: Option<String>,
+    pub notes: Option<String>,
+    #[serde(rename = "isDisabled")]
+    pub is_disabled: Option<bool>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaMergeNotification {
+    pub id: i32,
+    #[serde(rename = "type")]
+    pub notification_type: Option<NotificationType>,
+    #[serde(rename = "mediaId")]
+    pub media_id: i32,
+    #[serde(rename = "deletedMediaTitles")]
+    pub deleted_media_titles: Option<Vec<String>>,
+    pub context: Option<String>,
+    pub reason: Option<String>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<i32>,
+    pub media: Option<Media>
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaRank {
+    pub id: i32,
+    pub rank: i32,
+    #[serde(rename = "type")]
+    pub rank_type: MediaRankType,
+    pub format: MediaFormat,
+    pub year: Option<i32>,
+    pub season: Option<MediaSeason>,
+    #[serde(rename = "allTime")]
+    pub all_time: Option<bool>,
+    #[serde(rename = "context")]
+    pub context: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaStreamingEpisode {
+    pub title: Option<String>,
+    pub thumbnail: Option<String>,
+    pub url: Option<String>,
+    pub site: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaSubmission {
+    pub id: i32,
+    pub submitter: Option<User>,
+    pub assignee: Option<User>,
+    pub status: Option<SubmissionStatus>,
+    #[serde(rename = "submitterStats")]
+    pub submitter_stats: Option<Json>,
+    pub notes: Option<String>,
+    pub source: Option<String>,
+    pub changes: Option<Vec<String>>,
+    pub locked: Option<bool>,
+    pub media: Option<Media>,
+    pub submission: Option<Media>,
+    pub characters: Option<Vec<MediaSubmissionComparison>>,
+    pub staff: Option<Vec<MediaSubmissionComparison>>,
+    pub studios: Option<Vec<MediaSubmissionComparison>>,
+    pub relations: Option<Vec<MediaEdge>>,
+    #[serde(rename = "externalLinks")]
+    pub external_links: Option<Vec<MediaSubmissionComparison>>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaSubmissionComparison {
+    pub submission: Option<MediaSubmissionEdge>,
+    pub character: Option<MediaCharacter>,
+    pub staff: Option<StaffEdge>,
+    pub studio: Option<StudioEdge>,
+    #[serde(rename = "externalLink")]
+    pub external_link: Option<MediaExternalLink>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaSubmissionEdge {
+    pub id: i32,
+    #[serde(rename = "characterRole")]
+    pub character_role: Option<CharacterRole>,
+    #[serde(rename = "staffRole")]
+    pub staff_role: Option<String>,
+    #[serde(rename = "roleNotes")]
+    pub role_notes: Option<String>,
+    #[serde(rename = "dubGroup")]
+    pub dub_group: Option<String>,
+    #[serde(rename = "characterName")]
+    pub character_name: Option<String>,
+    #[serde(rename = "isMain")]
+    pub is_main: Option<bool>,
+    pub character: Option<Character>,
+    #[serde(rename = "characterSubmission")]
+    pub character_submission: Option<Character>,
+    #[serde(rename = "voiceActor")]
+    pub voice_actor: Option<Staff>,
+    #[serde(rename = "voiceActorSubmission")]
+    pub voice_actor_submission: Option<Staff>,
+    pub staff: Option<Staff>,
+    #[serde(rename = "staffSubmission")]
+    pub staff_submission: Option<Staff>,
+    pub studio: Option<Studio>,
+    #[serde(rename = "externalLink")]
+    pub external_link: Option<MediaExternalLink>,
+    pub media: Option<Media>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaTag {
+    pub id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub category: Option<String>,
+    pub rank: Option<i32>,
+    #[serde(rename = "isGeneralSpoiler")]
+    pub is_general_spoiler: Option<bool>,
+    #[serde(rename = "isMediaSpoiler")]
+    pub is_media_spoiler: Option<bool>,
+    #[serde(rename = "isAdult")]
+    pub is_adult: Option<bool>,
+    #[serde(rename = "userId")]
+    pub user_id: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaTitle {
+    pub romaji: Option<String>,
+    pub english: Option<String>,
+    pub native: Option<String>,
+    #[serde(rename = "userPreferred")]
+    pub user_preferred: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaTrailer {
+    pub id: Option<String>,
+    pub site: Option<String>,
+    pub thumbnail: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaTrend {
+    #[serde(rename = "mediaId")]
+    pub media_id: i32,
+    pub date: i32,
+    pub trending: i32,
+    #[serde(rename = "averageScore")]
+    pub average_score: Option<i32>,
+    pub popularity: Option<i32>,
+    pub in_progress: Option<i32>,
+    pub releasing: bool,
+    pub episode: Option<i32>,
+    pub media: Option<Media>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaTrendConnection {
+    pub edges: Option<Vec<MediaTrendEdge>>,
+    pub nodes: Option<Vec<MediaTrend>>,
+    #[serde(rename = "pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaTrendEdge {
+    pub node: Option<MediaTrend>,
 }

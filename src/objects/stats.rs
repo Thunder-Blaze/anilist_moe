@@ -1,5 +1,27 @@
 use serde::{Deserialize, Serialize};
 
+use crate::enums::media_list::MediaListStatus;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MediaStats {
+    #[serde(rename = "scoreDistribution")]
+    pub score_distribution: Option<Vec<ScoreDistribution>>,
+    #[serde(rename = "statusDistribution")]
+    pub status_distribution: Option<Vec<StatusDistribution>>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ScoreDistribution {
+    pub score: Option<i32>,
+    pub amount: Option<i32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StatusDistribution {
+    pub status: Option<MediaListStatus>,
+    pub amount: Option<i32>,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserCountryStatistic {
     pub count: i32,
