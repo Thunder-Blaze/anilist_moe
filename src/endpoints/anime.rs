@@ -6,7 +6,7 @@
 
 use crate::client::AniListClient;
 use crate::error::AniListError;
-use crate::models::Anime;
+use crate::objects::media::{Media as Anime};
 use crate::queries;
 use serde_json::json;
 use std::collections::HashMap;
@@ -27,7 +27,7 @@ impl AnimeEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["media"].clone();
         let anime_list: Vec<Anime> = serde_json::from_value(data)?;
         Ok(anime_list)
@@ -84,7 +84,7 @@ impl AnimeEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["media"].clone();
         let anime_list: Vec<Anime> = serde_json::from_value(data)?;
         Ok(anime_list)
@@ -163,7 +163,7 @@ impl AnimeEndpoint {
         let mut variables = HashMap::new();
         variables.insert("id".to_string(), json!(id));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Media"].clone();
         let anime: Anime = serde_json::from_value(data)?;
         Ok(anime)
@@ -201,7 +201,7 @@ impl AnimeEndpoint {
             variables.insert("format".to_string(), json!(format_filter));
         }
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["media"].clone();
         let anime_list: Vec<Anime> = serde_json::from_value(data)?;
         Ok(anime_list)
@@ -266,7 +266,7 @@ impl AnimeEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["media"].clone();
         let anime_list: Vec<Anime> = serde_json::from_value(data)?;
         Ok(anime_list)
@@ -317,7 +317,7 @@ impl AnimeEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["media"].clone();
         let anime_list: Vec<Anime> = serde_json::from_value(data)?;
         Ok(anime_list)
@@ -371,7 +371,7 @@ impl AnimeEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["media"].clone();
         let anime_list: Vec<Anime> = serde_json::from_value(data)?;
         Ok(anime_list)

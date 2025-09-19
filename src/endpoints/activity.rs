@@ -1,6 +1,7 @@
 use crate::client::AniListClient;
 use crate::error::AniListError;
-use crate::models::social::{Activity, ActivityReply, TextActivity};
+use crate::objects::activity::{ActivityReply, TextActivity};
+use crate::unions::activity::ActivityUnion as Activity;
 use crate::queries;
 use serde_json::json;
 use std::collections::HashMap;
@@ -96,7 +97,7 @@ impl ActivityEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["activities"].clone();
         let activities: Vec<Activity> = serde_json::from_value(data)?;
         Ok(activities)
@@ -157,7 +158,7 @@ impl ActivityEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["activities"].clone();
         let activities: Vec<Activity> = serde_json::from_value(data)?;
         Ok(activities)
@@ -220,7 +221,7 @@ impl ActivityEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["activities"].clone();
         let activities: Vec<Activity> = serde_json::from_value(data)?;
         Ok(activities)
@@ -263,7 +264,7 @@ impl ActivityEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["activities"].clone();
         let activities: Vec<TextActivity> = serde_json::from_value(data)?;
         Ok(activities)
@@ -344,7 +345,7 @@ impl ActivityEndpoint {
         let mut variables = HashMap::new();
         variables.insert("id".to_string(), json!(id));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Activity"].clone();
         let activity: Activity = serde_json::from_value(data)?;
         Ok(activity)
@@ -385,7 +386,7 @@ impl ActivityEndpoint {
         variables.insert("page".to_string(), json!(page));
         variables.insert("perPage".to_string(), json!(per_page));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["activityReplies"].clone();
         let replies: Vec<ActivityReply> = serde_json::from_value(data)?;
         Ok(replies)
@@ -419,7 +420,7 @@ impl ActivityEndpoint {
         let mut variables = HashMap::new();
         variables.insert("text".to_string(), json!(text));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["SaveTextActivity"].clone();
         let activity: TextActivity = serde_json::from_value(data)?;
         Ok(activity)
@@ -436,7 +437,7 @@ impl ActivityEndpoint {
         variables.insert("activityId".to_string(), json!(activity_id));
         variables.insert("text".to_string(), json!(text));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["SaveActivityReply"].clone();
         let reply: ActivityReply = serde_json::from_value(data)?;
         Ok(reply)
@@ -449,7 +450,7 @@ impl ActivityEndpoint {
         variables.insert("id".to_string(), json!(id));
         variables.insert("type".to_string(), json!("ACTIVITY"));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["ToggleLikeV2"].clone();
         let activity: Activity = serde_json::from_value(data)?;
         Ok(activity)
@@ -473,7 +474,7 @@ impl ActivityEndpoint {
         variables.insert("id".to_string(), json!(id));
         variables.insert("type".to_string(), json!("ACTIVITY_REPLY"));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["ToggleLikeV2"].clone();
         let reply: ActivityReply = serde_json::from_value(data)?;
         Ok(reply)
@@ -491,7 +492,7 @@ impl ActivityEndpoint {
         let mut variables = HashMap::new();
         variables.insert("id".to_string(), json!(id));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let deleted = response["data"]["DeleteActivity"]["deleted"]
             .as_bool()
             .unwrap_or(false);

@@ -24,10 +24,10 @@ impl AniListClient {
         }
     }
 
-    pub fn with_token(token: String) -> Self {
+    pub fn with_token(token: &str) -> Self {
         Self {
             client: Client::new(),
-            token: Some(token),
+            token: Some(token.to_string()),
         }
     }
 
@@ -79,8 +79,8 @@ impl AniListClient {
         NotificationEndpoint::new(self.clone())
     }
 
-    pub fn set_token(&mut self, token: String) {
-        self.token = Some(token);
+    pub fn set_token(&mut self, token: &str) {
+        self.token = Some(token.to_string());
     }
 
     pub fn clear_token(&mut self) {
@@ -94,13 +94,13 @@ impl AniListClient {
     pub(crate) async fn query(
         &self,
         query: &str,
-        variables: Option<HashMap<String, Value>>,
+        variables: Option<&HashMap<String, Value>>,
     ) -> Result<Value, AniListError> {
         let mut body = HashMap::new();
         body.insert("query", Value::String(query.to_string()));
 
         if let Some(vars) = variables {
-            body.insert("variables", Value::Object(vars.into_iter().collect()));
+            body.insert("variables", Value::Object(vars.clone().into_iter().collect()));
         }
 
         let mut request = self

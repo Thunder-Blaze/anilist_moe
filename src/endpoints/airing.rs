@@ -1,6 +1,6 @@
 use crate::client::AniListClient;
 use crate::error::AniListError;
-use crate::models::social::AiringSchedule;
+use crate::objects::airing::AiringSchedule;
 use serde_json::json;
 use std::collections::HashMap;
 
@@ -62,7 +62,7 @@ impl AiringEndpoint {
         variables.insert("airingAtGreater".to_string(), json!(current_timestamp));
         variables.insert("sort".to_string(), json!(["TIME"]));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["airingSchedules"].clone();
         let schedules: Vec<AiringSchedule> = serde_json::from_value(data)?;
         Ok(schedules)
@@ -121,7 +121,7 @@ impl AiringEndpoint {
         variables.insert("airingAtLesser".to_string(), json!(end_of_day));
         variables.insert("sort".to_string(), json!(["TIME"]));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["airingSchedules"].clone();
         let schedules: Vec<AiringSchedule> = serde_json::from_value(data)?;
         Ok(schedules)
@@ -176,7 +176,7 @@ impl AiringEndpoint {
         variables.insert("airingAtLesser".to_string(), json!(current_timestamp));
         variables.insert("sort".to_string(), json!(["TIME_DESC"]));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["airingSchedules"].clone();
         let schedules: Vec<AiringSchedule> = serde_json::from_value(data)?;
         Ok(schedules)
@@ -227,7 +227,7 @@ impl AiringEndpoint {
         variables.insert("perPage".to_string(), json!(per_page));
         variables.insert("sort".to_string(), json!(["TIME"]));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["airingSchedules"].clone();
         let schedules: Vec<AiringSchedule> = serde_json::from_value(data)?;
         Ok(schedules)
@@ -268,7 +268,7 @@ impl AiringEndpoint {
         let mut variables = HashMap::new();
         variables.insert("id".to_string(), json!(id));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["AiringSchedule"].clone();
         let schedule: AiringSchedule = serde_json::from_value(data)?;
         Ok(schedule)
@@ -321,7 +321,7 @@ impl AiringEndpoint {
         variables.insert("airingAtLesser".to_string(), json!(end_timestamp));
         variables.insert("sort".to_string(), json!(["TIME"]));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let data = response["data"]["Page"]["airingSchedules"].clone();
         let schedules: Vec<AiringSchedule> = serde_json::from_value(data)?;
         Ok(schedules)
@@ -360,7 +360,7 @@ impl AiringEndpoint {
         variables.insert("mediaId".to_string(), json!(media_id));
         variables.insert("airingAtGreater".to_string(), json!(current_timestamp));
 
-        let response = self.client.query(query, Some(variables)).await?;
+        let response = self.client.query(query, Some(&variables)).await?;
         let schedules_array = response["data"]["Page"]["airingSchedules"].as_array();
 
         if let Some(schedules) = schedules_array {
