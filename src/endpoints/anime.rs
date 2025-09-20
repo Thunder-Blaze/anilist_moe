@@ -1,5 +1,5 @@
 //! # Anime Endpoints
-//! 
+//!
 //! This module provides access to all anime-related functionality in the AniList API.
 //! It includes methods for searching, browsing, and retrieving detailed information
 //! about anime series and movies.
@@ -12,27 +12,27 @@ use serde_json::json;
 use std::collections::HashMap;
 
 /// Endpoint for anime-related API operations.
-/// 
+///
 /// This struct provides methods to interact with anime data on AniList, including
 /// searching, browsing popular/trending content, filtering by season, and retrieving
 /// detailed information about specific anime.
-/// 
+///
 /// All anime endpoints are publicly accessible and do not require authentication.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust
 /// use anilist_moe::AniListClient;
-/// 
+///
 /// let client = AniListClient::new();
 /// let anime_endpoint = client.anime();
-/// 
+///
 /// // Search for anime
 /// let results = anime_endpoint.search("Attack on Titan", 1, 5).await?;
-/// 
+///
 /// // Get trending anime
 /// let trending = anime_endpoint.get_trending(1, 10).await?;
-/// 
+///
 /// // Get anime by specific ID
 /// let anime = anime_endpoint.get_by_id(16498).await?;
 /// ```
@@ -42,64 +42,64 @@ pub struct AnimeEndpoint {
 
 impl AnimeEndpoint {
     /// Creates a new anime endpoint instance.
-    /// 
+    ///
     /// This method is typically called internally by [`AniListClient::anime()`]
     /// and should not be used directly.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `client` - The AniList client instance to use for API requests
     pub(crate) fn new(client: AniListClient) -> Self {
         Self { client }
     }
 
     /// Retrieves popular anime with pagination support.
-    /// 
+    ///
     /// Returns a list of anime sorted by popularity in descending order. Popularity
     /// is determined by AniList's algorithm based on user engagement, favorites,
     /// and other metrics.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `page` - The page number to retrieve (1-based indexing). Must be positive.
     /// * `per_page` - Number of anime to return per page (1-50). Higher values may impact performance.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Returns a vector of [`Anime`] objects containing comprehensive anime information
     /// including titles, descriptions, ratings, and metadata.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// This method can return:
     /// - [`AniListError::BadRequest`] if parameters are invalid (e.g., negative page number)
     /// - [`AniListError::RateLimit`] if rate limits are exceeded
     /// - [`AniListError::Network`] for connection issues
     /// - [`AniListError::Json`] if response parsing fails
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use anilist_moe::AniListClient;
-    /// 
+    ///
     /// let client = AniListClient::new();
-    /// 
+    ///
     /// // Get the top 10 most popular anime
     /// let popular_anime = client.anime().get_popular(1, 10).await?;
     /// for anime in popular_anime {
-    ///     println!("#{} - {} (Score: {})", 
+    ///     println!("#{} - {} (Score: {})",
     ///         anime.id,
     ///         anime.title.romaji,
     ///         anime.average_score.unwrap_or(0)
     ///     );
     /// }
-    /// 
+    ///
     /// // Get the next page of popular anime
     /// let more_popular = client.anime().get_popular(2, 10).await?;
     /// ```
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// The popularity ranking is updated regularly by AniList and may change over time.
     /// Results are consistent within short time periods but may vary across longer periods.
     pub async fn get_popular(&self, page: i32, per_page: i32) -> Result<Vec<Anime>, AniListError> {
@@ -116,48 +116,48 @@ impl AnimeEndpoint {
     }
 
     /// Retrieves currently trending anime with pagination support.
-    /// 
+    ///
     /// Returns a list of anime that are currently trending on AniList. Trending
     /// is determined by current user activity, recent additions to lists, ratings,
     /// and other real-time engagement metrics.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `page` - The page number to retrieve (1-based indexing). Must be positive.
     /// * `per_page` - Number of anime to return per page (1-50). Higher values may impact performance.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Returns a vector of [`Anime`] objects sorted by current trending score,
     /// with the most trending anime first.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// This method can return:
     /// - [`AniListError::BadRequest`] if parameters are invalid
     /// - [`AniListError::RateLimit`] if rate limits are exceeded
     /// - [`AniListError::Network`] for connection issues
     /// - [`AniListError::Json`] if response parsing fails
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use anilist_moe::AniListClient;
-    /// 
+    ///
     /// let client = AniListClient::new();
-    /// 
+    ///
     /// // Get currently trending anime
     /// let trending = client.anime().get_trending(1, 10).await?;
     /// for anime in trending {
-    ///     println!("Trending: {} (Popularity: {})", 
+    ///     println!("Trending: {} (Popularity: {})",
     ///         anime.title.romaji,
     ///         anime.popularity.unwrap_or(0)
     ///     );
     /// }
     /// ```
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// Trending data is updated in real-time and can change frequently throughout
     /// the day based on user activity and engagement patterns.
     pub async fn get_trending(&self, page: i32, per_page: i32) -> Result<Vec<Anime>, AniListError> {
@@ -247,6 +247,7 @@ impl AnimeEndpoint {
                     episodes
                     duration
                     genres
+                    synonyms
                     averageScore
                     meanScore
                     popularity
@@ -298,60 +299,60 @@ impl AnimeEndpoint {
     }
 
     /// Searches for anime by title with pagination support.
-    /// 
+    ///
     /// Performs a fuzzy search across anime titles in multiple languages (romaji, english, native)
-    /// and returns matching results sorted by relevance. The search is case-insensitive and 
+    /// and returns matching results sorted by relevance. The search is case-insensitive and
     /// supports partial matches.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `search` - The search query string. Can be partial titles, alternative titles, or keywords.
     ///   Supports searches in romaji, English, and native languages.
     /// * `page` - The page number to retrieve (1-based indexing). Must be positive.
     /// * `per_page` - Number of results to return per page (1-50). Higher values may impact performance.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Returns a vector of [`Anime`] objects that match the search criteria,
     /// sorted by relevance to the search query.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// This method can return:
     /// - [`AniListError::BadRequest`] if parameters are invalid
     /// - [`AniListError::RateLimit`] if rate limits are exceeded  
     /// - [`AniListError::Network`] for connection issues
     /// - [`AniListError::Json`] if response parsing fails
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use anilist_moe::AniListClient;
-    /// 
+    ///
     /// let client = AniListClient::new();
-    /// 
+    ///
     /// // Search for anime with "attack" in the title
     /// let results = client.anime().search("attack", 1, 10).await?;
     /// for anime in results {
     ///     println!("Found: {} (ID: {})", anime.title.romaji, anime.id);
     /// }
-    /// 
+    ///
     /// // Search for specific anime
     /// let specific = client.anime().search("Attack on Titan", 1, 5).await?;
-    /// 
+    ///
     /// // Search in different languages
     /// let japanese = client.anime().search("進撃の巨人", 1, 5).await?;
     /// ```
-    /// 
+    ///
     /// # Search Tips
-    /// 
+    ///
     /// - Use specific keywords for better results
     /// - Try alternative titles if initial search doesn't yield expected results
     /// - Search supports both romaji and native script titles
     /// - Partial matches are supported (e.g., "attack" will match "Attack on Titan")
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// Search results are ranked by AniList's relevance algorithm, which considers
     /// title similarity, popularity, and other factors.
     pub async fn search(
