@@ -1,6 +1,9 @@
-use crate::endpoints::MediaEndpoint;
-use crate::endpoints::staff::StaffEndpoint;
-use crate::endpoints::user::UserEndpoint;
+use crate::endpoints::{
+    MediaEndpoint,
+    StaffEndpoint,
+    UserEndpoint,
+    AiringEndpoint,
+};
 use crate::errors::AniListError;
 use reqwest::Client;
 use serde_json::Value;
@@ -69,9 +72,9 @@ impl AniListClient {
     //     RecommendationEndpoint::new(self.clone())
     // }
 
-    // pub fn airing(&self) -> AiringEndpoint {
-    //     AiringEndpoint::new(self.clone())
-    // }
+    pub fn airing(&self) -> AiringEndpoint {
+        AiringEndpoint::new(self.clone())
+    }
 
     // pub fn notification(&self) -> NotificationEndpoint {
     //     NotificationEndpoint::new(self.clone())
