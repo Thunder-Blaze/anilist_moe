@@ -91,73 +91,73 @@ where
 // Implement for common enum types
 impl ToGraphQLValue for MediaType {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self).to_uppercase()))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for MediaFormat {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self).to_uppercase()))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for MediaStatus {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self).to_uppercase()))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for MediaSeason {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self).to_uppercase()))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for MediaSort {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self)))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for MediaSource {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self).to_uppercase()))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for ActivityType {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self).to_uppercase()))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for ActivitySort {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self)))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for UserSort {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self)))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for CharacterSort {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self)))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for StaffSort {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self)))
+        serde_json::to_value(self).ok()
     }
 }
 
 impl ToGraphQLValue for StudioSort {
     fn to_graphql_value(self) -> Option<Value> {
-        Some(Value::String(format!("{:?}", self)))
+        serde_json::to_value(self).ok()
     }
 }
 
@@ -652,9 +652,7 @@ impl QueryBuilder<QueryType> {
         match self.query_type {
             QueryType::SearchUsers => {
                 Self {
-                    variables: self.variables.add_var("sort", sort.map(|s| {
-                        s.into_iter().map(|sort| format!("{:?}", sort)).collect::<Vec<_>>()
-                    })),
+                    variables: self.variables.add_var("sort", sort),
                     ..self
                 }
             },
@@ -681,9 +679,7 @@ impl QueryBuilder<QueryType> {
         match self.query_type {
             QueryType::SearchCharacters => {
                 Self {
-                    variables: self.variables.add_var("sort", sort.map(|s| {
-                        s.into_iter().map(|sort| format!("{:?}", sort)).collect::<Vec<_>>()
-                    })),
+                    variables: self.variables.add_var("sort", sort),
                     ..self
                 }
             },
@@ -698,9 +694,7 @@ impl QueryBuilder<QueryType> {
         match self.query_type {
             QueryType::SearchStaff => {
                 Self {
-                    variables: self.variables.add_var("sort", sort.map(|s| {
-                        s.into_iter().map(|sort| format!("{:?}", sort)).collect::<Vec<_>>()
-                    })),
+                    variables: self.variables.add_var("sort", sort),
                     ..self
                 }
             },
@@ -715,9 +709,7 @@ impl QueryBuilder<QueryType> {
         match self.query_type {
             QueryType::SearchStudios => {
                 Self {
-                    variables: self.variables.add_var("sort", sort.map(|s| {
-                        s.into_iter().map(|sort| format!("{:?}", sort)).collect::<Vec<_>>()
-                    })),
+                    variables: self.variables.add_var("sort", sort),
                     ..self
                 }
             },

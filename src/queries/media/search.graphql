@@ -37,7 +37,7 @@ query MediaSearch(
     $endDate_lesser: FuzzyDateInt
 
     # Pagination & sorting
-    $sort: [MediaSort] = [POPULARITY_DESC]
+    $sort: [MediaSort]
     $page: Int = 1
     $perPage: Int = 20
 
@@ -126,7 +126,6 @@ query MediaSearch(
                 id
                 site
                 thumbnail
-                medium
             }
             updatedAt @include(if: $extended)
             coverImage {
@@ -436,7 +435,6 @@ query MediaSearch(
                             donatorBadge
                             moderatorRoles
                         }
-                        spoilers
                     }
                 }
             }

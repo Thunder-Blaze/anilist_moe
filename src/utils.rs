@@ -3,7 +3,7 @@
 //! This module provides utility functions for handling rate limiting, retries,
 //! and other common operations when working with the AniList API.
 
-use crate::error::AniListError;
+use crate::errors::AniListError;
 use std::time::Duration;
 use tokio::time::sleep;
 

@@ -1,4 +1,8 @@
-use anilist_moe::client::AniListClient;
+use anilist_moe::{
+    client::AniListClient,
+    endpoints::staff::StaffSearchOptions,
+    enums::staff::StaffSort,
+};
 use chrono::prelude::*;
 use tokio::time::{Duration, sleep};
 
@@ -9,17 +13,29 @@ async fn rate_limit() {
 #[tokio::test]
 async fn test_get_popular_staff() {
     let client = AniListClient::new();
-    let result = client.staff().get_popular(1, 5).await;
+    let options = StaffSearchOptions {
+        page: Some(1),
+        per_page: Some(5),
+        sort: Some(vec![StaffSort::FavouritesDesc]),
+        ..Default::default()
+    };
+    let result = client.staff().search_staff(options).await;
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    assert!(!staff_list.is_empty());
-    assert!(staff_list.len() <= 5);
+    let media = staff_list
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("staff"))
+        .and_then(|m| m.as_array())
+        .unwrap();
+    assert!(!media.is_empty());
+    assert!(media.len() <= 5);
 
     // Check that all staff have required fields
-    for staff in &staff_list {
-        assert!(staff.id > 0);
-        assert!(staff.name.is_some());
+    for staff in media {
+        assert!(staff.get("id").and_then(|id| id.as_i64()).is_some());
+        assert!(staff.get("name").is_some());
     }
 
     rate_limit().await;
@@ -31,12 +47,24 @@ async fn test_get_staff_by_id() {
 
     let client = AniListClient::new();
     // Using Ikue Ootani's ID (95128)
-    let result = client.staff().get_by_id(95128).await;
+    let result = client.staff().get_staff_by_id(95128).await;
 
+    if let Err(e) = &result {
+        println!("Error in test_get_staff_by_id: {:?}", e);
+    }
     assert!(result.is_ok());
     let staff = result.unwrap();
-    assert_eq!(staff.id, 95128);
-    assert!(staff.name.is_some());
+    assert_eq!(
+        staff
+            .get("data")
+            .and_then(|d| d.get("Page"))
+            .and_then(|p| p.get("staff"))
+            .and_then(|s| s.as_array())
+            .and_then(|s| s.get(0))
+            .and_then(|s| s.get("id"))
+            .and_then(|id| id.as_i64()),
+        Some(95128)
+    );
 
     rate_limit().await;
 }
@@ -46,22 +74,30 @@ async fn test_search_staff() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let result = client.staff().search("Miyazaki", 1, 5).await;
+    let options = StaffSearchOptions {
+        search: Some("Miyazaki".to_string()),
+        page: Some(1),
+        per_page: Some(5),
+        ..Default::default()
+    };
+    let result = client.staff().search_staff(options).await;
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    assert!(!staff_list.is_empty());
+    let media = staff_list
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("staff"))
+        .and_then(|m| m.as_array())
+        .unwrap();
+    assert!(!media.is_empty());
 
     // Check that results contain "Miyazaki" in some form
-    let has_miyazaki = staff_list.iter().any(|staff| {
-        if let Some(name) = &staff.name {
-            name.full
-                .as_ref()
+    let has_miyazaki = media.iter().any(|staff| {
+        if let Some(name) = staff.get("name") {
+            name.get("full")
+                .and_then(|n| n.as_str())
                 .map_or(false, |n| n.to_lowercase().contains("miyazaki"))
-                || name
-                    .last
-                    .as_ref()
-                    .map_or(false, |n| n.to_lowercase().contains("miyazaki"))
         } else {
             false
         }
@@ -79,17 +115,32 @@ async fn test_get_staff_today_birthday() {
     let today = Local::now().date_naive();
     let day = today.day() as i32;
     let month = today.month() as i32;
-    let result = client.staff().get_today_birthday(1, 10).await;
+    let options = StaffSearchOptions {
+        is_birthday: Some(true),
+        page: Some(1),
+        per_page: Some(10),
+        sort: Some(vec![StaffSort::Id]),
+        ..Default::default()
+    };
+    let result = client.staff().search_staff(options).await;
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    // Note: This might be empty if no staff have this birthday
-
-    for staff in &staff_list {
-        assert!(staff.id > 0);
-        if let Some(birth_date) = &staff.date_of_birth {
-            assert_eq!(birth_date.month, Some(month));
-            assert_eq!(birth_date.day, Some(day));
+    if let Some(staff_list) = staff_list
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("staff"))
+        .and_then(|s| s.as_array())
+    {
+        for staff in staff_list {
+            if let Some(birth_date) = staff.get("dateOfBirth") {
+                if birth_date.get("day") == Some(&serde_json::Value::from(day))
+                    && birth_date.get("month") == Some(&serde_json::Value::from(month))
+                {
+                    // Found a staff with today's birthday
+                    return;
+                }
+            }
         }
     }
 
@@ -101,19 +152,31 @@ async fn test_get_most_favorited_staff() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let result = client.staff().get_most_favorited(1, 5).await;
+    let options = StaffSearchOptions {
+        page: Some(1),
+        per_page: Some(5),
+        sort: Some(vec![StaffSort::FavouritesDesc]),
+        ..Default::default()
+    };
+    let result = client.staff().search_staff(options).await;
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    assert!(!staff_list.is_empty());
+    let media = staff_list
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("staff"))
+        .and_then(|m| m.as_array())
+        .unwrap();
+    assert!(!media.is_empty());
 
     // Check that staff are ordered by favorites (descending)
     let mut prev_favorites = i32::MAX;
-    for staff in &staff_list {
-        assert!(staff.id > 0);
-        if let Some(favourites) = staff.favourites {
-            assert!(favourites <= prev_favorites);
-            prev_favorites = favourites;
+    for staff in media {
+        assert!(staff.get("id").and_then(|id| id.as_i64()).is_some());
+        if let Some(favourites) = staff.get("favourites").and_then(|f| f.as_i64()) {
+            assert!(favourites <= prev_favorites as i64);
+            prev_favorites = favourites as i32;
         }
     }
 

@@ -1,9 +1,38 @@
 use crate::client::AniListClient;
-use crate::error::AniListError;
+use crate::errors::AniListError;
 use crate::helpers::query_builders::{QueryBuilder, QueryType, MediaSearchQueryBuilder};
 use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct AnimeSearchOptions {
+    pub search_term: Option<String>,
+    pub format: Option<Vec<MediaFormat>>,
+    pub status: Option<MediaStatus>,
+    pub season: Option<MediaSeason>,
+    pub season_year: Option<i32>,
+    pub year: Option<String>,
+    pub genre: Option<Vec<String>>,
+    pub tag: Option<Vec<String>>,
+    pub sort: Option<Vec<MediaSort>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+}
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct MangaSearchOptions {
+    pub search_term: Option<String>,
+    pub format: Option<Vec<MediaFormat>>,
+    pub status: Option<MediaStatus>,
+    pub year: Option<String>,
+    pub genre: Option<Vec<String>>,
+    pub tag: Option<Vec<String>>,
+    pub sort: Option<Vec<MediaSort>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+}
 
 pub struct MediaEndpoint {
     client: AniListClient,
@@ -158,33 +187,20 @@ impl MediaEndpoint {
     }
 
     /// Search anime with all search options (media type set to Anime internally)
-    pub async fn search_anime(
-        &self,
-        search_term: Option<String>,
-        format: Option<Vec<MediaFormat>>,
-        status: Option<MediaStatus>,
-        season: Option<MediaSeason>,
-        season_year: Option<i32>,
-        year: Option<String>,
-        genre: Option<Vec<String>>,
-        tag: Option<Vec<String>>,
-        sort: Option<Vec<MediaSort>>,
-        page: Option<i32>,
-        per_page: Option<i32>
-    ) -> Result<Value, AniListError> {
+    pub async fn search_anime(&self, options: AnimeSearchOptions) -> Result<Value, AniListError> {
         let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .search(search_term)
+            .search(options.search_term)
             .media_type(Some(MediaType::Anime)) // Set internally
-            .format(format)
-            .status(status)
-            .season(season)
-            .season_year(season_year)
-            .year(year)
-            .genre(genre)
-            .tag(tag)
-            .sort_media(sort)
-            .page(page)
-            .per_page(per_page)
+            .format(options.format)
+            .status(options.status)
+            .season(options.season)
+            .season_year(options.season_year)
+            .year(options.year)
+            .genre(options.genre)
+            .tag(options.tag)
+            .sort_media(options.sort)
+            .page(options.page)
+            .per_page(options.per_page)
             .build();
 
         let variables_map = self.value_to_hashmap(variables);
@@ -265,29 +281,18 @@ impl MediaEndpoint {
     }
 
     /// Search manga with all search options (media type set to Manga internally)
-    pub async fn search_manga(
-        &self,
-        search_term: Option<String>,
-        format: Option<Vec<MediaFormat>>,
-        status: Option<MediaStatus>,
-        year: Option<String>,
-        genre: Option<Vec<String>>,
-        tag: Option<Vec<String>>,
-        sort: Option<Vec<MediaSort>>,
-        page: Option<i32>,
-        per_page: Option<i32>
-    ) -> Result<Value, AniListError> {
+    pub async fn search_manga(&self, options: MangaSearchOptions) -> Result<Value, AniListError> {
         let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .search(search_term)
+            .search(options.search_term)
             .media_type(Some(MediaType::Manga)) // Set internally
-            .format(format)
-            .status(status)
-            .year(year)
-            .genre(genre)
-            .tag(tag)
-            .sort_media(sort)
-            .page(page)
-            .per_page(per_page)
+            .format(options.format)
+            .status(options.status)
+            .year(options.year)
+            .genre(options.genre)
+            .tag(options.tag)
+            .sort_media(options.sort)
+            .page(options.page)
+            .per_page(options.per_page)
             .build();
 
         let variables_map = self.value_to_hashmap(variables);

@@ -1,128 +1,116 @@
-query SearchStaff(
-    $id: Int
-    $search: String
-    $sort: [StaffSort] = [ID]
-    $page: Int = 1
-    $perPage: Int = 20
-    $isBirthday: Boolean
+query (
+  $page: Int
+  $id: Int
+  $perPage: Int
+  $search: String
+  $sort: [StaffSort]
+  $isBirthday: Boolean
 ) {
-    Page(page: $page, perPage: $perPage) {
-        pageInfo {
-            total
-            currentPage
-            lastPage
-            hasNextPage
-            perPage
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      total
+      perPage
+      currentPage
+      lastPage
+      hasNextPage
+    }
+    staff(id: $id, search: $search, sort: $sort, isBirthday: $isBirthday) {
+      id
+      name {
+        first
+        middle
+        last
+        full
+        native
+        userPreferred
+      }
+      languageV2
+      image {
+        large
+        medium
+      }
+      description
+      primaryOccupations
+      gender
+      dateOfBirth {
+        year
+        month
+        day
+      }
+      dateOfDeath {
+        year
+        month
+        day
+      }
+      age
+      yearsActive
+      homeTown
+      bloodType
+      isFavourite
+      isFavouriteBlocked
+      siteUrl
+      staffMedia(sort: [START_DATE_DESC], perPage: 5) {
+        edges {
+          id
+          staffRole
+          node {
+            id
+            title {
+              romaji
+              english
+              native
+              userPreferred
+            }
+            type
+            format
+            bannerImage
+          }
         }
-        staff(
-            id: $id
-            search: $search
-            sort: $sort
-            isBirthday: $isBirthday
-        ) {
+      }
+      characters(sort: [ROLE, RELEVANCE, ID], perPage: 5) {
+        edges {
+          id
+          role
+          node {
             id
             name {
-                first
-                middle
-                last
-                full
-                native
-                alternative
+              full
             }
-            languageV2
             image {
-                large
-                medium
+              large
             }
-            description(asHtml: false)
-            primaryOccupations
-            gender
-            dateOfBirth {
-                year
-                month
-                day
-            }
-            dateOfDeath {
-                year
-                month
-                day
-            }
-            age
-            yearsActive
-            homeTown
-            bloodType
-            isFavourite
-            isFavouriteBlocked
-            siteUrl
-            staffMedia(page: 1, perPage: 25) {
-                edges {
-                    id
-                    role
-                    node {
-                        id
-                        title {
-                            romaji
-                            english
-                            native
-                            userPreferred
-                        }
-                        type
-                        format
-                        status
-                        startDate {
-                            year
-                            month
-                            day
-                        }
-                        coverImage {
-                            large
-                            medium
-                        }
-                    }
-                }
-            }
-            characters(page: 1, perPage: 25) {
-                edges {
-                    id
-                    role
-                    media {
-                        id
-                        title {
-                            romaji
-                            english
-                            native
-                            userPreferred
-                        }
-                        type
-                        format
-                        coverImage {
-                            medium
-                        }
-                    }
-                    node {
-                        id
-                        name {
-                            first
-                            middle
-                            last
-                            full
-                            native
-                        }
-                        image {
-                            large
-                            medium
-                        }
-                    }
-                }
-            }
-            favourites
-            modNotes
-            submitter {
-                id
-                name
-            }
-            submissionStatus
-            submissionNotes
+          }
         }
+      }
+      characterMedia(sort: [START_DATE_DESC], perPage: 5) {
+        edges {
+          id
+          node {
+            id
+            title {
+              romaji
+              english
+            }
+            type
+            format
+          }
+        }
+      }
+      staff {
+        id
+        name {
+          full
+        }
+      }
+      submitter {
+        id
+        name
+      }
+      submissionStatus
+      submissionNotes
+      favourites
+      modNotes
     }
+  }
 }
+

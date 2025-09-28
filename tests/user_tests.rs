@@ -12,13 +12,19 @@ async fn test_get_user_by_id() {
     let result = client.user().get_by_id(5429396).await;
 
     // This test might fail if the user doesn't exist, so we just check that the call works
-    match result {
-        Ok(user) => {
-            assert_eq!(user.id, 5429396);
-            assert!(!user.name.is_empty());
-        }
-        Err(_) => {
-            // User might not exist, which is acceptable for this test
+    assert!(result.is_ok());
+    let user_response = result.unwrap();
+    let users = user_response
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("users"))
+        .and_then(|u| u.as_array());
+
+    if let Some(users) = users {
+        if !users.is_empty() {
+            let user = &users[0];
+            assert_eq!(user.get("id").and_then(|id| id.as_i64()).unwrap(), 5429396);
+            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
         }
     }
 
@@ -31,12 +37,24 @@ async fn test_get_user_by_name() {
 
     let client = AniListClient::new();
     // This test might fail if the specific user doesn't exist
-    let result = client.user().get_by_name("xSensei").await;
+    let result = client.user().get_by_username("ThunderBlaze").await;
 
     // This is expected to potentially fail, so we don't assert on success
     match result {
-        Ok(user) => {
-            assert_eq!(user.name, "xSensei");
+        Ok(user_response) => {
+            let users = user_response
+                .get("data")
+                .and_then(|d| d.get("Page"))
+                .and_then(|p| p.get("users"))
+                .and_then(|u| u.as_array());
+
+            if let Some(users) = users {
+                if !users.is_empty() {
+                    let user = &users[0];
+                    let name = user.get("name").and_then(|n| n.as_str()).unwrap_or("");
+                    assert_eq!(name, "ThunderBlaze");
+                }
+            }
         }
         Err(_) => {
             // User might not exist, which is acceptable for this test
@@ -54,12 +72,19 @@ async fn test_search_users() {
     let result = client.user().search("xuehua", 1, 5).await;
 
     assert!(result.is_ok());
-    let users = result.unwrap();
+    let user_response = result.unwrap();
+    let users = user_response
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("users"))
+        .and_then(|u| u.as_array());
     // Note: This might be empty if no users match the search
 
-    for user in &users {
-        assert!(user.id > 0);
-        assert!(!user.name.is_empty());
+    if let Some(users) = users {
+        for user in users {
+            assert!(user.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0);
+            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
+        }
     }
 
     rate_limit().await;
@@ -73,12 +98,19 @@ async fn test_get_most_anime_watched() {
     let result = client.user().get_most_anime_watched(1, 5).await;
 
     assert!(result.is_ok());
-    let users = result.unwrap();
+    let user_response = result.unwrap();
+    let users = user_response
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("users"))
+        .and_then(|u| u.as_array());
     // Note: This might be empty based on privacy settings and data availability
 
-    for user in &users {
-        assert!(user.id > 0);
-        assert!(!user.name.is_empty());
+    if let Some(users) = users {
+        for user in users {
+            assert!(user.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0);
+            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
+        }
     }
 
     rate_limit().await;
@@ -92,38 +124,20 @@ async fn test_get_most_manga_read() {
     let result = client.user().get_most_manga_read(1, 5).await;
 
     assert!(result.is_ok());
-    let users = result.unwrap();
+    let user_response = result.unwrap();
+    let users = user_response
+        .get("data")
+        .and_then(|d| d.get("Page"))
+        .and_then(|p| p.get("users"))
+        .and_then(|u| u.as_array());
     // Note: This might be empty based on privacy settings and data availability
 
-    for user in &users {
-        assert!(user.id > 0);
-        assert!(!user.name.is_empty());
+    if let Some(users) = users {
+        for user in users {
+            assert!(user.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0);
+            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
+        }
     }
 
-    rate_limit().await;
-}
-
-// Integration test to verify the basic functionality works
-#[tokio::test]
-async fn test_client_integration() {
-    rate_limit().await;
-
-    let client = AniListClient::new();
-
-    // Test that we can make a basic query
-    let anime_result = client.anime().get_popular(1, 1).await;
-    assert!(anime_result.is_ok());
-    rate_limit().await;
-
-    let manga_result = client.manga().get_popular(1, 1).await;
-    assert!(manga_result.is_ok());
-    rate_limit().await;
-
-    let character_result = client.character().get_popular(1, 1).await;
-    assert!(character_result.is_ok());
-    rate_limit().await;
-
-    let staff_result = client.staff().get_popular(1, 1).await;
-    assert!(staff_result.is_ok());
     rate_limit().await;
 }

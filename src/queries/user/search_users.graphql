@@ -2,7 +2,7 @@ query SearchUsers(
     $id: Int
     $name: String
     $search: String
-    $sort: [UserSort] = [ID]
+    $sort: [UserSort]
     $page: Int = 1
     $perPage: Int = 20
 ) {

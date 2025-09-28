@@ -1,5 +1,7 @@
 use crate::endpoints::MediaEndpoint;
-use crate::error::AniListError;
+use crate::endpoints::staff::StaffEndpoint;
+use crate::endpoints::user::UserEndpoint;
+use crate::errors::AniListError;
 use reqwest::Client;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -39,13 +41,13 @@ impl AniListClient {
     //     CharacterEndpoint::new(self.clone())
     // }
 
-    // pub fn staff(&self) -> StaffEndpoint {
-    //     StaffEndpoint::new(self.clone())
-    // }
+    pub fn staff(&self) -> StaffEndpoint {
+        StaffEndpoint::new(self.clone())
+    }
 
-    // pub fn user(&self) -> UserEndpoint {
-    //     UserEndpoint::new(self.clone())
-    // }
+    pub fn user(&self) -> UserEndpoint {
+        UserEndpoint::new(self.clone())
+    }
 
     // pub fn studio(&self) -> StudioEndpoint {
     //     StudioEndpoint::new(self.clone())

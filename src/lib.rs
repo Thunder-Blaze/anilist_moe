@@ -137,7 +137,7 @@
 pub mod client;
 pub mod endpoints;
 pub mod enums;
-pub mod error;
+pub mod errors;
 pub mod helpers;
 pub mod objects;
 pub mod queries;
@@ -145,5 +145,5 @@ pub mod unions;
 pub mod utils;
 
 pub use client::AniListClient;
-pub use error::AniListError;
+pub use errors::AniListError;
 pub use helpers::*;
