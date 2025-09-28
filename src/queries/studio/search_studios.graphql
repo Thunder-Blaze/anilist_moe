@@ -4,6 +4,8 @@ query SearchStudios(
     $sort: [StudioSort] = [ID]
     $page: Int = 1
     $perPage: Int = 20
+    $mediaPage: Int = 1
+    $mediaPerPage: Int = 25
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -23,7 +25,7 @@ query SearchStudios(
             isAnimationStudio
             isFavourite
             siteUrl
-            media(page: 1, perPage: 25) {
+            media(page: $mediaPage, perPage: $mediaPerPage) {
                 edges {
                     id
                     isMain

@@ -39,9 +39,9 @@ query SearchThreads(
             repliedAt
             createdAt
             updatedAt
-            locked
-            sticky
-            subscribed
+            isLocked
+            isSticky
+            isSubscribed
             likeCount
             isLiked
             siteUrl

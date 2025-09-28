@@ -1,0 +1,109 @@
+query SearchRecommendations(
+    $id: Int
+    $mediaId: Int
+    $mediaRecommendationId: Int
+    $userId: Int
+    $rating: Int
+    $rating_greater: Int
+    $rating_lesser: Int
+    $onList: Boolean
+    $sort: [RecommendationSort]
+    $page: Int = 1
+    $perPage: Int = 20
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        recommendations(
+            id: $id
+            mediaId: $mediaId
+            mediaRecommendationId: $mediaRecommendationId
+            userId: $userId
+            rating: $rating
+            rating_greater: $rating_greater
+            rating_lesser: $rating_lesser
+            onList: $onList
+            sort: $sort
+        ) {
+            id
+            rating
+            userRating
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                status
+                coverImage {
+                    large
+                    medium
+                }
+                bannerImage
+                startDate {
+                    year
+                    month
+                    day
+                }
+                endDate {
+                    year
+                    month
+                    day
+                }
+                averageScore
+                popularity
+                favourites
+            }
+            mediaRecommendation {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                status
+                coverImage {
+                    large
+                    medium
+                }
+                bannerImage
+                startDate {
+                    year
+                    month
+                    day
+                }
+                endDate {
+                    year
+                    month
+                    day
+                }
+                averageScore
+                popularity
+                favourites
+            }
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+        }
+    }
+}

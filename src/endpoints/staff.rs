@@ -19,6 +19,19 @@ pub struct StaffSearchOptions {
     pub sort: Option<Vec<StaffSort>>,
     #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
     pub is_birthday: Option<bool>,
+    // Sub-pagination variables
+    #[serde(rename = "staffMediaPage", skip_serializing_if = "Option::is_none")]
+    pub staff_media_page: Option<i32>,
+    #[serde(rename = "staffMediaPerPage", skip_serializing_if = "Option::is_none")]
+    pub staff_media_per_page: Option<i32>,
+    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    pub characters_page: Option<i32>,
+    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    pub characters_per_page: Option<i32>,
+    #[serde(rename = "characterMediaPage", skip_serializing_if = "Option::is_none")]
+    pub character_media_page: Option<i32>,
+    #[serde(rename = "characterMediaPerPage", skip_serializing_if = "Option::is_none")]
+    pub character_media_per_page: Option<i32>,
 }
 
 pub struct StaffEndpoint(pub(crate) AniListClient);

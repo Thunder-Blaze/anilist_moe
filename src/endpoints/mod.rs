@@ -1,15 +1,23 @@
 pub mod activity;
 pub mod airing;
+pub mod character;
 pub mod forum;
 pub mod media;
 pub mod notification;
+pub mod recommendation;
+pub mod review;
 pub mod staff;
+pub mod studio;
 pub mod user;
 
 pub use activity::ActivityEndpoint;
 pub use airing::AiringEndpoint;
+pub use character::CharacterEndpoint;
 pub use forum::ForumEndpoint;
 pub use media::MediaEndpoint;
-pub use staff::StaffEndpoint;
-pub use user::UserEndpoint;
 pub use notification::NotificationEndpoint;
+pub use recommendation::RecommendationEndpoint;
+pub use review::ReviewEndpoint;
+pub use staff::StaffEndpoint;
+pub use studio::StudioEndpoint;
+pub use user::UserEndpoint;

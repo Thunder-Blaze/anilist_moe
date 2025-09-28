@@ -5,6 +5,12 @@ query (
   $search: String
   $sort: [StaffSort]
   $isBirthday: Boolean
+  $staffMediaPage: Int = 1
+  $staffMediaPerPage: Int = 5
+  $charactersPage: Int = 1
+  $charactersPerPage: Int = 5
+  $characterMediaPage: Int = 1
+  $characterMediaPerPage: Int = 5
 ) {
   Page(page: $page, perPage: $perPage) {
     pageInfo {
@@ -49,7 +55,7 @@ query (
       isFavourite
       isFavouriteBlocked
       siteUrl
-      staffMedia(sort: [START_DATE_DESC], perPage: 5) {
+      staffMedia(sort: [START_DATE_DESC], page: $staffMediaPage, perPage: $staffMediaPerPage) {
         edges {
           id
           staffRole
@@ -67,10 +73,10 @@ query (
           }
         }
       }
-      characters(sort: [ROLE, RELEVANCE, ID], perPage: 5) {
+      characters(sort: [ROLE, RELEVANCE, ID], page: $charactersPage, perPage: $charactersPerPage) {
         edges {
           id
-          role
+          characterRole
           node {
             id
             name {
@@ -82,7 +88,7 @@ query (
           }
         }
       }
-      characterMedia(sort: [START_DATE_DESC], perPage: 5) {
+      characterMedia(sort: [START_DATE_DESC], page: $characterMediaPage, perPage: $characterMediaPerPage) {
         edges {
           id
           node {

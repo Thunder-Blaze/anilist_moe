@@ -1,3 +1,4 @@
+
 query SearchCharacters(
     $id: Int
     $search: String
@@ -5,6 +6,8 @@ query SearchCharacters(
     $page: Int = 1
     $perPage: Int = 20
     $isBirthday: Boolean
+    $mediaPage: Int = 1
+    $mediaPerPage: Int = 25
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -46,10 +49,10 @@ query SearchCharacters(
             isFavourite
             isFavouriteBlocked
             siteUrl
-            media(page: 1, perPage: 25) {
+            media(page: $mediaPage, perPage: $mediaPerPage) {
                 edges {
                     id
-                    role
+                    characterRole
                     voiceActors(language: JAPANESE) {
                         id
                         name {

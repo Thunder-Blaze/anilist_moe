@@ -78,19 +78,6 @@ impl AiringEndpoint {
         self.0.query(query, Some(&variables_map)).await
     }
 
-    /// Get next airing episode for media
-    pub async fn get_next_episode(&self, media_id: i32) -> Result<Value, AniListError> {
-        let current_time = chrono::Utc::now().timestamp() as i32;
-        let options = AiringSearchOptions {
-            page: Some(1),
-            per_page: Some(1),
-            media_id: Some(media_id),
-            airing_at_greater: Some(current_time),
-            ..Default::default()
-        };
-        self.search_airing_schedule(options).await
-    }
-
     /// Search airing schedules with custom criteria
     pub async fn search_with_options(&self, options: AiringSearchOptions) -> Result<Value, AniListError> {
         self.search_airing_schedule(options).await

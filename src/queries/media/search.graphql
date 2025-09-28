@@ -41,6 +41,20 @@ query MediaSearch(
     $page: Int = 1
     $perPage: Int = 20
 
+    # Sub-pagination variables
+    $charactersPage: Int = 1
+    $charactersPerPage: Int = 25
+    $staffPage: Int = 1
+    $staffPerPage: Int = 25
+    $airingSchedulePage: Int = 1
+    $airingSchedulePerPage: Int = 25
+    $trendsPage: Int = 1
+    $trendsPerPage: Int = 25
+    $reviewsPage: Int = 1
+    $reviewsPerPage: Int = 10
+    $recommendationsPage: Int = 1
+    $recommendationsPerPage: Int = 10
+
     # Extended data toggle
     $extended: Boolean = false
 ) {
@@ -180,7 +194,7 @@ query MediaSearch(
                     }
                 }
             }
-            characters(page: 1, perPage: 25, sort: [ROLE, RELEVANCE, ID]) @include(if: $extended) {
+            characters(page: $charactersPage, perPage: $charactersPerPage, sort: [ROLE, RELEVANCE, ID]) @include(if: $extended) {
                 edges {
                     id
                     role
@@ -250,7 +264,7 @@ query MediaSearch(
                     }
                 }
             }
-            staff(page: 1, perPage: 25, sort: [RELEVANCE, ID]) @include(if: $extended) {
+            staff(page: $staffPage, perPage: $staffPerPage, sort: [RELEVANCE, ID]) @include(if: $extended) {
                 edges {
                     id
                     role
@@ -325,7 +339,7 @@ query MediaSearch(
                 episode
                 mediaId
             }
-            airingSchedule(page: 1, perPage: 25, notYetAired: true) @include(if: $extended) {
+            airingSchedule(page: $airingSchedulePage, perPage: $airingSchedulePerPage, notYetAired: true) @include(if: $extended) {
                 edges {
                     node {
                         id
@@ -335,7 +349,7 @@ query MediaSearch(
                     }
                 }
             }
-            trends(page: 1, perPage: 25, sort: [DATE_DESC]) @include(if: $extended) {
+            trends(page: $trendsPage, perPage: $trendsPerPage, sort: [DATE_DESC]) @include(if: $extended) {
                 edges {
                     node {
                         date
@@ -407,7 +421,7 @@ query MediaSearch(
                     name
                 }
             }
-            reviews(page: 1, perPage: 10, sort: [RATING_DESC]) @include(if: $extended) {
+            reviews(page: $reviewsPage, perPage: $reviewsPerPage, sort: [RATING_DESC]) @include(if: $extended) {
                 edges {
                     node {
                         id
@@ -438,7 +452,7 @@ query MediaSearch(
                     }
                 }
             }
-            recommendations(page: 1, perPage: 10, sort: [RATING_DESC]) @include(if: $extended) {
+            recommendations(page: $recommendationsPage, perPage: $recommendationsPerPage, sort: [RATING_DESC]) @include(if: $extended) {
                 edges {
                     node {
                         id
