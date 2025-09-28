@@ -1,0 +1,74 @@
+query SearchReviews(
+    $id: Int
+    $mediaId: Int
+    $userId: Int
+    $mediaType: MediaType
+    $sort: [ReviewSort]
+    $page: Int = 1
+    $perPage: Int = 20
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        reviews(
+            id: $id
+            mediaId: $mediaId
+            userId: $userId
+            mediaType: $mediaType
+            sort: $sort
+        ) {
+            id
+            userId
+            mediaId
+            mediaType
+            summary
+            body(asHtml: false)
+            rating
+            ratingAmount
+            score
+            private
+            siteUrl
+            createdAt
+            updatedAt
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                status
+                description(asHtml: false)
+                episodes
+                chapters
+                volumes
+                averageScore
+                coverImage {
+                    large
+                    medium
+                }
+                bannerImage
+                siteUrl
+            }
+        }
+    }
+}

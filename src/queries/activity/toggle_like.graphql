@@ -1,30 +1,96 @@
-mutation ($activityId: Int) {
-    ToggleLikeV2(id: $activityId, type: ACTIVITY) {
+mutation ToggleActivityLike(
+    $id: Int
+    $type: LikeableType
+) {
+    ToggleLikeV2(
+        id: $id
+        type: $type
+    ) {
         ... on ListActivity {
             id
-            isLiked
+            userId
+            type
+            status
+            progress
+            isLocked
+            isSubscribed
             likeCount
+            isLiked
+            isPinned
+            siteUrl
+            createdAt
             user {
                 id
                 name
+                avatar {
+                    large
+                    medium
+                }
+            }
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                coverImage {
+                    medium
+                }
             }
         }
         ... on TextActivity {
             id
-            isLiked
+            userId
+            type
+            text(asHtml: false)
+            isLocked
+            isSubscribed
             likeCount
+            isLiked
+            isPinned
+            siteUrl
+            createdAt
             user {
                 id
                 name
+                avatar {
+                    large
+                    medium
+                }
             }
         }
         ... on MessageActivity {
             id
-            isLiked
+            recipientId
+            messengerId
+            type
+            message(asHtml: false)
+            isLocked
+            isSubscribed
             likeCount
+            isLiked
+            isPrivate
+            siteUrl
+            createdAt
+            recipient {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+            }
             messenger {
                 id
                 name
+                avatar {
+                    large
+                    medium
+                }
             }
         }
     }

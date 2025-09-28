@@ -152,7 +152,7 @@ async fn test_token_validation() {
 
     if let Ok(token) = env::var("ANILIST_TOKEN") {
         if !token.is_empty() && token != "fake_token" {
-            let client = AniListClient::with_token(token);
+            let client = AniListClient::with_token(&token);
 
             // Test that we can make a basic authenticated request
             let result = client.user().get_current_user().await;
@@ -198,7 +198,8 @@ async fn test_token_validation() {
 #[tokio::test]
 async fn test_token_in_headers() {
     // This is more of a unit test to ensure our client structure is correct
-    let _client_with_token = AniListClient::with_token("test_token".to_string());
+    let test_token = "test_token".to_string();
+    let _client_with_token = AniListClient::with_token(&test_token);
     let _client_without_token = AniListClient::new();
 
     // We can't directly test the headers without exposing internal structure,

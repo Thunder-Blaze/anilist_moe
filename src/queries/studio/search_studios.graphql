@@ -1,0 +1,58 @@
+query SearchStudios(
+    $id: Int
+    $search: String
+    $sort: [StudioSort] = [ID]
+    $page: Int = 1
+    $perPage: Int = 20
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        studios(
+            id: $id
+            search: $search
+            sort: $sort
+        ) {
+            id
+            name
+            isAnimationStudio
+            isFavourite
+            siteUrl
+            media(page: 1, perPage: 25) {
+                edges {
+                    id
+                    isMain
+                    node {
+                        id
+                        title {
+                            romaji
+                            english
+                            native
+                            userPreferred
+                        }
+                        type
+                        format
+                        status
+                        startDate {
+                            year
+                            month
+                            day
+                        }
+                        coverImage {
+                            large
+                            medium
+                        }
+                        averageScore
+                        popularity
+                    }
+                }
+            }
+            favourites
+        }
+    }
+}

@@ -1,4 +1,4 @@
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

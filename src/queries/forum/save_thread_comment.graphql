@@ -1,0 +1,64 @@
+mutation SaveThreadComment(
+    $id: Int
+    $threadId: Int!
+    $parentCommentId: Int
+    $comment: String!
+    $locked: Boolean
+) {
+    SaveThreadComment(
+        id: $id
+        threadId: $threadId
+        parentCommentId: $parentCommentId
+        comment: $comment
+        locked: $locked
+    ) {
+        id
+        userId
+        threadId
+        comment(asHtml: false)
+        likeCount
+        isLiked
+        siteUrl
+        createdAt
+        updatedAt
+        thread {
+            id
+            title
+            replyCount
+        }
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+            donatorTier
+            donatorBadge
+            moderatorRoles
+        }
+        likes {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+        childComments {
+            id
+            comment(asHtml: false)
+            likeCount
+            isLiked
+            createdAt
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+            }
+        }
+    }
+}

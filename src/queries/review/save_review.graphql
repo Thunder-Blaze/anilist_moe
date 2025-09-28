@@ -1,0 +1,53 @@
+mutation SaveReview(
+    $id: Int
+    $mediaId: Int!
+    $body: String!
+    $summary: String
+    $score: Int
+    $private: Boolean
+) {
+    SaveReview(
+        id: $id
+        mediaId: $mediaId
+        body: $body
+        summary: $summary
+        score: $score
+        private: $private
+    ) {
+        id
+        userId
+        mediaId
+        mediaType
+        summary
+        body(asHtml: false)
+        rating
+        ratingAmount
+        score
+        private
+        siteUrl
+        createdAt
+        updatedAt
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+        media {
+            id
+            title {
+                romaji
+                english
+                native
+                userPreferred
+            }
+            type
+            format
+            coverImage {
+                medium
+            }
+        }
+    }
+}

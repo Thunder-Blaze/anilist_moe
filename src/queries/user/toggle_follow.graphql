@@ -1,9 +1,33 @@
-mutation ($userId: Int) {
+mutation ToggleFollow($userId: Int!) {
     ToggleFollow(userId: $userId) {
         id
         name
+        about(asHtml: false)
+        avatar {
+            large
+            medium
+        }
+        bannerImage
         isFollowing
         isFollower
         isBlocked
+        bans
+        options {
+            titleLanguage
+            displayAdultContent
+            airingNotifications
+            profileColor
+        }
+        mediaListOptions {
+            scoreFormat
+            rowOrder
+        }
+        unreadNotificationCount
+        siteUrl
+        donatorTier
+        donatorBadge
+        moderatorRoles
+        createdAt
+        updatedAt
     }
 }

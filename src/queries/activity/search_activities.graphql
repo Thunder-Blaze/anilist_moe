@@ -1,0 +1,245 @@
+query SearchActivities(
+    $id: Int
+    $userId: Int
+    $messengerId: Int
+    $mediaId: Int
+    $type: ActivityType
+    $isFollowing: Boolean
+    $hasReplies: Boolean
+    $hasRepliesOrTypeText: Boolean
+    $createdAt_greater: Int
+    $createdAt_lesser: Int
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    $userId_not: Int
+    $userId_in: [Int]
+    $userId_not_in: [Int]
+    $messengerId_not: Int
+    $messengerId_in: [Int]
+    $messengerId_not_in: [Int]
+    $mediaId_not: Int
+    $mediaId_in: [Int]
+    $mediaId_not_in: [Int]
+    $type_not: ActivityType
+    $type_in: [ActivityType]
+    $type_not_in: [ActivityType]
+    $sort: [ActivitySort]
+    $page: Int = 1
+    $perPage: Int = 20
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        activities(
+            id: $id
+            userId: $userId
+            messengerId: $messengerId
+            mediaId: $mediaId
+            type: $type
+            isFollowing: $isFollowing
+            hasReplies: $hasReplies
+            hasRepliesOrTypeText: $hasRepliesOrTypeText
+            createdAt_greater: $createdAt_greater
+            createdAt_lesser: $createdAt_lesser
+            id_not: $id_not
+            id_in: $id_in
+            id_not_in: $id_not_in
+            userId_not: $userId_not
+            userId_in: $userId_in
+            userId_not_in: $userId_not_in
+            messengerId_not: $messengerId_not
+            messengerId_in: $messengerId_in
+            messengerId_not_in: $messengerId_not_in
+            mediaId_not: $mediaId_not
+            mediaId_in: $mediaId_in
+            mediaId_not_in: $mediaId_not_in
+            type_not: $type_not
+            type_in: $type_in
+            type_not_in: $type_not_in
+            sort: $sort
+        ) {
+            ... on TextActivity {
+                id
+                userId
+                type
+                text(asHtml: false)
+                siteUrl
+                isLocked
+                isSubscribed
+                likeCount
+                replyCount
+                isLiked
+                isPinned
+                createdAt
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                    donatorTier
+                    donatorBadge
+                    moderatorRoles
+                }
+                replies {
+                    id
+                    userId
+                    text(asHtml: false)
+                    likeCount
+                    isLiked
+                    createdAt
+                    user {
+                        id
+                        name
+                        avatar {
+                            large
+                            medium
+                        }
+                    }
+                }
+                likes {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ListActivity {
+                id
+                userId
+                type
+                status
+                progress
+                isLocked
+                isSubscribed
+                likeCount
+                replyCount
+                isLiked
+                isPinned
+                siteUrl
+                createdAt
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                    donatorTier
+                    donatorBadge
+                    moderatorRoles
+                }
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    coverImage {
+                        large
+                        medium
+                    }
+                    siteUrl
+                }
+                replies {
+                    id
+                    userId
+                    text(asHtml: false)
+                    likeCount
+                    isLiked
+                    createdAt
+                    user {
+                        id
+                        name
+                        avatar {
+                            large
+                            medium
+                        }
+                    }
+                }
+                likes {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on MessageActivity {
+                id
+                recipientId
+                messengerId
+                type
+                message(asHtml: false)
+                isLocked
+                isSubscribed
+                likeCount
+                isLiked
+                isPrivate
+                siteUrl
+                createdAt
+                recipient {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                    donatorTier
+                    donatorBadge
+                    moderatorRoles
+                }
+                messenger {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                    donatorTier
+                    donatorBadge
+                    moderatorRoles
+                }
+                replies {
+                    id
+                    userId
+                    text(asHtml: false)
+                    likeCount
+                    isLiked
+                    createdAt
+                    user {
+                        id
+                        name
+                        avatar {
+                            large
+                            medium
+                        }
+                    }
+                }
+                likes {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+        }
+    }
+}

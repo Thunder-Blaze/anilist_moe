@@ -1,0 +1,90 @@
+query SearchThreads(
+    $id: Int
+    $userId: Int
+    $replyUserId: Int
+    $subscribed: Boolean
+    $categoryId: Int
+    $mediaCategoryId: Int
+    $search: String
+    $sort: [ThreadSort]
+    $page: Int = 1
+    $perPage: Int = 20
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        threads(
+            id: $id
+            userId: $userId
+            replyUserId: $replyUserId
+            subscribed: $subscribed
+            categoryId: $categoryId
+            mediaCategoryId: $mediaCategoryId
+            search: $search
+            sort: $sort
+        ) {
+            id
+            title
+            body(asHtml: false)
+            userId
+            replyUserId
+            replyCount
+            viewCount
+            replyCommentId
+            repliedAt
+            createdAt
+            updatedAt
+            locked
+            sticky
+            subscribed
+            likeCount
+            isLiked
+            siteUrl
+            categories {
+                id
+                name
+            }
+            mediaCategories {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                coverImage {
+                    medium
+                }
+            }
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+            replyUser {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+        }
+    }
+}

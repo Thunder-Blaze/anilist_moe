@@ -1,0 +1,397 @@
+query Notifications(
+    $page: Int = 1
+    $perPage: Int = 20
+    $unread: Boolean
+    $type_in: [NotificationType]
+    $reset: Boolean
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        notifications(
+            unread: $unread
+            type_in: $type_in
+            resetNotificationCount: $reset
+        ) {
+            ... on AiringNotification {
+                id
+                type
+                animeId
+                episode
+                contexts
+                createdAt
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    coverImage {
+                        medium
+                    }
+                }
+            }
+            ... on FollowingNotification {
+                id
+                userId
+                type
+                context
+                createdAt
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ActivityMessageNotification {
+                id
+                userId
+                type
+                activityId
+                context
+                createdAt
+                message {
+                    id
+                    message(asHtml: false)
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ActivityMentionNotification {
+                id
+                userId
+                type
+                activityId
+                context
+                createdAt
+                activity {
+                    ... on TextActivity {
+                        id
+                        text(asHtml: false)
+                    }
+                    ... on ListActivity {
+                        id
+                        status
+                        progress
+                    }
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ActivityReplyNotification {
+                id
+                userId
+                type
+                activityId
+                context
+                createdAt
+                activity {
+                    ... on TextActivity {
+                        id
+                        text(asHtml: false)
+                    }
+                    ... on ListActivity {
+                        id
+                        status
+                        progress
+                    }
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ActivityReplySubscribedNotification {
+                id
+                userId
+                type
+                activityId
+                context
+                createdAt
+                activity {
+                    ... on TextActivity {
+                        id
+                        text(asHtml: false)
+                    }
+                    ... on ListActivity {
+                        id
+                        status
+                        progress
+                    }
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ActivityLikeNotification {
+                id
+                userId
+                type
+                activityId
+                context
+                createdAt
+                activity {
+                    ... on TextActivity {
+                        id
+                        text(asHtml: false)
+                    }
+                    ... on ListActivity {
+                        id
+                        status
+                        progress
+                    }
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ActivityReplyLikeNotification {
+                id
+                userId
+                type
+                activityId
+                context
+                createdAt
+                activity {
+                    ... on TextActivity {
+                        id
+                        text(asHtml: false)
+                    }
+                    ... on ListActivity {
+                        id
+                        status
+                        progress
+                    }
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ThreadCommentMentionNotification {
+                id
+                userId
+                type
+                commentId
+                context
+                createdAt
+                thread {
+                    id
+                    title
+                }
+                comment {
+                    id
+                    comment(asHtml: false)
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ThreadCommentReplyNotification {
+                id
+                userId
+                type
+                commentId
+                context
+                createdAt
+                thread {
+                    id
+                    title
+                }
+                comment {
+                    id
+                    comment(asHtml: false)
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ThreadCommentSubscribedNotification {
+                id
+                userId
+                type
+                commentId
+                context
+                createdAt
+                thread {
+                    id
+                    title
+                }
+                comment {
+                    id
+                    comment(asHtml: false)
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ThreadCommentLikeNotification {
+                id
+                userId
+                type
+                commentId
+                context
+                createdAt
+                thread {
+                    id
+                    title
+                }
+                comment {
+                    id
+                    comment(asHtml: false)
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on ThreadLikeNotification {
+                id
+                userId
+                type
+                threadId
+                context
+                createdAt
+                thread {
+                    id
+                    title
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                }
+            }
+            ... on RelatedMediaAdditionNotification {
+                id
+                type
+                mediaId
+                context
+                createdAt
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    coverImage {
+                        medium
+                    }
+                }
+            }
+            ... on MediaDataChangeNotification {
+                id
+                type
+                mediaId
+                context
+                reason
+                createdAt
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    coverImage {
+                        medium
+                    }
+                }
+            }
+            ... on MediaMergeNotification {
+                id
+                type
+                mediaId
+                deletedMediaTitles
+                context
+                reason
+                createdAt
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    coverImage {
+                        medium
+                    }
+                }
+            }
+            ... on MediaDeletionNotification {
+                id
+                type
+                deletedMediaTitle
+                context
+                reason
+                createdAt
+            }
+        }
+    }
+}

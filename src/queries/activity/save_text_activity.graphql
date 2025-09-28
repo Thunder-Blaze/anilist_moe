@@ -1,0 +1,49 @@
+mutation SaveTextActivity(
+    $id: Int
+    $text: String!
+    $locked: Boolean
+) {
+    SaveTextActivity(
+        id: $id
+        text: $text
+        locked: $locked
+    ) {
+        id
+        userId
+        type
+        text(asHtml: false)
+        isLocked
+        isSubscribed
+        likeCount
+        replyCount
+        isLiked
+        isPinned
+        siteUrl
+        createdAt
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+        replies {
+            id
+            userId
+            activityId
+            text(asHtml: false)
+            likeCount
+            isLiked
+            createdAt
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+            }
+        }
+    }
+}

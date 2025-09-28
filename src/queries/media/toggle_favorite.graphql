@@ -1,0 +1,98 @@
+mutation ToggleFavorite(
+    $animeId: Int
+    $mangaId: Int
+    $characterId: Int
+    $staffId: Int
+    $studioId: Int
+) {
+    ToggleFavourite(
+        animeId: $animeId
+        mangaId: $mangaId
+        characterId: $characterId
+        staffId: $staffId
+        studioId: $studioId
+    ) {
+        anime {
+            edges {
+                node {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    coverImage {
+                        large
+                        medium
+                    }
+                }
+            }
+        }
+        manga {
+            edges {
+                node {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    coverImage {
+                        large
+                        medium
+                    }
+                }
+            }
+        }
+        characters {
+            edges {
+                node {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                    }
+                    image {
+                        large
+                        medium
+                    }
+                }
+            }
+        }
+        staff {
+            edges {
+                node {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                    }
+                    image {
+                        large
+                        medium
+                    }
+                }
+            }
+        }
+        studios {
+            edges {
+                node {
+                    id
+                    name
+                }
+            }
+        }
+    }
+}

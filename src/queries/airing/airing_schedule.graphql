@@ -1,0 +1,104 @@
+query AiringSchedule(
+    $id: Int
+    $mediaId: Int
+    $episode: Int
+    $airingAt: Int
+    $notYetAired: Boolean
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    $mediaId_not: Int
+    $mediaId_in: [Int]
+    $mediaId_not_in: [Int]
+    $episode_not: Int
+    $episode_in: [Int]
+    $episode_not_in: [Int]
+    $episode_greater: Int
+    $episode_lesser: Int
+    $airingAt_greater: Int
+    $airingAt_lesser: Int
+    $sort: [AiringSort]
+    $page: Int = 1
+    $perPage: Int = 20
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        airingSchedules(
+            id: $id
+            mediaId: $mediaId
+            episode: $episode
+            airingAt: $airingAt
+            notYetAired: $notYetAired
+            id_not: $id_not
+            id_in: $id_in
+            id_not_in: $id_not_in
+            mediaId_not: $mediaId_not
+            mediaId_in: $mediaId_in
+            mediaId_not_in: $mediaId_not_in
+            episode_not: $episode_not
+            episode_in: $episode_in
+            episode_not_in: $episode_not_in
+            episode_greater: $episode_greater
+            episode_lesser: $episode_lesser
+            airingAt_greater: $airingAt_greater
+            airingAt_lesser: $airingAt_lesser
+            sort: $sort
+        ) {
+            id
+            airingAt
+            timeUntilAiring
+            episode
+            mediaId
+            media {
+                id
+                idMal
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                status
+                description(asHtml: false)
+                season
+                seasonYear
+                episodes
+                duration
+                coverImage {
+                    extraLarge
+                    large
+                    medium
+                    color
+                }
+                bannerImage
+                genres
+                averageScore
+                popularity
+                studios(isMain: true) {
+                    edges {
+                        node {
+                            id
+                            name
+                        }
+                    }
+                }
+                isAdult
+                countryOfOrigin
+                siteUrl
+                nextAiringEpisode {
+                    airingAt
+                    timeUntilAiring
+                    episode
+                }
+            }
+        }
+    }
+}

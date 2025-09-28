@@ -1,25 +1,3 @@
-pub mod activity;
-pub mod airing;
-pub mod anime;
-pub mod character;
-pub mod forum;
-pub mod manga;
-pub mod notification;
-pub mod recommendation;
-pub mod review;
-pub mod staff;
-pub mod studio;
-pub mod user;
+pub mod media;
 
-pub use activity::ActivityEndpoint;
-pub use airing::AiringEndpoint;
-pub use anime::AnimeEndpoint;
-pub use character::CharacterEndpoint;
-pub use forum::ForumEndpoint;
-pub use manga::MangaEndpoint;
-pub use notification::NotificationEndpoint;
-pub use recommendation::RecommendationEndpoint;
-pub use review::ReviewEndpoint;
-pub use staff::StaffEndpoint;
-pub use studio::StudioEndpoint;
-pub use user::UserEndpoint;
+pub use media::MediaEndpoint;

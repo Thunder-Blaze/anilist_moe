@@ -1,8 +1,4 @@
-use crate::endpoints::{
-    ActivityEndpoint, AiringEndpoint, AnimeEndpoint, CharacterEndpoint, ForumEndpoint,
-    MangaEndpoint, NotificationEndpoint, RecommendationEndpoint, ReviewEndpoint, StaffEndpoint,
-    StudioEndpoint, UserEndpoint,
-};
+use crate::endpoints::MediaEndpoint;
 use crate::error::AniListError;
 use reqwest::Client;
 use serde_json::Value;
@@ -31,53 +27,53 @@ impl AniListClient {
         }
     }
 
-    pub fn anime(&self) -> AnimeEndpoint {
-        AnimeEndpoint::new(self.clone())
+    pub fn media(&self) -> MediaEndpoint {
+        MediaEndpoint::new(self.clone())
     }
 
-    pub fn manga(&self) -> MangaEndpoint {
-        MangaEndpoint::new(self.clone())
-    }
+    // pub fn manga(&self) -> MangaEndpoint {
+    //     MangaEndpoint::new(self.clone())
+    // }
 
-    pub fn character(&self) -> CharacterEndpoint {
-        CharacterEndpoint::new(self.clone())
-    }
+    // pub fn character(&self) -> CharacterEndpoint {
+    //     CharacterEndpoint::new(self.clone())
+    // }
 
-    pub fn staff(&self) -> StaffEndpoint {
-        StaffEndpoint::new(self.clone())
-    }
+    // pub fn staff(&self) -> StaffEndpoint {
+    //     StaffEndpoint::new(self.clone())
+    // }
 
-    pub fn user(&self) -> UserEndpoint {
-        UserEndpoint::new(self.clone())
-    }
+    // pub fn user(&self) -> UserEndpoint {
+    //     UserEndpoint::new(self.clone())
+    // }
 
-    pub fn studio(&self) -> StudioEndpoint {
-        StudioEndpoint::new(self.clone())
-    }
+    // pub fn studio(&self) -> StudioEndpoint {
+    //     StudioEndpoint::new(self.clone())
+    // }
 
-    pub fn forum(&self) -> ForumEndpoint {
-        ForumEndpoint::new(self.clone())
-    }
+    // pub fn forum(&self) -> ForumEndpoint {
+    //     ForumEndpoint::new(self.clone())
+    // }
 
-    pub fn activity(&self) -> ActivityEndpoint {
-        ActivityEndpoint::new(self.clone())
-    }
+    // pub fn activity(&self) -> ActivityEndpoint {
+    //     ActivityEndpoint::new(self.clone())
+    // }
 
-    pub fn review(&self) -> ReviewEndpoint {
-        ReviewEndpoint::new(self.clone())
-    }
+    // pub fn review(&self) -> ReviewEndpoint {
+    //     ReviewEndpoint::new(self.clone())
+    // }
 
-    pub fn recommendation(&self) -> RecommendationEndpoint {
-        RecommendationEndpoint::new(self.clone())
-    }
+    // pub fn recommendation(&self) -> RecommendationEndpoint {
+    //     RecommendationEndpoint::new(self.clone())
+    // }
 
-    pub fn airing(&self) -> AiringEndpoint {
-        AiringEndpoint::new(self.clone())
-    }
+    // pub fn airing(&self) -> AiringEndpoint {
+    //     AiringEndpoint::new(self.clone())
+    // }
 
-    pub fn notification(&self) -> NotificationEndpoint {
-        NotificationEndpoint::new(self.clone())
-    }
+    // pub fn notification(&self) -> NotificationEndpoint {
+    //     NotificationEndpoint::new(self.clone())
+    // }
 
     pub fn set_token(&mut self, token: &str) {
         self.token = Some(token.to_string());

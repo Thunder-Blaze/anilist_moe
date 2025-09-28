@@ -1,0 +1,95 @@
+query SearchCharacters(
+    $id: Int
+    $search: String
+    $sort: [CharacterSort] = [ID]
+    $page: Int = 1
+    $perPage: Int = 20
+    $isBirthday: Boolean
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        characters(
+            id: $id
+            search: $search
+            sort: $sort
+            isBirthday: $isBirthday
+        ) {
+            id
+            name {
+                first
+                middle
+                last
+                full
+                native
+                alternative
+                alternativeSpoiler
+            }
+            image {
+                large
+                medium
+            }
+            description(asHtml: false)
+            gender
+            dateOfBirth {
+                year
+                month
+                day
+            }
+            age
+            bloodType
+            isFavourite
+            isFavouriteBlocked
+            siteUrl
+            media(page: 1, perPage: 25) {
+                edges {
+                    id
+                    role
+                    voiceActors(language: JAPANESE) {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                        }
+                        languageV2
+                        image {
+                            large
+                            medium
+                        }
+                    }
+                    node {
+                        id
+                        title {
+                            romaji
+                            english
+                            native
+                            userPreferred
+                        }
+                        type
+                        format
+                        status
+                        startDate {
+                            year
+                            month
+                            day
+                        }
+                        coverImage {
+                            large
+                            medium
+                        }
+                    }
+                }
+            }
+            favourites
+            modNotes
+        }
+    }
+}
