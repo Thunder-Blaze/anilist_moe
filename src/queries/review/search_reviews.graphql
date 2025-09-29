@@ -3,6 +3,22 @@ query SearchReviews(
     $mediaId: Int
     $userId: Int
     $mediaType: MediaType
+    $score: Int
+    $score_greater: Int
+    $score_lesser: Int
+    # NOT filters
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    $mediaId_not: Int
+    $mediaId_in: [Int]
+    $mediaId_not_in: [Int]
+    $userId_not: Int
+    $userId_in: [Int]
+    $userId_not_in: [Int]
+    $score_not: Int
+    $score_in: [Int]
+    $score_not_in: [Int]
     $sort: [ReviewSort]
     $page: Int = 1
     $perPage: Int = 20
@@ -20,6 +36,21 @@ query SearchReviews(
             mediaId: $mediaId
             userId: $userId
             mediaType: $mediaType
+            score: $score
+            score_greater: $score_greater
+            score_lesser: $score_lesser
+            id_not: $id_not
+            id_in: $id_in
+            id_not_in: $id_not_in
+            mediaId_not: $mediaId_not
+            mediaId_in: $mediaId_in
+            mediaId_not_in: $mediaId_not_in
+            userId_not: $userId_not
+            userId_in: $userId_in
+            userId_not_in: $userId_not_in
+            score_not: $score_not
+            score_in: $score_in
+            score_not_in: $score_not_in
             sort: $sort
         ) {
             id

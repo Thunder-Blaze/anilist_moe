@@ -5,6 +5,7 @@ query SearchUsers(
     $sort: [UserSort]
     $page: Int = 1
     $perPage: Int = 20
+    $isModerator: Boolean
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -19,6 +20,7 @@ query SearchUsers(
             name: $name
             search: $search
             sort: $sort
+            isModerator: $isModerator
         ) {
             id
             name

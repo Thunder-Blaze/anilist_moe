@@ -1,6 +1,7 @@
 use crate::client::AniListClient;
 use crate::errors::AniListError;
 use crate::enums::character::CharacterSort;
+use crate::objects::responses::CharacterListResponse;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -17,13 +18,14 @@ pub struct CharacterSearchOptions {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
     pub is_birthday: Option<bool>,
+    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    pub id_not: Option<i32>,
+    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    pub id_in: Option<Vec<i32>>,
+    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    pub id_not_in: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<CharacterSort>>,
-    // Sub-pagination variables
-    #[serde(rename = "mediaPage", skip_serializing_if = "Option::is_none")]
-    pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage", skip_serializing_if = "Option::is_none")]
-    pub media_per_page: Option<i32>,
 }
 
 pub struct CharacterEndpoint(pub(crate) AniListClient);
@@ -34,7 +36,7 @@ impl CharacterEndpoint {
     }
 
     /// Search characters
-    pub async fn search(&self, query: &str, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn search(&self, query: &str, page: i32, per_page: i32) -> Result<CharacterListResponse, AniListError> {
         let options = CharacterSearchOptions {
             search: Some(query.to_string()),
             page: Some(page),
@@ -45,7 +47,7 @@ impl CharacterEndpoint {
     }
 
     /// Get popular characters
-    pub async fn get_popular(&self, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn get_popular(&self, page: i32, per_page: i32) -> Result<CharacterListResponse, AniListError> {
         let options = CharacterSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
@@ -56,7 +58,7 @@ impl CharacterEndpoint {
     }
 
     /// Get trending characters
-    pub async fn get_trending(&self, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn get_trending(&self, page: i32, per_page: i32) -> Result<CharacterListResponse, AniListError> {
         let options = CharacterSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
@@ -67,7 +69,7 @@ impl CharacterEndpoint {
     }
 
     /// Get character by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<Value, AniListError> {
+    pub async fn get_by_id(&self, id: i32) -> Result<CharacterListResponse, AniListError> {
         let options = CharacterSearchOptions {
             id: Some(id),
             ..Default::default()
@@ -76,7 +78,7 @@ impl CharacterEndpoint {
     }
 
     /// Get characters with birthdays today
-    pub async fn get_birthday_characters(&self, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn get_birthday_characters(&self, page: i32, per_page: i32) -> Result<CharacterListResponse, AniListError> {
         let options = CharacterSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
@@ -88,7 +90,7 @@ impl CharacterEndpoint {
     }
 
     /// Get most favorited characters
-    pub async fn get_most_favorited(&self, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn get_most_favorited(&self, page: i32, per_page: i32) -> Result<CharacterListResponse, AniListError> {
         let options = CharacterSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
@@ -99,15 +101,15 @@ impl CharacterEndpoint {
     }
 
     /// Search characters with custom options
-    pub async fn search_with_options(&self, options: CharacterSearchOptions) -> Result<Value, AniListError> {
+    pub async fn search_with_options(&self, options: CharacterSearchOptions) -> Result<CharacterListResponse, AniListError> {
         self.search_characters(options).await
     }
 
-    async fn search_characters(&self, options: CharacterSearchOptions) -> Result<Value, AniListError> {
+    async fn search_characters(&self, options: CharacterSearchOptions) -> Result<CharacterListResponse, AniListError> {
         let query = include_str!("../queries/character/search_characters.graphql");
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query(query, Some(&variables_map)).await
+        self.0.query_typed(query, Some(&variables_map)).await
     }
 
     fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {

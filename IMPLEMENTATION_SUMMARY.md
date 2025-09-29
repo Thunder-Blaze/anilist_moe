@@ -42,7 +42,7 @@ Each endpoint implements consistent `SearchOptions` structs with:
 Consistent method naming and functionality across all endpoints:
 - `search()` - General search with query parameters
 - `get_popular()` - Most popular items
-- `get_trending()` - Currently trending items  
+- `get_trending()` - Currently trending items
 - `get_by_id()` - Fetch specific items by ID
 - Specialized methods per endpoint (e.g., `get_birthday_characters`, `get_upcoming_episodes`)
 
@@ -63,7 +63,7 @@ Consistent method naming and functionality across all endpoints:
 
 ### **Test Files Created:**
 - `tests/character_tests.rs` - Character endpoint testing
-- `tests/recommendation_tests.rs` - Recommendation system testing  
+- `tests/recommendation_tests.rs` - Recommendation system testing
 - `tests/review_tests.rs` - Review CRUD and search testing
 - `tests/studio_tests.rs` - Studio search and popularity testing
 - `tests/activity_tests.rs` - Social activity features testing
@@ -79,7 +79,7 @@ Consistent method naming and functionality across all endpoints:
 
 ## 🎯 **Key Features Implemented**
 
-### **Media Endpoint** 
+### **Media Endpoint**
 - Anime and Manga support
 - Season-based queries (`get_anime_by_season`)
 - Format filtering (TV, Movie, OVA, etc.)
@@ -137,7 +137,7 @@ Consistent method naming and functionality across all endpoints:
 
 ### **Development Ready:**
 - All endpoints compile successfully ✅
-- Client methods activated ✅  
+- Client methods activated ✅
 - Test infrastructure ready ✅
 - GraphQL queries integrated ✅
 
@@ -155,7 +155,7 @@ Consistent method naming and functionality across all endpoints:
 
 - **Complete AniList API coverage** for all major functionality
 - **Production-ready codebase** with proper error handling
-- **Consistent API patterns** across all endpoints  
+- **Consistent API patterns** across all endpoints
 - **Comprehensive testing infrastructure**
 - **Full authentication support** for protected operations
 

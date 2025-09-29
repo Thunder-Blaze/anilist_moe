@@ -60,7 +60,7 @@ async fn test_get_high_scored_reviews() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let result = client.review().get_high_scored_reviews(80, 1, 5).await;
+    let result = client.review().get_high_scored_reviews(1, 5).await;
 
     println!("Result: {:?}", result);
     assert!(result.is_ok());

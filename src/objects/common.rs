@@ -9,15 +9,15 @@ pub struct FuzzyDate {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PageInfo {
-    total: Option<i32>,
+    pub total: Option<i32>,
     #[serde(rename = "perPage")]
-    per_page: Option<i32>,
+    pub per_page: Option<i32>,
     #[serde(rename = "currentPage")]
-    current_page: Option<i32>,
+    pub current_page: Option<i32>,
     #[serde(rename = "lastPage")]
-    last_page: Option<i32>,
+    pub last_page: Option<i32>,
     #[serde(rename = "hasNextPage")]
-    has_next_page: Option<bool>,
+    pub has_next_page: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

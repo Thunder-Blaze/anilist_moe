@@ -2,6 +2,7 @@ use serde::Serialize;
 use crate::client::AniListClient;
 use crate::errors::AniListError;
 use crate::enums::staff::StaffSort;
+use crate::objects::responses::StaffListResponse;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 
@@ -15,23 +16,16 @@ pub struct StaffSearchOptions {
     pub id: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<Vec<StaffSort>>,
     #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
     pub is_birthday: Option<bool>,
-    // Sub-pagination variables
-    #[serde(rename = "staffMediaPage", skip_serializing_if = "Option::is_none")]
-    pub staff_media_page: Option<i32>,
-    #[serde(rename = "staffMediaPerPage", skip_serializing_if = "Option::is_none")]
-    pub staff_media_per_page: Option<i32>,
-    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
-    pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
-    pub characters_per_page: Option<i32>,
-    #[serde(rename = "characterMediaPage", skip_serializing_if = "Option::is_none")]
-    pub character_media_page: Option<i32>,
-    #[serde(rename = "characterMediaPerPage", skip_serializing_if = "Option::is_none")]
-    pub character_media_per_page: Option<i32>,
+    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    pub id_not: Option<i32>,
+    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    pub id_in: Option<Vec<i32>>,
+    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    pub id_not_in: Option<Vec<i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Vec<StaffSort>>,
 }
 
 pub struct StaffEndpoint(pub(crate) AniListClient);
@@ -44,14 +38,14 @@ impl StaffEndpoint {
     pub async fn search_staff(
         &self,
         options: StaffSearchOptions,
-    ) -> Result<Value, AniListError> {
+    ) -> Result<StaffListResponse, AniListError> {
         let query = include_str!("../queries/staff/search_staff.graphql");
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query(query, Some(&variables_map)).await
+        self.0.query_typed(query, Some(&variables_map)).await
     }
 
-    pub async fn get_staff_by_id(&self, id: i32) -> Result<Value, AniListError> {
+    pub async fn get_staff_by_id(&self, id: i32) -> Result<StaffListResponse, AniListError> {
         let options = StaffSearchOptions {
             id: Some(id),
             ..Default::default()

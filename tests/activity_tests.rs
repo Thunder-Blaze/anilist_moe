@@ -67,7 +67,7 @@ async fn test_search_activities() {
         sort: Some(vec![ActivitySort::IdDesc]),
         ..Default::default()
     };
-    
+
     let result = client.activity().search(options).await;
 
     println!("Result: {:?}", result);

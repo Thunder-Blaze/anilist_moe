@@ -11,6 +11,7 @@ pub mod media_list;
 pub mod mods;
 pub mod notification;
 pub mod recommendation;
+pub mod responses;
 pub mod review;
 pub mod staff;
 pub mod stats;

@@ -10,7 +10,7 @@ async fn test_get_popular_characters() {
     let client = AniListClient::new();
     let result = client.character().get_popular(1, 5).await;
 
-    println!("Result: {:?}", result);
+    println!("Result: {:#?}", result);
     assert!(result.is_ok());
 
     rate_limit().await;

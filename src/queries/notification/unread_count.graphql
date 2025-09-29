@@ -1,0 +1,7 @@
+query UnreadCount {
+    Viewer {
+        id
+        name
+        unreadNotificationCount
+    }
+}

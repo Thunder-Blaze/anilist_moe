@@ -52,8 +52,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("✓ Notification endpoint methods compile");
 
     // Prevent unused variable warnings
-    drop((media_endpoint, character_endpoint, staff_endpoint, user_endpoint, 
-          studio_endpoint, forum_endpoint, activity_endpoint, review_endpoint, 
+    drop((media_endpoint, character_endpoint, staff_endpoint, user_endpoint,
+          studio_endpoint, forum_endpoint, activity_endpoint, review_endpoint,
           rec_endpoint, airing_endpoint, notif_endpoint));
 
     println!("\n🎉 SUCCESS: All 11 endpoints with their methods compile successfully!");

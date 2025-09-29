@@ -23,19 +23,14 @@ async fn test_get_popular_staff() {
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    let media = staff_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("staff"))
-        .and_then(|m| m.as_array())
-        .unwrap();
+    let media = &staff_list.data.page.data.staff;
     assert!(!media.is_empty());
     assert!(media.len() <= 5);
 
     // Check that all staff have required fields
     for staff in media {
-        assert!(staff.get("id").and_then(|id| id.as_i64()).is_some());
-        assert!(staff.get("name").is_some());
+        assert!(staff.id > 0);
+        assert!(staff.name.is_some());
     }
 
     rate_limit().await;
@@ -54,17 +49,7 @@ async fn test_get_staff_by_id() {
     }
     assert!(result.is_ok());
     let staff = result.unwrap();
-    assert_eq!(
-        staff
-            .get("data")
-            .and_then(|d| d.get("Page"))
-            .and_then(|p| p.get("staff"))
-            .and_then(|s| s.as_array())
-            .and_then(|s| s.get(0))
-            .and_then(|s| s.get("id"))
-            .and_then(|id| id.as_i64()),
-        Some(95128)
-    );
+    assert_eq!(staff.data.page.data.staff.get(0).map(|s| s.id), Some(95128));
 
     rate_limit().await;
 }
@@ -84,23 +69,14 @@ async fn test_search_staff() {
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    let media = staff_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("staff"))
-        .and_then(|m| m.as_array())
-        .unwrap();
+    let media = &staff_list.data.page.data.staff;
     assert!(!media.is_empty());
 
     // Check that results contain "Miyazaki" in some form
     let has_miyazaki = media.iter().any(|staff| {
-        if let Some(name) = staff.get("name") {
-            name.get("full")
-                .and_then(|n| n.as_str())
-                .map_or(false, |n| n.to_lowercase().contains("miyazaki"))
-        } else {
-            false
-        }
+        staff.name.as_ref()
+            .and_then(|n| n.full.as_ref())
+            .map_or(false, |n| n.to_lowercase().contains("miyazaki"))
     });
     assert!(has_miyazaki);
 
@@ -126,20 +102,12 @@ async fn test_get_staff_today_birthday() {
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    if let Some(staff_list) = staff_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("staff"))
-        .and_then(|s| s.as_array())
-    {
-        for staff in staff_list {
-            if let Some(birth_date) = staff.get("dateOfBirth") {
-                if birth_date.get("day") == Some(&serde_json::Value::from(day))
-                    && birth_date.get("month") == Some(&serde_json::Value::from(month))
-                {
-                    // Found a staff with today's birthday
-                    return;
-                }
+    let staff_vec = &staff_list.data.page.data.staff;
+    for staff in staff_vec {
+        if let Some(birth_date) = &staff.date_of_birth {
+            if birth_date.day == Some(day) && birth_date.month == Some(month) {
+                // Found a staff with today's birthday
+                return;
             }
         }
     }
@@ -162,21 +130,16 @@ async fn test_get_most_favorited_staff() {
 
     assert!(result.is_ok());
     let staff_list = result.unwrap();
-    let media = staff_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("staff"))
-        .and_then(|m| m.as_array())
-        .unwrap();
+    let media = &staff_list.data.page.data.staff;
     assert!(!media.is_empty());
 
     // Check that staff are ordered by favorites (descending)
     let mut prev_favorites = i32::MAX;
     for staff in media {
-        assert!(staff.get("id").and_then(|id| id.as_i64()).is_some());
-        if let Some(favourites) = staff.get("favourites").and_then(|f| f.as_i64()) {
-            assert!(favourites <= prev_favorites as i64);
-            prev_favorites = favourites as i32;
+        assert!(staff.id > 0);
+        if let Some(favourites) = staff.favourites {
+            assert!(favourites <= prev_favorites);
+            prev_favorites = favourites;
         }
     }
 

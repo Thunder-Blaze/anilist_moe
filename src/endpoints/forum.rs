@@ -108,7 +108,7 @@ impl ForumEndpoint {
             page: Some(page),
             per_page: Some(per_page),
         };
-        
+
         let query = include_str!("../queries/forum/search_threads.graphql");
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
@@ -118,15 +118,15 @@ impl ForumEndpoint {
     /// Save thread comment (requires authentication)
     pub async fn save_thread_comment(&self, thread_id: i32, comment: &str, parent_comment_id: Option<i32>) -> Result<Value, AniListError> {
         let query = include_str!("../queries/forum/save_thread_comment.graphql");
-        let mut variables = json!({ 
-            "threadId": thread_id, 
-            "comment": comment 
+        let mut variables = json!({
+            "threadId": thread_id,
+            "comment": comment
         });
-        
+
         if let Some(parent_id) = parent_comment_id {
             variables["parentCommentId"] = json!(parent_id);
         }
-        
+
         let variables_map = self.value_to_hashmap(variables);
         self.0.query(query, Some(&variables_map)).await
     }
@@ -134,9 +134,9 @@ impl ForumEndpoint {
     /// Comment on thread (requires authentication)
     pub async fn comment_on_thread(&self, thread_id: i32, comment: &str) -> Result<Value, AniListError> {
         let query = include_str!("../queries/forum/comment_on_thread.graphql");
-        let variables = json!({ 
-            "threadId": thread_id, 
-            "comment": comment 
+        let variables = json!({
+            "threadId": thread_id,
+            "comment": comment
         });
         let variables_map = self.value_to_hashmap(variables);
         self.0.query(query, Some(&variables_map)).await

@@ -100,6 +100,29 @@ impl AniListClient {
         query: &str,
         variables: Option<&HashMap<String, Value>>,
     ) -> Result<Value, AniListError> {
+        let response_data = self.raw_query(query, variables).await?;
+        Ok(response_data)
+    }
+
+    pub(crate) async fn query_typed<T>(
+        &self,
+        query: &str,
+        variables: Option<&HashMap<String, Value>>,
+    ) -> Result<T, AniListError>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        let response_data = self.raw_query(query, variables).await?;
+        serde_json::from_value(response_data).map_err(|e| AniListError::ParseError {
+            message: format!("Failed to deserialize response: {}", e),
+        })
+    }
+
+    async fn raw_query(
+        &self,
+        query: &str,
+        variables: Option<&HashMap<String, Value>>,
+    ) -> Result<Value, AniListError> {
         let mut body = HashMap::new();
         body.insert("query", Value::String(query.to_string()));
 

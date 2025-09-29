@@ -17,12 +17,7 @@ async fn test_get_popular_manga() {
     println!("Result: {:?}", result);
     assert!(result.is_ok());
     let manga_list = result.unwrap();
-    assert!(manga_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("media"))
-        .and_then(|m| m.as_array())
-        .map_or(false, |a| !a.is_empty()));
+    assert!(!manga_list.data.page.data.media.is_empty());
 
     rate_limit().await;
 }
@@ -36,12 +31,7 @@ async fn test_get_trending_manga() {
 
     assert!(result.is_ok());
     let manga_list = result.unwrap();
-    assert!(manga_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("media"))
-        .and_then(|m| m.as_array())
-        .map_or(false, |a| !a.is_empty()));
+    assert!(!manga_list.data.page.data.media.is_empty());
 
     rate_limit().await;
 }
@@ -123,17 +113,12 @@ async fn test_get_top_rated_manga() {
 
     assert!(result.is_ok());
     let manga_list = result.unwrap();
-    let media = manga_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("media"))
-        .and_then(|m| m.as_array())
-        .unwrap();
+    let media = &manga_list.data.page.data.media;
     assert!(!media.is_empty());
 
     // Check that manga have scores
     for manga in media {
-        assert!(manga.get("id").and_then(|id| id.as_i64()).is_some());
+        assert!(manga.id > 0);
     }
 
     rate_limit().await;

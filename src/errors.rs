@@ -41,4 +41,7 @@ pub enum AniListError {
 
     #[error("Server error: {status} - {message}")]
     ServerError { status: u16, message: String },
+
+    #[error("Parse error: {message}")]
+    ParseError { message: String },
 }

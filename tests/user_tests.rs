@@ -14,18 +14,12 @@ async fn test_get_user_by_id() {
     // This test might fail if the user doesn't exist, so we just check that the call works
     assert!(result.is_ok());
     let user_response = result.unwrap();
-    let users = user_response
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("users"))
-        .and_then(|u| u.as_array());
+    let users = &user_response.data.page.data.users;
 
-    if let Some(users) = users {
-        if !users.is_empty() {
-            let user = &users[0];
-            assert_eq!(user.get("id").and_then(|id| id.as_i64()).unwrap(), 5429396);
-            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
-        }
+    if !users.is_empty() {
+        let user = &users[0];
+        assert_eq!(user.id, 5429396);
+        assert!(!user.name.is_empty());
     }
 
     rate_limit().await;
@@ -42,19 +36,8 @@ async fn test_get_user_by_name() {
     // This is expected to potentially fail, so we don't assert on success
     match result {
         Ok(user_response) => {
-            let users = user_response
-                .get("data")
-                .and_then(|d| d.get("Page"))
-                .and_then(|p| p.get("users"))
-                .and_then(|u| u.as_array());
-
-            if let Some(users) = users {
-                if !users.is_empty() {
-                    let user = &users[0];
-                    let name = user.get("name").and_then(|n| n.as_str()).unwrap_or("");
-                    assert_eq!(name, "ThunderBlaze");
-                }
-            }
+            let user = &user_response.data.user;
+            assert_eq!(user.name, "ThunderBlaze");
         }
         Err(_) => {
             // User might not exist, which is acceptable for this test
@@ -73,18 +56,12 @@ async fn test_search_users() {
 
     assert!(result.is_ok());
     let user_response = result.unwrap();
-    let users = user_response
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("users"))
-        .and_then(|u| u.as_array());
+    let users = &user_response.data.page.data.users;
     // Note: This might be empty if no users match the search
 
-    if let Some(users) = users {
-        for user in users {
-            assert!(user.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0);
-            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
-        }
+    for user in users {
+        assert!(user.id > 0);
+        assert!(!user.name.is_empty());
     }
 
     rate_limit().await;
@@ -99,18 +76,12 @@ async fn test_get_most_anime_watched() {
 
     assert!(result.is_ok());
     let user_response = result.unwrap();
-    let users = user_response
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("users"))
-        .and_then(|u| u.as_array());
+    let users = &user_response.data.page.data.users;
     // Note: This might be empty based on privacy settings and data availability
 
-    if let Some(users) = users {
-        for user in users {
-            assert!(user.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0);
-            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
-        }
+    for user in users {
+        assert!(user.id > 0);
+        assert!(!user.name.is_empty());
     }
 
     rate_limit().await;
@@ -125,18 +96,12 @@ async fn test_get_most_manga_read() {
 
     assert!(result.is_ok());
     let user_response = result.unwrap();
-    let users = user_response
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("users"))
-        .and_then(|u| u.as_array());
+    let users = &user_response.data.page.data.users;
     // Note: This might be empty based on privacy settings and data availability
 
-    if let Some(users) = users {
-        for user in users {
-            assert!(user.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0);
-            assert!(!user.get("name").and_then(|n| n.as_str()).unwrap_or("").is_empty());
-        }
+    for user in users {
+        assert!(user.id > 0);
+        assert!(!user.name.is_empty());
     }
 
     rate_limit().await;

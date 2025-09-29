@@ -6,6 +6,11 @@ query SearchCharacters(
     $page: Int = 1
     $perPage: Int = 20
     $isBirthday: Boolean
+    # NOT filters
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    # Sub-pagination variables
     $mediaPage: Int = 1
     $mediaPerPage: Int = 25
 ) {
@@ -22,6 +27,9 @@ query SearchCharacters(
             search: $search
             sort: $sort
             isBirthday: $isBirthday
+            id_not: $id_not
+            id_in: $id_in
+            id_not_in: $id_not_in
         ) {
             id
             name {

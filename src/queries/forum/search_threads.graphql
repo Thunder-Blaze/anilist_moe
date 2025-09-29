@@ -9,6 +9,8 @@ query SearchThreads(
     $sort: [ThreadSort]
     $page: Int = 1
     $perPage: Int = 20
+    # Additional filters
+    $id_in: [Int]
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -27,6 +29,7 @@ query SearchThreads(
             mediaCategoryId: $mediaCategoryId
             search: $search
             sort: $sort
+            id_in: $id_in
         ) {
             id
             title

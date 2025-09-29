@@ -1,7 +1,7 @@
 query Notifications(
     $page: Int = 1
     $perPage: Int = 20
-    $unread: Boolean
+    $type: NotificationType
     $type_in: [NotificationType]
     $reset: Boolean
 ) {
@@ -14,7 +14,7 @@ query Notifications(
             perPage
         }
         notifications(
-            unread: $unread
+            type: $type
             type_in: $type_in
             resetNotificationCount: $reset
         ) {

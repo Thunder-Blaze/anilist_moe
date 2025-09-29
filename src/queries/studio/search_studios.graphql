@@ -4,6 +4,11 @@ query SearchStudios(
     $sort: [StudioSort] = [ID]
     $page: Int = 1
     $perPage: Int = 20
+    # NOT filters
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    # Sub-pagination variables
     $mediaPage: Int = 1
     $mediaPerPage: Int = 25
 ) {
@@ -19,6 +24,9 @@ query SearchStudios(
             id: $id
             search: $search
             sort: $sort
+            id_not: $id_not
+            id_in: $id_in
+            id_not_in: $id_not_in
         ) {
             id
             name
@@ -28,7 +36,7 @@ query SearchStudios(
             media(page: $mediaPage, perPage: $mediaPerPage) {
                 edges {
                     id
-                    isMain
+                    isMainStudio
                     node {
                         id
                         title {

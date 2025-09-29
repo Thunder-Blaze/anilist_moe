@@ -17,7 +17,7 @@ Added comprehensive pagination controls for nested queries as you requested:
 
 #### **Staff Search Query** (`search_staff.graphql`)
 - `$staffMediaPage` & `$staffMediaPerPage` - Control staff's media pagination
-- `$charactersPage` & `$charactersPerPage` - Control staff's characters pagination  
+- `$charactersPage` & `$charactersPerPage` - Control staff's characters pagination
 - `$characterMediaPage` & `$characterMediaPerPage` - Control character media pagination
 
 #### **Character Search Query** (`search_characters.graphql`)
@@ -89,7 +89,7 @@ let options = StaffSearchOptions {
     per_page: Some(10),
     // Control how many characters per staff member
     characters_page: Some(1),
-    characters_per_page: Some(5), 
+    characters_per_page: Some(5),
     // Control how many media per staff member
     staff_media_page: Some(1),
     staff_media_per_page: Some(3),
@@ -119,11 +119,11 @@ let variables = json!({
     // Control characters shown per media
     "charactersPage": 1,
     "charactersPerPage": 15,
-    // Control staff shown per media  
+    // Control staff shown per media
     "staffPage": 1,
     "staffPerPage": 10,
     // Control reviews shown per media
-    "reviewsPage": 1, 
+    "reviewsPage": 1,
     "reviewsPerPage": 5
 });
 ```
@@ -137,14 +137,14 @@ let variables = json!({
 - **Performance Optimization**: Request only what you need
 - **Bandwidth Efficiency**: Reduce payload sizes with precise pagination
 
-### **2. Field Accuracy**  
+### **2. Field Accuracy**
 - **Schema Compliance**: All field names match AniList GraphQL schema
 - **Type Safety**: Aligned with your Rust object structures
 - **Error Elimination**: Fixed field name mismatches causing API errors
 
 ### **3. Enhanced Functionality**
 - **Staff Media Control**: "no of characters per page voiced by a certain staff" ✅
-- **Character Media Control**: Precise media appearances per character ✅  
+- **Character Media Control**: Precise media appearances per character ✅
 - **Media Sub-data Control**: Full pagination for characters, staff, reviews, recommendations ✅
 - **Studio Media Control**: Control studio's media list pagination ✅
 
@@ -168,11 +168,11 @@ query SearchEntity(
   # Main pagination
   $page: Int = 1
   $perPage: Int = 20
-  
+
   # Search parameters
   $search: String
   $sort: [EntitySort]
-  
+
   # Sub-pagination variables
   $subEntityPage: Int = 1
   $subEntityPerPage: Int = 10
@@ -182,7 +182,7 @@ query SearchEntity(
       # Basic fields
       id
       name
-      
+
       # Sub-entities with pagination
       subEntities(page: $subEntityPage, perPage: $subEntityPerPage) {
         # Sub-entity fields
@@ -199,12 +199,12 @@ pub struct EntitySearchOptions {
     // Main pagination
     pub page: Option<i32>,
     pub per_page: Option<i32>,
-    
+
     // Search parameters
     pub search: Option<String>,
     pub sort: Option<Vec<EntitySort>>,
-    
-    // Sub-pagination variables  
+
+    // Sub-pagination variables
     #[serde(rename = "subEntityPage")]
     pub sub_entity_page: Option<i32>,
     #[serde(rename = "subEntityPerPage")]
@@ -219,7 +219,7 @@ pub struct EntitySearchOptions {
 Your AniList API client now provides **complete control over pagination at every level** - exactly as requested! You can now:
 
 - Control "no of characters per page voiced by a certain staff"
-- Control "no of media per page for a character"  
+- Control "no of media per page for a character"
 - Control "no of reviews/recommendations per media"
 - Control any nested pagination in the AniList API
 

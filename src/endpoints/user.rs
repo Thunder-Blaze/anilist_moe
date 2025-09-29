@@ -2,6 +2,7 @@ use serde::Serialize;
 use crate::client::AniListClient;
 use crate::errors::AniListError;
 use crate::enums::user::UserSort;
+use crate::objects::responses::{UserListResponse, UserSingleResponse, UserResponse};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 
@@ -26,7 +27,7 @@ impl UserEndpoint {
         Self(client)
     }
 
-    pub async fn get_by_id(&self, id: i32) -> Result<Value, AniListError> {
+    pub async fn get_by_id(&self, id: i32) -> Result<UserListResponse, AniListError> {
         let options = UserSearchOptions {
             id: Some(id),
             ..Default::default()
@@ -34,30 +35,25 @@ impl UserEndpoint {
         self.search_users(options).await
     }
 
-    pub async fn get_by_username(&self, name: &str) -> Result<Value, AniListError> {
+    pub async fn get_by_username(&self, name: &str) -> Result<UserSingleResponse, AniListError> {
         let options = UserSearchOptions {
             search: Some(name.to_string()),
             ..Default::default()
         };
         let result = self.search_users(options).await?;
-        let users = result
-            .get("data")
-            .and_then(|d| d.get("Page"))
-            .and_then(|p| p.get("users"))
-            .and_then(|u| u.as_array());
-        if let Some(users) = users {
-            for user in users {
-                if let Some(username) = user.get("name").and_then(|n| n.as_str()) {
-                    if username.eq_ignore_ascii_case(name) {
-                        return Ok(json!({"data": {"User": user}}));
-                    }
-                }
+        let users = &result.data.page.data.users;
+
+        for user in users {
+            if user.name.eq_ignore_ascii_case(name) {
+                return Ok(UserSingleResponse {
+                    data: UserResponse { user: user.clone() }
+                });
             }
         }
-        return Err(AniListError::NotFound);
+        Err(AniListError::NotFound)
     }
 
-    pub async fn search(&self, query: &str, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn search(&self, query: &str, page: i32, per_page: i32) -> Result<UserListResponse, AniListError> {
         let options = UserSearchOptions {
             search: Some(query.to_string()),
             page: Some(page),
@@ -67,7 +63,7 @@ impl UserEndpoint {
         self.search_users(options).await
     }
 
-    pub async fn get_most_anime_watched(&self, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn get_most_anime_watched(&self, page: i32, per_page: i32) -> Result<UserListResponse, AniListError> {
         let options = UserSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
@@ -77,7 +73,7 @@ impl UserEndpoint {
         self.search_users(options).await
     }
 
-    pub async fn get_most_manga_read(&self, page: i32, per_page: i32) -> Result<Value, AniListError> {
+    pub async fn get_most_manga_read(&self, page: i32, per_page: i32) -> Result<UserListResponse, AniListError> {
         let options = UserSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
@@ -87,11 +83,11 @@ impl UserEndpoint {
         self.search_users(options).await
     }
 
-    async fn search_users(&self, options: UserSearchOptions) -> Result<Value, AniListError> {
+    async fn search_users(&self, options: UserSearchOptions) -> Result<UserListResponse, AniListError> {
         let query = include_str!("../queries/user/search_users.graphql");
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query(query, Some(&variables_map)).await
+        self.0.query_typed(query, Some(&variables_map)).await
     }
 
     fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
@@ -101,5 +97,3 @@ impl UserEndpoint {
         }
     }
 }
-
-

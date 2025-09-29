@@ -7,8 +7,10 @@ query SearchActivities(
     $isFollowing: Boolean
     $hasReplies: Boolean
     $hasRepliesOrTypeText: Boolean
+    $createdAt: Int
     $createdAt_greater: Int
     $createdAt_lesser: Int
+    # NOT filters
     $id_not: Int
     $id_in: [Int]
     $id_not_in: [Int]
@@ -45,6 +47,7 @@ query SearchActivities(
             isFollowing: $isFollowing
             hasReplies: $hasReplies
             hasRepliesOrTypeText: $hasRepliesOrTypeText
+            createdAt: $createdAt
             createdAt_greater: $createdAt_greater
             createdAt_lesser: $createdAt_lesser
             id_not: $id_not

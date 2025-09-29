@@ -1,6 +1,6 @@
 use anilist_moe::{
     client::AniListClient,
-    endpoints::media::AnimeSearchOptions,
+    endpoints::media::MangaSearchOptions,
     enums::media::{MediaSort, MediaStatus},
 };
 use tokio::time::{Duration, sleep};
@@ -17,12 +17,7 @@ async fn test_get_popular_anime() {
     println!("Result: {:?}", result);
     assert!(result.is_ok());
     let anime_list = result.unwrap();
-    assert!(anime_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("media"))
-        .and_then(|m| m.as_array())
-        .map_or(false, |a| !a.is_empty()));
+    assert!(!anime_list.data.page.data.media.is_empty());
 
     rate_limit().await;
 }
@@ -36,57 +31,42 @@ async fn test_get_trending_anime() {
 
     assert!(result.is_ok());
     let anime_list = result.unwrap();
-    assert!(anime_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("media"))
-        .and_then(|m| m.as_array())
-        .map_or(false, |a| !a.is_empty()));
+    assert!(!anime_list.data.page.data.media.is_empty());
 
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_anime_by_id() {
-    rate_limit().await;
-
     let client = AniListClient::new();
-    // Using Cowboy Bepop's ID (1)
-    let result = client.media().get_anime_by_id(1).await;
+    let anime_id = 1; // Cowboy Bebop
+
+    let result = client.media().get_anime_by_id(anime_id).await;
 
     assert!(result.is_ok());
-    let anime = result.unwrap();
-    assert_eq!(
-        anime
-            .get("data")
-            .and_then(|d| d.get("Page"))
-            .and_then(|p| p.get("media"))
-            .and_then(|m| m.as_array())
-            .and_then(|a| a.get(0))
-            .and_then(|a| a.get("id"))
-            .and_then(|id| id.as_i64()),
-        Some(1)
-    );
+    let anime_list = result.unwrap();
+    assert!(!anime_list.data.page.data.media.is_empty());
+    assert_eq!(anime_list.data.page.data.media[0].id, anime_id);
 
     rate_limit().await;
 }
 
 #[tokio::test]
-async fn test_search_anime() {
+async fn test_search_manga() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let options = AnimeSearchOptions {
+    let options = MangaSearchOptions {
         search_term: Some("One Piece".to_string()),
         page: Some(1),
         per_page: Some(5),
         ..Default::default()
     };
-    let result = client.media().search_anime(options).await;
+    let result = client.media().search_manga(options).await;
 
     assert!(result.is_ok());
-    let anime_list = result.unwrap();
-    let media = anime_list
+    let manga_list = result.unwrap();
+    let media = manga_list
         .get("data")
         .and_then(|d| d.get("Page"))
         .and_then(|p| p.get("media"))
@@ -95,8 +75,8 @@ async fn test_search_anime() {
     assert!(!media.is_empty());
 
     // Check that results contain "One Piece" in some form
-    let has_one_piece = media.iter().any(|anime| {
-        if let Some(title) = anime.get("title") {
+    let has_one_piece = media.iter().any(|manga| {
+        if let Some(title) = manga.get("title") {
             title
                 .get("romaji")
                 .and_then(|r| r.as_str())
@@ -115,47 +95,42 @@ async fn test_search_anime() {
 }
 
 #[tokio::test]
-async fn test_get_top_rated_anime() {
+async fn test_get_top_rated_manga() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let result = client.media().get_top_rated_anime(Some(1), Some(5)).await;
+    let result = client.media().get_top_rated_manga(Some(1), Some(5)).await;
 
     assert!(result.is_ok());
-    let anime_list = result.unwrap();
-    let media = anime_list
-        .get("data")
-        .and_then(|d| d.get("Page"))
-        .and_then(|p| p.get("media"))
-        .and_then(|m| m.as_array())
-        .unwrap();
+    let manga_list = result.unwrap();
+    let media = &manga_list.data.page.data.media;
     assert!(!media.is_empty());
 
-    // Check that anime have scores
-    for anime in media {
-        assert!(anime.get("id").and_then(|id| id.as_i64()).is_some());
+    // Check that manga have scores
+    for manga in media {
+        assert!(manga.id > 0);
     }
 
     rate_limit().await;
 }
 
 #[tokio::test]
-async fn test_get_releasing_anime() {
+async fn test_get_releasing_manga() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let result = client.media().get_airing_anime(Some(1), Some(5)).await;
+    let result = client.media().get_releasing_manga(Some(1), Some(5)).await;
 
     assert!(result.is_ok());
-    let anime_list = result.unwrap();
-    if let Some(media) = anime_list
+    let manga_list = result.unwrap();
+    if let Some(media) = manga_list
         .get("data")
         .and_then(|d| d.get("Page"))
         .and_then(|p| p.get("media"))
         .and_then(|m| m.as_array())
     {
-        for anime in media {
-            assert!(anime.get("id").and_then(|id| id.as_i64()).is_some());
+        for manga in media {
+            assert!(manga.get("id").and_then(|id| id.as_i64()).is_some());
         }
     }
 
@@ -163,22 +138,22 @@ async fn test_get_releasing_anime() {
 }
 
 #[tokio::test]
-async fn test_get_completed_anime() {
+async fn test_get_completed_manga() {
     rate_limit().await;
 
     let client = AniListClient::new();
-    let options = AnimeSearchOptions {
+    let options = MangaSearchOptions {
         status: Some(MediaStatus::Finished),
         sort: Some(vec![MediaSort::PopularityDesc]),
         page: Some(1),
         per_page: Some(5),
         ..Default::default()
     };
-    let result = client.media().search_anime(options).await;
+    let result = client.media().search_manga(options).await;
 
     assert!(result.is_ok());
-    let anime_list = result.unwrap();
-    let media = anime_list
+    let manga_list = result.unwrap();
+    let media = manga_list
         .get("data")
         .and_then(|d| d.get("Page"))
         .and_then(|p| p.get("media"))
@@ -186,10 +161,10 @@ async fn test_get_completed_anime() {
         .unwrap();
     assert!(!media.is_empty());
 
-    for anime in media {
-        assert!(anime.get("id").and_then(|id| id.as_i64()).is_some());
+    for manga in media {
+        assert!(manga.get("id").and_then(|id| id.as_i64()).is_some());
         assert_eq!(
-            anime.get("status").and_then(|s| s.as_str()),
+            manga.get("status").and_then(|s| s.as_str()),
             Some("FINISHED")
         );
     }
