@@ -12,56 +12,71 @@ use crate::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FormatStats {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<MediaFormat>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GenreStats {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub genre: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
-    #[serde(rename = "meanScore")]
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
     pub mean_score: Option<i32>,
-    #[serde(rename = "timeWatched")]
+    #[serde(rename = "timeWatched", skip_serializing_if = "Option::is_none")]
     pub time_watched: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ListScoreStats {
-    #[serde(rename = "meanScore")]
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
     pub mean_score: Option<i32>,
-    #[serde(rename = "standardDeviation")]
+    #[serde(rename = "standardDeviation", skip_serializing_if = "Option::is_none")]
     pub standard_deviation: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MediaStats {
-    #[serde(rename = "scoreDistribution")]
+    #[serde(rename = "scoreDistribution", skip_serializing_if = "Option::is_none")]
     pub score_distribution: Option<Vec<ScoreDistribution>>,
-    #[serde(rename = "statusDistribution")]
+    #[serde(rename = "statusDistribution", skip_serializing_if = "Option::is_none")]
     pub status_distribution: Option<Vec<StatusDistribution>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ScoreDistribution {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StatusDistribution {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<MediaListStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SiteStatistics {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub users: Option<SiteTrendConnection>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub anime: Option<SiteTrendConnection>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub manga: Option<SiteTrendConnection>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub characters: Option<SiteTrendConnection>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub staff: Option<SiteTrendConnection>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub studios: Option<SiteTrendConnection>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reviews: Option<SiteTrendConnection>,
 }
 
@@ -74,44 +89,53 @@ pub struct SiteTrend {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SiteTrendConnection {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub edges: Option<Vec<SiteTrendEdge>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nodes: Option<Vec<SiteTrend>>,
-    #[serde(rename = "pageInfo")]
+    #[serde(rename = "pageInfo", skip_serializing_if = "Option::is_none")]
     pub page_info: Option<PageInfo>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SiteTrendEdge {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub node: Option<SiteTrend>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StaffStats {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub staff: Option<Staff>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
-    #[serde(rename = "meanScore")]
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
     pub mean_score: Option<i32>,
-    #[serde(rename = "timeWatched")]
+    #[serde(rename = "timeWatched", skip_serializing_if = "Option::is_none")]
     pub time_watched: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StudioStats {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub studio: Option<Studio>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
-    #[serde(rename = "meanScore")]
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
     pub mean_score: Option<i32>,
-    #[serde(rename = "timeWatched")]
+    #[serde(rename = "timeWatched", skip_serializing_if = "Option::is_none")]
     pub time_watched: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TagStats {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<MediaTag>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
-    #[serde(rename = "meanScore")]
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
     pub mean_score: Option<i32>,
-    #[serde(rename = "timeWatched")]
+    #[serde(rename = "timeWatched", skip_serializing_if = "Option::is_none")]
     pub time_watched: Option<i32>,
 }
 
@@ -126,6 +150,7 @@ pub struct UserCountryStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub country: Option<CountryCode>,
 }
 
@@ -140,6 +165,7 @@ pub struct UserFormatStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<MediaFormat>,
 }
 
@@ -154,6 +180,7 @@ pub struct UserGenreStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub genre: Option<String>,
 }
 
@@ -168,6 +195,7 @@ pub struct UserLengthStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub length: Option<i32>,
 }
 
@@ -182,7 +210,7 @@ pub struct UserReleaseYearStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
-    #[serde(rename = "releaseYear")]
+    #[serde(rename = "releaseYear", skip_serializing_if = "Option::is_none")]
     pub release_year: Option<i32>,
 }
 
@@ -197,6 +225,7 @@ pub struct UserScoreStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<i32>,
 }
 
@@ -211,6 +240,7 @@ pub struct UserStaffStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub staff: Option<Staff>,
 }
 
@@ -225,15 +255,15 @@ pub struct UserStartYearStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
-    #[serde(rename = "startYear")]
+    #[serde(rename = "startYear", skip_serializing_if = "Option::is_none")]
     pub start_year: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStatisticTypes {
-    #[serde(rename = "animeStatus")]
+    #[serde(rename = "animeStatus", skip_serializing_if = "Option::is_none")]
     pub anime_status: Option<UserStatistics>,
-    #[serde(rename = "mangaStatus")]
+    #[serde(rename = "mangaStatus", skip_serializing_if = "Option::is_none")]
     pub manga_status: Option<UserStatistics>,
 }
 
@@ -252,20 +282,29 @@ pub struct UserStatistics {
     pub chapters_read: i32,
     #[serde(rename = "volumesRead")]
     pub volumes_read: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub formats: Option<Vec<UserFormatStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub statuses: Option<Vec<UserStatusStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scores: Option<Vec<UserScoreStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lengths: Option<Vec<UserLengthStatistic>>,
-    #[serde(rename = "releaseYears")]
+    #[serde(rename = "releaseYears", skip_serializing_if = "Option::is_none")]
     pub release_years: Option<Vec<UserReleaseYearStatistic>>,
-    #[serde(rename = "startYears")]
+    #[serde(rename = "startYears", skip_serializing_if = "Option::is_none")]
     pub start_years: Option<Vec<UserStartYearStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub genres: Option<Vec<UserGenreStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<UserTagStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub countries: Option<Vec<UserCountryStatistic>>,
-    #[serde(rename = "voiceActors")]
+    #[serde(rename = "voiceActors", skip_serializing_if = "Option::is_none")]
     pub voice_actors: Option<Vec<UserVoiceActorStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub staff: Option<Vec<UserStaffStatistic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub studios: Option<Vec<UserStudioStatistic>>,
 }
 
@@ -275,35 +314,35 @@ pub struct UserStats {
     pub watched_time: i32,
     #[serde(rename = "chaptersRead")]
     pub chapters_read: i32,
-    #[serde(rename = "activityHistory")]
+    #[serde(rename = "activityHistory", skip_serializing_if = "Option::is_none")]
     pub activity_history: Option<Vec<UserActivityHistory>>,
-    #[serde(rename = "animeStatusDistribution")]
+    #[serde(rename = "animeStatusDistribution", skip_serializing_if = "Option::is_none")]
     pub anime_status_distribution: Option<Vec<StatusDistribution>>,
-    #[serde(rename = "mangaStatusDistribution")]
+    #[serde(rename = "mangaStatusDistribution", skip_serializing_if = "Option::is_none")]
     pub manga_status_distribution: Option<Vec<StatusDistribution>>,
-    #[serde(rename = "animeScoreDistribution")]
+    #[serde(rename = "animeScoreDistribution", skip_serializing_if = "Option::is_none")]
     pub anime_score_distribution: Option<Vec<ScoreDistribution>>,
-    #[serde(rename = "mangaScoreDistribution")]
+    #[serde(rename = "mangaScoreDistribution", skip_serializing_if = "Option::is_none")]
     pub manga_score_distribution: Option<Vec<ScoreDistribution>>,
-    #[serde(rename = "animeListScores")]
+    #[serde(rename = "animeListScores", skip_serializing_if = "Option::is_none")]
     pub anime_list_scores: Option<ListScoreStats>,
-    #[serde(rename = "mangaListScores")]
+    #[serde(rename = "mangaListScores", skip_serializing_if = "Option::is_none")]
     pub manga_list_scores: Option<ListScoreStats>,
-    #[serde(rename = "favouredGenresOverview")]
+    #[serde(rename = "favouredGenresOverview", skip_serializing_if = "Option::is_none")]
     pub favoured_genres_overview: Option<Vec<GenreStats>>,
-    #[serde(rename = "favouredGenres")]
+    #[serde(rename = "favouredGenres", skip_serializing_if = "Option::is_none")]
     pub favoured_genres: Option<Vec<GenreStats>>,
-    #[serde(rename = "favouredTags")]
+    #[serde(rename = "favouredTags", skip_serializing_if = "Option::is_none")]
     pub favoured_tags: Option<Vec<TagStats>>,
-    #[serde(rename = "favouredActors")]
+    #[serde(rename = "favouredActors", skip_serializing_if = "Option::is_none")]
     pub favoured_actors: Option<Vec<StaffStats>>,
-    #[serde(rename = "favouredStaff")]
+    #[serde(rename = "favouredStaff", skip_serializing_if = "Option::is_none")]
     pub favoured_staff: Option<Vec<StaffStats>>,
-    #[serde(rename = "favouredStudios")]
+    #[serde(rename = "favouredStudios", skip_serializing_if = "Option::is_none")]
     pub favoured_studios: Option<Vec<StudioStats>>,
-    #[serde(rename = "favouredYears")]
+    #[serde(rename = "favouredYears", skip_serializing_if = "Option::is_none")]
     pub favoured_years: Option<Vec<YearStats>>,
-    #[serde(rename = "favouredFormats")]
+    #[serde(rename = "favouredFormats", skip_serializing_if = "Option::is_none")]
     pub favoured_formats: Option<Vec<FormatStats>>,
 }
 
@@ -318,6 +357,7 @@ pub struct UserStatusStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<MediaListStatus>,
 }
 
@@ -332,6 +372,7 @@ pub struct UserStudioStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub studio: Option<Studio>,
 }
 
@@ -346,6 +387,7 @@ pub struct UserTagStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<MediaTag>,
 }
 
@@ -360,6 +402,7 @@ pub struct UserVoiceActorStatistic {
     pub chapters_read: i32,
     #[serde(rename = "mediaIds")]
     pub media_ids: Vec<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub voice_actor: Option<Staff>,
     #[serde(rename = "characterIds")]
     pub character_ids: Vec<i32>,
@@ -367,8 +410,10 @@ pub struct UserVoiceActorStatistic {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct YearStats {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<i32>,
-    #[serde(rename = "meanScore")]
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
     pub mean_score: Option<i32>,
 }
