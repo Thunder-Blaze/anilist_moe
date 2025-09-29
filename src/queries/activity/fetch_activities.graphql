@@ -1,0 +1,146 @@
+fragment UserFields on User {
+    id
+    name
+    avatar {
+        large
+    }
+}
+
+fragment MediaFields on Media {
+    id
+    title {
+        userPreferred
+    }
+    coverImage {
+        large
+    }
+}
+
+query FetchActivity(
+    # Pagination
+    $page: Int,
+    $perPage: Int = 30,
+
+    # Filters
+    $id: Int,
+    $userId: Int,
+    $messengerId: Int,
+    $mediaId: Int,
+    $type: ActivityType,
+    $isFollowing: Boolean,
+    $hasReplies: Boolean,
+    $hasRepliesOrTypeText: Boolean,
+    $createdAt: Int,
+    $id_not: Int,
+    $id_in: [Int],
+    $id_not_in: [Int],
+    $userId_not: Int,
+    $userId_in: [Int],
+    $userId_not_in: [Int],
+    $messengerId_not: Int,
+    $messengerId_in: [Int],
+    $messengerId_not_in: [Int],
+    $mediaId_not: Int,
+    $mediaId_in: [Int],
+    $mediaId_not_in: [Int],
+    $type_not: ActivityType,
+    $type_in: [ActivityType],
+    $type_not_in: [ActivityType],
+    $createdAt_greater: Int,
+    $createdAt_lesser: Int,
+
+    # Sort
+    $sort: [ActivitySort] = [ID_DESC]
+) {
+    Page(page: $page, perPage: $perPage) {
+        PageInfo {
+            hasNextPage
+        }
+        activities(
+            id: $id,
+            userId: $userId,
+            messengerId: $messengerId,
+            mediaId: $mediaId,
+            type: $type,
+            isFollowing: $isFollowing,
+            hasReplies: $hasReplies,
+            hasRepliesOrTypeText: $hasRepliesOrTypeText,
+            createdAt: $createdAt,
+            id_not: $id_not,
+            id_in: $id_in,
+            id_not_in: $id_not_in,
+            userId_not: $userId_not,
+            userId_in: $userId_in,
+            userId_not_in: $userId_not_in,
+            messengerId_not: $messengerId_not,
+            messengerId_in: $messengerId_in,
+            messengerId_not_in: $messengerId_not_in,
+            mediaId_not: $mediaId_not,
+            mediaId_in: $mediaId_in,
+            mediaId_not_in: $mediaId_not_in,
+            type_not: $type_not,
+            type_in: $type_in,
+            type_not_in: $type_not_in,
+            createdAt_greater: $createdAt_greater,
+            createdAt_lesser: $createdAt_lesser,
+            sort: $sort
+        ) {
+            __typename
+            ... on ListActivity {
+                id
+                type
+                createdAt
+                isLiked
+                likeCount
+                replyCount
+                isSubscribed
+                status
+                progress
+                user {
+                    ...UserFields
+                }
+                likes {
+                    ...UserFields
+                }
+                media {
+                    ...MediaFields
+                }
+            }
+            ... on TextActivity {
+                id
+                type
+                createdAt
+                isLiked
+                likeCount
+                replyCount
+                isSubscribed
+                text(asHtml: true)
+                user {
+                    ...UserFields
+                }
+                likes {
+                    ...UserFields
+                }
+            }
+            ... on MessageActivity {
+                id
+                type
+                createdAt
+                isLiked
+                likeCount
+                replyCount
+                isSubscribed
+                message(asHtml: true)
+                messenger {
+                    ...UserFields
+                }
+                recipient {
+                    ...UserFields
+                }
+                likes {
+                    ...UserFields
+                }
+            }
+        }
+    }
+}

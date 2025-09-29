@@ -1,0 +1,78 @@
+fragment UserFields on User {
+    id
+    name
+    avatar {
+        large
+    }
+}
+
+fragment MediaFields on Media {
+    id
+    title {
+        userPreferred
+    }
+    coverImage {
+        large
+    }
+}
+
+query FetchActivity($id: Int) {
+    Activity(id: $id) {
+        __typename
+        ... on ListActivity {
+            id
+            type
+            status
+            progress
+            createdAt
+            replyCount
+            likeCount
+            isLiked
+            isSubscribed
+            user {
+                ...UserFields
+            }
+            media {
+                ...MediaFields
+            }
+            likes {
+                ...UserFields
+            }
+        }
+        ... on TextActivity {
+            id
+            type
+            text(asHtml: true)
+            createdAt
+            replyCount
+            likeCount
+            isLiked
+            isSubscribed
+            user {
+                ...UserFields
+            }
+            likes {
+                ...UserFields
+            }
+        }
+        ... on MessageActivity {
+            id
+            type
+            message(asHtml: true)
+            createdAt
+            replyCount
+            likeCount
+            isLiked
+            isSubscribed
+            messenger {
+                ...UserFields
+            }
+            recipient {
+                ...UserFields
+            }
+            likes {
+                ...UserFields
+            }
+        }
+    }
+}

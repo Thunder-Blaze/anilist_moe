@@ -1,0 +1,36 @@
+# Queries
+
+- [ ] Fetch User Profile
+- [ ] Fetch Single Activity + Likes
+- [ ] Fetch Activity Replies for a Single Activity + Likes + Paginated
+- [ ] Fetch Anime in HomePage (extended = false)
+- [ ] Fetch Anime in Its Dedicated Page (extended = true)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]

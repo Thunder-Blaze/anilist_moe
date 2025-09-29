@@ -1,5 +1,7 @@
 use anilist_moe::{AniListClient, enums::activity::{ActivityType, ActivitySort}, endpoints::activity::ActivitySearchOptions};
 use tokio::time::{Duration, sleep};
+use std::env;
+use dotenv::dotenv;
 
 async fn rate_limit() {
     sleep(Duration::from_secs(1)).await;
@@ -71,6 +73,22 @@ async fn test_search_activities() {
     let result = client.activity().search(options).await;
 
     println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn fetch_list_activity() {
+    rate_limit().await;
+    dotenv().ok();
+
+    let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set");
+    let client = AniListClient::with_token(&token);
+
+    let result = client.activity().get_by_id(962366160).await;
+
+    println!("Result: {:#?}", result);
     assert!(result.is_ok());
 
     rate_limit().await;

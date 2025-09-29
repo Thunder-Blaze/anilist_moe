@@ -1,5 +1,3 @@
-// Page & RevisionHistory
-
 pub mod activity;
 pub mod airing;
 pub mod anichart;

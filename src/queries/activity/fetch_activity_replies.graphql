@@ -1,0 +1,44 @@
+fragment LikesFields on User {
+    id
+    name
+    avatar {
+        large
+    }
+}
+
+fragment ReplyFields on ActivityReply {
+    id
+    text(asHtml: true)
+    createdAt
+    likeCount
+    isLiked
+    user {
+        id
+        name
+        avatar {
+            large
+        }
+    }
+    likes {
+        ...LikesFields
+    }
+}
+
+query FetchActivityReplies(
+    # Pagination
+    $page: Int,
+    $perPage: Int = 30,
+
+    # Filters
+    $id: Int,
+    $activityId: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            hasNextPage
+        }
+        activityReplies(id: $id, activityId: $activityId) {
+            ...ReplyFields
+        }
+    }
+}

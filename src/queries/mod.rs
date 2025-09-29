@@ -6,15 +6,7 @@ pub const DELETE_MEDIA_LIST_ENTRY: &str = include_str!("media/delete_media_list_
 pub const ADD_TO_LIST: &str = include_str!("media/add_to_list.graphql");
 pub const TOGGLE_FAVORITE: &str = include_str!("media/toggle_favorite.graphql");
 
-// Activity queries and mutations
-pub const SEARCH_ACTIVITIES: &str = include_str!("activity/search_activities.graphql");
-pub const FETCH_ACTIVITY: &str = include_str!("activity/fetch_activity.graphql");
-pub const SAVE_TEXT_ACTIVITY: &str = include_str!("activity/save_text_activity.graphql");
-pub const SAVE_ACTIVITY_REPLY: &str = include_str!("activity/save_activity_reply.graphql");
-pub const REPLY_TO_ACTIVITY: &str = include_str!("activity/reply_to_activity.graphql");
-pub const TOGGLE_ACTIVITY_LIKE: &str = include_str!("activity/toggle_like.graphql");
-pub const DELETE_ACTIVITY: &str = include_str!("activity/delete_activity.graphql");
-pub const DELETE_ACTIVITY_REPLY: &str = include_str!("activity/delete_activity_reply.graphql");
+pub mod activity;
 
 // User queries and mutations
 pub const SEARCH_USERS: &str = include_str!("user/search_users.graphql");

@@ -1,7 +1,7 @@
 use crate::client::AniListClient;
 use crate::errors::AniListError;
 use crate::enums::activity::{ActivitySort, ActivityType};
-use crate::objects::responses::{ActivityListResponse, ActivityResponse};
+use crate::objects::responses::{ActivityListResponse, ActivityResponse, ActivitySingleResponse};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -87,7 +87,7 @@ impl ActivityEndpoint {
     }
 
     /// Get activity by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<ActivityResponse, AniListError> {
+    pub async fn get_by_id(&self, id: i32) -> Result<ActivitySingleResponse, AniListError> {
         let query = include_str!("../queries/activity/fetch_activity.graphql");
         let variables = json!({ "id": id });
         let variables_map = self.value_to_hashmap(variables);
