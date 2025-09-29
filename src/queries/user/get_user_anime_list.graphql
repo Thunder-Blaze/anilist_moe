@@ -1,0 +1,106 @@
+query GetUserAnimeList(
+    $userId: Int!
+    $page: Int = 1
+    $perPage: Int = 25
+    $status: MediaListStatus
+    $sort: [MediaListSort]
+    $type: MediaType = ANIME
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        mediaList(
+            userId: $userId
+            type: $type
+            status: $status
+            sort: $sort
+        ) {
+            id
+            userId
+            mediaId
+            status
+            score
+            progress
+            progressVolumes
+            repeat
+            priority
+            private
+            notes
+            hiddenFromStatusLists
+            customLists
+            advancedScores
+            startedAt {
+                year
+                month
+                day
+            }
+            completedAt {
+                year
+                month
+                day
+            }
+            updatedAt
+            createdAt
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                coverImage {
+                    extraLarge
+                    large
+                    medium
+                    color
+                }
+                type
+                format
+                status
+                episodes
+                duration
+                chapters
+                volumes
+                season
+                seasonYear
+                averageScore
+                popularity
+                genres
+                studios(isMain: true) {
+                    nodes {
+                        id
+                        name
+                    }
+                }
+                startDate {
+                    year
+                    month
+                    day
+                }
+                endDate {
+                    year
+                    month
+                    day
+                }
+                nextAiringEpisode {
+                    airingAt
+                    timeUntilAiring
+                    episode
+                }
+                isAdult
+                countryOfOrigin
+                siteUrl
+            }
+            user {
+                id
+                name
+            }
+        }
+    }
+}

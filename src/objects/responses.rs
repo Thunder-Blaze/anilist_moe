@@ -1,6 +1,7 @@
 use crate::objects::common::PageInfo;
 use crate::objects::user::User;
 use crate::objects::media::Media;
+use crate::objects::media_list::MediaList;
 use crate::objects::character::Character;
 use crate::objects::staff::Staff;
 use crate::objects::studio::Studio;
@@ -49,6 +50,12 @@ pub struct NotificationData {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MediaData {
     pub media: Vec<Media>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MediaListData {
+    #[serde(rename = "mediaList")]
+    pub media_list: Vec<MediaList>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -159,6 +166,7 @@ pub struct ViewerUnreadCount {
 /// Type aliases for common response patterns
 pub type NotificationResponse = GraphQLResponse<PageResponse<NotificationData>>;
 pub type MediaListResponse = GraphQLResponse<PageResponse<MediaData>>;
+pub type UserMediaListResponse = GraphQLResponse<PageResponse<MediaListData>>;
 pub type CharacterListResponse = GraphQLResponse<PageResponse<CharacterData>>;
 pub type StaffListResponse = GraphQLResponse<PageResponse<StaffData>>;
 pub type StudioListResponse = GraphQLResponse<PageResponse<StudioData>>;

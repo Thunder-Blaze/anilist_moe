@@ -1,0 +1,168 @@
+query GetUserStats($id: Int!) {
+    User(id: $id) {
+        id
+        name
+        statistics {
+            anime {
+                count
+                meanScore
+                standardDeviation
+                minutesWatched
+                episodesWatched
+                chaptersRead
+                volumesRead
+                formats {
+                    format
+                    count
+                }
+                statuses {
+                    status
+                    count
+                }
+                scores {
+                    score
+                    count
+                }
+                lengths {
+                    length
+                    count
+                }
+                releaseYears {
+                    releaseYear
+                    count
+                }
+                startYears {
+                    startYear
+                    count
+                }
+                genres {
+                    genre
+                    count
+                    meanScore
+                    minutesWatched
+                }
+                tags {
+                    tag {
+                        id
+                        name
+                    }
+                    count
+                    meanScore
+                    minutesWatched
+                }
+                countries {
+                    country
+                    count
+                    meanScore
+                    minutesWatched
+                }
+                voiceActors {
+                    voiceActor {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                        }
+                    }
+                    count
+                    meanScore
+                    minutesWatched
+                }
+                staff {
+                    staff {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                        }
+                    }
+                    count
+                    meanScore
+                    minutesWatched
+                }
+                studios {
+                    studio {
+                        id
+                        name
+                    }
+                    count
+                    meanScore
+                    minutesWatched
+                }
+            }
+            manga {
+                count
+                meanScore
+                standardDeviation
+                chaptersRead
+                volumesRead
+                formats {
+                    format
+                    count
+                }
+                statuses {
+                    status
+                    count
+                }
+                scores {
+                    score
+                    count
+                }
+                lengths {
+                    length
+                    count
+                }
+                releaseYears {
+                    releaseYear
+                    count
+                }
+                startYears {
+                    startYear
+                    count
+                }
+                genres {
+                    genre
+                    count
+                    meanScore
+                    chaptersRead
+                }
+                tags {
+                    tag {
+                        id
+                        name
+                    }
+                    count
+                    meanScore
+                    chaptersRead
+                }
+                countries {
+                    country
+                    count
+                    meanScore
+                    chaptersRead
+                }
+                staff {
+                    staff {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                        }
+                    }
+                    count
+                    meanScore
+                    chaptersRead
+                }
+            }
+        }
+    }
+}

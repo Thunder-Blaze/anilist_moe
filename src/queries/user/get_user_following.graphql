@@ -1,0 +1,78 @@
+query GetUserFollowing(
+    $userId: Int!
+    $page: Int = 1
+    $perPage: Int = 25
+    $sort: [UserSort]
+) {
+    User(id: $userId) {
+        following(page: $page, perPage: $perPage, sort: $sort) {
+            pageInfo {
+                total
+                currentPage
+                lastPage
+                hasNextPage
+                perPage
+            }
+            nodes {
+                id
+                name
+                about
+                avatar {
+                    large
+                    medium
+                }
+                bannerImage
+                isFollowing
+                isFollower
+                isBlocked
+                bans
+                options {
+                    displayAdultContent
+                    airingNotifications
+                    profileColor
+                }
+                mediaListOptions {
+                    scoreFormat
+                    rowOrder
+                    animeList {
+                        sectionOrder
+                        splitCompletedSectionByFormat
+                        customLists
+                        advancedScoring
+                        advancedScoringEnabled
+                    }
+                    mangaList {
+                        sectionOrder
+                        splitCompletedSectionByFormat
+                        customLists
+                        advancedScoring
+                        advancedScoringEnabled
+                    }
+                }
+                statistics {
+                    anime {
+                        count
+                        meanScore
+                        standardDeviation
+                        minutesWatched
+                        episodesWatched
+                    }
+                    manga {
+                        count
+                        meanScore
+                        standardDeviation
+                        chaptersRead
+                        volumesRead
+                    }
+                }
+                unreadNotificationCount
+                siteUrl
+                donatorTier
+                donatorBadge
+                moderatorRoles
+                createdAt
+                updatedAt
+            }
+        }
+    }
+}

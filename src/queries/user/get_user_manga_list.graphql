@@ -1,0 +1,104 @@
+query GetUserMangaList(
+    $userId: Int!
+    $page: Int = 1
+    $perPage: Int = 25
+    $status: MediaListStatus
+    $sort: [MediaListSort]
+    $type: MediaType = MANGA
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        mediaList(
+            userId: $userId
+            type: $type
+            status: $status
+            sort: $sort
+        ) {
+            id
+            userId
+            mediaId
+            status
+            score
+            progress
+            progressVolumes
+            repeat
+            priority
+            private
+            notes
+            hiddenFromStatusLists
+            customLists
+            advancedScores
+            startedAt {
+                year
+                month
+                day
+            }
+            completedAt {
+                year
+                month
+                day
+            }
+            updatedAt
+            createdAt
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                coverImage {
+                    extraLarge
+                    large
+                    medium
+                    color
+                }
+                type
+                format
+                status
+                episodes
+                duration
+                chapters
+                volumes
+                averageScore
+                popularity
+                genres
+                staff {
+                    edges {
+                        node {
+                            id
+                            name {
+                                userPreferred
+                            }
+                        }
+                        role
+                    }
+                }
+                startDate {
+                    year
+                    month
+                    day
+                }
+                endDate {
+                    year
+                    month
+                    day
+                }
+                isAdult
+                countryOfOrigin
+                siteUrl
+            }
+            user {
+                id
+                name
+            }
+        }
+    }
+}

@@ -1,0 +1,47 @@
+query GetUserById($id: Int!) {
+    User(id: $id) {
+        id
+        name
+        about(asHtml: false)
+        avatar {
+            large
+            medium
+        }
+        bannerImage
+        siteUrl
+        createdAt
+        updatedAt
+        isFollowing
+        isFollower
+        isBlocked
+        bans
+        options {
+            titleLanguage
+            displayAdultContent
+            airingNotifications
+            profileColor
+        }
+        mediaListOptions {
+            scoreFormat
+            rowOrder
+            animeList {
+                sectionOrder
+                splitCompletedSectionByFormat
+                customLists
+                advancedScoring
+                advancedScoringEnabled
+            }
+            mangaList {
+                sectionOrder
+                splitCompletedSectionByFormat
+                customLists
+                advancedScoring
+                advancedScoringEnabled
+            }
+        }
+        unreadNotificationCount
+        donatorTier
+        donatorBadge
+        moderatorRoles
+    }
+}

@@ -112,30 +112,26 @@ async fn test_user_stats_functionality() {
             println!("Successfully retrieved user by ID!");
 
             // get_by_id returns UserListResponse (paginated), so access first user
-            let users = &data.data.page.data.users;
-            if let Some(user) = users.first() {
-                println!("User name: {:?}", user.name);
-                println!("User ID: {:?}", user.id);
+            let user = &data.data.user;
+            println!("User name: {:?}", user.name);
+            println!("User ID: {:?}", user.id);
 
-                // Check for basic user fields
-                assert!(user.id > 0, "Should have user ID");
-                assert!(!user.name.is_empty(), "Should have username");
+            // Check for basic user fields
+            assert!(user.id > 0, "Should have user ID");
+            assert!(!user.name.is_empty(), "Should have username");
 
-                // Check for statistics if available
-                if let Some(stats) = &user.statistics {
-                    println!("User has statistics available");
-                    if let Some(anime_stats) = &stats.anime_status {
-                        println!("Anime count: {:?}", anime_stats.count);
-                        println!("Mean score: {:?}", anime_stats.mean_score);
-                    }
+            // Check for statistics if available
+            if let Some(stats) = &user.statistics {
+                println!("User has statistics available");
+                if let Some(anime_stats) = &stats.anime_status {
+                    println!("Anime count: {:?}", anime_stats.count);
+                    println!("Mean score: {:?}", anime_stats.mean_score);
                 }
+            }
 
-                // Check for favourites if available
-                if user.favourites.is_some() {
-                    println!("User has favourites available");
-                }
-            } else {
-                println!("No user found with that ID");
+            // Check for favourites if available
+            if user.favourites.is_some() {
+                println!("User has favourites available");
             }
         }
         Err(e) => {
@@ -214,12 +210,12 @@ async fn test_media_access_comparison() {
             println!("Both authenticated and unauthenticated requests succeeded");
 
             // Both should have basic media info
-            assert!(unauth_data.media.id == anime_id);
-            assert!(auth_data.media.id == anime_id);
+            assert!(unauth_data.data.page.data.media[0].id == anime_id);
+            assert!(auth_data.data.page.data.media[0].id == anime_id);
 
             // Both should have the same basic structure
-            let unauth_media = &unauth_data.media;
-            let auth_media = &auth_data.media;
+            let unauth_media = &unauth_data.data.page.data.media[0];
+            let auth_media = &auth_data.data.page.data.media[0];
 
             println!("Both have title: unauth={}, auth={}",
                 unauth_media.title.as_ref().map(|t| t.romaji.is_some()).unwrap_or(false),
