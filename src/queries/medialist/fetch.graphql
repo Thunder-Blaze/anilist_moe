@@ -27,7 +27,7 @@ query FetchMedialist(
     $perPage: Int
 ) {
     Page(page: $page, perPage: $perPage) {
-        PageInfo {
+        pageInfo {
             hasNextPage
         }
         mediaList(

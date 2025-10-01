@@ -53,7 +53,7 @@ query FetchActivity(
     $sort: [ActivitySort] = [ID_DESC]
 ) {
     Page(page: $page, perPage: $perPage) {
-        PageInfo {
+        pageInfo {
             hasNextPage
         }
         activities(

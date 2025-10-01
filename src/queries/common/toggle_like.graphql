@@ -1,4 +1,4 @@
-mutation ToggleActivityLike(
+mutation ToggleLike(
     $id: Int
     $type: LikeableType
 ) {
@@ -8,32 +8,26 @@ mutation ToggleActivityLike(
     ) {
         ... on ListActivity {
             id
-            likeCount
             isLiked
         }
         ... on TextActivity {
             id
-            likeCount
             isLiked
         }
         ... on MessageActivity {
             id
-            likeCount
             isLiked
         }
         ... on ActivityReply {
             id
-            likeCount
             isLiked
         }
         ... on Thread {
             id
-            likeCount
             isLiked
         }
         ... on ThreadComment {
             id
-            likeCount
             isLiked
         }
     }

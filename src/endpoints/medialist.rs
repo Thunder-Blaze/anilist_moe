@@ -3,7 +3,7 @@ use crate::enums::media_list::{MediaListSort, MediaListStatus};
 use crate::objects::common::FuzzyDate;
 use crate::{client::AniListClient, queries::medialist};
 use crate::errors::AniListError;
-use crate::objects::responses::MediaListResponse;
+use crate::objects::responses::{MediaListResponse, UserMediaListResponse};
 use serde::Serialize;
 use serde_json::json;
 
@@ -148,7 +148,7 @@ impl MediaListEndpoint {
     pub async fn fetch(
         &self,
         options: FetchMediaListOptions,
-    ) -> Result<MediaListResponse, AniListError> {
+    ) -> Result<UserMediaListResponse, AniListError> {
         let query = medialist::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

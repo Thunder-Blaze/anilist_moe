@@ -36,32 +36,12 @@ query FetchThreadComment(
                 medium
             }
         }
-        childComments {
+        childComments
+        likes {
             id
-            userId
-            comment(asHtml: false)
-            likeCount
-            isLiked
-            createdAt
-            updatedAt
-            isLocked
-            user {
-                id
-                name
-                avatar {
-                    large
-                    medium
-                }
-                donatorTier
-                donatorBadge
-                moderatorRoles
-            }
-            likes {
-                id
-                name
-                avatar {
-                    medium
-                }
+            name
+            avatar {
+                medium
             }
         }
     }

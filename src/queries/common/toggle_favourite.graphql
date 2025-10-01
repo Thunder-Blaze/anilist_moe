@@ -13,24 +13,29 @@ mutation ToggleFavourite(
         studioId: $studioId
     ) {
         anime {
-            id
-            isFavourite
+            nodes {
+                id
+            }
         }
         manga {
-            id
-            isFavourite
+            nodes {
+                id
+            }
         }
-        character {
-            id
-            isFavourite
+        characters {
+            nodes {
+                id
+            }
         }
         staff {
-            id
-            isFavourite
+            nodes {
+                id
+            }
         }
-        studio {
-            id
-            isFavourite
+        studios {
+            nodes {
+                id
+            }
         }
     }
 }

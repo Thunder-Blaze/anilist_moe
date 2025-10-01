@@ -1,9 +1,7 @@
 mutation ToggleFollow($userId: Int!) {
     ToggleFollow(userId: $userId) {
-        user {
-            id
-            name
-            isFollowing
-        }
+        id
+        name
+        isFollowing
     }
 }

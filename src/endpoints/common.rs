@@ -1,11 +1,15 @@
 use crate::{client::AniListClient, queries::common};
 use crate::errors::AniListError;
+use crate::enums::likable::LikeableType;
+use crate::objects::responses::{ToggleLikeResponse, ToggleFollowResponse, ToggleFavouriteResponse};
 use serde::Serialize;
 use serde_json::json;
 
-#[derive(Default, Serialize)]
+#[derive(Serialize)]
 pub struct ToggleLikeOptions {
     pub id: i32,
+    #[serde(rename = "type")]
+    pub like_type: LikeableType,
 }
 
 #[derive(Default, Serialize)]
@@ -40,7 +44,7 @@ impl CommonEndpoint {
     pub async fn toggle_like(
         &self,
         options: ToggleLikeOptions,
-    ) -> Result<bool, AniListError> {
+    ) -> Result<ToggleLikeResponse, AniListError> {
         let query = common::TOGGLE_LIKE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -50,7 +54,7 @@ impl CommonEndpoint {
     pub async fn toggle_follow(
         &self,
         options: ToggleFollowOptions,
-    ) -> Result<bool, AniListError> {
+    ) -> Result<ToggleFollowResponse, AniListError> {
         let query = common::TOGGLE_FOLLOW;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -60,7 +64,7 @@ impl CommonEndpoint {
     pub async fn toggle_favourite(
         &self,
         options: ToggleFavouriteOptions,
-    ) -> Result<bool, AniListError> {
+    ) -> Result<ToggleFavouriteResponse, AniListError> {
         let query = common::TOGGLE_FAVOURITE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

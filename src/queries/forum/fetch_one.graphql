@@ -63,28 +63,5 @@ query FetchThread(
             donatorBadge
             moderatorRoles
         }
-        childComments {
-            id
-            body(asHtml: false)
-            userId
-            threadId
-            parentCommentId
-            likeCount
-            isLiked
-            createdAt
-            updatedAt
-            siteUrl
-            user {
-                id
-                name
-                avatar {
-                    large
-                    medium
-                }
-                donatorTier
-                donatorBadge
-                moderatorRoles
-            }
-        }
     }
 }

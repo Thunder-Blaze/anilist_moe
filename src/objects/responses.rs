@@ -5,7 +5,10 @@ use crate::objects::media_list::MediaList;
 use crate::objects::character::Character;
 use crate::objects::staff::Staff;
 use crate::objects::studio::Studio;
+use crate::objects::favourites::Favourites;
 use crate::unions::activity::ActivityUnion;
+use crate::unions::likeable::LikeableUnion;
+use crate::objects::activity::ActivityReply;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::recommendation::Recommendation;
 use crate::objects::review::Review;
@@ -81,6 +84,12 @@ pub struct UserData {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActivityData {
     pub activities: Vec<ActivityUnion>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActivityReplyData {
+    #[serde(rename = "activityReplies")]
+    pub activity_replies: Vec<ActivityReply>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -172,6 +181,7 @@ pub type StaffListResponse = GraphQLResponse<PageResponse<StaffData>>;
 pub type StudioListResponse = GraphQLResponse<PageResponse<StudioData>>;
 pub type UserListResponse = GraphQLResponse<PageResponse<UserData>>;
 pub type ActivityListResponse = GraphQLResponse<PageResponse<ActivityData>>;
+pub type ActivityReplyListResponse = GraphQLResponse<PageResponse<ActivityReplyData>>;
 pub type AiringListResponse = GraphQLResponse<PageResponse<AiringData>>;
 pub type AiringSingleResponse = GraphQLResponse<AiringScheduleResponse>;
 pub type RecommendationListResponse = GraphQLResponse<PageResponse<RecommendationData>>;
@@ -187,3 +197,26 @@ pub type UserSingleResponse = GraphQLResponse<UserResponse>;
 pub type ActivitySingleResponse = GraphQLResponse<ActivityResponse>;
 pub type ReviewSingleResponse = GraphQLResponse<ReviewResponse>;
 pub type RecommendationSingleResponse = GraphQLResponse<RecommendationResponse>;
+
+// Common endpoint response types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ToggleLikeData {
+    #[serde(rename = "ToggleLikeV2")]
+    pub toggle_like_v2: LikeableUnion,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ToggleFollowData {
+    #[serde(rename = "ToggleFollow")]
+    pub toggle_follow: User,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ToggleFavouriteData {
+    #[serde(rename = "ToggleFavourite")]
+    pub toggle_favourite: Favourites,
+}
+
+pub type ToggleLikeResponse = GraphQLResponse<ToggleLikeData>;
+pub type ToggleFollowResponse = GraphQLResponse<ToggleFollowData>;
+pub type ToggleFavouriteResponse = GraphQLResponse<ToggleFavouriteData>;

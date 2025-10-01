@@ -48,33 +48,7 @@ query FetchThreadComments(
                     medium
                 }
             }
-            childComments {
-                id
-                userId
-                comment(asHtml: false)
-                likeCount
-                isLiked
-                createdAt
-                updatedAt
-                isLocked
-                user {
-                    id
-                    name
-                    avatar {
-                        large
-                        medium
-                    }
-                    donatorTier
-                    donatorBadge
-                }
-                likes {
-                    id
-                    name
-                    avatar {
-                        medium
-                    }
-                }
-            }
+            childComments
         }
     }
 }

@@ -1,7 +1,7 @@
 use crate::{client::AniListClient, queries::activity};
 use crate::errors::AniListError;
 use crate::enums::activity::{ActivitySort, ActivityType};
-use crate::objects::responses::{ActivityListResponse, ActivityResponse, ActivitySingleResponse};
+use crate::objects::responses::{ActivityListResponse, ActivityResponse, ActivitySingleResponse, ActivityReplyListResponse};
 use serde::Serialize;
 use serde_json::json;
 
@@ -179,7 +179,7 @@ impl ActivityEndpoint {
     pub async fn fetch_replies(
         &self,
         options: FetchActivityRepliesOptions,
-    ) -> Result<ActivityResponse, AniListError> {
+    ) -> Result<ActivityReplyListResponse, AniListError> {
         let query = activity::FETCH_REPLIES;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

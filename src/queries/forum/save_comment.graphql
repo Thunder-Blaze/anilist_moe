@@ -45,20 +45,6 @@ mutation SaveThreadComment(
                 medium
             }
         }
-        childComments {
-            id
-            comment(asHtml: false)
-            likeCount
-            isLiked
-            createdAt
-            user {
-                id
-                name
-                avatar {
-                    large
-                    medium
-                }
-            }
-        }
+        childComments
     }
 }
