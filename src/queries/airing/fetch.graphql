@@ -3,7 +3,7 @@ query AiringSchedule(
     $mediaId: Int
     $episode: Int
     $airingAt: Int
-    $notYetAired: Boolean
+    $notYetAired: Boolean = true
     $id_not: Int
     $id_in: [Int]
     $id_not_in: [Int]
@@ -17,17 +17,13 @@ query AiringSchedule(
     $episode_lesser: Int
     $airingAt_greater: Int
     $airingAt_lesser: Int
-    $sort: [AiringSort]
+    $sort: [AiringSort] = [TIME]
     $page: Int = 1
     $perPage: Int = 20
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
-            total
-            currentPage
-            lastPage
             hasNextPage
-            perPage
         }
         airingSchedules(
             id: $id

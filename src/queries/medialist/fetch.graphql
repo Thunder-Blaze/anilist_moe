@@ -1,0 +1,105 @@
+query FetchMedialist(
+    $userId: Int,
+    $userName: String,
+    $type: MediaType,
+    $status: MediaListStatus,
+    $mediaId: Int,
+    $isFollowing: Boolean,
+    $notes: String,
+    $startedAt: FuzzyDateInt,
+    $completedAt: FuzzyDateInt,
+    $compareWithAuthList: Boolean,
+    $userId_in: [Int],
+    $status_in: [MediaListStatus],
+    $status_not_in: [MediaListStatus],
+    $status_not: MediaListStatus,
+    $mediaId_in: [Int],
+    $mediaId_not_in: [Int],
+    $notes_like: String,
+    $startedAt_greater: FuzzyDateInt,
+    $startedAt_lesser: FuzzyDateInt,
+    $startedAt_like: String,
+    $completedAt_greater: FuzzyDateInt,
+    $completedAt_lesser: FuzzyDateInt,
+    $completedAt_like: String,
+    $sort: [MediaListSort],
+    $page: Int,
+    $perPage: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        PageInfo {
+            hasNextPage
+        }
+        mediaList(
+            userId: $userId
+            userName: $userName
+            type: $type
+            status: $status
+            mediaId: $mediaId
+            isFollowing: $isFollowing
+            notes: $notes
+            startedAt: $startedAt
+            completedAt: $completedAt
+            compareWithAuthList: $compareWithAuthList
+            userId_in: $userId_in
+            status_in: $status_in
+            status_not_in: $status_not_in
+            status_not: $status_not
+            mediaId_in: $mediaId_in
+            mediaId_not_in: $mediaId_not_in
+            notes_like: $notes_like
+            startedAt_greater: $startedAt_greater
+            startedAt_lesser: $startedAt_lesser
+            startedAt_like: $startedAt_like
+            completedAt_greater: $completedAt_greater
+            completedAt_lesser: $completedAt_lesser
+            completedAt_like: $completedAt_like
+            sort: $sort
+        ) {
+            id
+            userId
+            mediaId
+            status
+            score
+            progress
+            progressVolumes
+            repeat
+            priority
+            private
+            notes
+            hiddenFromStatusLists
+            customLists
+            advancedScores
+            startedAt {
+                year
+                month
+                day
+            }
+            completedAt {
+                year
+                month
+                day
+            }
+            updatedAt
+            createdAt
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                }
+                type
+                format
+                status
+                description
+                episodes
+                chapters
+                volumes
+                coverImage {
+                    large
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+mutation ToggleActivityPin($id: Int!, $pinned: Boolean!) {
+    ToggleActivityPin(id: $id, pinned: $pinned) {
+        ... on ActivityUnion {
+            id
+            type
+        }
+    }
+}

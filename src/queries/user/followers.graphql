@@ -1,0 +1,16 @@
+query GetUserFollowers(
+    $userId: Int!,
+    $sort: [UserSort],
+    $page: Int,
+    $perPage: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        followers(userId: $userId, sort: $sort) {
+            id
+            name
+            avatar {
+                large
+            }
+        }
+    }
+}

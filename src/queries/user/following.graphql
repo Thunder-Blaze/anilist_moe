@@ -1,0 +1,16 @@
+query GetFollowing(
+    $userId: Int!,
+    $sort: [UserSort],
+    $page: Int,
+    $perPage: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        following(userId: $userId, sort: $sort) {
+            id
+            name
+            avatar {
+                large
+            }
+        }
+    }
+}

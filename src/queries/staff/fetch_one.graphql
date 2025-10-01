@@ -1,0 +1,211 @@
+query FetchStaff(
+    $id: Int
+    $isBirthday: Boolean
+    $search: String
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    $sort: [StaffSort]
+    # Sub-pagination variables
+    $staffMediaPage: Int = 1
+    $staffMediaPerPage: Int = 10
+    $charactersPage: Int = 1
+    $charactersPerPage: Int = 10
+    $characterMediaPage: Int = 1
+    $characterMediaPerPage: Int = 10
+) {
+    Staff(
+        id: $id
+        isBirthday: $isBirthday
+        search: $search
+        id_not: $id_not
+        id_in: $id_in
+        id_not_in: $id_not_in
+        sort: $sort
+    ) {
+        id
+        name {
+            first
+            middle
+            last
+            full
+            native
+            userPreferred
+        }
+        languageV2
+        image {
+            large
+            medium
+        }
+        description
+        primaryOccupations
+        gender
+        dateOfBirth {
+            year
+            month
+            day
+        }
+        dateOfDeath {
+            year
+            month
+            day
+        }
+        age
+        yearsActive
+        homeTown
+        bloodType
+        isFavourite
+        isFavouriteBlocked
+        siteUrl
+        staffMedia(sort: [START_DATE_DESC], page: $staffMediaPage, perPage: $staffMediaPerPage) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            edges {
+                id
+                staffRole
+                node {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+                    season
+                    seasonYear
+                    episodes
+                    chapters
+                    volumes
+                    averageScore
+                    popularity
+                    coverImage {
+                        large
+                        medium
+                        color
+                    }
+                    bannerImage
+                    genres
+                    isAdult
+                }
+            }
+        }
+        characters(sort: [ROLE, RELEVANCE, ID], page: $charactersPage, perPage: $charactersPerPage) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            edges {
+                id
+                role
+                node {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                        userPreferred
+                    }
+                    image {
+                        large
+                        medium
+                    }
+                    description
+                    gender
+                    dateOfBirth {
+                        year
+                        month
+                        day
+                    }
+                    age
+                    bloodType
+                    isFavourite
+                    siteUrl
+                    favourites
+                }
+            }
+        }
+        characterMedia(sort: [START_DATE_DESC], page: $characterMediaPage, perPage: $characterMediaPerPage) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            edges {
+                id
+                characterRole
+                node {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    season
+                    seasonYear
+                    episodes
+                    chapters
+                    averageScore
+                    popularity
+                    coverImage {
+                        large
+                        medium
+                        color
+                    }
+                    genres
+                    isAdult
+                }
+            }
+        }
+        staff {
+            id
+            name {
+                full
+            }
+            image {
+                large
+            }
+        }
+        submitter {
+            id
+            name
+        }
+        submissionStatus
+        submissionNotes
+        favourites
+        modNotes
+    }
+}

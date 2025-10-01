@@ -1,6 +1,9 @@
 use crate::client::AniListClient;
 use crate::errors::AniListError;
-use crate::objects::responses::AiringListResponse;
+use crate::{
+    objects::responses::AiringListResponse,
+    enums::airing::AiringSort,
+};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -24,7 +27,7 @@ pub struct AiringSearchOptions {
     #[serde(rename = "airingAt_lesser", skip_serializing_if = "Option::is_none")]
     pub airing_at_lesser: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<Vec<crate::enums::airing::AiringSort>>,
+    pub sort: Option<Vec<AiringSort>>,
 }
 
 pub struct AiringEndpoint(pub(crate) AniListClient);
@@ -39,7 +42,7 @@ impl AiringEndpoint {
         let options = AiringSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
-            sort: Some(vec![crate::enums::airing::AiringSort::Time]),
+            sort: Some(vec![AiringSort::Time]),
             ..Default::default()
         };
         self.search_airing_schedule(options).await
@@ -50,7 +53,7 @@ impl AiringEndpoint {
         let options = AiringSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
-            sort: Some(vec![crate::enums::airing::AiringSort::Time]),
+            sort: Some(vec![AiringSort::Time]),
             ..Default::default()
         };
         self.search_airing_schedule(options).await
@@ -61,7 +64,7 @@ impl AiringEndpoint {
         let options = AiringSearchOptions {
             page: Some(page),
             per_page: Some(per_page),
-            sort: Some(vec![crate::enums::airing::AiringSort::Time]),
+            sort: Some(vec![AiringSort::Time]),
             ..Default::default()
         };
         self.search_airing_schedule(options).await

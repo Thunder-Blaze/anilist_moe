@@ -1,14 +1,11 @@
-mutation ($activityId: Int, $text: String) {
+mutation SaveActivityReply(
+    $id: Int
+    $activityId: Int!
+    $text: String!
+) {
     SaveActivityReply(activityId: $activityId, text: $text) {
         id
         text
-        user {
-            id
-            name
-            avatar {
-                medium
-            }
-        }
         activityId
         createdAt
         likeCount

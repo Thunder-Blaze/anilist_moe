@@ -31,6 +31,9 @@ query FetchActivity($id: Int) {
             isSubscribed
             user {
                 ...UserFields
+                donatorTier
+                donatorBadge
+                moderatorRoles
             }
             media {
                 ...MediaFields
@@ -50,6 +53,9 @@ query FetchActivity($id: Int) {
             isSubscribed
             user {
                 ...UserFields
+                donatorTier
+                donatorBadge
+                moderatorRoles
             }
             likes {
                 ...UserFields
@@ -66,9 +72,15 @@ query FetchActivity($id: Int) {
             isSubscribed
             messenger {
                 ...UserFields
+                donatorTier
+                donatorBadge
+                moderatorRoles
             }
             recipient {
                 ...UserFields
+                donatorTier
+                donatorBadge
+                moderatorRoles
             }
             likes {
                 ...UserFields

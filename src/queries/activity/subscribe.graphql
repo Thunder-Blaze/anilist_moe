@@ -1,0 +1,16 @@
+mutation ToggleActivitySubscription($activityId: Int!, $subscribe: Boolean!) {
+    ToggleActivitySubscription(activityId: $activityId, subscribe: $subscribe) {
+        ... on ListActivity {
+            id
+            isSubscribed
+        }
+        ... on TextActivity {
+            id
+            isSubscribed
+        }
+        ... on MessageActivity {
+            id
+            isSubscribed
+        }
+    }
+}

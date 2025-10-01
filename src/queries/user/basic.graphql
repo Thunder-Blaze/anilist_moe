@@ -1,0 +1,18 @@
+query BasicUserInfo {
+    Viewer {
+        id
+        name
+        avatar {
+            large
+        }
+        statistics {
+            anime {
+                episodesWatched
+            }
+            manga {
+                chaptersRead
+            }
+        }
+        unreadNotificationCount
+    }
+}

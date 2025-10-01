@@ -1,6 +1,6 @@
 mutation SaveMediaListEntry(
     $id: Int
-    $mediaId: Int!
+    $mediaId: Int
     $status: MediaListStatus
     $score: Float
     $scoreRaw: Int
@@ -35,12 +35,10 @@ mutation SaveMediaListEntry(
         completedAt: $completedAt
     ) {
         id
-        userId
         mediaId
         status
-        score(format: POINT_100)
+        score
         progress
-        progressVolumes
         repeat
         priority
         private
@@ -57,31 +55,6 @@ mutation SaveMediaListEntry(
             year
             month
             day
-        }
-        updatedAt
-        createdAt
-        media {
-            id
-            title {
-                romaji
-                english
-                native
-                userPreferred
-            }
-            type
-            format
-            status
-            episodes
-            volumes
-            chapters
-            coverImage {
-                large
-                medium
-            }
-        }
-        user {
-            id
-            name
         }
     }
 }
