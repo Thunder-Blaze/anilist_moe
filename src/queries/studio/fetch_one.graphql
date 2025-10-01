@@ -21,7 +21,6 @@ query FetchStudio(
         name
         isAnimationStudio
         isFavourite
-        isFavouriteBlocked
         siteUrl
         media(sort: [START_DATE_DESC], page: $mediaPage, perPage: $mediaPerPage) {
             pageInfo {
@@ -33,7 +32,7 @@ query FetchStudio(
             }
             edges {
                 id
-                isMain
+                isMainStudio
                 node {
                     id
                     title {

@@ -1,7 +1,7 @@
 use crate::{client::AniListClient, queries::studio};
 use crate::errors::AniListError;
 use crate::enums::studio::StudioSort;
-use crate::objects::responses::StudioListResponse;
+use crate::objects::responses::{StudioListResponse, StudioSingleResponse};
 use serde::Serialize;
 use serde_json::json;
 
@@ -68,7 +68,7 @@ impl StudioEndpoint {
     pub async fn fetch_one(
         &self,
         options: FetchStudioOneOptions,
-    ) -> Result<StudioListResponse, AniListError> {
+    ) -> Result<StudioSingleResponse, AniListError> {
         let query = studio::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

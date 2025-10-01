@@ -2,7 +2,7 @@ use crate::enums::media::MediaSort;
 use crate::{client::AniListClient, queries::character};
 use crate::errors::AniListError;
 use crate::enums::character::CharacterSort;
-use crate::objects::responses::CharacterListResponse;
+use crate::objects::responses::{CharacterListResponse, CharacterSingleResponse};
 use serde::Serialize;
 use serde_json::json;
 
@@ -80,7 +80,7 @@ impl CharacterEndpoint {
     pub async fn fetch_one(
         &self,
         options: FetchCharacterOneOptions,
-    ) -> Result<CharacterListResponse, AniListError> {
+    ) -> Result<CharacterSingleResponse, AniListError> {
         let query = character::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

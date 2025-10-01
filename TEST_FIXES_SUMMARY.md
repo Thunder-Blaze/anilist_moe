@@ -14,7 +14,7 @@ Fixed multiple structural and type issues in the codebase to improve endpoint te
 pub anime_status: Option<UserStatistics>,
 pub manga_status: Option<UserStatistics>,
 
-// After  
+// After
 pub anime: Option<UserStatistics>,
 pub manga: Option<UserStatistics>,
 ```
@@ -84,7 +84,7 @@ pub length: Option<String>,
 - Multiple character, staff, and airing tests failing
 
 ### After Fixes
-- **17 passed, 7 failed** (71% pass rate)  
+- **17 passed, 7 failed** (71% pass rate)
 - ✅ All user endpoint tests passing (4/4)
 - ✅ All basic fetch tests passing for media, character, staff, studio
 - ✅ Pagination tests passing
@@ -110,7 +110,7 @@ All failures are due to **invalid GraphQL query fields** in the `fetch_one` quer
 To fix the remaining 7 tests, the following GraphQL queries need to be corrected:
 
 1. `src/queries/media/fetch_one.graphql` - Remove invalid fields
-2. `src/queries/character/fetch_one.graphql` - Remove invalid fields  
+2. `src/queries/character/fetch_one.graphql` - Remove invalid fields
 3. `src/queries/staff/fetch_one.graphql` - Remove invalid fields
 4. `src/queries/studio/fetch_one.graphql` - Remove invalid fields
 5. `src/queries/airing/fetch.graphql` - Fix field names

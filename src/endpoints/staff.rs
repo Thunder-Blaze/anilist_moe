@@ -2,7 +2,7 @@ use serde::Serialize;
 use crate::{client::AniListClient, queries::staff};
 use crate::errors::AniListError;
 use crate::enums::staff::StaffSort;
-use crate::objects::responses::StaffListResponse;
+use crate::objects::responses::{StaffListResponse, StaffSingleResponse};
 use serde_json::json;
 
 #[derive(Default, Serialize)]
@@ -76,7 +76,7 @@ impl StaffEndpoint {
     pub async fn fetch_one(
         &self,
         options: FetchStaffOneOptions,
-    ) -> Result<StaffListResponse, AniListError> {
+    ) -> Result<StaffSingleResponse, AniListError> {
         let query = staff::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

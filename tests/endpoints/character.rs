@@ -13,11 +13,11 @@ async fn test_fetch_character_by_search() {
 
     let result = client.character().fetch(options).await;
     assert!(result.is_ok(), "Should successfully fetch characters");
-    
+
     let response = result.unwrap();
     let characters = &response.data.page.data.characters;
     assert!(!characters.is_empty(), "Should return at least one character");
-    
+
     let first_char = &characters[0];
     assert!(first_char.id > 0, "Character should have a positive ID");
     assert!(first_char.name.is_some(), "Character should have a name");
@@ -33,7 +33,7 @@ async fn test_fetch_character_by_id() {
 
     let result = client.character().fetch(options).await;
     assert!(result.is_ok(), "Should successfully fetch character by ID");
-    
+
     let response = result.unwrap();
     let characters = &response.data.page.data.characters;
     assert_eq!(characters.len(), 1, "Should return exactly one character");
@@ -50,11 +50,11 @@ async fn test_fetch_one_character() {
 
     let result = client.character().fetch_one(options).await;
     assert!(result.is_ok(), "Should successfully fetch one character");
-    
+
     let response = result.unwrap();
-    let characters = &response.data.page.data.characters;
-    assert!(!characters.is_empty(), "Should return character");
-    assert_eq!(characters[0].id, 1, "Should return character with ID 1");
+    let character = &response.data.character;
+    assert_eq!(character.id, 1, "Should return character with ID 1");
+    assert!(character.name.is_some(), "Character should have a name");
 }
 
 #[tokio::test]
@@ -67,16 +67,16 @@ async fn test_character_data_types() {
 
     let result = client.character().fetch(options).await;
     assert!(result.is_ok(), "Should successfully fetch character");
-    
+
     let response = result.unwrap();
     let character = &response.data.page.data.characters[0];
-    
+
     assert!(character.id > 0, "ID should be positive");
-    
+
     if let Some(favourites) = character.favourites {
         assert!(favourites >= 0, "Favourites should be non-negative");
     }
-    
+
     if let Some(ref name) = character.name {
         let has_name = name.first.is_some() || name.last.is_some() || name.full.is_some();
         assert!(has_name, "Name should have at least one field");

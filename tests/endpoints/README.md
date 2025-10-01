@@ -4,11 +4,11 @@
 
 This directory contains **24 comprehensive integration tests** for all AniList API endpoints. These tests verify that:
 
-✅ Data is successfully fetched from the API  
-✅ JSON responses are correctly parsed into Rust structs  
-✅ Field types match expectations (i32, String, Option<T>, etc.)  
-✅ Pagination works correctly  
-✅ Search and filtering options work  
+✅ Data is successfully fetched from the API
+✅ JSON responses are correctly parsed into Rust structs
+✅ Field types match expectations (i32, String, Option<T>, etc.)
+✅ Pagination works correctly
+✅ Search and filtering options work
 
 ## 🧪 Test Coverage
 

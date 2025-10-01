@@ -1,7 +1,7 @@
 use crate::{client::AniListClient, queries::media};
 use crate::errors::AniListError;
 use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
-use crate::objects::responses::MediaListResponse;
+use crate::objects::responses::{MediaListResponse, MediaSingleResponse};
 use serde::Serialize;
 use serde_json::json;
 
@@ -207,7 +207,7 @@ impl MediaEndpoint {
     pub async fn fetch_one(
         &self,
         options: FetchMediaOneOptions,
-    ) -> Result<MediaListResponse, AniListError> {
+    ) -> Result<MediaSingleResponse, AniListError> {
         let query = media::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

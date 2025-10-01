@@ -27,7 +27,8 @@ use crate::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Media {
-    pub id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<i32>,
     #[serde(rename = "idMal", skip_serializing_if = "Option::is_none")]
     pub id_mal: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]

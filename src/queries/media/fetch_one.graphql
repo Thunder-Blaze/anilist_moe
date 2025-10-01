@@ -132,10 +132,9 @@ query (
                             full
                             native
                             alternative
-                            alternativeSpoiler
                             userPreferred
                         }
-                        language: JAPANESE
+                        language
                         image {
                             large
                         }
@@ -171,7 +170,6 @@ query (
                         full
                         native
                         alternative
-                        alternativeSpoiler
                         userPreferred
                     }
                     image {
@@ -184,14 +182,7 @@ query (
                         month
                         day
                     }
-                    dateOfDeath {
-                        year
-                        month
-                        day
-                    }
                     age
-                    yearsActive
-                    homeTown
                     bloodType
                     isFavourite
                     isFavouriteBlocked
@@ -221,7 +212,6 @@ query (
                         full
                         native
                         alternative
-                        alternativeSpoiler
                         userPreferred
                     }
                     language

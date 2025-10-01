@@ -11,7 +11,7 @@ Created comprehensive integration tests for all AniList API endpoints. These tes
 
 ### ✅ Completed
 - **Media** (5 tests) - Fully working
-- **Character** (4 tests) - Fully working  
+- **Character** (4 tests) - Fully working
 - **Airing** (3 tests) - Fully working
 
 ### ⚠️ Needs Minor Fixes

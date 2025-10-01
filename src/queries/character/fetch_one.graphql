@@ -28,7 +28,6 @@ query FetchCharacter(
             full
             native
             alternative
-            alternativeSpoiler
             userPreferred
         }
         image {

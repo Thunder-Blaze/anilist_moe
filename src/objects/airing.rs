@@ -14,15 +14,17 @@ pub struct AiringProgression {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AiringSchedule {
-    pub id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<i32>,
     #[serde(rename = "airingAt")]
     pub airing_at: i32,
     #[serde(rename = "timeUntilAiring")]
     pub time_until_airing: i32,
     pub episode: i32,
-    #[serde(rename = "mediaId")]
-    pub media_id: i32,
-    pub media: Box<Option<Media>>,
+    #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
+    pub media_id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub media: Option<Box<Media>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
