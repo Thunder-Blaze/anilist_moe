@@ -8,13 +8,13 @@ use crate::objects::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Favourites {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub anime: Option<Vec<MediaConnection>>,
+    pub anime: Option<MediaConnection>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub manga: Option<Vec<MediaConnection>>,
+    pub manga: Option<MediaConnection>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub characters: Option<Vec<CharacterConnection>>,
+    pub characters: Option<CharacterConnection>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub staff: Option<Vec<StaffConnection>>,
+    pub staff: Option<StaffConnection>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub studios: Option<Vec<StudioConnection>>,
+    pub studios: Option<StudioConnection>,
 }

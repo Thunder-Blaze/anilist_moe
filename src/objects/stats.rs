@@ -142,14 +142,14 @@ pub struct TagStats {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserCountryStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country: Option<CountryCode>,
 }
@@ -157,14 +157,14 @@ pub struct UserCountryStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserFormatStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<MediaFormat>,
 }
@@ -172,14 +172,14 @@ pub struct UserFormatStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserGenreStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub genre: Option<String>,
 }
@@ -187,29 +187,29 @@ pub struct UserGenreStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserLengthStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub length: Option<i32>,
+    pub length: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserReleaseYearStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(rename = "releaseYear", skip_serializing_if = "Option::is_none")]
     pub release_year: Option<i32>,
 }
@@ -217,14 +217,14 @@ pub struct UserReleaseYearStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserScoreStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<i32>,
 }
@@ -232,14 +232,14 @@ pub struct UserScoreStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStaffStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub staff: Option<Staff>,
 }
@@ -247,41 +247,42 @@ pub struct UserStaffStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStartYearStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(rename = "startYear", skip_serializing_if = "Option::is_none")]
     pub start_year: Option<i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStatisticTypes {
-    #[serde(rename = "animeStatus", skip_serializing_if = "Option::is_none")]
-    pub anime_status: Option<UserStatistics>,
-    #[serde(rename = "mangaStatus", skip_serializing_if = "Option::is_none")]
-    pub manga_status: Option<UserStatistics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub anime: Option<UserStatistics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub manga: Option<UserStatistics>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStatistics {
-    pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "standardDeviation")]
-    pub standard_deviation: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "episodesWatched")]
-    pub episodes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "volumesRead")]
-    pub volumes_read: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub count: Option<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "standardDeviation", skip_serializing_if = "Option::is_none")]
+    pub standard_deviation: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "episodesWatched", skip_serializing_if = "Option::is_none")]
+    pub episodes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "volumesRead", skip_serializing_if = "Option::is_none")]
+    pub volumes_read: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub formats: Option<Vec<UserFormatStatistic>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -349,14 +350,14 @@ pub struct UserStats {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStatusStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<MediaListStatus>,
 }
@@ -364,14 +365,14 @@ pub struct UserStatusStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserStudioStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub studio: Option<Studio>,
 }
@@ -379,14 +380,14 @@ pub struct UserStudioStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserTagStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<MediaTag>,
 }
@@ -394,18 +395,18 @@ pub struct UserTagStatistic {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserVoiceActorStatistic {
     pub count: i32,
-    #[serde(rename = "meanScore")]
-    pub mean_score: f32,
-    #[serde(rename = "minutesWatched")]
-    pub minutes_watched: i32,
-    #[serde(rename = "chaptersRead")]
-    pub chapters_read: i32,
-    #[serde(rename = "mediaIds")]
-    pub media_ids: Vec<i32>,
+    #[serde(rename = "meanScore", skip_serializing_if = "Option::is_none")]
+    pub mean_score: Option<f32>,
+    #[serde(rename = "minutesWatched", skip_serializing_if = "Option::is_none")]
+    pub minutes_watched: Option<i32>,
+    #[serde(rename = "chaptersRead", skip_serializing_if = "Option::is_none")]
+    pub chapters_read: Option<i32>,
+    #[serde(rename = "mediaIds", skip_serializing_if = "Option::is_none")]
+    pub media_ids: Option<Vec<i32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub voice_actor: Option<Staff>,
-    #[serde(rename = "characterIds")]
-    pub character_ids: Vec<i32>,
+    #[serde(rename = "characterIds", skip_serializing_if = "Option::is_none")]
+    pub character_ids: Option<Vec<i32>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
