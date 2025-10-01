@@ -3,7 +3,7 @@ query Notifications(
     $perPage: Int = 20
     $type: NotificationType
     $type_in: [NotificationType]
-    $reset: Boolean
+    $resetNotificationCount: Boolean
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -12,7 +12,7 @@ query Notifications(
         notifications(
             type: $type
             type_in: $type_in
-            resetNotificationCount: $reset
+            resetNotificationCount: $resetNotificationCount
         ) {
             ... on AiringNotification {
                 id

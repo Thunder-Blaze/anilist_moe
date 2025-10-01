@@ -1,23 +1,19 @@
 use serde::Serialize;
-use crate::client::AniListClient;
+use crate::endpoints::Vth;
+use crate::{client::AniListClient, queries::staff};
 use crate::errors::AniListError;
 use crate::enums::staff::StaffSort;
 use crate::objects::responses::StaffListResponse;
-use serde_json::{json, Value};
-use std::collections::HashMap;
+use serde_json::json;
 
 #[derive(Default, Serialize)]
-pub struct StaffSearchOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
-    pub per_page: Option<i32>,
+pub struct FetchStaffOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub search: Option<String>,
     #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
     pub is_birthday: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search: Option<String>,
     #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
@@ -28,6 +24,37 @@ pub struct StaffSearchOptions {
     pub sort: Option<Vec<StaffSort>>,
 }
 
+#[derive(Default, Serialize)]
+pub struct FetchStaffOneOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<i32>,
+    #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
+    pub is_birthday: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search: Option<String>,
+    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    pub id_not: Option<i32>,
+    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    pub id_in: Option<Vec<i32>>,
+    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    pub id_not_in: Option<Vec<i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Vec<StaffSort>>,
+    // Sub-pagination variables
+    #[serde(rename = "staffMediaPage", skip_serializing_if = "Option::is_none")]
+    pub staff_media_page: Option<i32>,
+    #[serde(rename = "staffMediaPerPage", skip_serializing_if = "Option::is_none")]
+    pub staff_media_per_page: Option<i32>,
+    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    pub characters_page: Option<i32>,
+    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    pub characters_per_page: Option<i32>,
+    #[serde(rename = "characterMediaPage", skip_serializing_if = "Option::is_none")]
+    pub character_media_page: Option<i32>,
+    #[serde(rename = "characterMediaPerPage", skip_serializing_if = "Option::is_none")]
+    pub character_media_per_page: Option<i32>,
+}
+
 pub struct StaffEndpoint(pub(crate) AniListClient);
 
 impl StaffEndpoint {
@@ -35,30 +62,27 @@ impl StaffEndpoint {
         Self(client)
     }
 
-    pub async fn search_staff(
+    pub async fn fetch(
         &self,
-        options: StaffSearchOptions,
+        options: FetchStaffOptions,
     ) -> Result<StaffListResponse, AniListError> {
-        let query = include_str!("../queries/staff/search_staff.graphql");
+        let query = staff::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
         self.0.query_typed(query, Some(&variables_map)).await
     }
 
-    pub async fn get_staff_by_id(&self, id: i32) -> Result<StaffListResponse, AniListError> {
-        let options = StaffSearchOptions {
-            id: Some(id),
-            ..Default::default()
-        };
-        self.search_staff(options).await
-    }
-
-    fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
-        match value {
-            Value::Object(map) => map.into_iter().collect(),
-            _ => HashMap::new(),
-        }
+    pub async fn fetch_one(
+        &self,
+        options: FetchStaffOneOptions,
+    ) -> Result<StaffListResponse, AniListError> {
+        let query = staff::FETCH_ONE;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.0.query_typed(query, Some(&variables_map)).await
     }
 }
+
+impl Vth for StaffEndpoint {}
 
 

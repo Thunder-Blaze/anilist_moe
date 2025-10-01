@@ -1,0 +1,25 @@
+query (
+  $page: Int
+  $id: Int
+  $perPage: Int
+  $search: String
+  $sort: [StudioSort]
+  # NOT filters
+  $id_not: Int
+  $id_in: [Int]
+  $id_not_in: [Int]
+) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      hasNextPage
+    }
+    studios(id: $id, search: $search, sort: $sort, id_not: $id_not, id_in: $id_in, id_not_in: $id_not_in) {
+      id
+      name
+      isAnimationStudio
+      isFavourite
+      siteUrl
+      favourites
+    }
+  }
+}

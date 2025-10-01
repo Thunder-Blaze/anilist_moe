@@ -57,7 +57,7 @@ query FetchStaff(
         isFavourite
         isFavouriteBlocked
         siteUrl
-        staffMedia(sort: [START_DATE_DESC], page: $staffMediaPage, perPage: $staffMediaPerPage) {
+        staffMedia(sort: POPULARITY_DESC, page: $staffMediaPage, perPage: $staffMediaPerPage) {
             pageInfo {
                 total
                 perPage
@@ -107,7 +107,7 @@ query FetchStaff(
                 }
             }
         }
-        characters(sort: [ROLE, RELEVANCE, ID], page: $charactersPage, perPage: $charactersPerPage) {
+        characters(sort: RELEVANCE, page: $charactersPage, perPage: $charactersPerPage) {
             pageInfo {
                 total
                 perPage
@@ -147,7 +147,7 @@ query FetchStaff(
                 }
             }
         }
-        characterMedia(sort: [START_DATE_DESC], page: $characterMediaPage, perPage: $characterMediaPerPage) {
+        characterMedia(sort: POPULARITY_DESC, page: $characterMediaPage, perPage: $characterMediaPerPage) {
             pageInfo {
                 total
                 perPage

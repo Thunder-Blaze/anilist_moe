@@ -1,154 +1,189 @@
-use crate::client::AniListClient;
+use crate::endpoints::Vth;
+use crate::{client::AniListClient, queries::media};
 use crate::errors::AniListError;
-use crate::helpers::query_builders::{QueryBuilder, QueryType, MediaSearchQueryBuilder};
 use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
 use crate::objects::responses::MediaListResponse;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::collections::HashMap;
+use serde::Serialize;
+use serde_json::json;
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct AnimeSearchOptions {
-    // Basic search
-    pub search_term: Option<String>,
+#[derive(Default, Serialize)]
+pub struct FetchMediaOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    pub format: Option<Vec<MediaFormat>>,
-    pub status: Option<MediaStatus>,
-    pub season: Option<MediaSeason>,
-    pub season_year: Option<i32>,
-    pub year: Option<String>,
-    pub genre: Option<Vec<String>>,
-    pub tag: Option<Vec<String>>,
-
-    // Extended parameters
+    #[serde(rename = "idMal", skip_serializing_if = "Option::is_none")]
     pub id_mal: Option<i32>,
-    pub start_date: Option<i32>,
-    pub end_date: Option<i32>,
-    pub episodes: Option<i32>,
-    pub duration: Option<i32>,
-    pub chapters: Option<i32>,
-    pub volumes: Option<i32>,
-    pub is_adult: Option<bool>,
-    pub is_licensed: Option<bool>,
-    pub average_score: Option<i32>,
-    pub popularity: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search: Option<String>,
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    pub media_type: Option<MediaType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format: Option<MediaFormat>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<MediaStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub season: Option<MediaSeason>,
+    #[serde(rename = "seasonYear", skip_serializing_if = "Option::is_none")]
+    pub season_year: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub genre: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    #[serde(rename = "tagCategory", skip_serializing_if = "Option::is_none")]
+    pub tag_category: Option<String>,
+    #[serde(rename = "minimumTagRank", skip_serializing_if = "Option::is_none")]
+    pub minimum_tag_rank: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
+    #[serde(rename = "countryOfOrigin", skip_serializing_if = "Option::is_none")]
     pub country_of_origin: Option<String>,
-
-    // NOT filters
+    #[serde(rename = "isLicensed", skip_serializing_if = "Option::is_none")]
+    pub is_licensed: Option<bool>,
+    #[serde(rename = "isAdult", skip_serializing_if = "Option::is_none")]
+    pub is_adult: Option<bool>,
+    #[serde(rename = "onList", skip_serializing_if = "Option::is_none")]
+    pub on_list: Option<bool>,
+    #[serde(rename = "licensedBy", skip_serializing_if = "Option::is_none")]
+    pub licensed_by: Option<String>,
+    #[serde(rename = "licensedById", skip_serializing_if = "Option::is_none")]
+    pub licensed_by_id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_in: Option<Vec<i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not_in: Option<Vec<i32>>,
+    #[serde(rename = "idMal_not", skip_serializing_if = "Option::is_none")]
     pub id_mal_not: Option<i32>,
+    #[serde(rename = "idMal_in", skip_serializing_if = "Option::is_none")]
     pub id_mal_in: Option<Vec<i32>>,
+    #[serde(rename = "idMal_not_in", skip_serializing_if = "Option::is_none")]
     pub id_mal_not_in: Option<Vec<i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub format_not: Option<MediaFormat>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub format_in: Option<Vec<MediaFormat>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub format_not_in: Option<Vec<MediaFormat>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status_not: Option<MediaStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status_in: Option<Vec<MediaStatus>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status_not_in: Option<Vec<MediaStatus>>,
-    pub genre_not_in: Option<Vec<String>>,
-    pub tag_not_in: Option<Vec<String>>,
-
-    // Range filters
-    pub episodes_greater: Option<i32>,
-    pub episodes_lesser: Option<i32>,
-    pub duration_greater: Option<i32>,
-    pub duration_lesser: Option<i32>,
-    pub chapters_greater: Option<i32>,
-    pub chapters_lesser: Option<i32>,
-    pub volumes_greater: Option<i32>,
-    pub volumes_lesser: Option<i32>,
-    pub average_score_greater: Option<i32>,
-    pub average_score_lesser: Option<i32>,
-    pub popularity_greater: Option<i32>,
-    pub popularity_lesser: Option<i32>,
-    pub start_date_greater: Option<i32>,
-    pub start_date_lesser: Option<i32>,
-    pub start_date_like: Option<String>,
-    pub end_date_greater: Option<i32>,
-    pub end_date_lesser: Option<i32>,
-    pub end_date_like: Option<String>,
-
-    // Array filters
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub genre_in: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub genre_not_in: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag_in: Option<Vec<String>>,
-
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_not_in: Option<Vec<String>>,
+    #[serde(rename = "tagCategory_in", skip_serializing_if = "Option::is_none")]
+    pub tag_category_in: Option<Vec<String>>,
+    #[serde(rename = "tagCategory_not_in", skip_serializing_if = "Option::is_none")]
+    pub tag_category_not_in: Option<Vec<String>>,
+    #[serde(rename = "licensedBy_in", skip_serializing_if = "Option::is_none")]
+    pub licensed_by_in: Option<Vec<String>>,
+    #[serde(rename = "licensedById_in", skip_serializing_if = "Option::is_none")]
+    pub licensed_by_id_in: Option<Vec<i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_in: Option<Vec<String>>,
+    #[serde(rename = "startDate", skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<i32>,
+    #[serde(rename = "endDate", skip_serializing_if = "Option::is_none")]
+    pub end_date: Option<i32>,
+    #[serde(rename = "startDate_greater", skip_serializing_if = "Option::is_none")]
+    pub start_date_greater: Option<i32>,
+    #[serde(rename = "startDate_lesser", skip_serializing_if = "Option::is_none")]
+    pub start_date_lesser: Option<i32>,
+    #[serde(rename = "startDate_like", skip_serializing_if = "Option::is_none")]
+    pub start_date_like: Option<String>,
+    #[serde(rename = "endDate_greater", skip_serializing_if = "Option::is_none")]
+    pub end_date_greater: Option<i32>,
+    #[serde(rename = "endDate_lesser", skip_serializing_if = "Option::is_none")]
+    pub end_date_lesser: Option<i32>,
+    #[serde(rename = "endDate_like", skip_serializing_if = "Option::is_none")]
+    pub end_date_like: Option<String>,
+    #[serde(rename = "averageScore", skip_serializing_if = "Option::is_none")]
+    pub average_score: Option<i32>,
+    #[serde(rename = "averageScore_not", skip_serializing_if = "Option::is_none")]
+    pub average_score_not: Option<i32>,
+    #[serde(rename = "averageScore_greater", skip_serializing_if = "Option::is_none")]
+    pub average_score_greater: Option<i32>,
+    #[serde(rename = "averageScore_lesser", skip_serializing_if = "Option::is_none")]
+    pub average_score_lesser: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub popularity: Option<i32>,
+    #[serde(rename = "popularity_not", skip_serializing_if = "Option::is_none")]
+    pub popularity_not: Option<i32>,
+    #[serde(rename = "popularity_greater", skip_serializing_if = "Option::is_none")]
+    pub popularity_greater: Option<i32>,
+    #[serde(rename = "popularity_lesser", skip_serializing_if = "Option::is_none")]
+    pub popularity_lesser: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub episodes: Option<i32>,
+    #[serde(rename = "episodes_greater", skip_serializing_if = "Option::is_none")]
+    pub episodes_greater: Option<i32>,
+    #[serde(rename = "episodes_lesser", skip_serializing_if = "Option::is_none")]
+    pub episodes_lesser: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<i32>,
+    #[serde(rename = "duration_greater", skip_serializing_if = "Option::is_none")]
+    pub duration_greater: Option<i32>,
+    #[serde(rename = "duration_lesser", skip_serializing_if = "Option::is_none")]
+    pub duration_lesser: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chapters: Option<i32>,
+    #[serde(rename = "chapters_greater", skip_serializing_if = "Option::is_none")]
+    pub chapters_greater: Option<i32>,
+    #[serde(rename = "chapters_lesser", skip_serializing_if = "Option::is_none")]
+    pub chapters_lesser: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub volumes: Option<i32>,
+    #[serde(rename = "volumes_greater", skip_serializing_if = "Option::is_none")]
+    pub volumes_greater: Option<i32>,
+    #[serde(rename = "volumes_lesser", skip_serializing_if = "Option::is_none")]
+    pub volumes_lesser: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<MediaSort>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
+    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
     pub per_page: Option<i32>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct MangaSearchOptions {
-    // Basic search
-    pub search_term: Option<String>,
+#[derive(Default, Serialize)]
+pub struct FetchMediaOneOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    pub format: Option<Vec<MediaFormat>>,
-    pub status: Option<MediaStatus>,
-    pub year: Option<String>,
-    pub genre: Option<Vec<String>>,
-    pub tag: Option<Vec<String>>,
-
-    // Extended parameters
-    pub id_mal: Option<i32>,
-    pub start_date: Option<i32>,
-    pub end_date: Option<i32>,
-    pub episodes: Option<i32>,
-    pub duration: Option<i32>,
-    pub chapters: Option<i32>,
-    pub volumes: Option<i32>,
-    pub is_adult: Option<bool>,
-    pub is_licensed: Option<bool>,
-    pub average_score: Option<i32>,
-    pub popularity: Option<i32>,
-    pub source: Option<String>,
-    pub country_of_origin: Option<String>,
-
-    // NOT filters
-    pub id_not: Option<i32>,
-    pub id_in: Option<Vec<i32>>,
-    pub id_not_in: Option<Vec<i32>>,
-    pub id_mal_not: Option<i32>,
-    pub id_mal_in: Option<Vec<i32>>,
-    pub id_mal_not_in: Option<Vec<i32>>,
-    pub format_not: Option<MediaFormat>,
-    pub format_in: Option<Vec<MediaFormat>>,
-    pub format_not_in: Option<Vec<MediaFormat>>,
-    pub status_not: Option<MediaStatus>,
-    pub status_in: Option<Vec<MediaStatus>>,
-    pub status_not_in: Option<Vec<MediaStatus>>,
-    pub genre_not_in: Option<Vec<String>>,
-    pub tag_not_in: Option<Vec<String>>,
-
-    // Range filters
-    pub episodes_greater: Option<i32>,
-    pub episodes_lesser: Option<i32>,
-    pub duration_greater: Option<i32>,
-    pub duration_lesser: Option<i32>,
-    pub chapters_greater: Option<i32>,
-    pub chapters_lesser: Option<i32>,
-    pub volumes_greater: Option<i32>,
-    pub volumes_lesser: Option<i32>,
-    pub average_score_greater: Option<i32>,
-    pub average_score_lesser: Option<i32>,
-    pub popularity_greater: Option<i32>,
-    pub popularity_lesser: Option<i32>,
-    pub start_date_greater: Option<i32>,
-    pub start_date_lesser: Option<i32>,
-    pub start_date_like: Option<String>,
-    pub end_date_greater: Option<i32>,
-    pub end_date_lesser: Option<i32>,
-    pub end_date_like: Option<String>,
-
-    // Array filters
-    pub genre_in: Option<Vec<String>>,
-    pub tag_in: Option<Vec<String>>,
-
-    pub sort: Option<Vec<MediaSort>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    // Characters pagination
+    #[serde(rename = "fetchCharacters", skip_serializing_if = "Option::is_none")]
+    pub fetch_characters: Option<bool>,
+    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    pub characters_page: Option<i32>,
+    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    pub characters_per_page: Option<i32>,
+    // Staff pagination
+    #[serde(rename = "fetchStaff", skip_serializing_if = "Option::is_none")]
+    pub fetch_staff: Option<bool>,
+    #[serde(rename = "staffPage", skip_serializing_if = "Option::is_none")]
+    pub staff_page: Option<i32>,
+    #[serde(rename = "staffPerPage", skip_serializing_if = "Option::is_none")]
+    pub staff_per_page: Option<i32>,
+    // Reviews pagination
+    #[serde(rename = "fetchReviews", skip_serializing_if = "Option::is_none")]
+    pub fetch_reviews: Option<bool>,
+    #[serde(rename = "reviewsPage", skip_serializing_if = "Option::is_none")]
+    pub reviews_page: Option<i32>,
+    #[serde(rename = "reviewsPerPage", skip_serializing_if = "Option::is_none")]
+    pub reviews_per_page: Option<i32>,
+    // Recommendations pagination
+    #[serde(rename = "fetchRecommendations", skip_serializing_if = "Option::is_none")]
+    pub fetch_recommendations: Option<bool>,
+    #[serde(rename = "recommendationsPage", skip_serializing_if = "Option::is_none")]
+    pub recommendations_page: Option<i32>,
+    #[serde(rename = "recommendationsPerPage", skip_serializing_if = "Option::is_none")]
+    pub recommendations_per_page: Option<i32>,
 }
 
 pub struct MediaEndpoint {
@@ -160,272 +195,25 @@ impl MediaEndpoint {
         Self { client }
     }
 
-    /// General search method - allows full customization using QueryBuilder (only MediaSearch allowed)
-    /// Usage: Pass a QueryBuilder created with QueryType::MediaSearch
-    pub async fn search(&self, query_builder: MediaSearchQueryBuilder) -> Result<MediaListResponse, AniListError> {
-        // Note: QueryBuilder must be created with QueryType::MediaSearch
-        let variables = query_builder.build();
-        let variables_map = self.value_to_hashmap(variables);
-
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get popular anime (specific endpoint)
-    pub async fn get_popular_anime(&self, page: Option<i32>, per_page: Option<i32>) -> Result<MediaListResponse, AniListError> {
-        let mut query_builder = MediaSearchQueryBuilder::new(QueryType::MediaSearch);
-        query_builder = query_builder.media_type(Some(MediaType::Anime))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]));
-
-        if let Some(p) = page {
-            query_builder = query_builder.page(Some(p));
-        }
-        if let Some(pp) = per_page {
-            query_builder = query_builder.per_page(Some(pp));
-        }
-
-        self.search(query_builder).await
-    }
-
-    /// Get trending anime (specific endpoint)
-    pub async fn get_trending_anime(&self, page: Option<i32>, per_page: Option<i32>) -> Result<MediaListResponse, AniListError> {
-        let mut query_builder = MediaSearchQueryBuilder::new(QueryType::MediaSearch);
-        query_builder = query_builder.media_type(Some(MediaType::Anime))
-            .sort_media(Some(vec![MediaSort::TrendingDesc]));
-
-        if let Some(p) = page {
-            query_builder = query_builder.page(Some(p));
-        }
-        if let Some(pp) = per_page {
-            query_builder = query_builder.per_page(Some(pp));
-        }
-
-        self.search(query_builder).await
-    }
-
-    /// Get top rated anime (specific endpoint)
-    pub async fn get_top_rated_anime(&self, page: Option<i32>, per_page: Option<i32>) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Anime))
-            .sort_media(Some(vec![MediaSort::ScoreDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get anime by season (specific endpoint)
-    pub async fn get_anime_by_season(
+    pub async fn fetch(
         &self,
-        season: MediaSeason,
-        year: i32,
-        page: Option<i32>,
-        per_page: Option<i32>
-    ) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Anime))
-            .season(Some(season))
-            .season_year(Some(year))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
+        options: FetchMediaOptions,
+    ) -> Result<MediaListResponse, AniListError> {
+        let query = media::FETCH;
+        let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get currently airing anime (specific endpoint)
-    pub async fn get_airing_anime(&self, page: Option<i32>, per_page: Option<i32>) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Anime))
-            .status(Some(MediaStatus::Releasing))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get anime by format (TV, Movie, etc.) (specific endpoint)
-    pub async fn get_anime_by_format(
+    pub async fn fetch_one(
         &self,
-        format: Vec<MediaFormat>,
-        page: Option<i32>,
-        per_page: Option<i32>
-    ) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Anime))
-            .format(Some(format))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
+        options: FetchMediaOneOptions,
+    ) -> Result<MediaListResponse, AniListError> {
+        let query = media::FETCH_ONE;
+        let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
         self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get anime by genre (specific endpoint)
-    pub async fn get_anime_by_genre(
-        &self,
-        genres: Vec<String>,
-        page: Option<i32>,
-        per_page: Option<i32>
-    ) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Anime))
-            .genre(Some(genres))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get anime by ID (specific endpoint)
-    pub async fn get_anime_by_id(&self, id: i32) -> Result<MediaListResponse, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .id(Some(id))
-            .media_type(Some(MediaType::Anime))
-            .extended(Some(true)) // Get extended data for single anime
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Search anime with all search options (media type set to Anime internally)
-    pub async fn search_anime(&self, options: AnimeSearchOptions) -> Result<MediaListResponse, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .search(options.search_term)
-            .media_type(Some(MediaType::Anime)) // Set internally
-            .format(options.format)
-            .status(options.status)
-            .season(options.season)
-            .season_year(options.season_year)
-            .year(options.year)
-            .genre(options.genre)
-            .tag(options.tag)
-            .sort_media(options.sort)
-            .page(options.page)
-            .per_page(options.per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    // === MANGA METHODS ===
-
-    /// Get popular manga (specific endpoint)
-    pub async fn get_popular_manga(&self, page: Option<i32>, per_page: Option<i32>) -> Result<MediaListResponse, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Manga))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get trending manga (specific endpoint)
-    pub async fn get_trending_manga(&self, page: Option<i32>, per_page: Option<i32>) -> Result<MediaListResponse, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Manga))
-            .sort_media(Some(vec![MediaSort::TrendingDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get top rated manga (specific endpoint)
-    pub async fn get_top_rated_manga(&self, page: Option<i32>, per_page: Option<i32>) -> Result<MediaListResponse, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Manga))
-            .sort_media(Some(vec![MediaSort::ScoreDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get currently releasing manga (specific endpoint)
-    pub async fn get_releasing_manga(&self, page: Option<i32>, per_page: Option<i32>) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .media_type(Some(MediaType::Manga))
-            .status(Some(MediaStatus::Releasing))
-            .sort_media(Some(vec![MediaSort::PopularityDesc]))
-            .page(page)
-            .per_page(per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get manga by ID (specific endpoint)
-    pub async fn get_manga_by_id(&self, id: i32) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .id(Some(id))
-            .media_type(Some(MediaType::Manga))
-            .extended(Some(true)) // Get extended data for single manga
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Search manga with all search options (media type set to Manga internally)
-    pub async fn search_manga(&self, options: MangaSearchOptions) -> Result<Value, AniListError> {
-        let variables = QueryBuilder::new(QueryType::MediaSearch)
-            .search(options.search_term)
-            .media_type(Some(MediaType::Manga)) // Set internally
-            .format(options.format)
-            .status(options.status)
-            .year(options.year)
-            .genre(options.genre)
-            .tag(options.tag)
-            .sort_media(options.sort)
-            .page(options.page)
-            .per_page(options.per_page)
-            .build();
-
-        let variables_map = self.value_to_hashmap(variables);
-        let query = include_str!("../queries/media/search.graphql");
-        self.client.query_typed(query, Some(&variables_map)).await
-    }
-
-    // Helper method to convert Value to HashMap<String, Value>
-    fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
-        match value {
-            Value::Object(map) => map.into_iter().collect(),
-            _ => HashMap::new(),
-        }
     }
 }
+
+impl Vth for MediaEndpoint {}

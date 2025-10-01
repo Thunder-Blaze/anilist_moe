@@ -1,0 +1,398 @@
+query (
+    $id: Int
+    # Characters pagination
+    $fetchCharacters: Boolean = true
+    $charactersPage: Int = 1
+    $charactersPerPage: Int = 10
+    # Staff pagination
+    $fetchStaff: Boolean = true
+    $staffPage: Int = 1
+    $staffPerPage: Int = 10
+    # Reviews pagination
+    $fetchReviews: Boolean = true
+    $reviewsPage: Int = 1
+    $reviewsPerPage: Int = 10
+    # Recommendations pagination
+    $fetchRecommendations: Boolean = true
+    $recommendationsPage: Int = 1
+    $recommendationsPerPage: Int = 10
+) {
+    Media(id: $id) {
+        id
+        idMal
+        title {
+            romaji
+            english
+            native
+            userPreferred
+        }
+        type
+        format
+        status
+        description
+        startDate {
+            year
+            month
+            day
+        }
+        endDate {
+            year
+            month
+            day
+        }
+        season
+        seasonYear
+        episodes
+        duration
+        chapters
+        volumes
+        countryOfOrigin
+        isLicensed
+        source
+        hashtag
+        trailer {
+            id
+            site
+            thumbnail
+        }
+        updatedAt
+        coverImage {
+            extraLarge
+            large
+            medium
+            color
+        }
+        bannerImage
+        genres
+        synonyms
+        averageScore
+        meanScore
+        popularity
+        isLocked
+        trending
+        favourites
+        tags {
+            id
+            name
+            description
+            category
+            rank
+            isGeneralSpoiler
+            isMediaSpoiler
+            isAdult
+            userId
+        }
+        isAdult
+        nextAiringEpisode {
+            id
+            airingAt
+            timeUntilAiring
+            episode
+        }
+        relations {
+            edges {
+                id
+                relationType
+                node {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    coverImage {
+                        large
+                    }
+                }
+            }
+        }
+        characters(page: $charactersPage, perPage: $charactersPerPage, sort: ROLE) @include(if: $fetchCharacters) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            edges {
+                id
+                role
+                name
+                voiceActorRoles(language: JAPANESE) {
+                    voiceActor {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                            alternative
+                            alternativeSpoiler
+                            userPreferred
+                        }
+                        language: JAPANESE
+                        image {
+                            large
+                        }
+                        gender
+                        dateOfBirth {
+                            year
+                            month
+                            day
+                        }
+                        dateOfDeath {
+                            year
+                            month
+                            day
+                        }
+                        age
+                        yearsActive
+                        homeTown
+                        bloodType
+                        isFavourite
+                        isFavouriteBlocked
+                        favourites
+                        modNotes
+                    }
+                    roleNotes
+                    dubGroup
+                }
+                node {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                        alternative
+                        alternativeSpoiler
+                        userPreferred
+                    }
+                    image {
+                        large
+                    }
+                    description
+                    gender
+                    dateOfBirth {
+                        year
+                        month
+                        day
+                    }
+                    dateOfDeath {
+                        year
+                        month
+                        day
+                    }
+                    age
+                    yearsActive
+                    homeTown
+                    bloodType
+                    isFavourite
+                    isFavouriteBlocked
+                    favourites
+                    modNotes
+                    siteUrl
+                }
+            }
+        }
+        staff(page: $staffPage, perPage: $staffPerPage, sort: ROLE) @include(if: $fetchStaff) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            edges {
+                id
+                role
+                node {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                        alternative
+                        alternativeSpoiler
+                        userPreferred
+                    }
+                    language
+                    image {
+                        large
+                    }
+                    description
+                    primaryOccupations
+                    gender
+                    dateOfBirth {
+                        year
+                        month
+                        day
+                    }
+                    dateOfDeath {
+                        year
+                        month
+                        day
+                    }
+                    age
+                    yearsActive
+                    homeTown
+                    bloodType
+                    isFavourite
+                    isFavouriteBlocked
+                    favourites
+                    modNotes
+                    siteUrl
+                }
+            }
+        }
+        studios {
+            edges {
+                id
+                isMain
+                node {
+                    id
+                    name
+                    isAnimationStudio
+                    siteUrl
+                    favourites
+                }
+            }
+        }
+        reviews(page: $reviewsPage, perPage: $reviewsPerPage, sort: RATING_DESC) @include(if: $fetchReviews) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            nodes {
+                id
+                userId
+                mediaId
+                mediaType
+                summary
+                body
+                rating
+                ratingAmount
+                userRating
+                score
+                private
+                siteUrl
+                createdAt
+                updatedAt
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                    }
+                }
+            }
+        }
+        recommendations(page: $recommendationsPage, perPage: $recommendationsPerPage, sort: RATING_DESC) @include(if: $fetchRecommendations) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            nodes {
+                id
+                rating
+                userRating
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    coverImage {
+                        large
+                    }
+                    bannerImage
+                }
+                mediaRecommendation {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    coverImage {
+                        large
+                    }
+                    bannerImage
+                }
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                    }
+                }
+            }
+        }
+        externalLinks {
+            id
+            url
+            site
+            siteId
+            type
+            language
+            color
+            icon
+            notes
+            isDisabled
+        }
+        streamingEpisodes {
+            title
+            thumbnail
+            url
+            site
+        }
+        rankings {
+            id
+            rank
+            type
+            format
+            year
+            season
+            allTime
+            context
+        }
+        stats {
+            scoreDistribution {
+                score
+                amount
+            }
+            statusDistribution {
+                status
+                amount
+            }
+        }
+        siteUrl
+        autoCreateForumThread
+        isRecommendationBlocked
+        isReviewBlocked
+        modNotes
+    }
+}

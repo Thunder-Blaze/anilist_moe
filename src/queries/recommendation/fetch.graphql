@@ -44,17 +44,6 @@ query SearchRecommendations(
                     large
                     medium
                 }
-                bannerImage
-                startDate {
-                    year
-                    month
-                    day
-                }
-                endDate {
-                    year
-                    month
-                    day
-                }
                 averageScore
                 popularity
                 favourites
@@ -74,31 +63,9 @@ query SearchRecommendations(
                     large
                     medium
                 }
-                bannerImage
-                startDate {
-                    year
-                    month
-                    day
-                }
-                endDate {
-                    year
-                    month
-                    day
-                }
                 averageScore
                 popularity
                 favourites
-            }
-            user {
-                id
-                name
-                avatar {
-                    large
-                    medium
-                }
-                donatorTier
-                donatorBadge
-                moderatorRoles
             }
         }
     }

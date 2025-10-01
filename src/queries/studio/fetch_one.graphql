@@ -1,0 +1,78 @@
+query FetchStudio(
+    $id: Int
+    $search: String
+    $id_not: Int
+    $id_in: [Int]
+    $id_not_in: [Int]
+    $sort: [StudioSort]
+    # Sub-pagination variables
+    $mediaPage: Int = 1
+    $mediaPerPage: Int = 10
+) {
+    Studio(
+        id: $id
+        search: $search
+        id_not: $id_not
+        id_in: $id_in
+        id_not_in: $id_not_in
+        sort: $sort
+    ) {
+        id
+        name
+        isAnimationStudio
+        isFavourite
+        isFavouriteBlocked
+        siteUrl
+        media(sort: [START_DATE_DESC], page: $mediaPage, perPage: $mediaPerPage) {
+            pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+            }
+            edges {
+                id
+                isMain
+                node {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    type
+                    format
+                    status
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+                    season
+                    seasonYear
+                    episodes
+                    chapters
+                    volumes
+                    averageScore
+                    popularity
+                    coverImage {
+                        large
+                        medium
+                        color
+                    }
+                    bannerImage
+                    genres
+                    isAdult
+                }
+            }
+        }
+        favourites
+    }
+}

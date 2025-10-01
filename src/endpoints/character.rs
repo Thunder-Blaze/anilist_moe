@@ -1,4 +1,4 @@
-use crate::client::AniListClient;
+use crate::{client::AniListClient, queries::character};
 use crate::errors::AniListError;
 use crate::enums::character::CharacterSort;
 use crate::objects::responses::CharacterListResponse;
@@ -106,7 +106,7 @@ impl CharacterEndpoint {
     }
 
     async fn search_characters(&self, options: CharacterSearchOptions) -> Result<CharacterListResponse, AniListError> {
-        let query = include_str!("../queries/character/search_characters.graphql");
+        let query = character::SEARCH_CHARACTERS;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
         self.0.query_typed(query, Some(&variables_map)).await

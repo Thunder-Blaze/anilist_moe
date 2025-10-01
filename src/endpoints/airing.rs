@@ -1,33 +1,53 @@
-use crate::client::AniListClient;
+use crate::endpoints::Vth;
+use crate::{client::AniListClient, queries::airing};
 use crate::errors::AniListError;
 use crate::{
     objects::responses::AiringListResponse,
     enums::airing::AiringSort,
 };
 use serde::Serialize;
-use serde_json::{json, Value};
-use std::collections::HashMap;
+use serde_json::json;
 
 #[derive(Default, Serialize)]
-pub struct AiringSearchOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
-    pub per_page: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+pub struct FetchAiringOptions {
     pub id: Option<i32>,
-    #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId")]
     pub media_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub episode: Option<i32>,
-    #[serde(rename = "airingAt", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "airingAt")]
     pub airing_at: Option<i32>,
-    #[serde(rename = "airingAt_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "notYetAired")]
+    pub not_yet_aired: Option<bool>,
+    #[serde(rename = "id_not")]
+    pub id_not: Option<i32>,
+    #[serde(rename = "id_in")]
+    pub id_in: Option<Vec<i32>>,
+    #[serde(rename = "id_not_in")]
+    pub id_not_in: Option<Vec<i32>>,
+    #[serde(rename = "mediaId_not")]
+    pub media_id_not: Option<i32>,
+    #[serde(rename = "mediaId_in")]
+    pub media_id_in: Option<Vec<i32>>,
+    #[serde(rename = "mediaId_not_in")]
+    pub media_id_not_in: Option<Vec<i32>>,
+    #[serde(rename = "episode_not")]
+    pub episode_not: Option<i32>,
+    #[serde(rename = "episode_in")]
+    pub episode_in: Option<Vec<i32>>,
+    #[serde(rename = "episode_not_in")]
+    pub episode_not_in: Option<Vec<i32>>,
+    #[serde(rename = "episode_greater")]
+    pub episode_greater: Option<i32>,
+    #[serde(rename = "episode_lesser")]
+    pub episode_lesser: Option<i32>,
+    #[serde(rename = "airingAt_greater")]
     pub airing_at_greater: Option<i32>,
-    #[serde(rename = "airingAt_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "airingAt_lesser")]
     pub airing_at_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<AiringSort>>,
+    #[serde(rename = "perPage")]
+    pub per_page: Option<i32>,
+    pub page: Option<i32>,
 }
 
 pub struct AiringEndpoint(pub(crate) AniListClient);
@@ -37,74 +57,15 @@ impl AiringEndpoint {
         Self(client)
     }
 
-    /// Get upcoming episodes
-    pub async fn get_upcoming_episodes(&self, page: i32, per_page: i32) -> Result<AiringListResponse, AniListError> {
-        let options = AiringSearchOptions {
-            page: Some(page),
-            per_page: Some(per_page),
-            sort: Some(vec![AiringSort::Time]),
-            ..Default::default()
-        };
-        self.search_airing_schedule(options).await
-    }
-
-    /// Get episodes airing today
-    pub async fn get_today_episodes(&self, page: i32, per_page: i32) -> Result<AiringListResponse, AniListError> {
-        let options = AiringSearchOptions {
-            page: Some(page),
-            per_page: Some(per_page),
-            sort: Some(vec![AiringSort::Time]),
-            ..Default::default()
-        };
-        self.search_airing_schedule(options).await
-    }
-
-    /// Get recently aired episodes
-    pub async fn get_recently_aired(&self, page: i32, per_page: i32) -> Result<AiringListResponse, AniListError> {
-        let options = AiringSearchOptions {
-            page: Some(page),
-            per_page: Some(per_page),
-            sort: Some(vec![AiringSort::Time]),
-            ..Default::default()
-        };
-        self.search_airing_schedule(options).await
-    }
-
-    /// Get airing schedule for specific media
-    pub async fn get_schedule_for_media(&self, media_id: i32, page: i32, per_page: i32) -> Result<AiringListResponse, AniListError> {
-        let options = AiringSearchOptions {
-            page: Some(page),
-            per_page: Some(per_page),
-            media_id: Some(media_id),
-            ..Default::default()
-        };
-        self.search_airing_schedule(options).await
-    }
-
-    /// Get airing schedule by ID
-    pub async fn get_schedule_by_id(&self, id: i32) -> Result<AiringListResponse, AniListError> {
-        let query = include_str!("../queries/airing/airing_schedule.graphql");
-        let variables = json!({ "id": id });
-        let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Search airing schedules with custom criteria
-    pub async fn search_with_options(&self, options: AiringSearchOptions) -> Result<AiringListResponse, AniListError> {
-        self.search_airing_schedule(options).await
-    }
-
-    async fn search_airing_schedule(&self, options: AiringSearchOptions) -> Result<AiringListResponse, AniListError> {
-        let query = include_str!("../queries/airing/airing_schedule.graphql");
+    pub async fn fetch(
+        &self,
+        options: FetchAiringOptions,
+    ) -> Result<AiringListResponse, AniListError> {
+        let query = airing::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
         self.0.query_typed(query, Some(&variables_map)).await
     }
-
-    fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
-        match value {
-            Value::Object(map) => map.into_iter().collect(),
-            _ => HashMap::new(),
-        }
-    }
 }
+
+impl Vth for AiringEndpoint {}

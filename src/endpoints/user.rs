@@ -1,5 +1,5 @@
 use serde::Serialize;
-use crate::client::AniListClient;
+use crate::{client::AniListClient, queries::user};
 use crate::errors::AniListError;
 use crate::enums::user::UserSort;
 use crate::enums::activity::{ActivitySort, ActivityType};
@@ -34,7 +34,7 @@ impl UserEndpoint {
     }
 
     pub async fn get_by_id(&self, id: i32) -> Result<UserSingleResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_by_id.graphql");
+        let query = user::GET_USER_BY_ID;
         let mut variables_map = std::collections::HashMap::new();
         variables_map.insert("id".to_string(), serde_json::Value::Number(serde_json::Number::from(id)));
 
@@ -90,7 +90,7 @@ impl UserEndpoint {
     }
 
     async fn search_users(&self, options: UserSearchOptions) -> Result<UserListResponse, AniListError> {
-        let query = include_str!("../queries/user/search_users.graphql");
+        let query = user::SEARCH_USERS;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
         self.0.query_typed(query, Some(&variables_map)).await
