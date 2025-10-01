@@ -1,0 +1,13 @@
+mutation ToggleThreadSubscription(
+    $threadId: Int!
+    $subscribe: Boolean!
+) {
+    ToggleThreadSubscription(
+        threadId: $threadId
+        subscribe: $subscribe
+    ) {
+        id
+        title
+        isSubscribed
+    }
+}

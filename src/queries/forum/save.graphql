@@ -1,0 +1,60 @@
+mutation SaveThread(
+    $id: Int
+    $title: String
+    $body: String
+    $categories: [Int]
+    $mediaCategories: [Int]
+    $locked: Boolean
+    $sticky: Boolean
+) {
+    SaveThread(
+        id: $id
+        title: $title
+        body: $body
+        categories: $categories
+        mediaCategories: $mediaCategories
+        locked: $locked
+        sticky: $sticky
+    ) {
+        id
+        title
+        body(asHtml: false)
+        userId
+        replyCount
+        viewCount
+        createdAt
+        updatedAt
+        isLocked
+        isSticky
+        isSubscribed
+        likeCount
+        isLiked
+        siteUrl
+        categories {
+            id
+            name
+        }
+        mediaCategories {
+            id
+            title {
+                romaji
+                english
+                native
+                userPreferred
+            }
+            type
+            format
+            coverImage {
+                medium
+            }
+        }
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+    }
+}

@@ -1,5 +1,18 @@
-pub const COMMENT_ON_THREAD: &str = include_str!("comment_on_thread.graphql");
-pub const LIKE_THREAD_COMMENT: &str = include_str!("like_thread_comment.graphql");
-pub const SAVE_THREAD_COMMENT: &str = include_str!("save_thread_comment.graphql");
-pub const SEARCH_THREADS: &str = include_str!("search_threads.graphql");
-pub const TOGGLE_THREAD_LIKE: &str = include_str!("toggle_thread_like.graphql");
+// Thread queries
+pub const FETCH: &str = include_str!("fetch.graphql");
+pub const FETCH_ONE: &str = include_str!("fetch_one.graphql");
+
+// Thread comment queries
+pub const FETCH_COMMENT: &str = include_str!("fetch_comment.graphql");
+pub const FETCH_COMMENT_ONE: &str = include_str!("fetch_comment_one.graphql");
+//
+// Thread mutations
+pub const SAVE: &str = include_str!("save.graphql");
+pub const DELETE: &str = include_str!("delete.graphql");
+
+// Comment mutations
+pub const SAVE_COMMENT: &str = include_str!("save_comment.graphql");
+pub const DELETE_COMMENT: &str = include_str!("delete_comment.graphql");
+
+// Subscription mutations
+pub const SUBSCRIPTION: &str = include_str!("subscription.graphql");

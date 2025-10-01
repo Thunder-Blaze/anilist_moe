@@ -1,0 +1,80 @@
+query FetchThreadComments(
+    $threadId: Int
+    $id: Int
+    $userId: Int
+    $sort: [ThreadCommentSort]
+    $page: Int = 1
+    $perPage: Int = 25
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+            perPage
+        }
+        threadComments(
+            threadId: $threadId
+            id: $id
+            userId: $userId
+            sort: $sort
+        ) {
+            id
+            threadId
+            userId
+            comment(asHtml: false)
+            likeCount
+            isLiked
+            siteUrl
+            createdAt
+            updatedAt
+            isLocked
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+            likes {
+                id
+                name
+                avatar {
+                    medium
+                }
+            }
+            childComments {
+                id
+                userId
+                comment(asHtml: false)
+                likeCount
+                isLiked
+                createdAt
+                updatedAt
+                isLocked
+                user {
+                    id
+                    name
+                    avatar {
+                        large
+                        medium
+                    }
+                    donatorTier
+                    donatorBadge
+                }
+                likes {
+                    id
+                    name
+                    avatar {
+                        medium
+                    }
+                }
+            }
+        }
+    }
+}

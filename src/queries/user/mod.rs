@@ -1,13 +1,13 @@
 pub const BASIC: &str = include_str!("basic.graphql");
+
+pub const FETCH: &str = include_str!("fetch.graphql");
+pub const FETCH_ONE: &str = include_str!("fetch_one.graphql");
+
 pub const FOLLOWERS: &str = include_str!("followers.graphql");
 pub const FOLLOWING: &str = include_str!("following.graphql");
-pub const GET_USER_BY_ID: &str = include_str!("get_user_by_id.graphql");
-pub const GET_USER_FAVORITES_ANIME: &str = include_str!("get_user_favorites_anime.graphql");
-pub const GET_USER_FAVORITES_CHARACTERS: &str = include_str!("get_user_favorites_characters.graphql");
-pub const GET_USER_FAVORITES_MANGA: &str = include_str!("get_user_favorites_manga.graphql");
-pub const GET_USER_FAVORITES_STAFF: &str = include_str!("get_user_favorites_staff.graphql");
-pub const GET_USER_FAVORITES_STUDIOS: &str = include_str!("get_user_favorites_studios.graphql");
-pub const GET_USER_MANGA_LIST: &str = include_str!("get_user_manga_list.graphql");
-pub const GET_USER_STATS: &str = include_str!("get_user_stats.graphql");
-pub const SEARCH_USERS: &str = include_str!("search_users.graphql");
-pub const TOGGLE_FOLLOW: &str = include_str!("toggle_follow.graphql");
+
+pub const FAVORITES: &str = include_str!("favorites.graphql");
+
+pub const MEDIA_LIST: &str = include_str!("media_list.graphql");
+
+pub const STATS: &str = include_str!("stats.graphql");

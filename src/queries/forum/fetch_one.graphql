@@ -1,0 +1,90 @@
+query FetchThread(
+    $id: Int!
+) {
+    Thread(id: $id) {
+        id
+        title
+        body(asHtml: false)
+        userId
+        replyUserId
+        replyCount
+        viewCount
+        replyCommentId
+        repliedAt
+        createdAt
+        updatedAt
+        isLocked
+        isSticky
+        isSubscribed
+        likeCount
+        isLiked
+        siteUrl
+        categories {
+            id
+            name
+        }
+        mediaCategories {
+            id
+            title {
+                romaji
+                english
+                native
+                userPreferred
+            }
+            type
+            format
+            status
+            coverImage {
+                large
+                medium
+                color
+            }
+            bannerImage
+        }
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+            donatorTier
+            donatorBadge
+            moderatorRoles
+        }
+        replyUser {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+            donatorTier
+            donatorBadge
+            moderatorRoles
+        }
+        childComments {
+            id
+            body(asHtml: false)
+            userId
+            threadId
+            parentCommentId
+            likeCount
+            isLiked
+            createdAt
+            updatedAt
+            siteUrl
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+        }
+    }
+}

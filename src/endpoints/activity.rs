@@ -148,11 +148,13 @@ pub struct SaveActivityReplyOptions {
     pub activity_id: i32,
 }
 
-pub struct ActivityEndpoint(pub(crate) AniListClient);
+pub struct ActivityEndpoint {
+    pub client: AniListClient,
+}
 
 impl ActivityEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
     pub async fn fetch(
@@ -162,7 +164,7 @@ impl ActivityEndpoint {
         let query = activity::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn fetch_one(
@@ -172,7 +174,7 @@ impl ActivityEndpoint {
         let query = activity::FETCH_ONE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn fetch_replies(
@@ -182,7 +184,7 @@ impl ActivityEndpoint {
         let query = activity::FETCH_REPLIES;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn delete(
@@ -192,7 +194,7 @@ impl ActivityEndpoint {
         let query = activity::DELETE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn delete_reply(
@@ -202,7 +204,7 @@ impl ActivityEndpoint {
         let query = activity::DELETE_REPLY;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn pin(
@@ -212,7 +214,7 @@ impl ActivityEndpoint {
         let query = activity::PIN;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn subscribe(
@@ -222,7 +224,7 @@ impl ActivityEndpoint {
         let query = activity::SUBSCRIBE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn save_message_activity(
@@ -232,7 +234,7 @@ impl ActivityEndpoint {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn save_text_activity(
@@ -242,7 +244,7 @@ impl ActivityEndpoint {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn save_reply(
@@ -252,7 +254,7 @@ impl ActivityEndpoint {
         let query = activity::SAVE_REPLY;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
 

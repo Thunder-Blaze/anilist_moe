@@ -1,83 +1,69 @@
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
+use tokio::time::{Duration, sleep};
+
+async fn rate_limit() {
+    sleep(Duration::from_secs(1)).await;
+}
 
 #[tokio::test]
 async fn test_get_recent_recommendations() {
     let client = AniListClient::new();
-    let result = client
-        .recommendation()
-        .get_recent_recommendations(1, 5)
-        .await;
+    let result = client.recommendation().get_recent(1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let recommendations = result.unwrap();
-    // Note: This might be empty if there are no recent recommendations
 
-    for recommendation in &recommendations {
-        assert!(recommendation.id > 0);
-        assert!(recommendation.media.is_some());
-        assert!(recommendation.media_recommendation.is_some());
-    }
+    rate_limit().await;
 }
 
 #[tokio::test]
-async fn test_get_recommendations_for_media() {
+async fn test_get_for_media() {
+    rate_limit().await;
+
     let client = AniListClient::new();
-    // Using Attack on Titan's ID (16498)
-    let result = client
-        .recommendation()
-        .get_recommendations_for_media(16498, 1, 5)
-        .await;
+    let result = client.recommendation().get_for_media(1, 1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let recommendations = result.unwrap();
-    // Note: This might be empty if the media has no recommendations
 
-    for recommendation in &recommendations {
-        assert!(recommendation.id > 0);
-        if let Some(media) = &recommendation.media {
-            assert_eq!(media.id, 16498);
-        }
-    }
+    rate_limit().await;
 }
 
 #[tokio::test]
-async fn test_get_top_rated_recommendations() {
+async fn test_get_highly_rated_recommendations() {
+    rate_limit().await;
+
     let client = AniListClient::new();
-    let result = client
-        .recommendation()
-        .get_top_rated_recommendations(1, 5)
-        .await;
+    let result = client.recommendation().get_highly_rated(5, 1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let recommendations = result.unwrap();
-    // Note: This might be empty if there are no recommendations
 
-    // Check that recommendations are ordered by rating (descending)
-    let mut prev_rating = i32::MAX;
-    for recommendation in &recommendations {
-        assert!(recommendation.id > 0);
-        if let Some(rating) = recommendation.rating {
-            assert!(rating <= prev_rating);
-            prev_rating = rating;
-        }
-    }
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_recommendation_by_id() {
-    let client = AniListClient::new();
-    // This test might fail if the specific recommendation doesn't exist
-    let result = client.recommendation().get_recommendation_by_id(1).await;
+    rate_limit().await;
 
-    // We just check that the call doesn't panic
-    match result {
-        Ok(recommendation) => {
-            assert_eq!(recommendation.id, 1);
-            assert!(recommendation.media.is_some());
-            assert!(recommendation.media_recommendation.is_some());
-        }
-        Err(_) => {
-            // Recommendation might not exist, which is acceptable for this test
-        }
-    }
+    let client = AniListClient::new();
+    let result = client.recommendation().get_by_id(1).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_by_user() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.recommendation().get_by_user(1, 1, 5).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }

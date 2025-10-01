@@ -1,0 +1,430 @@
+query GetUserFavorites(
+    $userId: Int!
+    # Toggles for what to fetch
+    $fetchAnime: Boolean = false
+    $fetchManga: Boolean = false
+    $fetchCharacters: Boolean = false
+    $fetchStaff: Boolean = false
+    $fetchStudios: Boolean = false
+    # Pagination for anime
+    $animePage: Int = 1
+    $animePerPage: Int = 25
+    $animeSort: [MediaSort]
+    # Pagination for manga
+    $mangaPage: Int = 1
+    $mangaPerPage: Int = 25
+    $mangaSort: [MediaSort]
+    # Pagination for characters
+    $charactersPage: Int = 1
+    $charactersPerPage: Int = 25
+    $charactersSort: [CharacterSort]
+    # Pagination for staff
+    $staffPage: Int = 1
+    $staffPerPage: Int = 25
+    $staffSort: [StaffSort]
+    # Pagination for studios
+    $studiosPage: Int = 1
+    $studiosPerPage: Int = 25
+    $studiosSort: [StudioSort]
+) {
+    User(id: $userId) {
+        id
+        name
+        favourites {
+            anime(page: $animePage, perPage: $animePerPage, sort: $animeSort) @include(if: $fetchAnime) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                nodes {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    coverImage {
+                        extraLarge
+                        large
+                        medium
+                        color
+                    }
+                    type
+                    format
+                    status
+                    episodes
+                    duration
+                    chapters
+                    volumes
+                    averageScore
+                    popularity
+                    trending
+                    genres
+                    tags {
+                        id
+                        name
+                        description
+                        rank
+                    }
+                    staff {
+                        edges {
+                            node {
+                                id
+                                name {
+                                    userPreferred
+                                }
+                            }
+                            role
+                        }
+                    }
+                    studios {
+                        edges {
+                            node {
+                                id
+                                name
+                            }
+                            isMain
+                        }
+                    }
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+                    season
+                    seasonYear
+                    isAdult
+                    countryOfOrigin
+                    siteUrl
+                    description
+                }
+            }
+            manga(page: $mangaPage, perPage: $mangaPerPage, sort: $mangaSort) @include(if: $fetchManga) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                nodes {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                        userPreferred
+                    }
+                    coverImage {
+                        extraLarge
+                        large
+                        medium
+                        color
+                    }
+                    type
+                    format
+                    status
+                    episodes
+                    duration
+                    chapters
+                    volumes
+                    averageScore
+                    popularity
+                    trending
+                    genres
+                    tags {
+                        id
+                        name
+                        description
+                        rank
+                    }
+                    staff {
+                        edges {
+                            node {
+                                id
+                                name {
+                                    userPreferred
+                                }
+                            }
+                            role
+                        }
+                    }
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+                    season
+                    seasonYear
+                    isAdult
+                    countryOfOrigin
+                    siteUrl
+                    description
+                }
+            }
+            characters(page: $charactersPage, perPage: $charactersPerPage, sort: $charactersSort) @include(if: $fetchCharacters) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                nodes {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                        userPreferred
+                    }
+                    image {
+                        large
+                        medium
+                    }
+                    description
+                    gender
+                    dateOfBirth {
+                        year
+                        month
+                        day
+                    }
+                    age
+                    bloodType
+                    favourites
+                    isFavourite
+                    isFavouriteBlocked
+                    siteUrl
+                    media {
+                        pageInfo {
+                            total
+                            currentPage
+                            lastPage
+                            hasNextPage
+                            perPage
+                        }
+                        edges {
+                            node {
+                                id
+                                title {
+                                    romaji
+                                    english
+                                    native
+                                    userPreferred
+                                }
+                                type
+                                format
+                                status
+                                averageScore
+                                popularity
+                                coverImage {
+                                    large
+                                    medium
+                                    color
+                                }
+                                siteUrl
+                            }
+                            characterRole
+                            voiceActors {
+                                id
+                                name {
+                                    userPreferred
+                                }
+                                languageV2
+                                image {
+                                    large
+                                    medium
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            staff(page: $staffPage, perPage: $staffPerPage, sort: $staffSort) @include(if: $fetchStaff) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                nodes {
+                    id
+                    name {
+                        first
+                        middle
+                        last
+                        full
+                        native
+                        userPreferred
+                    }
+                    image {
+                        large
+                        medium
+                    }
+                    description
+                    primaryOccupations
+                    gender
+                    dateOfBirth {
+                        year
+                        month
+                        day
+                    }
+                    dateOfDeath {
+                        year
+                        month
+                        day
+                    }
+                    age
+                    yearsActive
+                    homeTown
+                    bloodType
+                    languageV2
+                    favourites
+                    isFavourite
+                    isFavouriteBlocked
+                    siteUrl
+                    staffMedia {
+                        pageInfo {
+                            total
+                            currentPage
+                            lastPage
+                            hasNextPage
+                            perPage
+                        }
+                        edges {
+                            node {
+                                id
+                                title {
+                                    romaji
+                                    english
+                                    native
+                                    userPreferred
+                                }
+                                type
+                                format
+                                status
+                                averageScore
+                                popularity
+                                coverImage {
+                                    large
+                                    medium
+                                    color
+                                }
+                                siteUrl
+                            }
+                            staffRole
+                        }
+                    }
+                    characters {
+                        pageInfo {
+                            total
+                            currentPage
+                            lastPage
+                            hasNextPage
+                            perPage
+                        }
+                        edges {
+                            node {
+                                id
+                                name {
+                                    userPreferred
+                                }
+                                image {
+                                    large
+                                    medium
+                                }
+                            }
+                            role
+                            media {
+                                id
+                                title {
+                                    userPreferred
+                                }
+                                type
+                                format
+                            }
+                        }
+                    }
+                }
+            }
+            studios(page: $studiosPage, perPage: $studiosPerPage, sort: $studiosSort) @include(if: $fetchStudios) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                nodes {
+                    id
+                    name
+                    isAnimationStudio
+                    favourites
+                    isFavourite
+                    siteUrl
+                    media {
+                        pageInfo {
+                            total
+                            currentPage
+                            lastPage
+                            hasNextPage
+                            perPage
+                        }
+                        edges {
+                            node {
+                                id
+                                title {
+                                    romaji
+                                    english
+                                    native
+                                    userPreferred
+                                }
+                                type
+                                format
+                                status
+                                averageScore
+                                popularity
+                                coverImage {
+                                    large
+                                    medium
+                                    color
+                                }
+                                startDate {
+                                    year
+                                    month
+                                    day
+                                }
+                                endDate {
+                                    year
+                                    month
+                                    day
+                                }
+                                season
+                                seasonYear
+                                siteUrl
+                            }
+                            isMain
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

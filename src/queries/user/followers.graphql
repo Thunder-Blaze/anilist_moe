@@ -5,6 +5,10 @@ query GetUserFollowers(
     $perPage: Int
 ) {
     Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            hasNextPage
+        }
         followers(userId: $userId, sort: $sort) {
             id
             name

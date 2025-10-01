@@ -1,1 +1,2 @@
-pub const SEARCH_CHARACTERS: &str = include_str!("search_characters.graphql");
+pub const FETCH: &str = include_str!("fetch.graphql");
+pub const FETCH_ONE: &str = include_str!("fetch_one.graphql");

@@ -1,10 +1,10 @@
+use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::notification};
 use crate::errors::AniListError;
 use crate::enums::notification::NotificationType;
 use crate::objects::responses::NotificationResponse;
 use serde::Serialize;
-use serde_json::{json, Value};
-use std::collections::HashMap;
+use serde_json::json;
 
 #[derive(Default, Serialize)]
 pub struct NotificationSearchOptions {
@@ -20,25 +20,21 @@ pub struct NotificationSearchOptions {
     pub reset_notification_count: Option<bool>,
 }
 
-pub struct NotificationEndpoint(pub(crate) AniListClient);
+pub struct NotificationEndpoint {
+    pub client: AniListClient,
+}
 
 impl NotificationEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
-
-    async fn fetch(&self, options: NotificationSearchOptions) -> Result<NotificationResponse, AniListError> {
+    pub async fn fetch(&self, options: NotificationSearchOptions) -> Result<NotificationResponse, AniListError> {
         let query = notification::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
-    }
-
-    fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
-        match value {
-            Value::Object(map) => map.into_iter().collect(),
-            _ => HashMap::new(),
-        }
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
+
+impl Vth for NotificationEndpoint {}

@@ -3,10 +3,6 @@ pub const FETCH: &str = include_str!("fetch.graphql");
 pub const FETCH_ONE: &str = include_str!("fetch_one.graphql");
 pub const FETCH_REPLIES: &str = include_str!("fetch_replies.graphql");
 
-// Note: These files need to be created or are aliases
-pub const SEARCH_ACTIVITIES: &str = include_str!("fetch.graphql");
-pub const FETCH_ACTIVITY: &str = include_str!("fetch_one.graphql");
-
 pub const SAVE_TEXT_ACTIVITY: &str = include_str!("save_text_activity.graphql");
 pub const SAVE_MESSAGE_ACTIVITY: &str = include_str!("save_message_activity.graphql");
 pub const SAVE_REPLY: &str = include_str!("save_reply.graphql");

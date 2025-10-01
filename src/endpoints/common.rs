@@ -29,11 +29,13 @@ pub struct ToggleFavouriteOptions {
     pub studio_id: Option<i32>,
 }
 
-pub struct CommonEndpoint(pub(crate) AniListClient);
+pub struct CommonEndpoint {
+    pub client: AniListClient,
+}
 
 impl CommonEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
     pub async fn toggle_like(
@@ -43,7 +45,7 @@ impl CommonEndpoint {
         let query = common::TOGGLE_LIKE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn toggle_follow(
@@ -53,7 +55,7 @@ impl CommonEndpoint {
         let query = common::TOGGLE_FOLLOW;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn toggle_favourite(
@@ -63,7 +65,7 @@ impl CommonEndpoint {
         let query = common::TOGGLE_FAVOURITE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
 

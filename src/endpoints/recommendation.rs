@@ -41,11 +41,13 @@ pub struct SaveRecommendationOptions {
     pub rating: i32,
 }
 
-pub struct RecommendationEndpoint(pub(crate) AniListClient);
+pub struct RecommendationEndpoint {
+    pub client: AniListClient,
+}
 
 impl RecommendationEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
     pub async fn fetch(
@@ -55,7 +57,7 @@ impl RecommendationEndpoint {
         let query = recommendation::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn save(
@@ -65,7 +67,7 @@ impl RecommendationEndpoint {
         let query = recommendation::SAVE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
 

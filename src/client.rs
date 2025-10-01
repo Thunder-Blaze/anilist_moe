@@ -1,15 +1,5 @@
 use crate::endpoints::{
-    MediaEndpoint,
-    StaffEndpoint,
-    UserEndpoint,
-    AiringEndpoint,
-    ActivityEndpoint,
-    NotificationEndpoint,
-    ForumEndpoint,
-    CharacterEndpoint,
-    RecommendationEndpoint,
-    ReviewEndpoint,
-    StudioEndpoint,
+    ActivityEndpoint, AiringEndpoint, CharacterEndpoint, CommonEndpoint, ForumEndpoint, MediaEndpoint, MediaListEndpoint, NotificationEndpoint, RecommendationEndpoint, ReviewEndpoint, StaffEndpoint, StudioEndpoint, UserEndpoint
 };
 use crate::errors::AniListError;
 use reqwest::Client;
@@ -43,8 +33,16 @@ impl AniListClient {
         MediaEndpoint::new(self.clone())
     }
 
+    pub fn medialist(&self) -> MediaListEndpoint {
+        MediaListEndpoint::new(self.clone())
+    }
+
     pub fn character(&self) -> CharacterEndpoint {
         CharacterEndpoint::new(self.clone())
+    }
+
+    pub fn common(&self) -> CommonEndpoint {
+        CommonEndpoint::new(self.clone())
     }
 
     pub fn staff(&self) -> StaffEndpoint {

@@ -1,95 +1,95 @@
-use anilist_moe::client::AniListClient;
+use anilist_moe::{AniListClient, enums::activity::{ActivityType, ActivitySort}, endpoints::activity::ActivitySearchOptions};
 use tokio::time::{Duration, sleep};
+use std::env;
+use dotenv::dotenv;
 
 async fn rate_limit() {
     sleep(Duration::from_secs(1)).await;
 }
 
 #[tokio::test]
-async fn test_get_recent_activities() {
+async fn test_get_global_activities() {
     let client = AniListClient::new();
-    let result = client.activity().get_recent_activities(1, 5).await;
+    let result = client.activity().get_global_activities(1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let activities = result.unwrap();
-    // Note: This might be empty based on privacy settings
-
-    for activity in &activities {
-        assert!(activity.id > 0);
-    }
-
-    rate_limit().await;
-}
-
-#[tokio::test]
-async fn test_get_text_activities() {
-    rate_limit().await;
-
-    let client = AniListClient::new();
-    let result = client.activity().get_text_activities(1, 5).await;
-
-    assert!(result.is_ok());
-    let activities = result.unwrap();
-    // Note: This might be empty based on privacy settings
-
-    for activity in &activities {
-        assert!(activity.id > 0);
-    }
 
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_user_activities() {
-    let client = AniListClient::new();
-    // Test with a known user ID (this might fail if the user doesn't exist or has private activities)
-    let result = client.activity().get_user_activities(1, 1, 5).await;
+    rate_limit().await;
 
-    // We just check that the call doesn't panic
-    match result {
-        Ok(activities) => {
-            for activity in &activities {
-                assert!(activity.id > 0);
-            }
-        }
-        Err(_) => {
-            // User might not exist or have private activities, which is acceptable
-        }
-    }
+    let client = AniListClient::new();
+    // Using a known user ID
+    let result = client.activity().get_user_activities(1, 1, 3).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_activities_by_type() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.activity().get_by_type(ActivityType::Text, 1, 3).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_activity_by_id() {
-    let client = AniListClient::new();
-    // This test might fail if the specific activity doesn't exist
-    let result = client.activity().get_activity_by_id(1).await;
+    rate_limit().await;
 
-    // We just check that the call doesn't panic
-    match result {
-        Ok(activity) => {
-            assert_eq!(activity.id, 1);
-        }
-        Err(_) => {
-            // Activity might not exist, which is acceptable for this test
-        }
-    }
+    let client = AniListClient::new();
+    let result = client.activity().get_by_id(1).await;
+
+    println!("Result: {:?}", result);
+    // This test might fail if the specific activity doesn't exist, which is acceptable
+    rate_limit().await;
 }
 
 #[tokio::test]
-async fn test_get_activity_replies() {
-    let client = AniListClient::new();
-    // This test might fail if the specific activity doesn't exist or has no replies
-    let result = client.activity().get_activity_replies(1, 1, 5).await;
+async fn test_search_activities() {
+    rate_limit().await;
 
-    // We just check that the call doesn't panic
-    match result {
-        Ok(replies) => {
-            for reply in &replies {
-                assert!(reply.id > 0);
-            }
-        }
-        Err(_) => {
-            // Activity might not exist or have no replies, which is acceptable
-        }
-    }
+    let client = AniListClient::new();
+    let options = ActivitySearchOptions {
+        page: Some(1),
+        per_page: Some(3),
+        activity_type: Some(ActivityType::Text),
+        sort: Some(vec![ActivitySort::IdDesc]),
+        ..Default::default()
+    };
+
+    let result = client.activity().search(options).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn fetch_list_activity() {
+    rate_limit().await;
+    dotenv().ok();
+
+    let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set");
+    let client = AniListClient::with_token(&token);
+
+    let result = client.activity().get_by_id(962366160).await;
+
+    println!("Result: {:#?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }

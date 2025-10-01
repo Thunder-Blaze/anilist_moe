@@ -55,11 +55,13 @@ pub struct FetchStaffOneOptions {
     pub character_media_per_page: Option<i32>,
 }
 
-pub struct StaffEndpoint(pub(crate) AniListClient);
+pub struct StaffEndpoint {
+    client: AniListClient,
+}
 
 impl StaffEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
     pub async fn fetch(
@@ -69,7 +71,7 @@ impl StaffEndpoint {
         let query = staff::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn fetch_one(
@@ -79,7 +81,7 @@ impl StaffEndpoint {
         let query = staff::FETCH_ONE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
 

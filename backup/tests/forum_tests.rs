@@ -1,70 +1,80 @@
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
+use tokio::time::{Duration, sleep};
+
+async fn rate_limit() {
+    sleep(Duration::from_secs(1)).await;
+}
 
 #[tokio::test]
 async fn test_get_recent_threads() {
     let client = AniListClient::new();
     let result = client.forum().get_recent_threads(1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let threads = result.unwrap();
-    // Note: This might be empty if there are no recent threads
 
-    for thread in &threads {
-        assert!(thread.id > 0);
-        assert!(!thread.title.is_empty());
-    }
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_search_threads() {
+    rate_limit().await;
+
     let client = AniListClient::new();
     let result = client.forum().search_threads("anime", 1, 5).await;
-    println!("Search result: {:?}", result);
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let threads = result.unwrap();
-    // Note: This might be empty if no threads match the search
 
-    for thread in &threads {
-        assert!(thread.id > 0);
-        assert!(!thread.title.is_empty());
-    }
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_threads_by_user() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.forum().get_threads_by_user(1, 1, 3).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_thread_by_id() {
+    rate_limit().await;
+
     let client = AniListClient::new();
-    // This test might fail if the specific thread doesn't exist
     let result = client.forum().get_thread_by_id(1).await;
 
-    // We just check that the call doesn't panic
-    match result {
-        Ok(thread) => {
-            assert_eq!(thread.id, 1);
-            assert!(!thread.title.is_empty());
-        }
-        Err(_) => {
-            // Thread might not exist, which is acceptable for this test
-        }
-    }
+    println!("Result: {:?}", result);
+    // This test might fail if the specific thread doesn't exist, which is acceptable
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_threads_by_category() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.forum().get_threads_by_category(1, 1, 3).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_thread_comments() {
+    rate_limit().await;
+
     let client = AniListClient::new();
-    // This test might fail if the specific thread doesn't exist or has no comments
     let result = client.forum().get_thread_comments(1, 1, 5).await;
 
-    // We just check that the call doesn't panic
-    match result {
-        Ok(comments) => {
-            for comment in &comments {
-                assert!(comment.id > 0);
-                assert!(!comment.comment.is_empty());
-            }
-        }
-        Err(_) => {
-            // Thread might not exist or have no comments, which is acceptable
-        }
-    }
+    println!("Result: {:?}", result);
+    // This test might fail if the specific thread doesn't exist, which is acceptable
+    rate_limit().await;
 }

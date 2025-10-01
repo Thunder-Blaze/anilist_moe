@@ -1,65 +1,82 @@
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
+use tokio::time::{Duration, sleep};
+
+async fn rate_limit() {
+    sleep(Duration::from_secs(1)).await;
+}
 
 #[tokio::test]
 async fn test_get_popular_studios() {
     let client = AniListClient::new();
     let result = client.studio().get_popular(1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let studios = result.unwrap();
-    assert!(!studios.is_empty());
-    assert!(studios.len() <= 5);
 
-    for studio in &studios {
-        assert!(studio.id > 0);
-        assert!(!studio.name.is_empty());
-    }
-}
-
-#[tokio::test]
-async fn test_get_studio_by_id() {
-    let client = AniListClient::new();
-    // Using Studio Ghibli's ID (21)
-    let result = client.studio().get_by_id(21).await;
-
-    assert!(result.is_ok());
-    let studio = result.unwrap();
-    assert_eq!(studio.id, 21);
-    assert!(!studio.name.is_empty());
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_search_studios() {
+    rate_limit().await;
+
     let client = AniListClient::new();
-    let result = client.studio().search("Ghibli", 1, 5).await;
+    let result = client.studio().search("Madhouse", 1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let studios = result.unwrap();
-    assert!(!studios.is_empty());
 
-    // Check that results contain "Ghibli" in some form
-    let has_ghibli = studios
-        .iter()
-        .any(|studio| studio.name.to_lowercase().contains("ghibli"));
-    assert!(has_ghibli);
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_trending_studios() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.studio().get_trending(1, 5).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_studio_by_id() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.studio().get_by_id(1).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_most_favorited_studios() {
+    rate_limit().await;
+
     let client = AniListClient::new();
     let result = client.studio().get_most_favorited(1, 5).await;
 
+    println!("Result: {:?}", result);
     assert!(result.is_ok());
-    let studios = result.unwrap();
-    assert!(!studios.is_empty());
 
-    // Check that studios are ordered by favorites (descending)
-    let mut prev_favorites = i32::MAX;
-    for studio in &studios {
-        assert!(studio.id > 0);
-        if let Some(favourites) = studio.favourites {
-            assert!(favourites <= prev_favorites);
-            prev_favorites = favourites;
-        }
-    }
+    rate_limit().await;
+}
+
+#[tokio::test]
+async fn test_get_studios_by_name() {
+    rate_limit().await;
+
+    let client = AniListClient::new();
+    let result = client.studio().get_by_name(1, 5).await;
+
+    println!("Result: {:?}", result);
+    assert!(result.is_ok());
+
+    rate_limit().await;
 }

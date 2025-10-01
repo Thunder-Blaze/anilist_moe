@@ -47,11 +47,13 @@ pub struct FetchStudioOneOptions {
     pub media_per_page: Option<i32>,
 }
 
-pub struct StudioEndpoint(pub(crate) AniListClient);
+pub struct StudioEndpoint {
+    client: AniListClient,
+}
 
 impl StudioEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
     pub async fn fetch(
@@ -61,7 +63,7 @@ impl StudioEndpoint {
         let query = studio::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn fetch_one(
@@ -71,7 +73,7 @@ impl StudioEndpoint {
         let query = studio::FETCH_ONE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
 

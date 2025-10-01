@@ -53,11 +53,13 @@ pub struct RateReviewOptions {
     pub rating: i32,
 }
 
-pub struct ReviewEndpoint(pub(crate) AniListClient);
+pub struct ReviewEndpoint {
+    pub client: AniListClient,
+}
 
 impl ReviewEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
     pub async fn fetch(
@@ -67,7 +69,7 @@ impl ReviewEndpoint {
         let query = review::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn save(
@@ -77,7 +79,7 @@ impl ReviewEndpoint {
         let query = review::SAVE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn delete(
@@ -87,7 +89,7 @@ impl ReviewEndpoint {
         let query = review::DELETE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
     pub async fn rate(
@@ -97,7 +99,7 @@ impl ReviewEndpoint {
         let query = review::RATE;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
 

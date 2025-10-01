@@ -1,306 +1,241 @@
-use serde::Serialize;
+use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::user};
 use crate::errors::AniListError;
-use crate::enums::user::UserSort;
-use crate::enums::activity::{ActivitySort, ActivityType};
-use crate::enums::media_list::{MediaListSort, MediaListStatus};
-use crate::enums::character::CharacterSort;
-use crate::enums::staff::StaffSort;
-use crate::enums::studio::StudioSort;
-use crate::enums::media::{MediaSort, MediaType};
-use crate::objects::responses::{UserListResponse, UserSingleResponse, UserResponse, UserMediaListResponse, MediaListResponse, ActivityListResponse};
-use serde_json::{json, Value};
-use std::collections::HashMap;
+use crate::enums::user::{UserSort, UserStatisticsSort};
+use crate::enums::media::{MediaType, MediaSort};
+use crate::enums::media_list::MediaListStatus;
+use crate::objects::responses::{UserListResponse, UserSingleResponse};
+use serde::Serialize;
+use serde_json::json;
 
 #[derive(Default, Serialize)]
-pub struct UserSearchOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
-    pub per_page: Option<i32>,
+pub struct FetchUserOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<UserSort>>,
+    #[serde(rename = "isModerator", skip_serializing_if = "Option::is_none")]
+    pub is_moderator: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<i32>,
+    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    pub per_page: Option<i32>,
 }
 
-pub struct UserEndpoint(pub(crate) AniListClient);
+#[derive(Default, Serialize)]
+pub struct FetchUserOneOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+}
+
+#[derive(Default, Serialize)]
+pub struct FetchUserBasicOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+}
+
+#[derive(Default, Serialize)]
+pub struct FetchUserFollowersOptions {
+    #[serde(rename = "userId")]
+    pub user_id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<i32>,
+    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    pub per_page: Option<i32>,
+}
+
+#[derive(Default, Serialize)]
+pub struct FetchUserFollowingOptions {
+    #[serde(rename = "userId")]
+    pub user_id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<i32>,
+    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    pub per_page: Option<i32>,
+}
+
+#[derive(Default, Serialize)]
+pub struct FetchUserFavoritesOptions {
+    #[serde(rename = "userId")]
+    pub user_id: i32,
+    // Toggle what to fetch
+    #[serde(rename = "fetchAnime", skip_serializing_if = "Option::is_none")]
+    pub fetch_anime: Option<bool>,
+    #[serde(rename = "fetchManga", skip_serializing_if = "Option::is_none")]
+    pub fetch_manga: Option<bool>,
+    #[serde(rename = "fetchCharacters", skip_serializing_if = "Option::is_none")]
+    pub fetch_characters: Option<bool>,
+    #[serde(rename = "fetchStaff", skip_serializing_if = "Option::is_none")]
+    pub fetch_staff: Option<bool>,
+    #[serde(rename = "fetchStudios", skip_serializing_if = "Option::is_none")]
+    pub fetch_studios: Option<bool>,
+    // Anime pagination
+    #[serde(rename = "animePage", skip_serializing_if = "Option::is_none")]
+    pub anime_page: Option<i32>,
+    #[serde(rename = "animePerPage", skip_serializing_if = "Option::is_none")]
+    pub anime_per_page: Option<i32>,
+    #[serde(rename = "animeSort", skip_serializing_if = "Option::is_none")]
+    pub anime_sort: Option<Vec<MediaSort>>,
+    // Manga pagination
+    #[serde(rename = "mangaPage", skip_serializing_if = "Option::is_none")]
+    pub manga_page: Option<i32>,
+    #[serde(rename = "mangaPerPage", skip_serializing_if = "Option::is_none")]
+    pub manga_per_page: Option<i32>,
+    #[serde(rename = "mangaSort", skip_serializing_if = "Option::is_none")]
+    pub manga_sort: Option<Vec<MediaSort>>,
+    // Characters pagination
+    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    pub characters_page: Option<i32>,
+    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    pub characters_per_page: Option<i32>,
+    // Staff pagination
+    #[serde(rename = "staffPage", skip_serializing_if = "Option::is_none")]
+    pub staff_page: Option<i32>,
+    #[serde(rename = "staffPerPage", skip_serializing_if = "Option::is_none")]
+    pub staff_per_page: Option<i32>,
+    // Studios pagination
+    #[serde(rename = "studiosPage", skip_serializing_if = "Option::is_none")]
+    pub studios_page: Option<i32>,
+    #[serde(rename = "studiosPerPage", skip_serializing_if = "Option::is_none")]
+    pub studios_per_page: Option<i32>,
+}
+
+#[derive(Default, Serialize)]
+pub struct FetchUserMediaListOptions {
+    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    pub media_type: Option<MediaType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<MediaListStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    #[serde(rename = "startedAt", skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<i32>,
+    #[serde(rename = "completedAt", skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Vec<MediaSort>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<i32>,
+    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    pub per_page: Option<i32>,
+}
+
+#[derive(Default, Serialize)]
+pub struct FetchUserStatsOptions {
+    #[serde(rename = "userId")]
+    pub user_id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Vec<UserStatisticsSort>>,
+}
+
+pub struct UserEndpoint {
+    client: AniListClient,
+}
 
 impl UserEndpoint {
     pub fn new(client: AniListClient) -> Self {
-        Self(client)
+        Self { client }
     }
 
-    pub async fn get_by_id(&self, id: i32) -> Result<UserSingleResponse, AniListError> {
-        let query = user::GET_USER_BY_ID;
-        let mut variables_map = std::collections::HashMap::new();
-        variables_map.insert("id".to_string(), serde_json::Value::Number(serde_json::Number::from(id)));
-
-        self.0.query_typed(query, Some(&variables_map)).await
-    }
-
-    pub async fn get_by_username(&self, name: &str) -> Result<UserSingleResponse, AniListError> {
-        let options = UserSearchOptions {
-            search: Some(name.to_string()),
-            ..Default::default()
-        };
-        let result = self.search_users(options).await?;
-        let users = &result.data.page.data.users;
-
-        for user in users {
-            if user.name.eq_ignore_ascii_case(name) {
-                return Ok(UserSingleResponse {
-                    data: UserResponse { user: user.clone() }
-                });
-            }
-        }
-        Err(AniListError::NotFound)
-    }
-
-    pub async fn search(&self, query: &str, page: i32, per_page: i32) -> Result<UserListResponse, AniListError> {
-        let options = UserSearchOptions {
-            search: Some(query.to_string()),
-            page: Some(page),
-            per_page: Some(per_page),
-            ..Default::default()
-        };
-        self.search_users(options).await
-    }
-
-    pub async fn get_most_anime_watched(&self, page: i32, per_page: i32) -> Result<UserListResponse, AniListError> {
-        let options = UserSearchOptions {
-            page: Some(page),
-            per_page: Some(per_page),
-            sort: Some(vec![UserSort::WatchedTimeDesc]),
-            ..Default::default()
-        };
-        self.search_users(options).await
-    }
-
-    pub async fn get_most_manga_read(&self, page: i32, per_page: i32) -> Result<UserListResponse, AniListError> {
-        let options = UserSearchOptions {
-            page: Some(page),
-            per_page: Some(per_page),
-            sort: Some(vec![UserSort::ChaptersReadDesc]),
-            ..Default::default()
-        };
-        self.search_users(options).await
-    }
-
-    async fn search_users(&self, options: UserSearchOptions) -> Result<UserListResponse, AniListError> {
-        let query = user::SEARCH_USERS;
+    /// Fetch multiple users with pagination
+    pub async fn fetch(
+        &self,
+        options: FetchUserOptions,
+    ) -> Result<UserListResponse, AniListError> {
+        let query = user::FETCH;
         let variables = json!(options);
         let variables_map = self.value_to_hashmap(variables);
-        self.0.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
-        match value {
-            Value::Object(map) => map.into_iter().collect(),
-            _ => HashMap::new(),
-        }
-    }
-
-    // User Profile Methods
-
-    /// Get user's anime list with pagination and filtering
-    pub async fn get_anime_list(
+    /// Fetch a single user with full details
+    pub async fn fetch_one(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        status: Option<MediaListStatus>,
-        sort: Option<Vec<MediaListSort>>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_anime_list.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(s) = status { variables_map.insert("status".to_string(), json!(s)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-        variables_map.insert("type".to_string(), json!(MediaType::Anime));
-
-        self.0.query_typed(query, Some(&variables_map)).await
+        options: FetchUserOneOptions,
+    ) -> Result<UserSingleResponse, AniListError> {
+        let query = user::FETCH_ONE;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get user's manga list with pagination and filtering
-    pub async fn get_manga_list(
+    /// Fetch basic user information
+    pub async fn fetch_basic(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        status: Option<MediaListStatus>,
-        sort: Option<Vec<MediaListSort>>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_manga_list.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(s) = status { variables_map.insert("status".to_string(), json!(s)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-        variables_map.insert("type".to_string(), json!(MediaType::Manga));
-
-        self.0.query_typed(query, Some(&variables_map)).await
+        options: FetchUserBasicOptions,
+    ) -> Result<UserSingleResponse, AniListError> {
+        let query = user::BASIC;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get user's followers with pagination
-    pub async fn get_followers(
+    /// Fetch user followers
+    pub async fn followers(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<UserSort>>,
+        options: FetchUserFollowersOptions,
     ) -> Result<UserListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_followers.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query_typed(query, Some(&variables_map)).await
+        let query = user::FOLLOWERS;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get user's following with pagination
-    pub async fn get_following(
+    /// Fetch users that the user is following
+    pub async fn following(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<UserSort>>,
+        options: FetchUserFollowingOptions,
     ) -> Result<UserListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_following.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query_typed(query, Some(&variables_map)).await
+        let query = user::FOLLOWING;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get user's favorite anime with pagination
-    pub async fn get_favorites_anime(
+    /// Fetch user favorites with conditional sections and independent pagination
+    pub async fn favorites(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<MediaSort>>,
-    ) -> Result<MediaListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_favorites_anime.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query_typed(query, Some(&variables_map)).await
+        options: FetchUserFavoritesOptions,
+    ) -> Result<UserSingleResponse, AniListError> {
+        let query = user::FAVORITES;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get user's favorite manga with pagination
-    pub async fn get_favorites_manga(
+    /// Fetch user's media list
+    pub async fn media_list(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<MediaSort>>,
-    ) -> Result<MediaListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_favorites_manga.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query_typed(query, Some(&variables_map)).await
+        options: FetchUserMediaListOptions,
+    ) -> Result<UserListResponse, AniListError> {
+        let query = user::MEDIA_LIST;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 
-    /// Get user's favorite characters with pagination
-    pub async fn get_favorites_characters(
+    /// Fetch user statistics
+    pub async fn stats(
         &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<CharacterSort>>,
-    ) -> Result<serde_json::Value, AniListError> {
-        let query = include_str!("../queries/user/get_user_favorites_characters.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query(query, Some(&variables_map)).await
-    }
-
-    /// Get user's favorite staff with pagination
-    pub async fn get_favorites_staff(
-        &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<StaffSort>>,
-    ) -> Result<serde_json::Value, AniListError> {
-        let query = include_str!("../queries/user/get_user_favorites_staff.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query(query, Some(&variables_map)).await
-    }
-
-    /// Get user's favorite studios with pagination
-    pub async fn get_favorites_studios(
-        &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<StudioSort>>,
-    ) -> Result<serde_json::Value, AniListError> {
-        let query = include_str!("../queries/user/get_user_favorites_studios.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-
-        self.0.query(query, Some(&variables_map)).await
-    }
-
-    /// Get user's activities with pagination and filtering
-    pub async fn get_activities(
-        &self,
-        user_id: i32,
-        page: Option<i32>,
-        per_page: Option<i32>,
-        sort: Option<Vec<ActivitySort>>,
-        activity_type: Option<ActivityType>,
-        has_replies: Option<bool>,
-    ) -> Result<ActivityListResponse, AniListError> {
-        let query = include_str!("../queries/user/get_user_activities.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-        if let Some(p) = page { variables_map.insert("page".to_string(), json!(p)); }
-        if let Some(pp) = per_page { variables_map.insert("perPage".to_string(), json!(pp)); }
-        if let Some(sort_vec) = sort { variables_map.insert("sort".to_string(), json!(sort_vec)); }
-        if let Some(at) = activity_type { variables_map.insert("type".to_string(), json!(at)); }
-        if let Some(hr) = has_replies { variables_map.insert("hasReplies".to_string(), json!(hr)); }
-
-        self.0.query_typed(query, Some(&variables_map)).await
-    }
-
-    /// Get user's statistics
-    pub async fn get_stats(&self, user_id: i32) -> Result<serde_json::Value, AniListError> {
-        let query = include_str!("../queries/user/get_user_stats.graphql");
-        let mut variables_map = HashMap::new();
-        variables_map.insert("userId".to_string(), json!(user_id));
-
-        self.0.query(query, Some(&variables_map)).await
+        options: FetchUserStatsOptions,
+    ) -> Result<UserSingleResponse, AniListError> {
+        let query = user::STATS;
+        let variables = json!(options);
+        let variables_map = self.value_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
     }
 }
+
+impl Vth for UserEndpoint {}

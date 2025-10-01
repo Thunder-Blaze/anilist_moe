@@ -1,0 +1,68 @@
+query FetchThreadComment(
+    $id: Int!
+) {
+    ThreadComment(id: $id) {
+        id
+        threadId
+        userId
+        comment(asHtml: false)
+        likeCount
+        isLiked
+        siteUrl
+        createdAt
+        updatedAt
+        isLocked
+        thread {
+            id
+            title
+            siteUrl
+        }
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+            donatorTier
+            donatorBadge
+            moderatorRoles
+        }
+        likes {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+        childComments {
+            id
+            userId
+            comment(asHtml: false)
+            likeCount
+            isLiked
+            createdAt
+            updatedAt
+            isLocked
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+                donatorTier
+                donatorBadge
+                moderatorRoles
+            }
+            likes {
+                id
+                name
+                avatar {
+                    medium
+                }
+            }
+        }
+    }
+}

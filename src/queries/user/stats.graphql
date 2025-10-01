@@ -80,7 +80,7 @@ query GetUserStats($id: Int!) {
                             last
                             full
                             native
-                        }
+                        }STATS: &s
                     }
                     count
                     meanScore
