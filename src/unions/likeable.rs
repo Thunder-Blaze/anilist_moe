@@ -3,7 +3,7 @@ use crate::objects::thread::{Thread, ThreadComment};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "__typename")]
 pub enum LikeableUnion {
     ListActivity(ListActivity),
     TextActivity(TextActivity),
