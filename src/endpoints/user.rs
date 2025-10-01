@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::user};
 use crate::errors::AniListError;
 use crate::enums::user::{UserSort, UserStatisticsSort};
@@ -156,7 +155,7 @@ impl UserEndpoint {
     ) -> Result<UserListResponse, AniListError> {
         let query = user::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -167,7 +166,7 @@ impl UserEndpoint {
     ) -> Result<UserSingleResponse, AniListError> {
         let query = user::FETCH_ONE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -178,7 +177,7 @@ impl UserEndpoint {
     ) -> Result<UserSingleResponse, AniListError> {
         let query = user::BASIC;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -189,7 +188,7 @@ impl UserEndpoint {
     ) -> Result<UserListResponse, AniListError> {
         let query = user::FOLLOWERS;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -200,7 +199,7 @@ impl UserEndpoint {
     ) -> Result<UserListResponse, AniListError> {
         let query = user::FOLLOWING;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -211,7 +210,7 @@ impl UserEndpoint {
     ) -> Result<UserSingleResponse, AniListError> {
         let query = user::FAVORITES;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -222,7 +221,7 @@ impl UserEndpoint {
     ) -> Result<UserListResponse, AniListError> {
         let query = user::MEDIA_LIST;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -233,9 +232,7 @@ impl UserEndpoint {
     ) -> Result<UserSingleResponse, AniListError> {
         let query = user::STATS;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for UserEndpoint {}

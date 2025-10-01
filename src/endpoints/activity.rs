@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::activity};
 use crate::errors::AniListError;
 use crate::enums::activity::{ActivitySort, ActivityType};
@@ -163,7 +162,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivityListResponse, AniListError> {
         let query = activity::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -173,7 +172,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::FETCH_ONE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -183,7 +182,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivityResponse, AniListError> {
         let query = activity::FETCH_REPLIES;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -193,7 +192,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::DELETE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -203,7 +202,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::DELETE_REPLY;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -213,7 +212,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::PIN;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -223,7 +222,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::SUBSCRIBE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -233,7 +232,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -243,7 +242,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -253,9 +252,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivitySingleResponse, AniListError> {
         let query = activity::SAVE_REPLY;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for ActivityEndpoint {}

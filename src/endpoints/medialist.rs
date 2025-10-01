@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::enums::media::MediaType;
 use crate::enums::media_list::{MediaListSort, MediaListStatus};
 use crate::objects::common::FuzzyDate;
@@ -152,7 +151,7 @@ impl MediaListEndpoint {
     ) -> Result<MediaListResponse, AniListError> {
         let query = medialist::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -162,7 +161,7 @@ impl MediaListEndpoint {
     ) -> Result<MediaListResponse, AniListError> {
         let query = medialist::SAVE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -172,7 +171,7 @@ impl MediaListEndpoint {
     ) -> Result<Vec<MediaListResponse>, AniListError> {
         let query = medialist::SAVE_MULTIPLE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -182,9 +181,7 @@ impl MediaListEndpoint {
     ) -> Result<MediaListResponse, AniListError> {
         let query = medialist::DELETE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for MediaListEndpoint {}

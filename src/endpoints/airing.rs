@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::airing};
 use crate::errors::AniListError;
 use crate::{
@@ -65,9 +64,7 @@ impl AiringEndpoint {
     ) -> Result<AiringListResponse, AniListError> {
         let query = airing::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for AiringEndpoint {}

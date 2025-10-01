@@ -4,17 +4,16 @@
 //! and other common operations when working with the AniList API.
 
 use crate::errors::AniListError;
+use serde_json::Value;
+use std::collections::HashMap;
 use std::time::Duration;
 use tokio::time::sleep;
 
 #[derive(Debug, Clone)]
 pub struct RetryConfig {
     pub max_retries: u32,
-
     pub base_delay_ms: u64,
-
     pub exponential_backoff: bool,
-
     pub max_delay_ms: u64,
 }
 
@@ -60,7 +59,7 @@ where
                     Duration::from_millis(delay.min(config.max_delay_ms))
                 };
 
-                println!(
+                log::warn!(
                     "Rate limited. Retrying in {} seconds... (attempt {}/{})",
                     sleep_duration.as_secs(),
                     attempts + 1,
@@ -80,7 +79,7 @@ where
                 }
 
                 let sleep_duration = Duration::from_millis(delay.min(config.max_delay_ms));
-                println!(
+                log::warn!(
                     "Rate limited. Retrying in {} seconds... (attempt {}/{})",
                     sleep_duration.as_secs(),
                     attempts + 1,
@@ -101,7 +100,7 @@ where
 
                 // For burst limits, wait a bit longer
                 let sleep_duration = Duration::from_millis((delay * 2).min(config.max_delay_ms));
-                println!(
+                log::warn!(
                     "Burst limit exceeded. Retrying in {} seconds... (attempt {}/{})",
                     sleep_duration.as_secs(),
                     attempts + 1,
@@ -131,5 +130,15 @@ pub fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
         Duration::from_millis(1000) // 1 second when moderate
     } else {
         Duration::from_millis(500) // 500ms when plenty remaining
+    }
+}
+
+/// Converts a `serde_json::Value` to a `HashMap<String, Value>`.
+///
+/// If the input `Value` is not a JSON object, it returns an empty `HashMap`.
+pub fn json_to_hashmap(value: Value) -> HashMap<String, Value> {
+    match value {
+        Value::Object(map) => map.into_iter().collect(),
+        _ => HashMap::new(),
     }
 }

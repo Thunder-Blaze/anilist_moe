@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::review};
 use crate::errors::AniListError;
 use crate::enums::media::MediaType;
@@ -68,7 +67,7 @@ impl ReviewEndpoint {
     ) -> Result<ReviewListResponse, AniListError> {
         let query = review::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -78,7 +77,7 @@ impl ReviewEndpoint {
     ) -> Result<ReviewSingleResponse, AniListError> {
         let query = review::SAVE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -88,7 +87,7 @@ impl ReviewEndpoint {
     ) -> Result<ReviewSingleResponse, AniListError> {
         let query = review::DELETE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -98,9 +97,7 @@ impl ReviewEndpoint {
     ) -> Result<ReviewSingleResponse, AniListError> {
         let query = review::RATE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for ReviewEndpoint {}

@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::forum};
 use crate::errors::AniListError;
 use crate::enums::thread::{ThreadSort, ThreadCommentSort};
@@ -129,7 +128,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -140,7 +139,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::FETCH_ONE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -151,7 +150,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::FETCH_COMMENT;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -162,7 +161,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::FETCH_COMMENT_ONE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -173,7 +172,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::SAVE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -184,7 +183,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::DELETE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -195,7 +194,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::SAVE_COMMENT;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -206,7 +205,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::DELETE_COMMENT;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 
@@ -217,9 +216,7 @@ impl ForumEndpoint {
     ) -> Result<Value, AniListError> {
         let query = forum::SUBSCRIPTION;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for ForumEndpoint {}

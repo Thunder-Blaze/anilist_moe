@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-use serde_json::Value;
-
 pub mod activity;
 pub mod airing;
 pub mod character;
@@ -14,16 +11,6 @@ pub mod review;
 pub mod staff;
 pub mod studio;
 pub mod user;
-
-trait Vth {
-    fn value_to_hashmap(&self, value: Value) -> HashMap<String, Value> {
-        match value {
-            Value::Object(map) => map.into_iter().collect(),
-            _ => HashMap::new(),
-        }
-    }
-}
-
 
 pub use activity::ActivityEndpoint;
 pub use airing::AiringEndpoint;

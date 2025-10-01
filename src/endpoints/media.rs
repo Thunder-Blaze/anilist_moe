@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::media};
 use crate::errors::AniListError;
 use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
@@ -201,7 +200,7 @@ impl MediaEndpoint {
     ) -> Result<MediaListResponse, AniListError> {
         let query = media::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -211,9 +210,7 @@ impl MediaEndpoint {
     ) -> Result<MediaListResponse, AniListError> {
         let query = media::FETCH_ONE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for MediaEndpoint {}

@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::enums::media::MediaSort;
 use crate::{client::AniListClient, queries::character};
 use crate::errors::AniListError;
@@ -74,7 +73,7 @@ impl CharacterEndpoint {
     ) -> Result<CharacterListResponse, AniListError> {
         let query = character::FETCH;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -84,9 +83,7 @@ impl CharacterEndpoint {
     ) -> Result<CharacterListResponse, AniListError> {
         let query = character::FETCH_ONE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for CharacterEndpoint {}

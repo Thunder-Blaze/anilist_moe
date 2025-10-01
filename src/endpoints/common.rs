@@ -1,4 +1,3 @@
-use crate::endpoints::Vth;
 use crate::{client::AniListClient, queries::common};
 use crate::errors::AniListError;
 use serde::Serialize;
@@ -44,7 +43,7 @@ impl CommonEndpoint {
     ) -> Result<bool, AniListError> {
         let query = common::TOGGLE_LIKE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -54,7 +53,7 @@ impl CommonEndpoint {
     ) -> Result<bool, AniListError> {
         let query = common::TOGGLE_FOLLOW;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 
@@ -64,9 +63,7 @@ impl CommonEndpoint {
     ) -> Result<bool, AniListError> {
         let query = common::TOGGLE_FAVOURITE;
         let variables = json!(options);
-        let variables_map = self.value_to_hashmap(variables);
+        let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 }
-
-impl Vth for CommonEndpoint {}
