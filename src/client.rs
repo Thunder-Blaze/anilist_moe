@@ -6,9 +6,31 @@ use crate::utils::{retry_with_backoff, RetryConfig};
 use reqwest::{Client, Response, StatusCode};
 use serde_json::{Value, from_value};
 use std::collections::HashMap;
+use std::fmt;
 
+/// The default AniList GraphQL API endpoint
 const ANILIST_API_URL: &str = "https://graphql.anilist.co";
 
+/// User-Agent header for identifying this library
+const USER_AGENT: &str = concat!("anilist-moe/", env!("CARGO_PKG_VERSION"), " (Rust)");
+
+/// The main client for interacting with the AniList API.
+///
+/// This client handles all API requests, authentication, rate limiting,
+/// and error handling. It provides access to all AniList API endpoints
+/// through specialized endpoint methods.
+///
+/// # Examples
+///
+/// ```rust
+/// use anilist_moe::AniListClient;
+///
+/// // Create a client without authentication
+/// let client = AniListClient::new();
+///
+/// // Create a client with authentication
+/// let authenticated_client = AniListClient::with_token("your_token_here");
+/// ```
 #[derive(Clone)]
 pub struct AniListClient {
     client: Client,
@@ -17,30 +39,116 @@ pub struct AniListClient {
     base_url: String,
 }
 
+// Implement Debug manually to avoid exposing sensitive token information
+impl fmt::Debug for AniListClient {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AniListClient")
+            .field("base_url", &self.base_url)
+            .field("has_token", &self.token.is_some())
+            .field("retry_config", &self.retry_config)
+            .finish()
+    }
+}
+
 impl AniListClient {
+    /// Creates a new AniList client without authentication.
+    ///
+    /// This client can access all public endpoints but cannot perform
+    /// authenticated actions like posting activities or managing lists.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use anilist_moe::AniListClient;
+    ///
+    /// let client = AniListClient::new();
+    /// ```
+    #[must_use]
     pub fn new() -> Self {
+        Self::new_with_client(Self::build_client())
+    }
+
+    /// Creates a new AniList client with authentication.
+    ///
+    /// # Arguments
+    ///
+    /// * `token` - The OAuth2 Bearer token for authentication
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use anilist_moe::AniListClient;
+    ///
+    /// let client = AniListClient::with_token("your_access_token");
+    /// ```
+    #[must_use]
+    pub fn with_token(token: &str) -> Self {
+        let mut client = Self::new();
+        client.token = Some(token.to_string());
+        client
+    }
+
+    /// Builds a configured reqwest client with optimal settings.
+    fn build_client() -> Client {
+        Client::builder()
+            .user_agent(USER_AGENT)
+            .timeout(std::time::Duration::from_secs(30))
+            .pool_max_idle_per_host(10)
+            .build()
+            .expect("Failed to build HTTP client")
+    }
+
+    /// Creates a client with a custom reqwest client.
+    fn new_with_client(client: Client) -> Self {
         Self {
-            client: Client::new(),
+            client,
             token: None,
             retry_config: RetryConfig::default(),
             base_url: ANILIST_API_URL.to_string(),
         }
     }
 
-    pub fn with_token(token: &str) -> Self {
-        Self {
-            client: Client::new(),
-            token: Some(token.to_string()),
-            retry_config: RetryConfig::default(),
-            base_url: ANILIST_API_URL.to_string(),
-        }
-    }
-
+    /// Configures the retry behavior for failed requests.
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - The retry configuration to use
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use anilist_moe::{AniListClient, utils::RetryConfig};
+    ///
+    /// let config = RetryConfig {
+    ///     max_retries: 5,
+    ///     base_delay_ms: 2000,
+    ///     exponential_backoff: true,
+    ///     max_delay_ms: 60000,
+    /// };
+    ///
+    /// let client = AniListClient::new().with_retry_config(config);
+    /// ```
+    #[must_use]
     pub fn with_retry_config(mut self, config: RetryConfig) -> Self {
         self.retry_config = config;
         self
     }
 
+    /// Sets a custom base URL for the API (useful for testing or custom endpoints).
+    ///
+    /// # Arguments
+    ///
+    /// * `base_url` - The base URL to use for API requests
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use anilist_moe::AniListClient;
+    ///
+    /// let client = AniListClient::new()
+    ///     .with_base_url("https://custom-api.example.com");
+    /// ```
+    #[must_use]
     pub fn with_base_url(mut self, base_url: &str) -> Self {
         self.base_url = base_url.to_string();
         self
@@ -141,7 +249,7 @@ impl AniListClient {
             || async {
                 self.raw_query(query, variables).await
             },
-            self.retry_config.clone(),
+            self.retry_config,
         ).await
     }
 

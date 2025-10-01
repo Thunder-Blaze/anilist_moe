@@ -64,22 +64,26 @@
 //!
 //! ### Basic Usage (No Authentication)
 //!
-//! ```rust
+//! ```rust,no_run
 //! use anilist_moe::AniListClient;
+//! use anilist_moe::endpoints::media::FetchMediaOptions;
+//! use anilist_moe::enums::media::MediaSort;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let client = AniListClient::new();
 //!
-//!     // Search for anime
-//!     let anime_results = client.anime().search("Attack on Titan", 1, 5).await?;
-//!     for anime in anime_results {
-//!         println!("Found: {} ({})", anime.title.romaji, anime.id);
-//!     }
+//!     // Search for anime using the media endpoint
+//!     let options = FetchMediaOptions {
+//!         search: Some("Attack on Titan".to_string()),
+//!         page: Some(1),
+//!         per_page: Some(5),
+//!         sort: Some(vec![MediaSort::PopularityDesc]),
+//!         ..Default::default()
+//!     };
 //!
-//!     // Get trending anime
-//!     let trending = client.anime().get_trending(1, 10).await?;
-//!     println!("Found {} trending anime", trending.len());
+//!     let results = client.media().fetch(options).await?;
+//!     println!("Found results: {:?}", results);
 //!
 //!     Ok(())
 //! }
@@ -87,26 +91,23 @@
 //!
 //! ### Authenticated Usage
 //!
-//! ```rust
+//! ```rust,no_run
 //! use anilist_moe::AniListClient;
+//! use anilist_moe::endpoints::user::FetchUserOneOptions;
 //! use std::env;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let token = env::var("ANILIST_TOKEN")?;
-//!     let client = AniListClient::with_token(token);
+//!     let client = AniListClient::with_token(&token);
 //!
 //!     // Get user profile
-//!     let user = client.user().get_current_user().await?;
-//!     println!("Logged in as: {}", user.name);
-//!
-//!     // Get user's notifications
-//!     let notifications = client.notification().get_notifications(1, 10).await?;
-//!     println!("You have {} notifications", notifications.len());
-//!
-//!     // Post a text activity
-//!     let activity = client.activity().post_text_activity("Hello from Rust!".to_string()).await?;
-//!     println!("Posted activity: {}", activity.id);
+//!     let options = FetchUserOneOptions {
+//!         id: Some(123456),
+//!         ..Default::default()
+//!     };
+//!     let user = client.user().fetch_one(options).await?;
+//!     println!("User: {:?}", user);
 //!
 //!     Ok(())
 //! }
@@ -114,20 +115,26 @@
 //!
 //! ### Error Handling
 //!
-//! ```rust
+//! ```rust,no_run
 //! use anilist_moe::{AniListClient, AniListError};
+//! use anilist_moe::endpoints::media::FetchMediaOneOptions;
 //!
 //! #[tokio::main]
 //! async fn main() {
 //!     let client = AniListClient::new();
 //!
-//!     match client.anime().get_by_id(999999).await {
-//!         Ok(anime) => println!("Found anime: {}", anime.title.romaji),
+//!     let options = FetchMediaOneOptions {
+//!         id: Some(999999),
+//!         ..Default::default()
+//!     };
+//!
+//!     match client.media().fetch_one(options).await {
+//!         Ok(media) => println!("Found media: {:?}", media),
 //!         Err(AniListError::RateLimit { retry_after, .. }) => {
 //!             println!("Rate limited! Retry after {} seconds", retry_after);
 //!         },
 //!         Err(AniListError::NotFound) => {
-//!             println!("Anime not found");
+//!             println!("Media not found");
 //!         },
 //!         Err(e) => println!("Error: {}", e),
 //!     }

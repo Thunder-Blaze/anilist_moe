@@ -9,11 +9,32 @@ use std::collections::HashMap;
 use std::time::Duration;
 use tokio::time::sleep;
 
-#[derive(Debug, Clone)]
+/// Configuration for retry behavior when requests fail.
+///
+/// This struct controls how the client retries failed requests, including
+/// rate limit errors and transient network failures.
+///
+/// # Examples
+///
+/// ```rust
+/// use anilist_moe::utils::RetryConfig;
+///
+/// let config = RetryConfig {
+///     max_retries: 5,
+///     base_delay_ms: 2000,
+///     exponential_backoff: true,
+///     max_delay_ms: 60000,
+/// };
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RetryConfig {
+    /// Maximum number of retry attempts before giving up
     pub max_retries: u32,
+    /// Initial delay in milliseconds before the first retry
     pub base_delay_ms: u64,
+    /// Whether to use exponential backoff (doubles delay each retry)
     pub exponential_backoff: bool,
+    /// Maximum delay in milliseconds between retries
     pub max_delay_ms: u64,
 }
 
