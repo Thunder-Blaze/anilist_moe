@@ -2,6 +2,7 @@
 //!
 //! These tests verify that the media endpoint correctly fetches, parses,
 //! and returns data with proper types from the AniList API.
+use log::info;
 
 use anilist_moe::{AniListClient, endpoints::media::*};
 use anilist_moe::enums::media::{MediaType, MediaSort};
@@ -21,6 +22,7 @@ async fn test_fetch_media_with_search() {
     assert!(result.is_ok(), "Should successfully fetch media");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     assert!(response.data.page.page_info.current_page.is_some());
 
     let media_list = &response.data.page.data.media;
@@ -47,6 +49,7 @@ async fn test_fetch_media_by_id() {
     assert!(result.is_ok(), "Should successfully fetch media by ID: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let media_list = &response.data.page.data.media;
     assert_eq!(media_list.len(), 1, "Should return exactly one media");
 
@@ -70,6 +73,7 @@ async fn test_fetch_one_media() {
     assert!(result.is_ok(), "Should successfully fetch one media: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let media = &response.data.media;
     assert_eq!(media.id, Some(1), "Should return media with ID 1");
     assert!(media.title.is_some(), "Media should have a title");
@@ -87,6 +91,7 @@ async fn test_media_data_types() {
     assert!(result.is_ok(), "Should successfully fetch media");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let media = &response.data.page.data.media[0];
 
     // Verify ID is required and positive

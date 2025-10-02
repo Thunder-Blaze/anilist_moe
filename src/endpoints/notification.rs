@@ -32,6 +32,9 @@ impl NotificationEndpoint {
         let query = notification::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        println!("Variables Map: {:?}", variables_map);
+        let x = self.client.query_typed(query, Some(&variables_map)).await;
+        println!("Query Result: {:?}", x);
+        x
     }
 }

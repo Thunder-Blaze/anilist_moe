@@ -1,6 +1,7 @@
 //! Tests for Notification endpoint
 
 use anilist_moe::{AniListClient, endpoints::notification::*};
+use log::info;
 use dotenv::dotenv;
 use std::env;
 
@@ -23,6 +24,7 @@ async fn test_fetch_notifications() {
     // Notifications require authentication
     match result {
         Ok(response) => {
+            info!("Response: {:?}", response);
             println!("Successfully fetched notifications");
             let notifications = &response.data.page.data.notifications;
             println!("Number of notifications: {}", notifications.len());
@@ -44,20 +46,27 @@ async fn test_notification_data_types() {
     let result = client.notification().fetch(options).await;
 
     if let Ok(response) = result {
+        println!("Response: {:?}", response);
         let notifications = &response.data.page.data.notifications;
         if !notifications.is_empty() {
             let notification_id = match &notifications[0] {
                 anilist_moe::unions::notification::NotificationUnion::Airing(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::Following(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityMessage(n) => n.id,
-                anilist_moe::unions::notification::NotificationUnion::ActivityReply(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityMention(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ActivityReply(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ActivityReplySubscribed(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityLike(n) => n.id,
-                anilist_moe::unions::notification::NotificationUnion::ThreadCommentMessage(n) => n.id,
-                anilist_moe::unions::notification::NotificationUnion::ThreadSubscribed(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ActivityReplyLike(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ThreadCommentMention(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ThreadCommentReply(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ThreadSubscribed(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ThreadCommentLike(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ThreadLike(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::RelatedMediaAddition(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::MediaDataChange(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::MediaMerge(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::MediaDeletion(n) => n.id,
             };
             assert!(notification_id > 0, "Notification ID should be positive");
         }

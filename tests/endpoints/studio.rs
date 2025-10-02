@@ -1,6 +1,7 @@
 //! Tests for Studio endpoint
 
 use anilist_moe::{AniListClient, endpoints::studio::*};
+use log::info;
 
 #[tokio::test]
 async fn test_fetch_studio_by_search() {
@@ -15,6 +16,7 @@ async fn test_fetch_studio_by_search() {
     assert!(result.is_ok(), "Should successfully fetch studios");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let studios = &response.data.page.data.studios;
     assert!(!studios.is_empty(), "Should return at least one studio");
 
@@ -38,6 +40,7 @@ async fn test_fetch_studio_by_id() {
     assert!(result.is_ok(), "Should successfully fetch studio by ID");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let studios = &response.data.page.data.studios;
     assert_eq!(studios.len(), 1, "Should return exactly one studio");
     assert_eq!(studios[0].id, Some(2), "Should return correct studio ID");
@@ -58,6 +61,7 @@ async fn test_fetch_one_studio() {
     assert!(result.is_ok(), "Should successfully fetch one studio: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let studio = &response.data.studio;
     assert_eq!(studio.id, Some(2), "Should return studio with ID 2");
 }
@@ -74,6 +78,7 @@ async fn test_studio_data_types() {
     assert!(result.is_ok(), "Should successfully fetch studio");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let studio = &response.data.page.data.studios[0];
 
     if let Some(id) = studio.id {

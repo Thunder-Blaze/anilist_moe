@@ -1,12 +1,13 @@
 //! Tests for User endpoint
 
 use anilist_moe::{AniListClient, endpoints::user::*};
+use log::info;
 
 #[tokio::test]
 async fn test_fetch_user_by_search() {
     let client = AniListClient::new();
     let options = FetchUserOptions {
-        search: Some("demo".to_string()),
+        search: Some("ThunderBlaze".to_string()),
         per_page: Some(5),
         ..Default::default()
     };
@@ -18,6 +19,7 @@ async fn test_fetch_user_by_search() {
     assert!(result.is_ok(), "Should successfully fetch users: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let users = &response.data.page.data.users;
     assert!(!users.is_empty(), "Should return at least one user");
 
@@ -30,7 +32,7 @@ async fn test_fetch_user_by_search() {
 async fn test_fetch_user_by_id() {
     let client = AniListClient::new();
     let options = FetchUserOptions {
-        id: Some(3225),
+        id: Some(5429396),
         ..Default::default()
     };
 
@@ -38,6 +40,7 @@ async fn test_fetch_user_by_id() {
     assert!(result.is_ok(), "Should successfully fetch user by ID");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let users = &response.data.page.data.users;
     assert_eq!(users.len(), 1, "Should return exactly one user");
 }
@@ -46,7 +49,7 @@ async fn test_fetch_user_by_id() {
 async fn test_fetch_one_user() {
     let client = AniListClient::new();
     let options = FetchUserOneOptions {
-        id: Some(3225),
+        id: Some(5429396),
         ..Default::default()
     };
 
@@ -54,6 +57,7 @@ async fn test_fetch_one_user() {
     assert!(result.is_ok(), "Should successfully fetch one user");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let user = &response.data.user;
     assert!(user.id > 0, "User should have positive ID");
     assert!(!user.name.is_empty(), "User should have name");
@@ -71,6 +75,7 @@ async fn test_user_data_types() {
     assert!(result.is_ok(), "Should successfully fetch user");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let user = &response.data.page.data.users[0];
 
     assert!(!user.name.is_empty(), "Name should not be empty");

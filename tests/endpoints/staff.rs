@@ -1,6 +1,7 @@
 //! Tests for Staff endpoint
 
 use anilist_moe::{AniListClient, endpoints::staff::*};
+use log::info;
 
 #[tokio::test]
 async fn test_fetch_staff_by_search() {
@@ -14,6 +15,7 @@ async fn test_fetch_staff_by_search() {
     assert!(result.is_ok(), "Should successfully fetch staff");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let staff_list = &response.data.page.data.staff;
     assert!(!staff_list.is_empty(), "Should return at least one staff member");
 
@@ -34,6 +36,7 @@ async fn test_fetch_staff_by_id() {
     assert!(result.is_ok(), "Should successfully fetch staff by ID");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let staff_list = &response.data.page.data.staff;
     assert_eq!(staff_list.len(), 1, "Should return exactly one staff member");
     assert_eq!(staff_list[0].id, 95269, "Should return correct staff ID");
@@ -51,6 +54,7 @@ async fn test_fetch_one_staff() {
     assert!(result.is_ok(), "Should successfully fetch one staff");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let staff = &response.data.staff;
     assert_eq!(staff.id, 95269, "Should return correct staff ID");
 }
@@ -67,6 +71,7 @@ async fn test_staff_data_types() {
     assert!(result.is_ok(), "Should successfully fetch staff");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let staff = &response.data.page.data.staff[0];
 
     assert!(staff.id > 0, "ID should be positive");

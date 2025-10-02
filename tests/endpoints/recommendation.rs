@@ -1,6 +1,7 @@
 //! Tests for Recommendation endpoint
 
 use anilist_moe::{AniListClient, endpoints::recommendation::*};
+use log::info;
 use dotenv::dotenv;
 use std::env;
 
@@ -25,6 +26,7 @@ async fn test_fetch_recommendations() {
     assert!(result.is_ok(), "Should successfully fetch recommendations: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let recommendations = &response.data.page.data.recommendations;
     assert!(!recommendations.is_empty(), "Should return at least one recommendation");
 }
@@ -42,6 +44,7 @@ async fn test_fetch_recommendations_by_media() {
     assert!(result.is_ok(), "Should successfully fetch recommendations by media");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let recommendations = &response.data.page.data.recommendations;
     if !recommendations.is_empty() {
         let first_rec = &recommendations[0];
@@ -61,6 +64,7 @@ async fn test_recommendation_data_types() {
     assert!(result.is_ok(), "Should successfully fetch recommendations");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let recommendations = &response.data.page.data.recommendations;
 
     if !recommendations.is_empty() {
@@ -69,3 +73,34 @@ async fn test_recommendation_data_types() {
         assert!(rec.rating.is_some(), "Recommendation should have a rating");
     }
 }
+
+// Authentication required tests
+#[tokio::test]
+async fn test_save_recommendation() {
+    let client = get_authenticated_client();
+
+    // Try to save a recommendation rating
+    // Recommending Cowboy Bebop (1) -> Samurai Champloo (205)
+    let options = SaveRecommendationOptions {
+        media_id: 1,
+        media_recommendation_id: 205,
+        rating: 1, // 1 = upvote, -1 = downvote
+    };
+
+    let result = client.recommendation().save(options).await;
+
+    match result {
+        Ok(response) => {
+            info!("Save Response: {:?}", response);
+            println!("Successfully saved recommendation");
+            let recs = &response.data.page.data.recommendations;
+            if let Some(rec) = recs.first() {
+                println!("Recommendation ID: {}", rec.id);
+            }
+        }
+        Err(e) => {
+            println!("Expected authentication error or permission issue: {:?}", e);
+        }
+    }
+}
+

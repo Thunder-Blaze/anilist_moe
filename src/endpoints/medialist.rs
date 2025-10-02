@@ -3,7 +3,7 @@ use crate::enums::media_list::{MediaListSort, MediaListStatus};
 use crate::objects::common::FuzzyDate;
 use crate::{client::AniListClient, queries::medialist};
 use crate::errors::AniListError;
-use crate::objects::responses::{MediaListResponse, UserMediaListResponse};
+use crate::objects::responses::{UserMediaListResponse, SaveMediaListEntryResponse, DeleteMediaListEntryResponse};
 use serde::Serialize;
 use serde_json::json;
 
@@ -158,7 +158,7 @@ impl MediaListEndpoint {
     pub async fn save(
         &self,
         options: SaveMediaListOptions,
-    ) -> Result<MediaListResponse, AniListError> {
+    ) -> Result<SaveMediaListEntryResponse, AniListError> {
         let query = medialist::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -168,7 +168,7 @@ impl MediaListEndpoint {
     pub async fn save_multiple(
         &self,
         options: SaveMediaListMultipleOptions,
-    ) -> Result<Vec<MediaListResponse>, AniListError> {
+    ) -> Result<Vec<SaveMediaListEntryResponse>, AniListError> {
         let query = medialist::SAVE_MULTIPLE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -178,7 +178,7 @@ impl MediaListEndpoint {
     pub async fn delete(
         &self,
         options: DeleteMediaListOptions,
-    ) -> Result<MediaListResponse, AniListError> {
+    ) -> Result<DeleteMediaListEntryResponse, AniListError> {
         let query = medialist::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

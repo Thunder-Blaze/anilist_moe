@@ -1,6 +1,7 @@
 //! Tests for Common endpoint (likes, follows, favourites)
 
 use anilist_moe::{AniListClient, endpoints::common::*, enums::likable::LikeableType};
+use log::info;
 use dotenv::dotenv;
 use std::env;
 
@@ -26,6 +27,7 @@ async fn test_toggle_like() {
 
     match result {
         Ok(response) => {
+            info!("Response: {:?}", response);
             println!("Successfully toggled like on item");
             println!("Response data: {:?}", response.data.toggle_like_v2);
         }
@@ -48,6 +50,7 @@ async fn test_toggle_follow() {
 
     match result {
         Ok(response) => {
+            info!("Response: {:?}", response);
             println!("Successfully toggled follow");
             println!("User: {} (ID: {})", response.data.toggle_follow.name, response.data.toggle_follow.id);
         }
@@ -74,6 +77,7 @@ async fn test_toggle_favourite() {
 
     match result {
         Ok(response) => {
+            info!("Response: {:?}", response);
             println!("Successfully toggled favourite");
             println!("Favourites data: {:?}", response.data.toggle_favourite);
         }

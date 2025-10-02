@@ -25,8 +25,8 @@ pub struct Report {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Review {
     pub id: i32,
-    #[serde(rename = "userId")]
-    pub user_id: i32,
+    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<i32>,
     #[serde(rename = "mediaId")]
     pub media_id: i32,
     #[serde(rename = "mediaType", skip_serializing_if = "Option::is_none")]
@@ -47,8 +47,8 @@ pub struct Review {
     pub private: Option<bool>,
     #[serde(rename = "siteUrl", skip_serializing_if = "Option::is_none")]
     pub site_url: Option<String>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
     #[serde(rename = "updatedAt")]
     pub updated_at: i32,
     #[serde(skip_serializing_if = "Option::is_none")]

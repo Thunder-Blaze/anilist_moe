@@ -9,8 +9,8 @@ pub struct Thread {
     pub title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    #[serde(rename = "userId")]
-    pub user_id: i32,
+    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<i32>,
     #[serde(rename = "replyUserId", skip_serializing_if = "Option::is_none")]
     pub reply_user_id: Option<i32>,
     #[serde(rename = "replyCommentId", skip_serializing_if = "Option::is_none")]
@@ -25,16 +25,16 @@ pub struct Thread {
     pub is_sticky: Option<bool>,
     #[serde(rename = "isSubscribed", skip_serializing_if = "Option::is_none")]
     pub is_subscribed: Option<bool>,
-    #[serde(rename = "likeCount")]
-    pub like_count: i32,
+    #[serde(rename = "likeCount", skip_serializing_if = "Option::is_none")]
+    pub like_count: Option<i32>,
     #[serde(rename = "isLiked", skip_serializing_if = "Option::is_none")]
     pub is_liked: Option<bool>,
     #[serde(rename = "repliedAt", skip_serializing_if = "Option::is_none")]
     pub replied_at: Option<i32>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
-    #[serde(rename = "updatedAt")]
-    pub updated_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
+    #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
     #[serde(rename = "replyUser", skip_serializing_if = "Option::is_none")]
@@ -68,16 +68,16 @@ pub struct ThreadComment {
     #[serde(rename = "asHtml", skip_serializing_if = "Option::is_none")]
     pub as_html: Option<bool>,
 
-    #[serde(rename = "likeCount")]
-    pub like_count: i32,
+    #[serde(rename = "likeCount", skip_serializing_if = "Option::is_none")]
+    pub like_count: Option<i32>,
     #[serde(rename = "isLiked", skip_serializing_if = "Option::is_none")]
     pub is_liked: Option<bool>,
     #[serde(rename = "siteUrl", skip_serializing_if = "Option::is_none")]
     pub site_url: Option<String>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
-    #[serde(rename = "updatedAt")]
-    pub updated_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
+    #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<Thread>,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -1,6 +1,7 @@
 //! Tests for MediaList endpoint
 
 use anilist_moe::{AniListClient, endpoints::medialist::*};
+use log::info;
 use anilist_moe::enums::media_list::MediaListStatus;
 use dotenv::dotenv;
 use std::env;
@@ -27,6 +28,7 @@ async fn test_fetch_media_list() {
     assert!(result.is_ok(), "Should successfully fetch media list: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let lists = &response.data.page.data.media_list;
     assert!(!lists.is_empty(), "Should return at least one media list entry");
 }
@@ -47,6 +49,7 @@ async fn test_fetch_media_list_by_media() {
     assert!(result.is_ok(), "Should successfully fetch media list by media: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let lists = &response.data.page.data.media_list;
     if !lists.is_empty() {
         let first_entry = &lists[0];
@@ -67,12 +70,13 @@ async fn test_media_list_data_types() {
     assert!(result.is_ok(), "Should successfully fetch media list");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let lists = &response.data.page.data.media_list;
 
     if !lists.is_empty() {
         let entry = &lists[0];
         assert!(entry.id > 0, "Media list ID should be positive");
-        assert!(entry.user_id > 0, "User ID should be positive");
+        assert!(entry.user_id > Some(0), "User ID should be positive");
     }
 }
 
@@ -92,11 +96,69 @@ async fn test_save_media_list() {
     let result = client.medialist().save(options).await;
 
     match result {
-        Ok(_) => {
-            println!("Successfully saved media list entry");
+        Ok(response) => {
+            println!("Successfully saved media list entry with ID: {}", response.data.save_media_list_entry.id);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);
         }
     }
 }
+
+#[tokio::test]
+async fn test_save_multiple_media_lists() {
+    let client = get_authenticated_client();
+
+    // Try to update multiple media list entries at once
+    let options = SaveMediaListMultipleOptions {
+        ids: vec![1, 2, 3], // Multiple anime IDs
+        status: Some(MediaListStatus::Planning),
+        ..Default::default()
+    };
+
+    let result = client.medialist().save_multiple(options).await;
+
+    match result {
+        Ok(responses) => {
+            println!("Successfully saved {} media list entries", responses.len());
+            for response in responses {
+                println!("Updated entry ID: {}", response.data.save_media_list_entry.id);
+            }
+        }
+        Err(e) => {
+            println!("Expected authentication error or permission issue: {:?}", e);
+        }
+    }
+}
+
+#[tokio::test]
+async fn test_delete_media_list() {
+    let client = get_authenticated_client();
+
+    // First create a media list entry to delete
+    let save_options = SaveMediaListOptions {
+        media_id: Some(20), // Random anime
+        status: Some(MediaListStatus::Planning),
+        ..Default::default()
+    };
+
+    if let Ok(response) = client.medialist().save(save_options).await {
+        let entry_id = response.data.save_media_list_entry.id;
+
+        let delete_options = DeleteMediaListOptions {
+            id: entry_id,
+        };
+
+        let result = client.medialist().delete(delete_options).await;
+
+        match result {
+            Ok(response) => {
+                println!("Successfully deleted media list entry: {}", response.data.deleted);
+            }
+            Err(e) => {
+                println!("Expected authentication error or permission issue: {:?}", e);
+            }
+        }
+    }
+}
+

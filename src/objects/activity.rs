@@ -13,12 +13,12 @@ pub struct ActivityReply {
     pub activity_id: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,
-    #[serde(rename = "likeCount")]
-    pub like_count: i32,
+    #[serde(rename = "likeCount", skip_serializing_if = "Option::is_none")]
+    pub like_count: Option<i32>,
     #[serde(rename = "isLiked", skip_serializing_if = "Option::is_none")]
     pub is_liked: Option<bool>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -42,14 +42,14 @@ pub struct TextActivity {
     pub is_locked: Option<bool>,
     #[serde(rename = "isSubscribed", skip_serializing_if = "Option::is_none")]
     pub is_subscribed: Option<bool>,
-    #[serde(rename = "likeCount")]
-    pub like_count: i32,
+    #[serde(rename = "likeCount", skip_serializing_if = "Option::is_none")]
+    pub like_count: Option<i32>,
     #[serde(rename = "isLiked", skip_serializing_if = "Option::is_none")]
     pub is_liked: Option<bool>,
     #[serde(rename = "isPinned", skip_serializing_if = "Option::is_none")]
     pub is_pinned: Option<bool>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -75,16 +75,16 @@ pub struct ListActivity {
     pub is_locked: Option<bool>,
     #[serde(rename = "isSubscribed", skip_serializing_if = "Option::is_none")]
     pub is_subscribed: Option<bool>,
-    #[serde(rename = "likeCount")]
-    pub like_count: i32,
+    #[serde(rename = "likeCount", skip_serializing_if = "Option::is_none")]
+    pub like_count: Option<i32>,
     #[serde(rename = "isLiked", skip_serializing_if = "Option::is_none")]
     pub is_liked: Option<bool>,
     #[serde(rename = "isPinned", skip_serializing_if = "Option::is_none")]
     pub is_pinned: Option<bool>,
     #[serde(rename = "siteUrl", skip_serializing_if = "Option::is_none")]
     pub site_url: Option<String>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
     #[serde(skip_serializing_if = "Option::is_none")]

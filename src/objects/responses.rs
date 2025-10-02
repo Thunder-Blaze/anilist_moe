@@ -198,6 +198,22 @@ pub type ActivitySingleResponse = GraphQLResponse<ActivityResponse>;
 pub type ReviewSingleResponse = GraphQLResponse<ReviewResponse>;
 pub type RecommendationSingleResponse = GraphQLResponse<RecommendationResponse>;
 
+// MediaList single item response types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MediaListEntryData {
+    #[serde(rename = "SaveMediaListEntry")]
+    pub save_media_list_entry: MediaList,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeleteMediaListData {
+    #[serde(rename = "DeleteMediaListEntry")]
+    pub deleted: bool,
+}
+
+pub type SaveMediaListEntryResponse = GraphQLResponse<MediaListEntryData>;
+pub type DeleteMediaListEntryResponse = GraphQLResponse<DeleteMediaListData>;
+
 // Common endpoint response types
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ToggleLikeData {

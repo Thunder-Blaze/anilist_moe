@@ -1,7 +1,7 @@
 use crate::{client::AniListClient, queries::activity};
 use crate::errors::AniListError;
 use crate::enums::activity::{ActivitySort, ActivityType};
-use crate::objects::responses::{ActivityListResponse, ActivityResponse, ActivitySingleResponse, ActivityReplyListResponse};
+use crate::objects::responses::{ActivityListResponse, ActivitySingleResponse, ActivityReplyListResponse};
 use serde::Serialize;
 use serde_json::json;
 

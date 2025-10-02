@@ -1,6 +1,7 @@
 //! Tests for Airing endpoint
 
 use anilist_moe::{AniListClient, endpoints::airing::*};
+use log::info;
 
 #[tokio::test]
 async fn test_fetch_airing_schedules() {
@@ -17,6 +18,7 @@ async fn test_fetch_airing_schedules() {
     assert!(result.is_ok(), "Should successfully fetch airing schedules: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let schedules = &response.data.page.data.airing_schedules;
     assert!(!schedules.is_empty(), "Should return airing schedules");
 
@@ -77,6 +79,7 @@ async fn test_airing_data_types() {
     assert!(result.is_ok(), "Should successfully fetch airing schedule: {:?}", result.err());
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     if let Some(schedule) = response.data.page.data.airing_schedules.first() {
         assert!(schedule.id.is_some() && schedule.id.unwrap() > 0, "ID should be positive");
         assert!(schedule.airing_at > 0, "Airing time should be positive timestamp");

@@ -14,6 +14,6 @@ pub struct ModAction {
     #[serde(rename = "objectType")]
     pub object_type: Option<String>,
     pub data: Option<String>,
-    #[serde(rename = "createdAt")]
-    pub created_at: i32,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<i32>,
 }

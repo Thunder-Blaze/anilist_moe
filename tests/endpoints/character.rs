@@ -1,6 +1,7 @@
 //! Tests for Character endpoint
 
 use anilist_moe::{AniListClient, endpoints::character::*};
+use log::info;
 
 #[tokio::test]
 async fn test_fetch_character_by_search() {
@@ -15,6 +16,7 @@ async fn test_fetch_character_by_search() {
     assert!(result.is_ok(), "Should successfully fetch characters");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let characters = &response.data.page.data.characters;
     assert!(!characters.is_empty(), "Should return at least one character");
 
@@ -35,6 +37,7 @@ async fn test_fetch_character_by_id() {
     assert!(result.is_ok(), "Should successfully fetch character by ID");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let characters = &response.data.page.data.characters;
     assert_eq!(characters.len(), 1, "Should return exactly one character");
     assert_eq!(characters[0].id, 1, "Should return correct character ID");
@@ -52,6 +55,7 @@ async fn test_fetch_one_character() {
     assert!(result.is_ok(), "Should successfully fetch one character");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let character = &response.data.character;
     assert_eq!(character.id, 1, "Should return character with ID 1");
     assert!(character.name.is_some(), "Character should have a name");
@@ -69,6 +73,7 @@ async fn test_character_data_types() {
     assert!(result.is_ok(), "Should successfully fetch character");
 
     let response = result.unwrap();
+    info!("Response: {:?}", response);
     let character = &response.data.page.data.characters[0];
 
     assert!(character.id > 0, "ID should be positive");

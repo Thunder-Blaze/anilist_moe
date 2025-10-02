@@ -9,8 +9,8 @@ use crate::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MediaList {
     pub id: i32,
-    #[serde(rename = "userId")]
-    pub user_id: i32,
+    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<i32>,
     #[serde(rename = "mediaId")]
     pub media_id: i32,
     #[serde(skip_serializing_if = "Option::is_none")]
