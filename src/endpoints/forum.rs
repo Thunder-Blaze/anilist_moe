@@ -1,8 +1,8 @@
-use crate::{client::AniListClient, queries::forum};
+use crate::enums::thread::{ThreadCommentSort, ThreadSort};
 use crate::errors::AniListError;
-use crate::enums::thread::{ThreadSort, ThreadCommentSort};
+use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[derive(Default, Serialize)]
 pub struct FetchThreadOptions {
@@ -122,10 +122,7 @@ impl ForumEndpoint {
     }
 
     /// Fetch multiple threads with pagination
-    pub async fn fetch(
-        &self,
-        options: FetchThreadOptions,
-    ) -> Result<Value, AniListError> {
+    pub async fn fetch(&self, options: FetchThreadOptions) -> Result<Value, AniListError> {
         let query = forum::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -133,10 +130,7 @@ impl ForumEndpoint {
     }
 
     /// Fetch a single thread with full details
-    pub async fn fetch_one(
-        &self,
-        options: FetchThreadOneOptions,
-    ) -> Result<Value, AniListError> {
+    pub async fn fetch_one(&self, options: FetchThreadOneOptions) -> Result<Value, AniListError> {
         let query = forum::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -166,10 +160,7 @@ impl ForumEndpoint {
     }
 
     /// Create or update a thread
-    pub async fn save(
-        &self,
-        options: SaveThreadOptions,
-    ) -> Result<Value, AniListError> {
+    pub async fn save(&self, options: SaveThreadOptions) -> Result<Value, AniListError> {
         let query = forum::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -177,10 +168,7 @@ impl ForumEndpoint {
     }
 
     /// Delete a thread
-    pub async fn delete(
-        &self,
-        options: DeleteThreadOptions,
-    ) -> Result<Value, AniListError> {
+    pub async fn delete(&self, options: DeleteThreadOptions) -> Result<Value, AniListError> {
         let query = forum::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

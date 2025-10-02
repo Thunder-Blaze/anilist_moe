@@ -18,7 +18,10 @@ async fn test_fetch_character_by_search() {
     let response = result.unwrap();
     info!("Response: {:?}", response);
     let characters = &response.data.page.data.characters;
-    assert!(!characters.is_empty(), "Should return at least one character");
+    assert!(
+        !characters.is_empty(),
+        "Should return at least one character"
+    );
 
     let first_char = &characters[0];
     assert!(first_char.id > 0, "Character should have a positive ID");

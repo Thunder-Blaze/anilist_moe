@@ -1,10 +1,10 @@
-use crate::{client::AniListClient, queries::review};
-use crate::errors::AniListError;
 use crate::enums::media::MediaType;
 use crate::enums::review::ReviewSort;
+use crate::errors::AniListError;
 use crate::objects::responses::{ReviewListResponse, ReviewSingleResponse};
-use serde_json::json;
+use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
+use serde_json::json;
 
 #[derive(Default, Serialize)]
 pub struct FetchReviewOptions {

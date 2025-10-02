@@ -2,8 +2,8 @@
 
 use anilist_moe::{AniListClient, endpoints::activity::*};
 use dotenv::dotenv;
-use std::env;
 use log::info;
+use std::env;
 
 fn get_authenticated_client() -> AniListClient {
     dotenv().ok();
@@ -23,7 +23,11 @@ async fn test_fetch_activities() {
     if let Err(ref e) = result {
         eprintln!("Error fetching activities: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch activities: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch activities: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -104,9 +108,7 @@ async fn test_activity_full_lifecycle() {
 
     // Step 3: Fetch the activity
     println!("Step 3: Fetching activity...");
-    let fetch_options = FetchActivityOneOptions {
-        id: activity_id,
-    };
+    let fetch_options = FetchActivityOneOptions { id: activity_id };
 
     let fetch_result = client.activity().fetch_one(fetch_options).await;
     match fetch_result {
@@ -114,7 +116,10 @@ async fn test_activity_full_lifecycle() {
             info!("Fetch Response: {:?}", response);
             match &response.data.activity {
                 anilist_moe::unions::activity::ActivityUnion::TextActivity(a) => {
-                    println!("✓ Fetched activity: {}", a.text.as_ref().unwrap_or(&"".to_string()));
+                    println!(
+                        "✓ Fetched activity: {}",
+                        a.text.as_ref().unwrap_or(&"".to_string())
+                    );
                 }
                 _ => println!("✗ Unexpected activity type"),
             }
@@ -124,9 +129,7 @@ async fn test_activity_full_lifecycle() {
 
     // Step 4: Delete the activity
     println!("Step 4: Deleting activity...");
-    let delete_options = DeleteActivityOptions {
-        id: activity_id,
-    };
+    let delete_options = DeleteActivityOptions { id: activity_id };
 
     let delete_result = client.activity().delete(delete_options).await;
     match delete_result {

@@ -110,7 +110,7 @@ fn test_error_from_serde_json() {
     let anilist_error: AniListError = json_error.into();
 
     match anilist_error {
-        AniListError::Json(_) => {}, // Expected
+        AniListError::Json(_) => {} // Expected
         _ => panic!("Expected Json error variant"),
     }
 }
@@ -124,7 +124,13 @@ fn test_rate_limit_error_values() {
         retry_after: 45,
     };
 
-    if let AniListError::RateLimit { limit, remaining, reset_at, retry_after } = error {
+    if let AniListError::RateLimit {
+        limit,
+        remaining,
+        reset_at,
+        retry_after,
+    } = error
+    {
         assert_eq!(limit, 90);
         assert_eq!(remaining, 5);
         assert_eq!(reset_at, 1234567890);

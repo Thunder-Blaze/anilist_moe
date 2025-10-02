@@ -2,8 +2,8 @@
 
 use anilist_moe::{AniListClient, endpoints::review::*};
 use dotenv::dotenv;
-use std::env;
 use log::info;
+use std::env;
 
 fn get_authenticated_client() -> AniListClient {
     dotenv().ok();
@@ -23,7 +23,11 @@ async fn test_fetch_reviews() {
     if let Err(ref e) = result {
         eprintln!("Error fetching reviews: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch reviews: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch reviews: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -95,7 +99,10 @@ async fn test_save_review() {
     match result {
         Ok(response) => {
             info!("Save Response: {:?}", response);
-            println!("Successfully saved review with ID: {}", response.data.review.id);
+            println!(
+                "Successfully saved review with ID: {}",
+                response.data.review.id
+            );
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);
@@ -160,9 +167,7 @@ async fn test_delete_review() {
     if let Ok(response) = client.review().save(save_options).await {
         let review_id = response.data.review.id;
 
-        let delete_options = DeleteReviewOptions {
-            id: review_id,
-        };
+        let delete_options = DeleteReviewOptions { id: review_id };
 
         let result = client.review().delete(delete_options).await;
 
@@ -176,4 +181,3 @@ async fn test_delete_review() {
         }
     }
 }
-

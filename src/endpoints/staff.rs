@@ -1,8 +1,8 @@
-use serde::Serialize;
-use crate::{client::AniListClient, queries::staff};
-use crate::errors::AniListError;
 use crate::enums::staff::StaffSort;
+use crate::errors::AniListError;
 use crate::objects::responses::{StaffListResponse, StaffSingleResponse};
+use crate::{client::AniListClient, queries::staff};
+use serde::Serialize;
 use serde_json::json;
 
 #[derive(Default, Serialize)]
@@ -50,7 +50,10 @@ pub struct FetchStaffOneOptions {
     pub characters_per_page: Option<i32>,
     #[serde(rename = "characterMediaPage", skip_serializing_if = "Option::is_none")]
     pub character_media_page: Option<i32>,
-    #[serde(rename = "characterMediaPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "characterMediaPerPage",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub character_media_per_page: Option<i32>,
 }
 

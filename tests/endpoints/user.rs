@@ -16,7 +16,11 @@ async fn test_fetch_user_by_search() {
     if let Err(ref e) = result {
         eprintln!("Error fetching users: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch users: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch users: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -25,7 +29,10 @@ async fn test_fetch_user_by_search() {
 
     let first_user = &users[0];
     assert!(first_user.id > 0, "User should have a positive ID");
-    assert!(!first_user.name.as_ref().unwrap().is_empty(), "User should have a name");
+    assert!(
+        !first_user.name.as_ref().unwrap().is_empty(),
+        "User should have a name"
+    );
 }
 
 #[tokio::test]
@@ -60,7 +67,10 @@ async fn test_fetch_one_user() {
     info!("Response: {:?}", response);
     let user = &response.data.user;
     assert!(user.id > 0, "User should have positive ID");
-    assert!(!user.name.as_ref().unwrap().is_empty(), "User should have name");
+    assert!(
+        !user.name.as_ref().unwrap().is_empty(),
+        "User should have name"
+    );
 }
 
 #[tokio::test]
@@ -78,9 +88,15 @@ async fn test_user_data_types() {
     info!("Response: {:?}", response);
     let user = &response.data.page.data.users[0];
 
-    assert!(!user.name.as_ref().unwrap().is_empty(), "Name should not be empty");
+    assert!(
+        !user.name.as_ref().unwrap().is_empty(),
+        "Name should not be empty"
+    );
 
     if let Some(ref avatar) = user.avatar {
-        assert!(avatar.large.is_some() || avatar.medium.is_some(), "Avatar should have at least one size");
+        assert!(
+            avatar.large.is_some() || avatar.medium.is_some(),
+            "Avatar should have at least one size"
+        );
     }
 }

@@ -15,7 +15,11 @@ async fn test_fetch_airing_schedules() {
     if let Err(ref e) = result {
         eprintln!("Error fetching airing schedules: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch airing schedules: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch airing schedules: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -23,9 +27,18 @@ async fn test_fetch_airing_schedules() {
     assert!(!schedules.is_empty(), "Should return airing schedules");
 
     let first_schedule = &schedules[0];
-    assert!(first_schedule.id.is_some() && first_schedule.id.unwrap() > 0, "Schedule should have a positive ID");
-    assert!(first_schedule.airing_at > Some(0), "Should have airing time");
-    assert!(first_schedule.episode > Some(0), "Should have episode number");
+    assert!(
+        first_schedule.id.is_some() && first_schedule.id.unwrap() > 0,
+        "Schedule should have a positive ID"
+    );
+    assert!(
+        first_schedule.airing_at > Some(0),
+        "Should have airing time"
+    );
+    assert!(
+        first_schedule.episode > Some(0),
+        "Should have episode number"
+    );
 }
 
 #[tokio::test]
@@ -42,7 +55,11 @@ async fn test_fetch_airing_pagination() {
     if let Err(ref e) = result1 {
         eprintln!("Error fetching airing page 1: {:?}", e);
     }
-    assert!(result1.is_ok(), "Should successfully fetch page 1: {:?}", result1.as_ref().err());
+    assert!(
+        result1.is_ok(),
+        "Should successfully fetch page 1: {:?}",
+        result1.as_ref().err()
+    );
 
     let options_page2 = FetchAiringOptions {
         per_page: Some(5),
@@ -76,14 +93,30 @@ async fn test_airing_data_types() {
     if let Err(ref e) = result {
         eprintln!("Error fetching airing schedule: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch airing schedule: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch airing schedule: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
     if let Some(schedule) = response.data.page.data.airing_schedules.first() {
-        assert!(schedule.id.is_some() && schedule.id.unwrap() > 0, "ID should be positive");
-        assert!(schedule.airing_at > Some(0), "Airing time should be positive timestamp");
-        assert!(schedule.episode > Some(0), "Episode number should be positive");
-        assert!(schedule.media_id.is_some() && schedule.media_id.unwrap() > 0, "Media ID should be positive");
+        assert!(
+            schedule.id.is_some() && schedule.id.unwrap() > 0,
+            "ID should be positive"
+        );
+        assert!(
+            schedule.airing_at > Some(0),
+            "Airing time should be positive timestamp"
+        );
+        assert!(
+            schedule.episode > Some(0),
+            "Episode number should be positive"
+        );
+        assert!(
+            schedule.media_id.is_some() && schedule.media_id.unwrap() > 0,
+            "Media ID should be positive"
+        );
     }
 }

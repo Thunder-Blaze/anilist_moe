@@ -1,7 +1,9 @@
-use crate::{client::AniListClient, queries::activity};
-use crate::errors::AniListError;
 use crate::enums::activity::{ActivitySort, ActivityType};
-use crate::objects::responses::{ActivityListResponse, ActivitySingleResponse, ActivityReplyListResponse};
+use crate::errors::AniListError;
+use crate::objects::responses::{
+    ActivityListResponse, ActivityReplyListResponse, ActivitySingleResponse,
+};
+use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
 use serde_json::json;
 
@@ -28,7 +30,10 @@ pub struct FetchActivityOptions {
     pub is_following: Option<bool>,
     #[serde(rename = "hasReplies", skip_serializing_if = "Option::is_none")]
     pub has_replies: Option<bool>,
-    #[serde(rename = "hasRepliesOrTypeText", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "hasRepliesOrTypeText",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub has_replies_or_type_text: Option<bool>,
     #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,

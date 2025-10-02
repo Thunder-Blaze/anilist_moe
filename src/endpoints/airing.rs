@@ -1,9 +1,6 @@
-use crate::{client::AniListClient, queries::airing};
 use crate::errors::AniListError;
-use crate::{
-    objects::responses::AiringListResponse,
-    enums::airing::AiringSort,
-};
+use crate::{client::AniListClient, queries::airing};
+use crate::{enums::airing::AiringSort, objects::responses::AiringListResponse};
 use serde::Serialize;
 use serde_json::json;
 

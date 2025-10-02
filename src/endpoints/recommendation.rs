@@ -1,7 +1,7 @@
-use crate::{client::AniListClient, queries::recommendation};
-use crate::errors::AniListError;
 use crate::enums::recommendation::RecommendationSort;
+use crate::errors::AniListError;
 use crate::objects::responses::RecommendationListResponse;
+use crate::{client::AniListClient, queries::recommendation};
 use serde::Serialize;
 use serde_json::json;
 
@@ -15,7 +15,10 @@ pub struct FetchRecommendationOptions {
     pub id: Option<i32>,
     #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
     pub media_id: Option<i32>,
-    #[serde(rename = "mediaRecommendationId", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "mediaRecommendationId",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub media_recommendation_id: Option<i32>,
     #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,

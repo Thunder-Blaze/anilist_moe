@@ -1,7 +1,7 @@
-use crate::{client::AniListClient, queries::studio};
-use crate::errors::AniListError;
 use crate::enums::studio::StudioSort;
+use crate::errors::AniListError;
 use crate::objects::responses::{StudioListResponse, StudioSingleResponse};
+use crate::{client::AniListClient, queries::studio};
 use serde::Serialize;
 use serde_json::json;
 

@@ -1,8 +1,8 @@
 //! Tests for Notification endpoint
 
 use anilist_moe::{AniListClient, endpoints::notification::*};
-use log::info;
 use dotenv::dotenv;
+use log::info;
 use std::env;
 
 fn get_authenticated_client() -> AniListClient {
@@ -30,7 +30,10 @@ async fn test_fetch_notifications() {
             println!("Number of notifications: {}", notifications.len());
         }
         Err(e) => {
-            eprintln!("Error fetching notifications (expected if not authenticated): {:?}", e);
+            eprintln!(
+                "Error fetching notifications (expected if not authenticated): {:?}",
+                e
+            );
         }
     }
 }
@@ -55,15 +58,21 @@ async fn test_notification_data_types() {
                 anilist_moe::unions::notification::NotificationUnion::ActivityMessage(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityMention(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityReply(n) => n.id,
-                anilist_moe::unions::notification::NotificationUnion::ActivityReplySubscribed(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ActivityReplySubscribed(
+                    n,
+                ) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityLike(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ActivityReplyLike(n) => n.id,
-                anilist_moe::unions::notification::NotificationUnion::ThreadCommentMention(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::ThreadCommentMention(n) => {
+                    n.id
+                }
                 anilist_moe::unions::notification::NotificationUnion::ThreadCommentReply(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ThreadSubscribed(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ThreadCommentLike(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::ThreadLike(n) => n.id,
-                anilist_moe::unions::notification::NotificationUnion::RelatedMediaAddition(n) => n.id,
+                anilist_moe::unions::notification::NotificationUnion::RelatedMediaAddition(n) => {
+                    n.id
+                }
                 anilist_moe::unions::notification::NotificationUnion::MediaDataChange(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::MediaMerge(n) => n.id,
                 anilist_moe::unions::notification::NotificationUnion::MediaDeletion(n) => n.id,

@@ -1,8 +1,8 @@
 //! Tests for Recommendation endpoint
 
 use anilist_moe::{AniListClient, endpoints::recommendation::*};
-use log::info;
 use dotenv::dotenv;
+use log::info;
 use std::env;
 
 fn get_authenticated_client() -> AniListClient {
@@ -23,12 +23,19 @@ async fn test_fetch_recommendations() {
     if let Err(ref e) = result {
         eprintln!("Error fetching recommendations: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch recommendations: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch recommendations: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
     let recommendations = &response.data.page.data.recommendations;
-    assert!(!recommendations.is_empty(), "Should return at least one recommendation");
+    assert!(
+        !recommendations.is_empty(),
+        "Should return at least one recommendation"
+    );
 }
 
 #[tokio::test]
@@ -41,7 +48,10 @@ async fn test_fetch_recommendations_by_media() {
     };
 
     let result = client.recommendation().fetch(options).await;
-    assert!(result.is_ok(), "Should successfully fetch recommendations by media");
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch recommendations by media"
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -103,4 +113,3 @@ async fn test_save_recommendation() {
         }
     }
 }
-

@@ -17,7 +17,10 @@ async fn test_fetch_staff_by_search() {
     let response = result.unwrap();
     info!("Response: {:?}", response);
     let staff_list = &response.data.page.data.staff;
-    assert!(!staff_list.is_empty(), "Should return at least one staff member");
+    assert!(
+        !staff_list.is_empty(),
+        "Should return at least one staff member"
+    );
 
     let first_staff = &staff_list[0];
     assert!(first_staff.id > 0, "Staff should have a positive ID");
@@ -38,7 +41,11 @@ async fn test_fetch_staff_by_id() {
     let response = result.unwrap();
     info!("Response: {:?}", response);
     let staff_list = &response.data.page.data.staff;
-    assert_eq!(staff_list.len(), 1, "Should return exactly one staff member");
+    assert_eq!(
+        staff_list.len(),
+        1,
+        "Should return exactly one staff member"
+    );
     assert_eq!(staff_list[0].id, 95269, "Should return correct staff ID");
 }
 

@@ -1,8 +1,8 @@
 //! Tests for Forum endpoint
 
 use anilist_moe::{AniListClient, endpoints::forum::*};
-use log::info;
 use dotenv::dotenv;
+use log::info;
 use std::env;
 
 fn get_authenticated_client() -> AniListClient {
@@ -23,7 +23,11 @@ async fn test_fetch_forum_threads() {
     if let Err(ref e) = result {
         eprintln!("Error fetching forum threads: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch forum threads: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch forum threads: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -67,7 +71,11 @@ async fn test_fetch_one_forum_thread() {
                 if let Err(ref e) = result {
                     eprintln!("Error fetching one thread: {:?}", e);
                 }
-                assert!(result.is_ok(), "Should successfully fetch one thread: {:?}", result.err());
+                assert!(
+                    result.is_ok(),
+                    "Should successfully fetch one thread: {:?}",
+                    result.err()
+                );
             }
         }
     }
@@ -99,7 +107,11 @@ async fn test_fetch_forum_comments() {
                         if let Err(ref e) = result {
                             eprintln!("Error fetching forum comments: {:?}", e);
                         }
-                        assert!(result.is_ok(), "Should successfully fetch forum comments: {:?}", result.err());
+                        assert!(
+                            result.is_ok(),
+                            "Should successfully fetch forum comments: {:?}",
+                            result.err()
+                        );
                     }
                 }
             }
@@ -124,8 +136,18 @@ async fn test_forum_data_types() {
         if let Some(threads) = page.get("threads").and_then(|t| t.as_array()) {
             if !threads.is_empty() {
                 let thread = &threads[0];
-                assert!(thread.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0, "Thread ID should be positive");
-                assert!(thread.get("title").and_then(|t| t.as_str()).map(|s| !s.is_empty()).unwrap_or(false), "Thread should have a title");
+                assert!(
+                    thread.get("id").and_then(|id| id.as_i64()).unwrap_or(0) > 0,
+                    "Thread ID should be positive"
+                );
+                assert!(
+                    thread
+                        .get("title")
+                        .and_then(|t| t.as_str())
+                        .map(|s| !s.is_empty())
+                        .unwrap_or(false),
+                    "Thread should have a title"
+                );
             }
         }
     }
@@ -155,7 +177,11 @@ async fn test_fetch_comment_one() {
                         if let Err(ref e) = result {
                             eprintln!("Error fetching one comment: {:?}", e);
                         }
-                        assert!(result.is_ok(), "Should successfully fetch one comment: {:?}", result.err());
+                        assert!(
+                            result.is_ok(),
+                            "Should successfully fetch one comment: {:?}",
+                            result.err()
+                        );
                     }
                 }
             }
@@ -225,7 +251,10 @@ async fn test_save_forum_comment() {
                                 println!("Successfully created forum comment");
                             }
                             Err(e) => {
-                                println!("Expected authentication error or permission issue: {:?}", e);
+                                println!(
+                                    "Expected authentication error or permission issue: {:?}",
+                                    e
+                                );
                             }
                         }
                     }
@@ -297,20 +326,29 @@ async fn test_delete_forum_comment() {
                         };
 
                         if let Ok(save_response) = client.forum().save_comment(save_options).await {
-                            if let Some(comment) = save_response.get("data").and_then(|d| d.get("SaveThreadComment")) {
-                                if let Some(comment_id) = comment.get("id").and_then(|id| id.as_i64()) {
+                            if let Some(comment) = save_response
+                                .get("data")
+                                .and_then(|d| d.get("SaveThreadComment"))
+                            {
+                                if let Some(comment_id) =
+                                    comment.get("id").and_then(|id| id.as_i64())
+                                {
                                     let delete_options = DeleteThreadCommentOptions {
                                         id: comment_id as i32,
                                     };
 
-                                    let result = client.forum().delete_comment(delete_options).await;
+                                    let result =
+                                        client.forum().delete_comment(delete_options).await;
 
                                     match result {
                                         Ok(_) => {
                                             println!("Successfully deleted forum comment");
                                         }
                                         Err(e) => {
-                                            println!("Expected authentication error or permission issue: {:?}", e);
+                                            println!(
+                                                "Expected authentication error or permission issue: {:?}",
+                                                e
+                                            );
                                         }
                                     }
                                 }
@@ -356,7 +394,10 @@ async fn test_toggle_thread_subscription() {
                                 let _ = client.forum().subscription(unsub_options).await;
                             }
                             Err(e) => {
-                                println!("Expected authentication error or permission issue: {:?}", e);
+                                println!(
+                                    "Expected authentication error or permission issue: {:?}",
+                                    e
+                                );
                             }
                         }
                     }
@@ -365,4 +406,3 @@ async fn test_toggle_thread_subscription() {
         }
     }
 }
-

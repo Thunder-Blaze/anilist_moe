@@ -1,7 +1,7 @@
 //! Unit tests for utility functions
 
-use anilist_moe::utils::{RetryConfig, json_to_hashmap, calculate_delay};
-use serde_json::{json, Value};
+use anilist_moe::utils::{RetryConfig, calculate_delay, json_to_hashmap};
+use serde_json::{Value, json};
 use std::time::Duration;
 
 #[test]
@@ -62,25 +62,41 @@ fn test_json_to_hashmap_with_nested_object() {
 #[test]
 fn test_calculate_delay_with_zero_remaining() {
     let delay = calculate_delay(0, 60);
-    assert_eq!(delay, Duration::from_secs(60), "Should wait full reset time when no requests remaining");
+    assert_eq!(
+        delay,
+        Duration::from_secs(60),
+        "Should wait full reset time when no requests remaining"
+    );
 }
 
 #[test]
 fn test_calculate_delay_with_low_remaining() {
     let delay = calculate_delay(5, 60);
-    assert_eq!(delay, Duration::from_millis(2000), "Should wait 2 seconds when less than 10 remaining");
+    assert_eq!(
+        delay,
+        Duration::from_millis(2000),
+        "Should wait 2 seconds when less than 10 remaining"
+    );
 }
 
 #[test]
 fn test_calculate_delay_with_moderate_remaining() {
     let delay = calculate_delay(20, 60);
-    assert_eq!(delay, Duration::from_millis(1000), "Should wait 1 second when 10-30 remaining");
+    assert_eq!(
+        delay,
+        Duration::from_millis(1000),
+        "Should wait 1 second when 10-30 remaining"
+    );
 }
 
 #[test]
 fn test_calculate_delay_with_plenty_remaining() {
     let delay = calculate_delay(50, 60);
-    assert_eq!(delay, Duration::from_millis(500), "Should wait 500ms when plenty remaining");
+    assert_eq!(
+        delay,
+        Duration::from_millis(500),
+        "Should wait 500ms when plenty remaining"
+    );
 }
 
 #[test]

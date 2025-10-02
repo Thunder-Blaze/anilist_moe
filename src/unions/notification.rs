@@ -1,11 +1,10 @@
 use crate::objects::notification::{
-    ActivityMessageNotification, ActivityMentionNotification,
-    ActivityReplyNotification, ActivityReplySubscribedNotification, ActivityLikeNotification,
-    ActivityReplyLikeNotification, AiringNotification, FollowingNotification,
-    RelatedMediaAdditionNotification, ThreadCommentMentionNotification,
-    ThreadCommentReplyNotification, ThreadCommentSubscribedNotification,
-    ThreadCommentLikeNotification, ThreadLikeNotification, MediaDataChangeNotification,
-    MediaMergeNotification, MediaDeletionNotification
+    ActivityLikeNotification, ActivityMentionNotification, ActivityMessageNotification,
+    ActivityReplyLikeNotification, ActivityReplyNotification, ActivityReplySubscribedNotification,
+    AiringNotification, FollowingNotification, MediaDataChangeNotification,
+    MediaDeletionNotification, MediaMergeNotification, RelatedMediaAdditionNotification,
+    ThreadCommentLikeNotification, ThreadCommentMentionNotification,
+    ThreadCommentReplyNotification, ThreadCommentSubscribedNotification, ThreadLikeNotification,
 };
 use serde::{Deserialize, Serialize};
 

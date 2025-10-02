@@ -1,7 +1,9 @@
-use crate::{client::AniListClient, queries::common};
-use crate::errors::AniListError;
 use crate::enums::likable::LikeableType;
-use crate::objects::responses::{ToggleLikeResponse, ToggleFollowResponse, ToggleFavouriteResponse};
+use crate::errors::AniListError;
+use crate::objects::responses::{
+    ToggleFavouriteResponse, ToggleFollowResponse, ToggleLikeResponse,
+};
+use crate::{client::AniListClient, queries::common};
 use serde::Serialize;
 use serde_json::json;
 

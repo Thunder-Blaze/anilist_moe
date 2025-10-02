@@ -1,9 +1,9 @@
 //! Tests for MediaList endpoint
 
-use anilist_moe::{AniListClient, endpoints::medialist::*};
-use log::info;
 use anilist_moe::enums::media_list::MediaListStatus;
+use anilist_moe::{AniListClient, endpoints::medialist::*};
 use dotenv::dotenv;
+use log::info;
 use std::env;
 
 fn get_authenticated_client() -> AniListClient {
@@ -25,12 +25,19 @@ async fn test_fetch_media_list() {
     if let Err(ref e) = result {
         eprintln!("Error fetching media list: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch media list: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch media list: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
     let lists = &response.data.page.data.media_list;
-    assert!(!lists.is_empty(), "Should return at least one media list entry");
+    assert!(
+        !lists.is_empty(),
+        "Should return at least one media list entry"
+    );
 }
 
 #[tokio::test]
@@ -46,14 +53,21 @@ async fn test_fetch_media_list_by_media() {
     if let Err(ref e) = result {
         eprintln!("Error fetching media list by media: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch media list by media: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch media list by media: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
     let lists = &response.data.page.data.media_list;
     if !lists.is_empty() {
         let first_entry = &lists[0];
-        assert!(first_entry.id > 0, "Media list entry should have a positive ID");
+        assert!(
+            first_entry.id > 0,
+            "Media list entry should have a positive ID"
+        );
     }
 }
 
@@ -97,7 +111,10 @@ async fn test_save_media_list() {
 
     match result {
         Ok(response) => {
-            println!("Successfully saved media list entry with ID: {}", response.data.save_media_list_entry.id);
+            println!(
+                "Successfully saved media list entry with ID: {}",
+                response.data.save_media_list_entry.id
+            );
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);
@@ -122,7 +139,10 @@ async fn test_save_multiple_media_lists() {
         Ok(responses) => {
             println!("Successfully saved {} media list entries", responses.len());
             for response in responses {
-                println!("Updated entry ID: {}", response.data.save_media_list_entry.id);
+                println!(
+                    "Updated entry ID: {}",
+                    response.data.save_media_list_entry.id
+                );
             }
         }
         Err(e) => {
@@ -145,15 +165,16 @@ async fn test_delete_media_list() {
     if let Ok(response) = client.medialist().save(save_options).await {
         let entry_id = response.data.save_media_list_entry.id;
 
-        let delete_options = DeleteMediaListOptions {
-            id: entry_id,
-        };
+        let delete_options = DeleteMediaListOptions { id: entry_id };
 
         let result = client.medialist().delete(delete_options).await;
 
         match result {
             Ok(response) => {
-                println!("Successfully deleted media list entry: {}", response.data.deleted);
+                println!(
+                    "Successfully deleted media list entry: {}",
+                    response.data.deleted
+                );
             }
             Err(e) => {
                 println!("Expected authentication error or permission issue: {:?}", e);
@@ -161,4 +182,3 @@ async fn test_delete_media_list() {
         }
     }
 }
-

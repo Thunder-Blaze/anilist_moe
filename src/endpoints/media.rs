@@ -1,7 +1,7 @@
-use crate::{client::AniListClient, queries::media};
-use crate::errors::AniListError;
 use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
+use crate::errors::AniListError;
 use crate::objects::responses::{MediaListResponse, MediaSingleResponse};
+use crate::{client::AniListClient, queries::media};
 use serde::Serialize;
 use serde_json::json;
 
@@ -107,9 +107,15 @@ pub struct FetchMediaOptions {
     pub average_score: Option<i32>,
     #[serde(rename = "averageScore_not", skip_serializing_if = "Option::is_none")]
     pub average_score_not: Option<i32>,
-    #[serde(rename = "averageScore_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "averageScore_greater",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub average_score_greater: Option<i32>,
-    #[serde(rename = "averageScore_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "averageScore_lesser",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub average_score_lesser: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub popularity: Option<i32>,
@@ -177,11 +183,20 @@ pub struct FetchMediaOneOptions {
     #[serde(rename = "reviewsPerPage", skip_serializing_if = "Option::is_none")]
     pub reviews_per_page: Option<i32>,
     // Recommendations pagination
-    #[serde(rename = "fetchRecommendations", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "fetchRecommendations",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub fetch_recommendations: Option<bool>,
-    #[serde(rename = "recommendationsPage", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "recommendationsPage",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub recommendations_page: Option<i32>,
-    #[serde(rename = "recommendationsPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "recommendationsPerPage",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub recommendations_per_page: Option<i32>,
 }
 

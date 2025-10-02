@@ -4,8 +4,8 @@
 //! and returns data with proper types from the AniList API.
 use log::info;
 
+use anilist_moe::enums::media::{MediaSort, MediaType};
 use anilist_moe::{AniListClient, endpoints::media::*};
-use anilist_moe::enums::media::{MediaType, MediaSort};
 
 #[tokio::test]
 async fn test_fetch_media_with_search() {
@@ -26,11 +26,17 @@ async fn test_fetch_media_with_search() {
     assert!(response.data.page.page_info.current_page.is_some());
 
     let media_list = &response.data.page.data.media;
-    assert!(!media_list.is_empty(), "Should return at least one media result");
+    assert!(
+        !media_list.is_empty(),
+        "Should return at least one media result"
+    );
     assert!(media_list.len() <= 5, "Should respect perPage limit");
 
     let first_media = &media_list[0];
-    assert!(first_media.id.unwrap_or(0) > 0, "Media should have a positive ID");
+    assert!(
+        first_media.id.unwrap_or(0) > 0,
+        "Media should have a positive ID"
+    );
     assert!(first_media.title.is_some(), "Media should have a title");
 }
 
@@ -46,7 +52,11 @@ async fn test_fetch_media_by_id() {
     if let Err(ref e) = result {
         eprintln!("Error fetching media: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch media by ID: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch media by ID: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
@@ -70,7 +80,11 @@ async fn test_fetch_one_media() {
     if let Err(ref e) = result {
         eprintln!("Error fetching one media: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch one media: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch one media: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);

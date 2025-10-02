@@ -58,7 +58,11 @@ async fn test_fetch_one_studio() {
     if let Err(ref e) = result {
         eprintln!("Error fetching one studio: {:?}", e);
     }
-    assert!(result.is_ok(), "Should successfully fetch one studio: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch one studio: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
     info!("Response: {:?}", response);

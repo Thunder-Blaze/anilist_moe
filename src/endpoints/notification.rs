@@ -1,7 +1,7 @@
-use crate::{client::AniListClient, queries::notification};
-use crate::errors::AniListError;
 use crate::enums::notification::NotificationType;
+use crate::errors::AniListError;
 use crate::objects::responses::NotificationResponse;
+use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
 use serde_json::json;
 
@@ -15,7 +15,10 @@ pub struct NotificationSearchOptions {
     pub notification_type: Option<NotificationType>,
     #[serde(rename = "type_in", skip_serializing_if = "Option::is_none")]
     pub type_in: Option<Vec<NotificationType>>,
-    #[serde(rename = "resetNotificationCount", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "resetNotificationCount",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub reset_notification_count: Option<bool>,
 }
 
@@ -28,7 +31,10 @@ impl NotificationEndpoint {
         Self { client }
     }
 
-    pub async fn fetch(&self, options: NotificationSearchOptions) -> Result<NotificationResponse, AniListError> {
+    pub async fn fetch(
+        &self,
+        options: NotificationSearchOptions,
+    ) -> Result<NotificationResponse, AniListError> {
         let query = notification::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

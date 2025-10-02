@@ -1,9 +1,9 @@
-use crate::{client::AniListClient, queries::user};
-use crate::errors::AniListError;
-use crate::enums::user::{UserSort, UserStatisticsSort};
-use crate::enums::media::{MediaType, MediaSort};
+use crate::enums::media::{MediaSort, MediaType};
 use crate::enums::media_list::MediaListStatus;
+use crate::enums::user::{UserSort, UserStatisticsSort};
+use crate::errors::AniListError;
 use crate::objects::responses::{UserListResponse, UserSingleResponse};
+use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_json::json;
 
@@ -149,10 +149,7 @@ impl UserEndpoint {
     }
 
     /// Fetch multiple users with pagination
-    pub async fn fetch(
-        &self,
-        options: FetchUserOptions,
-    ) -> Result<UserListResponse, AniListError> {
+    pub async fn fetch(&self, options: FetchUserOptions) -> Result<UserListResponse, AniListError> {
         let query = user::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);

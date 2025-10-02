@@ -1,8 +1,8 @@
 //! Tests for Common endpoint (likes, follows, favourites)
 
 use anilist_moe::{AniListClient, endpoints::common::*, enums::likable::LikeableType};
-use log::info;
 use dotenv::dotenv;
+use log::info;
 use std::env;
 
 fn get_authenticated_client() -> AniListClient {
@@ -42,9 +42,7 @@ async fn test_toggle_follow() {
     let client = get_authenticated_client();
 
     // Try to follow a user
-    let options = ToggleFollowOptions {
-        user_id: 5429396,
-    };
+    let options = ToggleFollowOptions { user_id: 5429396 };
 
     let result = client.common().toggle_follow(options).await;
 
@@ -52,7 +50,11 @@ async fn test_toggle_follow() {
         Ok(response) => {
             info!("Response: {:?}", response);
             println!("Successfully toggled follow");
-            println!("User: {} (ID: {})", response.data.toggle_follow.name.as_ref().unwrap(), response.data.toggle_follow.id);
+            println!(
+                "User: {} (ID: {})",
+                response.data.toggle_follow.name.as_ref().unwrap(),
+                response.data.toggle_follow.id
+            );
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);

@@ -1,11 +1,10 @@
-use crate::enums::media::MediaSort;
-use crate::{client::AniListClient, queries::character};
-use crate::errors::AniListError;
 use crate::enums::character::CharacterSort;
+use crate::enums::media::MediaSort;
+use crate::errors::AniListError;
 use crate::objects::responses::{CharacterListResponse, CharacterSingleResponse};
+use crate::{client::AniListClient, queries::character};
 use serde::Serialize;
 use serde_json::json;
-
 
 #[derive(Default, Serialize)]
 pub struct FetchCharacterOptions {
