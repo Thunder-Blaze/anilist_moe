@@ -71,7 +71,7 @@ async fn test_review_data_types() {
         let review = &reviews[0];
         assert!(review.id > 0, "Review ID should be positive");
         assert!(review.user_id > Some(0), "User ID should be positive");
-        assert!(review.media_id > 0, "Media ID should be positive");
+        assert!(review.media_id > Some(0), "Media ID should be positive");
     }
 }
 

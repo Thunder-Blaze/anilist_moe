@@ -14,161 +14,209 @@ use crate::objects::recommendation::Recommendation;
 use crate::objects::review::Review;
 use crate::unions::notification::NotificationUnion;
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 /// Top-level GraphQL response wrapper
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GraphQLResponse<T> {
     pub data: T,
 }
 
 /// Generic response wrapper for paginated data
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PageResponse<T> {
     #[serde(rename = "Page")]
     pub page: Page<T>,
 }
 
 /// Generic page structure
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Page<T> {
-    #[serde(rename = "pageInfo")]
     pub page_info: PageInfo,
     #[serde(flatten)]
     pub data: T,
 }
 
 /// Generic viewer response wrapper
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ViewerResponse<T> {
     #[serde(rename = "Viewer")]
     pub viewer: T,
 }
 
 /// Specific response data types
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NotificationData {
     pub notifications: Vec<NotificationUnion>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaData {
     pub media: Vec<Media>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaListData {
-    #[serde(rename = "mediaList")]
     pub media_list: Vec<MediaList>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CharacterData {
     pub characters: Vec<Character>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct StaffData {
     pub staff: Vec<Staff>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct StudioData {
     pub studios: Vec<Studio>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UserData {
     pub users: Vec<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityData {
     pub activities: Vec<ActivityUnion>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityReplyData {
-    #[serde(rename = "activityReplies")]
     pub activity_replies: Vec<ActivityReply>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringData {
-    #[serde(rename = "airingSchedules")]
     pub airing_schedules: Vec<AiringSchedule>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringScheduleResponse {
     #[serde(rename = "AiringSchedule")]
     pub airing_schedule: AiringSchedule,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RecommendationData {
     pub recommendations: Vec<Recommendation>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ReviewData {
     pub reviews: Vec<Review>,
 }
 
 /// Single item response wrappers
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaResponse {
     #[serde(rename = "Media")]
     pub media: Media,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CharacterResponse {
     #[serde(rename = "Character")]
     pub character: Character,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct StaffResponse {
     #[serde(rename = "Staff")]
     pub staff: Staff,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct StudioResponse {
     #[serde(rename = "Studio")]
     pub studio: Studio,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UserResponse {
     #[serde(rename = "User")]
     pub user: User,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityResponse {
     #[serde(rename = "Activity")]
     pub activity: ActivityUnion,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ReviewResponse {
     #[serde(rename = "Review")]
     pub review: Review,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RecommendationResponse {
     #[serde(rename = "Recommendation")]
     pub recommendation: Recommendation,
 }
 
 /// Viewer-specific response data types
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ViewerUnreadCount {
     pub id: i32,
     pub name: String,
-    #[serde(rename = "unreadNotificationCount")]
     pub unread_notification_count: i32,
 }
 
@@ -199,13 +247,17 @@ pub type ReviewSingleResponse = GraphQLResponse<ReviewResponse>;
 pub type RecommendationSingleResponse = GraphQLResponse<RecommendationResponse>;
 
 // MediaList single item response types
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaListEntryData {
     #[serde(rename = "SaveMediaListEntry")]
     pub save_media_list_entry: MediaList,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteMediaListData {
     #[serde(rename = "DeleteMediaListEntry")]
     pub deleted: bool,
@@ -215,19 +267,25 @@ pub type SaveMediaListEntryResponse = GraphQLResponse<MediaListEntryData>;
 pub type DeleteMediaListEntryResponse = GraphQLResponse<DeleteMediaListData>;
 
 // Common endpoint response types
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToggleLikeData {
     #[serde(rename = "ToggleLikeV2")]
     pub toggle_like_v2: LikeableUnion,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToggleFollowData {
     #[serde(rename = "ToggleFollow")]
     pub toggle_follow: User,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToggleFavouriteData {
     #[serde(rename = "ToggleFavourite")]
     pub toggle_favourite: Favourites,

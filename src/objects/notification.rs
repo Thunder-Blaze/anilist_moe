@@ -9,326 +9,264 @@ use crate::{
     unions::activity::ActivityUnion,
 };
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityMessageNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
     #[serde(rename = "type")]
-    pub activity_type: NotificationType,
-    #[serde(rename = "activityId")]
-    pub activity_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_type: Option<NotificationType>,
+    pub activity_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<MessageActivity>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringNotification {
     pub id: i32,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "animeId")]
-    pub anime_id: i32,
-    pub episode: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub anime_id: Option<i32>,
+    pub episode: Option<i32>,
     pub contexts: Option<Vec<String>>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub media: Option<Media>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FollowingNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NotificationOption {
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub notification_type: Option<NotificationType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RelatedMediaAdditionNotification {
     pub id: i32,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "mediaId")]
-    pub media_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub media_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub media: Option<Media>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ThreadLikeNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "threadId")]
-    pub thread_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thread_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<Thread>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityMentionNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
     #[serde(rename = "type")]
-    pub activity_type: NotificationType,
-    #[serde(rename = "activityId")]
-    pub activity_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_type: Option<NotificationType>,
+    pub activity_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<ActivityUnion>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityReplyNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
     #[serde(rename = "type")]
-    pub activity_type: NotificationType,
-    #[serde(rename = "activityId")]
-    pub activity_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_type: Option<NotificationType>,
+    pub activity_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<ActivityUnion>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityReplySubscribedNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
     #[serde(rename = "type")]
-    pub activity_type: NotificationType,
-    #[serde(rename = "activityId")]
-    pub activity_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_type: Option<NotificationType>,
+    pub activity_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<ActivityUnion>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityLikeNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
     #[serde(rename = "type")]
-    pub activity_type: NotificationType,
-    #[serde(rename = "activityId")]
-    pub activity_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_type: Option<NotificationType>,
+    pub activity_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<ActivityUnion>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivityReplyLikeNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
     #[serde(rename = "type")]
-    pub activity_type: NotificationType,
-    #[serde(rename = "activityId")]
-    pub activity_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_type: Option<NotificationType>,
+    pub activity_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<ActivityUnion>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ThreadCommentMentionNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "commentId")]
-    pub comment_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<Thread>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<ThreadComment>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ThreadCommentReplyNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "commentId")]
-    pub comment_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<Thread>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<ThreadComment>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ThreadCommentSubscribedNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "commentId")]
-    pub comment_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<Thread>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<ThreadComment>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ThreadCommentLikeNotification {
     pub id: i32,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "commentId")]
-    pub comment_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<Thread>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<ThreadComment>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaDataChangeNotification {
     pub id: i32,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "mediaId")]
-    pub media_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    pub media_id: Option<i32>,
     pub context: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub media: Option<Media>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaMergeNotification {
     pub id: i32,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "mediaId")]
-    pub media_id: i32,
-    #[serde(rename = "deletedMediaTitles", skip_serializing_if = "Option::is_none")]
+    pub media_id: Option<i32>,
     pub deleted_media_titles: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub media: Option<Media>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MediaDeletionNotification {
     pub id: i32,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub activity_type: Option<NotificationType>,
-    #[serde(rename = "deletedMediaTitle", skip_serializing_if = "Option::is_none")]
     pub deleted_media_title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
 }
-

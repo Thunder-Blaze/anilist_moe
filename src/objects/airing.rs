@@ -1,46 +1,42 @@
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 use crate::objects::{common::PageInfo, media::Media};
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringProgression {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub episode: Option<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub progress: Option<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub watching: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringSchedule {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "airingAt")]
-    pub airing_at: i32,
-    #[serde(rename = "timeUntilAiring")]
-    pub time_until_airing: i32,
-    pub episode: i32,
-    #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
+    pub airing_at: Option<i32>,
+    pub time_until_airing: Option<i32>,
+    pub episode: Option<i32>,
     pub media_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub media: Option<Box<Media>>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringScheduleConnection {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub edges: Option<Vec<AiringScheduleEdge>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub nodes: Option<Vec<AiringSchedule>>,
-    #[serde(rename = "pageInfo", skip_serializing_if = "Option::is_none")]
     pub page_info: Option<PageInfo>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AiringScheduleEdge {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub node: Option<AiringSchedule>,
 }

@@ -1,13 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LikeableType {
-    #[serde(rename = "THREAD")]
     Thread,
-    #[serde(rename = "THREAD_COMMENT")]
     ThreadComment,
-    #[serde(rename = "ACTIVITY")]
     Activity,
-    #[serde(rename = "ACTIVITY_REPLY")]
     ActivityReply,
 }

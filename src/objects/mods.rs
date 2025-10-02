@@ -1,19 +1,19 @@
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 use crate::{enums::mods::ModActionType, objects::user::User};
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ModAction {
     pub id: i32,
     pub user: Option<User>,
     pub mod_: Option<User>,
     #[serde(rename = "type")]
     pub action_type: Option<ModActionType>,
-    #[serde(rename = "objectId")]
     pub object_id: Option<i32>,
-    #[serde(rename = "objectType")]
     pub object_type: Option<String>,
     pub data: Option<String>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<i32>,
 }
