@@ -52,7 +52,7 @@ async fn test_toggle_follow() {
         Ok(response) => {
             info!("Response: {:?}", response);
             println!("Successfully toggled follow");
-            println!("User: {} (ID: {})", response.data.toggle_follow.name.unwrap(), response.data.toggle_follow.id);
+            println!("User: {} (ID: {})", response.data.toggle_follow.name.as_ref().unwrap(), response.data.toggle_follow.id);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);

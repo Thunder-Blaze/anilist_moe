@@ -24,7 +24,7 @@ query FetchMedialist(
     $completedAt_like: String,
     $sort: [MediaListSort],
     $page: Int,
-    $perPage: Int = 10
+    $perPage: Int
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
