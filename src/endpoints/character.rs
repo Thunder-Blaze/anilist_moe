@@ -6,6 +6,7 @@ use crate::{client::AniListClient, queries::character};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching multiple characters with pagination and filters.
 #[derive(Default, Serialize)]
 pub struct FetchCharacterOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,6 +29,7 @@ pub struct FetchCharacterOptions {
     pub id_not_in: Option<Vec<i32>>,
 }
 
+/// Options for fetching a single character.
 #[derive(Default, Serialize)]
 pub struct FetchCharacterOneOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,6 +59,7 @@ pub struct FetchCharacterOneOptions {
     pub media_per_page: Option<i32>,
 }
 
+/// Endpoint for character operations.
 pub struct CharacterEndpoint {
     client: AniListClient,
 }

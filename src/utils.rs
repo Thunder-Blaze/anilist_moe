@@ -49,6 +49,9 @@ impl Default for RetryConfig {
     }
 }
 
+/// Retries an operation with exponential backoff on rate limit errors.
+///
+/// Automatically handles rate limits by sleeping and retrying according to the provided config.
 pub async fn retry_with_backoff<F, Fut, T>(
     mut operation: F,
     config: RetryConfig,
@@ -138,10 +141,12 @@ where
     }
 }
 
+/// Sleeps for the specified duration in milliseconds.
 pub async fn rate_limit_delay(delay_ms: u64) {
     sleep(Duration::from_millis(delay_ms)).await;
 }
 
+/// Calculates an appropriate delay based on remaining rate limit quota.
 pub fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
     if remaining == 0 {
         Duration::from_secs(reset_in_seconds)

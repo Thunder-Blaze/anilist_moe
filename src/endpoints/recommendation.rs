@@ -5,6 +5,7 @@ use crate::{client::AniListClient, queries::recommendation};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching media recommendations.
 #[derive(Default, Serialize)]
 pub struct FetchRecommendationOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,6 +35,7 @@ pub struct FetchRecommendationOptions {
     pub sort: Option<Vec<RecommendationSort>>,
 }
 
+/// Options for saving a recommendation rating.
 #[derive(Default, Serialize)]
 pub struct SaveRecommendationOptions {
     #[serde(rename = "mediaId")]
@@ -43,6 +45,7 @@ pub struct SaveRecommendationOptions {
     pub rating: i32,
 }
 
+/// Endpoint for media recommendation operations.
 pub struct RecommendationEndpoint {
     pub client: AniListClient,
 }

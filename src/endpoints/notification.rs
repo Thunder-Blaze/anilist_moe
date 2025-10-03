@@ -5,6 +5,7 @@ use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for searching and filtering notifications.
 #[derive(Default, Serialize)]
 pub struct NotificationSearchOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -22,6 +23,7 @@ pub struct NotificationSearchOptions {
     pub reset_notification_count: Option<bool>,
 }
 
+/// Endpoint for notification operations.
 pub struct NotificationEndpoint {
     pub client: AniListClient,
 }

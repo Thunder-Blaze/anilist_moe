@@ -31,7 +31,7 @@ async fn test_fetch_forum_threads() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    
+
     let threads = &response.data.page.data.threads;
     assert!(!threads.is_empty(), "Should return at least one thread");
 }
@@ -50,7 +50,7 @@ async fn test_fetch_one_forum_thread() {
 
     let response = list_result.unwrap();
     info!("Response: {:?}", response);
-    
+
     let threads = &response.data.page.data.threads;
     if threads.is_empty() {
         println!("No threads found to test fetch_one");
@@ -123,7 +123,7 @@ async fn test_forum_data_types() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    
+
     let threads = &response.data.page.data.threads;
     if !threads.is_empty() {
         let thread = &threads[0];

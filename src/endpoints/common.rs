@@ -7,6 +7,7 @@ use crate::{client::AniListClient, queries::common};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for toggling a like on various entities.
 #[derive(Serialize)]
 pub struct ToggleLikeOptions {
     pub id: i32,
@@ -14,12 +15,14 @@ pub struct ToggleLikeOptions {
     pub like_type: LikeableType,
 }
 
+/// Options for toggling follow status of a user.
 #[derive(Default, Serialize)]
 pub struct ToggleFollowOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
 }
 
+/// Options for adding or removing favourites.
 #[derive(Default, Serialize)]
 pub struct ToggleFavouriteOptions {
     #[serde(rename = "animeId", skip_serializing_if = "Option::is_none")]
@@ -34,6 +37,7 @@ pub struct ToggleFavouriteOptions {
     pub studio_id: Option<i32>,
 }
 
+/// Endpoint for common and general-purpose operations.
 pub struct CommonEndpoint {
     pub client: AniListClient,
 }

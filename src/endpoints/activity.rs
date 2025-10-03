@@ -9,6 +9,7 @@ use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching activity feed entries.
 #[derive(Default, Serialize)]
 pub struct FetchActivityOptions {
     // # Pagination
@@ -79,11 +80,13 @@ pub struct FetchActivityOptions {
     pub sort: Option<Vec<ActivitySort>>,
 }
 
+/// Options for fetching a single activity by ID.
 #[derive(Default, Serialize)]
 pub struct FetchActivityOneOptions {
     pub id: i32,
 }
 
+/// Options for fetching replies to an activity.
 #[derive(Default, Serialize)]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
@@ -99,28 +102,33 @@ pub struct FetchActivityRepliesOptions {
     pub activity_id: i32,
 }
 
+/// Options for deleting an activity.
 #[derive(Default, Serialize)]
 pub struct DeleteActivityOptions {
     pub id: i32,
 }
 
+/// Options for deleting an activity reply.
 #[derive(Default, Serialize)]
 pub struct DeleteActivityReplyOptions {
     pub id: i32,
 }
 
+/// Options for pinning or unpinning an activity.
 #[derive(Default, Serialize)]
 pub struct PinActivityOptions {
     pub id: i32,
     pub pinned: bool,
 }
 
+/// Options for subscribing or unsubscribing to an activity.
 #[derive(Default, Serialize)]
 pub struct SubscribeActivityOptions {
     pub id: i32,
     pub subscribe: bool,
 }
 
+/// Options for saving a message activity.
 #[derive(Default, Serialize)]
 pub struct SaveMessageActivityOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,6 +144,7 @@ pub struct SaveMessageActivityOptions {
     pub as_mod: Option<bool>,
 }
 
+/// Options for saving a text activity.
 #[derive(Default, Serialize)]
 pub struct SaveTextActivityOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -145,6 +154,7 @@ pub struct SaveTextActivityOptions {
     pub locked: Option<bool>,
 }
 
+/// Options for saving a reply to an activity.
 #[derive(Default, Serialize)]
 pub struct SaveActivityReplyOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -154,6 +164,7 @@ pub struct SaveActivityReplyOptions {
     pub activity_id: i32,
 }
 
+/// Endpoint for activity feed operations.
 pub struct ActivityEndpoint {
     pub client: AniListClient,
 }

@@ -5,6 +5,7 @@ use crate::{client::AniListClient, queries::studio};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching studios.
 #[derive(Default, Serialize)]
 pub struct FetchStudioOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -25,6 +26,7 @@ pub struct FetchStudioOptions {
     pub sort: Option<Vec<StudioSort>>,
 }
 
+/// Options for fetching a single studio by ID.
 #[derive(Default, Serialize)]
 pub struct FetchStudioOneOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,6 +48,7 @@ pub struct FetchStudioOneOptions {
     pub media_per_page: Option<i32>,
 }
 
+/// Endpoint for studio operations.
 pub struct StudioEndpoint {
     client: AniListClient,
 }

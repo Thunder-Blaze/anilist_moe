@@ -5,6 +5,7 @@ use crate::{client::AniListClient, queries::staff};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching staff members.
 #[derive(Default, Serialize)]
 pub struct FetchStaffOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -23,6 +24,7 @@ pub struct FetchStaffOptions {
     pub sort: Option<Vec<StaffSort>>,
 }
 
+/// Options for fetching a single staff member by ID.
 #[derive(Default, Serialize)]
 pub struct FetchStaffOneOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,6 +59,7 @@ pub struct FetchStaffOneOptions {
     pub character_media_per_page: Option<i32>,
 }
 
+/// Endpoint for staff member operations.
 pub struct StaffEndpoint {
     client: AniListClient,
 }

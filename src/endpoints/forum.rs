@@ -9,6 +9,7 @@ use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching forum threads.
 #[derive(Default, Serialize)]
 pub struct FetchThreadOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,6 +34,7 @@ pub struct FetchThreadOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching a single forum thread by ID.
 #[derive(Default, Serialize)]
 pub struct FetchThreadOneOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,6 +47,7 @@ pub struct FetchThreadOneOptions {
     pub comments_sort: Option<Vec<ThreadCommentSort>>,
 }
 
+/// Options for fetching thread comments.
 #[derive(Default, Serialize)]
 pub struct FetchThreadCommentOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,12 +64,14 @@ pub struct FetchThreadCommentOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching a single thread comment by ID.
 #[derive(Default, Serialize)]
 pub struct FetchThreadCommentOneOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
 }
 
+/// Options for creating or updating a forum thread.
 #[derive(Default, Serialize)]
 pub struct SaveThreadOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,11 +90,13 @@ pub struct SaveThreadOptions {
     pub locked: Option<bool>,
 }
 
+/// Options for deleting a forum thread.
 #[derive(Default, Serialize)]
 pub struct DeleteThreadOptions {
     pub id: i32,
 }
 
+/// Options for creating or updating a thread comment.
 #[derive(Default, Serialize)]
 pub struct SaveThreadCommentOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -104,11 +111,13 @@ pub struct SaveThreadCommentOptions {
     pub locked: Option<bool>,
 }
 
+/// Options for deleting a thread comment.
 #[derive(Default, Serialize)]
 pub struct DeleteThreadCommentOptions {
     pub id: i32,
 }
 
+/// Options for subscribing or unsubscribing to a thread.
 #[derive(Default, Serialize)]
 pub struct ToggleThreadSubscriptionOptions {
     #[serde(rename = "threadId")]
@@ -117,6 +126,7 @@ pub struct ToggleThreadSubscriptionOptions {
     pub subscribe: Option<bool>,
 }
 
+/// Endpoint for forum thread and comment operations.
 pub struct ForumEndpoint {
     client: AniListClient,
 }

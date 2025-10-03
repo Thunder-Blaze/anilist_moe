@@ -1,25 +1,24 @@
-//! # AniList API Wrapper
+//! # AniList.moe
 //!
-//! A comprehensive, production-ready Rust wrapper for the AniList GraphQL API that provides
+//! A comprehensive, type-safe Rust wrapper for the AniList GraphQL API that provides
 //! complete coverage of AniList's features including anime, manga, characters, staff, users,
 //! social features, forums, activities, reviews, recommendations, and more.
 //!
-//! This crate provides a type-safe, async interface to interact with the AniList API,
-//! supporting both authenticated and unauthenticated requests with automatic rate limiting
-//! handling and comprehensive error management.
+//! This crate provides a fully typed, async interface to interact with the AniList API,
+//! supporting both authenticated and unauthenticated requests with comprehensive error
+//! management and proper type safety throughout.
 //!
 //! ## Features
 //!
+//! - **Type Safety**: Fully typed responses - no more `serde_json::Value`
 //! - **Complete API Coverage**: All major AniList endpoints including social features
 //! - **Async/Await Support**: Built with tokio for high-performance async operations
-//! - **Type Safety**: Strongly typed responses with serde serialization/deserialization
 //! - **Modular Design**: Separate endpoint modules for clean code organization
 //! - **Authentication**: Full support for authenticated requests with Bearer tokens
-//! - **Rate Limiting**: Automatic handling of AniList's 90 requests/minute rate limit
 //! - **Error Handling**: Comprehensive error types with detailed error messages
-//! - **Retry Logic**: Built-in retry mechanisms for transient failures
 //! - **GraphQL Integration**: Direct GraphQL query execution with proper field mapping
 //! - **Pagination**: Built-in support for paginated results across all endpoints
+//! - **Convenience Functions**: 80+ helper functions for common queries
 //!
 //! ## Supported Endpoints
 //!
@@ -33,14 +32,14 @@
 //! ### Social & Community
 //! - **Users**: Profiles, statistics, favorites, media lists, following
 //! - **Forums**: Threads, comments, categories, moderation
-//! - **Activities**: Text posts, list updates, replies, likes, following feed
+//! - **Activities**: Text posts, message activities, list updates, replies
 //! - **Reviews**: Create, read, update, delete user reviews with ratings
 //! - **Recommendations**: Browse and manage anime/manga recommendations
 //! - **Notifications**: Read, filter, and manage user notifications
 //!
 //! ### Scheduling & Discovery
 //! - **Airing Schedules**: Upcoming episodes, recently aired, date-based filtering
-//! - **Trending Data**: Real-time trending content across all media types
+//! - **Media Lists**: User anime/manga lists with status tracking
 //!
 //! ## Authentication
 //!
@@ -53,37 +52,56 @@
 //!
 //! ## Rate Limiting
 //!
-//! AniList enforces a rate limit of 90 requests per minute. This wrapper automatically
-//! handles rate limiting with:
-//! - Automatic detection of rate limit headers
-//! - Proper 429 error handling with retry-after support
-//! - Built-in retry logic with exponential backoff
-//! - Burst request protection
+//! AniList enforces a rate limit of 90 requests per minute. Be respectful of the API
+//! and implement appropriate delays between requests in production applications.
 //!
 //! ## Examples
 //!
-//! ### Basic Usage (No Authentication)
+//! ### Get Trending Anime
 //!
 //! ```rust,no_run
-//! use anilist_moe::AniListClient;
-//! use anilist_moe::endpoints::media::FetchMediaOptions;
-//! use anilist_moe::enums::media::MediaSort;
+//! use anilist_moe::client::AniListClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let client = AniListClient::new();
 //!
-//!     // Search for anime using the media endpoint
-//!     let options = FetchMediaOptions {
-//!         search: Some("Attack on Titan".to_string()),
-//!         page: Some(1),
-//!         per_page: Some(5),
-//!         sort: Some(vec![MediaSort::PopularityDesc]),
-//!         ..Default::default()
-//!     };
+//!     // Get trending anime with full type safety
+//!     let response = client.anime().get_trending(Some(1), Some(10)).await?;
 //!
-//!     let results = client.media().fetch(options).await?;
-//!     println!("Found results: {:?}", results);
+//!     // Access typed data
+//!     for anime in &response.data.page.data.media {
+//!         if let Some(title) = &anime.title {
+//!             if let Some(romaji) = &title.romaji {
+//!                 println!("Anime: {}", romaji);
+//!             }
+//!         }
+//!     }
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ### Search and Get Details
+//!
+//! ```rust,no_run
+//! use anilist_moe::client::AniListClient;
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = AniListClient::new();
+//!
+//!     // Search for anime
+//!     let search = client.anime().search("Steins Gate", Some(1), Some(5)).await?;
+//!
+//!     if let Some(first) = search.data.page.data.media.first() {
+//!         // Get detailed information
+//!         let details = client.anime().get_by_id(first.id).await?;
+//!         let anime = &details.data.media;
+//!
+//!         println!("Score: {}/100", anime.average_score.unwrap_or(0));
+//!         println!("Episodes: {}", anime.episodes.unwrap_or(0));
+//!     }
 //!
 //!     Ok(())
 //! }
@@ -92,22 +110,17 @@
 //! ### Authenticated Usage
 //!
 //! ```rust,no_run
-//! use anilist_moe::AniListClient;
-//! use anilist_moe::endpoints::user::FetchUserOneOptions;
+//! use anilist_moe::client::AniListClient;
 //! use std::env;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let token = env::var("ANILIST_TOKEN")?;
-//!     let client = AniListClient::with_token(&token);
+//!     let client = AniListClient::with_token(token);
 //!
-//!     // Get user profile
-//!     let options = FetchUserOneOptions {
-//!         id: Some(123456),
-//!         ..Default::default()
-//!     };
-//!     let user = client.user().fetch_one(options).await?;
-//!     println!("User: {:?}", user);
+//!     // Get current user
+//!     let user = client.user().get_current_user().await?;
+//!     println!("Logged in as: {}", user.data.viewer.name);
 //!
 //!     Ok(())
 //! }
@@ -116,27 +129,20 @@
 //! ### Error Handling
 //!
 //! ```rust,no_run
-//! use anilist_moe::{AniListClient, AniListError};
-//! use anilist_moe::endpoints::media::FetchMediaOneOptions;
+//! use anilist_moe::client::AniListClient;
+//! use anilist_moe::errors::AniListError;
 //!
 //! #[tokio::main]
 //! async fn main() {
 //!     let client = AniListClient::new();
 //!
-//!     let options = FetchMediaOneOptions {
-//!         id: Some(999999),
-//!         ..Default::default()
-//!     };
-//!
-//!     match client.media().fetch_one(options).await {
-//!         Ok(media) => println!("Found media: {:?}", media),
-//!         Err(AniListError::RateLimit { retry_after, .. }) => {
-//!             println!("Rate limited! Retry after {} seconds", retry_after);
-//!         },
-//!         Err(AniListError::NotFound) => {
-//!             println!("Media not found");
-//!         },
-//!         Err(e) => println!("Error: {}", e),
+//!     match client.anime().get_by_id(999999).await {
+//!         Ok(anime) => println!("Found: {:?}", anime),
+//!         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
+//!         Err(AniListError::GraphQL { message, .. }) => eprintln!("API error: {}", message),
+//!         Err(AniListError::NotFound) => eprintln!("Not found"),
+//!         Err(AniListError::RateLimit) => eprintln!("Rate limited"),
+//!         Err(e) => eprintln!("Error: {:?}", e),
 //!     }
 //! }
 //! ```

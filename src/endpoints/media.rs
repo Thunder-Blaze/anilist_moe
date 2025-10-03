@@ -5,6 +5,7 @@ use crate::{client::AniListClient, queries::media};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching media (anime/manga) with various filters.
 #[derive(Default, Serialize)]
 pub struct FetchMediaOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -200,6 +201,7 @@ pub struct FetchMediaOneOptions {
     pub recommendations_per_page: Option<i32>,
 }
 
+/// Endpoint for anime and manga operations.
 pub struct MediaEndpoint {
     client: AniListClient,
 }

@@ -156,66 +156,92 @@ impl AniListClient {
         self
     }
 
+    /// Returns the media endpoint for anime and manga operations.
     pub fn media(&self) -> MediaEndpoint {
         MediaEndpoint::new(self.clone())
     }
 
+    /// Returns the media endpoint for anime operations (alias for media()).
+    pub fn anime(&self) -> MediaEndpoint {
+        self.media()
+    }
+
+    /// Returns the media endpoint for manga operations (alias for media()).
+    pub fn manga(&self) -> MediaEndpoint {
+        self.media()
+    }
+
+    /// Returns the medialist endpoint for user anime/manga list operations.
     pub fn medialist(&self) -> MediaListEndpoint {
         MediaListEndpoint::new(self.clone())
     }
 
+    /// Returns the character endpoint for character operations.
     pub fn character(&self) -> CharacterEndpoint {
         CharacterEndpoint::new(self.clone())
     }
 
+    /// Returns the common endpoint for likes, follows, and favorites.
     pub fn common(&self) -> CommonEndpoint {
         CommonEndpoint::new(self.clone())
     }
 
+    /// Returns the staff endpoint for staff member operations.
     pub fn staff(&self) -> StaffEndpoint {
         StaffEndpoint::new(self.clone())
     }
 
+    /// Returns the user endpoint for user profile operations.
     pub fn user(&self) -> UserEndpoint {
         UserEndpoint::new(self.clone())
     }
 
+    /// Returns the studio endpoint for studio operations.
     pub fn studio(&self) -> StudioEndpoint {
         StudioEndpoint::new(self.clone())
     }
 
+    /// Returns the forum endpoint for thread and comment operations.
     pub fn forum(&self) -> ForumEndpoint {
         ForumEndpoint::new(self.clone())
     }
 
+    /// Returns the activity endpoint for activity feed operations.
     pub fn activity(&self) -> ActivityEndpoint {
         ActivityEndpoint::new(self.clone())
     }
 
+    /// Returns the review endpoint for review operations.
     pub fn review(&self) -> ReviewEndpoint {
         ReviewEndpoint::new(self.clone())
     }
 
+    /// Returns the recommendation endpoint for recommendation operations.
     pub fn recommendation(&self) -> RecommendationEndpoint {
         RecommendationEndpoint::new(self.clone())
     }
 
+    /// Returns the airing endpoint for airing schedule operations.
     pub fn airing(&self) -> AiringEndpoint {
         AiringEndpoint::new(self.clone())
     }
 
+    /// Returns the notification endpoint for notification operations.
     pub fn notification(&self) -> NotificationEndpoint {
         NotificationEndpoint::new(self.clone())
     }
 
+    /// Sets the authentication token for this client.
     pub fn set_token(&mut self, token: &str) {
         self.token = Some(token.to_string());
     }
 
+    /// Clears the authentication token from this client.
     pub fn clear_token(&mut self) {
         self.token = None;
     }
 
+    /// Returns whether this client has an authentication token.
     pub fn has_token(&self) -> bool {
         self.token.is_some()
     }

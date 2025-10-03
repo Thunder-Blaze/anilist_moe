@@ -10,5 +10,5 @@ pub enum LikeableUnion {
     MessageActivity(MessageActivity),
     ActivityReply(ActivityReply),
     Thread(Thread),
-    ThreadComment(ThreadComment),
+    ThreadComment(Box<ThreadComment>),
 }

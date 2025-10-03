@@ -7,6 +7,7 @@ use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching users.
 #[derive(Default, Serialize)]
 pub struct FetchUserOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -25,6 +26,7 @@ pub struct FetchUserOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching a single user by ID or name.
 #[derive(Default, Serialize)]
 pub struct FetchUserOneOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,6 +35,7 @@ pub struct FetchUserOneOptions {
     pub name: Option<String>,
 }
 
+/// Options for fetching basic user information.
 #[derive(Default, Serialize)]
 pub struct FetchUserBasicOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,6 +44,7 @@ pub struct FetchUserBasicOptions {
     pub name: Option<String>,
 }
 
+/// Options for fetching a user's followers.
 #[derive(Default, Serialize)]
 pub struct FetchUserFollowersOptions {
     #[serde(rename = "userId")]
@@ -51,6 +55,7 @@ pub struct FetchUserFollowersOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching users a user is following.
 #[derive(Default, Serialize)]
 pub struct FetchUserFollowingOptions {
     #[serde(rename = "userId")]
@@ -61,6 +66,7 @@ pub struct FetchUserFollowingOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching a user's favorites.
 #[derive(Default, Serialize)]
 pub struct FetchUserFavoritesOptions {
     #[serde(rename = "userId")]
@@ -107,6 +113,7 @@ pub struct FetchUserFavoritesOptions {
     pub studios_per_page: Option<i32>,
 }
 
+/// Options for fetching a user's media list.
 #[derive(Default, Serialize)]
 pub struct FetchUserMediaListOptions {
     #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
@@ -131,6 +138,7 @@ pub struct FetchUserMediaListOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching user statistics.
 #[derive(Default, Serialize)]
 pub struct FetchUserStatsOptions {
     #[serde(rename = "userId")]
@@ -139,6 +147,7 @@ pub struct FetchUserStatsOptions {
     pub sort: Option<Vec<UserStatisticsSort>>,
 }
 
+/// Endpoint for user profile and statistics operations.
 pub struct UserEndpoint {
     client: AniListClient,
 }

@@ -4,6 +4,7 @@ use crate::{enums::airing::AiringSort, objects::responses::AiringListResponse};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching airing schedule information.
 #[derive(Default, Serialize)]
 pub struct FetchAiringOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,6 +51,7 @@ pub struct FetchAiringOptions {
     pub page: Option<i32>,
 }
 
+/// Endpoint for airing schedule operations.
 pub struct AiringEndpoint {
     pub client: AniListClient,
 }

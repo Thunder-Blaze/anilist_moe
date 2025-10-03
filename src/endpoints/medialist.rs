@@ -10,6 +10,7 @@ use serde::Serialize;
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
+/// Options for fetching media list entries.
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchMediaListOptions {
@@ -63,6 +64,7 @@ pub struct FetchMediaListOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for creating or updating a media list entry.
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -85,6 +87,7 @@ pub struct SaveMediaListOptions {
     pub completed_at: Option<FuzzyDate>,
 }
 
+/// Options for bulk updating multiple media list entries.
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -105,11 +108,13 @@ pub struct SaveMediaListMultipleOptions {
     pub ids: Vec<i32>,
 }
 
+/// Options for deleting a media list entry.
 #[derive(Default, Serialize)]
 pub struct DeleteMediaListOptions {
     pub id: i32,
 }
 
+/// Endpoint for media list operations.
 pub struct MediaListEndpoint {
     client: AniListClient,
 }

@@ -6,6 +6,7 @@ use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
 use serde_json::json;
 
+/// Options for fetching reviews.
 #[derive(Default, Serialize)]
 pub struct FetchReviewOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,6 +25,7 @@ pub struct FetchReviewOptions {
     pub sort: Option<Vec<ReviewSort>>,
 }
 
+/// Options for creating or updating a review.
 #[derive(Default, Serialize)]
 pub struct SaveReviewOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,11 +42,13 @@ pub struct SaveReviewOptions {
     pub private: Option<bool>,
 }
 
+/// Options for deleting a review.
 #[derive(Default, Serialize)]
 pub struct DeleteReviewOptions {
     pub id: i32,
 }
 
+/// Options for rating a review.
 #[derive(Default, Serialize)]
 pub struct RateReviewOptions {
     #[serde(rename = "reviewId")]
@@ -52,6 +56,7 @@ pub struct RateReviewOptions {
     pub rating: i32,
 }
 
+/// Endpoint for review operations.
 pub struct ReviewEndpoint {
     pub client: AniListClient,
 }
