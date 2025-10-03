@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "Running pre-commit hook"
+cargo fmt
+cargo clippy -- -D warnings

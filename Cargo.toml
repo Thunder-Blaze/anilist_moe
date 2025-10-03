@@ -20,4 +20,5 @@ dotenv = "0.15.0"
 log = "0.4.22"
 
 [dev-dependencies]
+husky-rs = "0.1.5"
 tokio-test = "0.4"
