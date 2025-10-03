@@ -1,12 +1,24 @@
 mutation SaveTextActivity($id: Int, $text: String!, $locked: Boolean) {
     SaveTextActivity(id: $id, text: $text, locked: $locked) {
+        __typename
         id
+        type
         text
-        locked
+        isLocked
+        replyCount
+        siteUrl
+        isLiked
+        likeCount
+        isSubscribed
         createdAt
+        userId
         user {
             id
             name
+            avatar {
+                large
+                medium
+            }
         }
     }
 }

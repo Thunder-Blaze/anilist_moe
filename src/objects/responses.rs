@@ -1,4 +1,4 @@
-use crate::objects::activity::ActivityReply;
+use crate::objects::activity::{ActivityReply, MessageActivity};
 use crate::objects::airing::AiringSchedule;
 use crate::objects::character::Character;
 use crate::objects::common::PageInfo;
@@ -245,6 +245,60 @@ pub type UserSingleResponse = GraphQLResponse<UserResponse>;
 pub type ActivitySingleResponse = GraphQLResponse<ActivityResponse>;
 pub type ReviewSingleResponse = GraphQLResponse<ReviewResponse>;
 pub type RecommendationSingleResponse = GraphQLResponse<RecommendationResponse>;
+
+// Activity mutation response types
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveTextActivityData {
+    #[serde(rename = "SaveTextActivity")]
+    pub save_text_activity: ActivityUnion,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveMessageActivityData {
+    #[serde(rename = "SaveMessageActivity")]
+    pub save_message_activity: MessageActivity,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteActivityData {
+    #[serde(rename = "DeleteActivity")]
+    pub deleted: DeletedResponse,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeletedResponse {
+    pub deleted: bool,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveActivityReplyData {
+    #[serde(rename = "SaveActivityReply")]
+    pub save_activity_reply: ActivityReply,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteActivityReplyData {
+    #[serde(rename = "DeleteActivityReply")]
+    pub deleted: DeletedResponse,
+}
+
+pub type SaveTextActivityResponse = GraphQLResponse<SaveTextActivityData>;
+pub type SaveMessageActivityResponse = GraphQLResponse<SaveMessageActivityData>;
+pub type DeleteActivityResponse = GraphQLResponse<DeleteActivityData>;
+pub type SaveActivityReplyResponse = GraphQLResponse<SaveActivityReplyData>;
+pub type DeleteActivityReplyResponse = GraphQLResponse<DeleteActivityReplyData>;
 
 // MediaList single item response types
 #[skip_serializing_none]

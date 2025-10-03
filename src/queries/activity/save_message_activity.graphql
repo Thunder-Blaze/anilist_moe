@@ -17,11 +17,14 @@ mutation SaveMessageActivity(
         id
         message
         recipientId
-        private
-        locked
-        asMod
+        isPrivate
+        isLocked
         createdAt
-        user {
+        recipient {
+            id
+            name
+        }
+        messenger {
             id
             name
         }

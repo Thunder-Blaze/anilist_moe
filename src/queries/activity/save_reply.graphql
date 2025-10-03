@@ -3,7 +3,7 @@ mutation SaveActivityReply(
     $activityId: Int!
     $text: String!
 ) {
-    SaveActivityReply(activityId: $activityId, text: $text) {
+    SaveActivityReply(id: $id, activityId: $activityId, text: $text) {
         id
         text
         activityId

@@ -2,6 +2,8 @@ use crate::enums::activity::{ActivitySort, ActivityType};
 use crate::errors::AniListError;
 use crate::objects::responses::{
     ActivityListResponse, ActivityReplyListResponse, ActivitySingleResponse,
+    SaveTextActivityResponse, SaveMessageActivityResponse, DeleteActivityResponse,
+    SaveActivityReplyResponse, DeleteActivityReplyResponse,
 };
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
@@ -194,7 +196,7 @@ impl ActivityEndpoint {
     pub async fn delete(
         &self,
         options: DeleteActivityOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+    ) -> Result<DeleteActivityResponse, AniListError> {
         let query = activity::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -204,7 +206,7 @@ impl ActivityEndpoint {
     pub async fn delete_reply(
         &self,
         options: DeleteActivityReplyOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+    ) -> Result<DeleteActivityReplyResponse, AniListError> {
         let query = activity::DELETE_REPLY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -234,7 +236,7 @@ impl ActivityEndpoint {
     pub async fn save_message_activity(
         &self,
         options: SaveMessageActivityOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+    ) -> Result<SaveMessageActivityResponse, AniListError> {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -244,7 +246,7 @@ impl ActivityEndpoint {
     pub async fn save_text_activity(
         &self,
         options: SaveTextActivityOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+    ) -> Result<SaveTextActivityResponse, AniListError> {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -254,7 +256,7 @@ impl ActivityEndpoint {
     pub async fn save_reply(
         &self,
         options: SaveActivityReplyOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+    ) -> Result<SaveActivityReplyResponse, AniListError> {
         let query = activity::SAVE_REPLY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
