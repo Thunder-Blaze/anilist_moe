@@ -8,21 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Documentation**: Comprehensive inline documentation
-  - Added concise doc comments to all 13 endpoint structs
-  - Documented all 49 option structs across all endpoints
-  - Added module-level documentation for core modules (endpoints, objects, enums, unions, queries)
-  - Documented all utility functions in `utils.rs`
-  - Added PR template in `.github/PULL_REQUEST_TEMPLATE.md`
-- **Documentation Files**:
-  - `README.md` - Complete project documentation with examples
-  - `EXAMPLES.md` - 25+ working code examples covering all endpoints
-  - `CONTRIBUTING.md` - Developer contribution guidelines
-  - `DOCUMENTATION.md` - Documentation summary and overview
-  - `DOC_COMMENTS_COMPLETE.md` - Summary of inline documentation work
 
 ### Changed
-- Improved documentation structure and consistency across all modules
 
 ## [0.2.0] - 2024
 
@@ -56,6 +43,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `manga()` convenience alias for `media()` endpoint
   - Improved authentication token management
   - Better error handling with typed errors
+- **Documentation**: Comprehensive inline documentation
+  - Added concise doc comments to all 13 endpoint structs
+  - Documented all 49 option structs across all endpoints
+  - Added module-level documentation for core modules (endpoints, objects, enums, unions, queries)
+  - Documented all utility functions in `utils.rs`
+  - Added PR template in `.github/PULL_REQUEST_TEMPLATE.md`
+- **Documentation Files**:
+  - `README.md` - Complete project documentation with examples
+  - `EXAMPLES.md` - 25+ working code examples covering all endpoints
+  - `CONTRIBUTING.md` - Developer contribution guidelines
+  - `DOCUMENTATION.md` - Documentation summary and overview
+  - `DOC_COMMENTS_COMPLETE.md` - Summary of inline documentation work
 
 ### Changed
 - **Breaking**: Forum endpoints now return typed responses
@@ -73,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed from SCREAMING_SNAKE_CASE to PascalCase
   - Example: `MediaType::ANIME` → `MediaType::Anime`
   - Affects all enums: MediaType, MediaFormat, MediaStatus, MediaSeason, etc.
+- Improved documentation structure and consistency across all modules
 
 ### Fixed
 - **ActivityUnion Deserialization**: Fixed parsing issues
@@ -155,14 +155,6 @@ let response = client.anime().get_popular_anime(Some(1), Some(10)).await?;
 - GraphQL query execution
 - Basic pagination support
 - Async/await support with tokio
-
-### Known Issues
-- Forum endpoints return untyped `serde_json::Value`
-- MediaList endpoints return untyped `serde_json::Value`
-- Enum variants use inconsistent SCREAMING_SNAKE_CASE
-- ActivityUnion deserialization may fail due to untagged approach
-- Limited documentation
-- No convenience functions for common operations
 
 ---
 

@@ -1,4 +1,4 @@
-# AniList.moe
+# AniList_Moe
 
 [![Crates.io](https://img.shields.io/crates/v/anilist_moe.svg)](https://crates.io/crates/anilist_moe)
 [![Documentation](https://docs.rs/anilist_moe/badge.svg)](https://docs.rs/anilist_moe)
