@@ -232,4 +232,79 @@ impl UserEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get current authenticated user
+    pub async fn get_current_user(&self) -> Result<UserSingleResponse, AniListError> {
+        self.fetch_one(FetchUserOneOptions {
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user by ID
+    pub async fn get_by_id(&self, id: i32) -> Result<UserSingleResponse, AniListError> {
+        self.fetch_one(FetchUserOneOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user by username
+    pub async fn get_by_name(&self, name: &str) -> Result<UserSingleResponse, AniListError> {
+        self.fetch_one(FetchUserOneOptions {
+            name: Some(name.to_string()),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Search users by query
+    pub async fn search(
+        &self,
+        query: &str,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<UserListResponse, AniListError> {
+        self.fetch(FetchUserOptions {
+            search: Some(query.to_string()),
+            page,
+            per_page,
+            sort: Some(vec![UserSort::SearchMatch]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get users with most anime watched
+    pub async fn get_most_anime_watched(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<UserListResponse, AniListError> {
+        self.fetch(FetchUserOptions {
+            page,
+            per_page,
+            sort: Some(vec![UserSort::WatchedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get users with most manga read
+    pub async fn get_most_manga_read(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<UserListResponse, AniListError> {
+        self.fetch(FetchUserOptions {
+            page,
+            per_page,
+            sort: Some(vec![UserSort::ChaptersReadDesc]),
+            ..Default::default()
+        })
+        .await
+    }
 }

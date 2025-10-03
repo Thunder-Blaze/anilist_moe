@@ -100,4 +100,99 @@ impl ReviewEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get reviews for a specific media
+    pub async fn get_by_media_id(
+        &self,
+        media_id: i32,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<ReviewListResponse, AniListError> {
+        self.fetch(FetchReviewOptions {
+            media_id: Some(media_id),
+            page,
+            per_page,
+            sort: Some(vec![ReviewSort::RatingDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get reviews by a specific user
+    pub async fn get_by_user_id(
+        &self,
+        user_id: i32,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<ReviewListResponse, AniListError> {
+        self.fetch(FetchReviewOptions {
+            user_id: Some(user_id),
+            page,
+            per_page,
+            sort: Some(vec![ReviewSort::CreatedAtDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get recent reviews
+    pub async fn get_recent(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<ReviewListResponse, AniListError> {
+        self.fetch(FetchReviewOptions {
+            page,
+            per_page,
+            sort: Some(vec![ReviewSort::CreatedAtDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get review by ID
+    pub async fn get_by_id(&self, id: i32) -> Result<ReviewListResponse, AniListError> {
+        self.fetch(FetchReviewOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Create a new review
+    pub async fn create(
+        &self,
+        media_id: i32,
+        score: i32,
+        summary: &str,
+        body: &str,
+        private: Option<bool>,
+    ) -> Result<ReviewSingleResponse, AniListError> {
+        self.save(SaveReviewOptions {
+            id: None,
+            media_id,
+            score: Some(score),
+            summary: Some(summary.to_string()),
+            body: Some(body.to_string()),
+            private,
+        })
+        .await
+    }
+
+    /// Delete a review
+    pub async fn delete_review(&self, id: i32) -> Result<ReviewSingleResponse, AniListError> {
+        self.delete(DeleteReviewOptions { id }).await
+    }
+
+    /// Rate a review
+    pub async fn rate_review(
+        &self,
+        review_id: i32,
+        rating: i32,
+    ) -> Result<ReviewSingleResponse, AniListError> {
+        self.rate(RateReviewOptions { review_id, rating })
+            .await
+    }
 }

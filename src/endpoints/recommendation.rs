@@ -71,4 +71,70 @@ impl RecommendationEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get recommendations for a specific media
+    pub async fn get_by_media_id(
+        &self,
+        media_id: i32,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<RecommendationListResponse, AniListError> {
+        self.fetch(FetchRecommendationOptions {
+            media_id: Some(media_id),
+            page,
+            per_page,
+            sort: Some(vec![RecommendationSort::RatingDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get recommendations by a specific user
+    pub async fn get_by_user_id(
+        &self,
+        user_id: i32,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<RecommendationListResponse, AniListError> {
+        self.fetch(FetchRecommendationOptions {
+            user_id: Some(user_id),
+            page,
+            per_page,
+            sort: Some(vec![RecommendationSort::IdDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get recent recommendations
+    pub async fn get_recent(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<RecommendationListResponse, AniListError> {
+        self.fetch(FetchRecommendationOptions {
+            page,
+            per_page,
+            sort: Some(vec![RecommendationSort::IdDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Create or update a recommendation rating
+    pub async fn rate_recommendation(
+        &self,
+        media_id: i32,
+        media_recommendation_id: i32,
+        rating: i32,
+    ) -> Result<RecommendationListResponse, AniListError> {
+        self.save(SaveRecommendationOptions {
+            media_id,
+            media_recommendation_id,
+            rating,
+        })
+        .await
+    }
 }

@@ -85,4 +85,66 @@ impl StaffEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get popular staff sorted by favorites
+    pub async fn get_popular(
+        &self,
+        _page: Option<i32>,
+        _per_page: Option<i32>,
+    ) -> Result<StaffListResponse, AniListError> {
+        self.fetch(FetchStaffOptions {
+            sort: Some(vec![StaffSort::FavouritesDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get most favorited staff (alias for get_popular)
+    pub async fn get_most_favorited(
+        &self,
+        _page: Option<i32>,
+        _per_page: Option<i32>,
+    ) -> Result<StaffListResponse, AniListError> {
+        self.get_popular(_page, _per_page).await
+    }
+
+    /// Search staff by name
+    pub async fn search(
+        &self,
+        query: &str,
+        _page: Option<i32>,
+        _per_page: Option<i32>,
+    ) -> Result<StaffListResponse, AniListError> {
+        self.fetch(FetchStaffOptions {
+            search: Some(query.to_string()),
+            sort: Some(vec![StaffSort::SearchMatch]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get staff by ID
+    pub async fn get_by_id(&self, id: i32) -> Result<StaffSingleResponse, AniListError> {
+        self.fetch_one(FetchStaffOneOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get staff with birthday today
+    pub async fn get_today_birthday(
+        &self,
+        _page: Option<i32>,
+        _per_page: Option<i32>,
+    ) -> Result<StaffListResponse, AniListError> {
+        self.fetch(FetchStaffOptions {
+            is_birthday: Some(true),
+            sort: Some(vec![StaffSort::FavouritesDesc]),
+            ..Default::default()
+        })
+        .await
+    }
 }

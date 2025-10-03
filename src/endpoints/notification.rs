@@ -43,4 +43,51 @@ impl NotificationEndpoint {
         println!("Query Result: {:?}", x);
         x
     }
+
+    // Convenience functions
+
+    /// Get all notifications (requires authentication)
+    pub async fn get_all(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<NotificationResponse, AniListError> {
+        self.fetch(NotificationSearchOptions {
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get unread notifications and mark them as read
+    pub async fn get_and_mark_read(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<NotificationResponse, AniListError> {
+        self.fetch(NotificationSearchOptions {
+            page,
+            per_page,
+            reset_notification_count: Some(true),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get notifications of a specific type
+    pub async fn get_by_type(
+        &self,
+        notification_type: NotificationType,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<NotificationResponse, AniListError> {
+        self.fetch(NotificationSearchOptions {
+            notification_type: Some(notification_type),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
 }

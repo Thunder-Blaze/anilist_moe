@@ -262,4 +262,122 @@ impl ActivityEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get recent activities
+    pub async fn get_recent(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<ActivityListResponse, AniListError> {
+        self.fetch(FetchActivityOptions {
+            page,
+            per_page,
+            sort: Some(vec![ActivitySort::IdDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get activities from users you're following (requires authentication)
+    pub async fn get_following(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<ActivityListResponse, AniListError> {
+        self.fetch(FetchActivityOptions {
+            is_following: Some(true),
+            page,
+            per_page,
+            sort: Some(vec![ActivitySort::IdDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get activity by ID
+    pub async fn get_by_id(&self, id: i32) -> Result<ActivitySingleResponse, AniListError> {
+        self.fetch_one(FetchActivityOneOptions { id }).await
+    }
+
+    /// Create a text activity
+    pub async fn create_text_activity(
+        &self,
+        text: &str,
+    ) -> Result<SaveTextActivityResponse, AniListError> {
+        self.save_text_activity(SaveTextActivityOptions {
+            id: None,
+            text: text.to_string(),
+            locked: None,
+        })
+        .await
+    }
+
+    /// Create a message activity
+    pub async fn create_message(
+        &self,
+        recipient_id: i32,
+        message: &str,
+        private: Option<bool>,
+    ) -> Result<SaveMessageActivityResponse, AniListError> {
+        self.save_message_activity(SaveMessageActivityOptions {
+            id: None,
+            message: message.to_string(),
+            recipient_id,
+            private,
+            locked: None,
+            as_mod: None,
+        })
+        .await
+    }
+
+    /// Reply to an activity
+    pub async fn reply_to(
+        &self,
+        activity_id: i32,
+        text: &str,
+    ) -> Result<SaveActivityReplyResponse, AniListError> {
+        self.save_reply(SaveActivityReplyOptions {
+            id: None,
+            text: text.to_string(),
+            activity_id,
+        })
+        .await
+    }
+
+    /// Delete an activity
+    pub async fn delete_activity(
+        &self,
+        id: i32,
+    ) -> Result<DeleteActivityResponse, AniListError> {
+        self.delete(DeleteActivityOptions { id }).await
+    }
+
+    /// Delete an activity reply
+    pub async fn delete_activity_reply(
+        &self,
+        id: i32,
+    ) -> Result<DeleteActivityReplyResponse, AniListError> {
+        self.delete_reply(DeleteActivityReplyOptions { id }).await
+    }
+
+    /// Toggle activity subscription
+    pub async fn toggle_subscription(
+        &self,
+        id: i32,
+        subscribe: bool,
+    ) -> Result<ActivitySingleResponse, AniListError> {
+        self.subscribe(SubscribeActivityOptions { id, subscribe })
+            .await
+    }
+
+    /// Toggle activity pin status
+    pub async fn toggle_pin(
+        &self,
+        id: i32,
+        pinned: bool,
+    ) -> Result<ActivitySingleResponse, AniListError> {
+        self.pin(PinActivityOptions { id, pinned }).await
+    }
 }

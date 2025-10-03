@@ -74,4 +74,47 @@ impl StudioEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get popular studios sorted by favorites
+    pub async fn get_popular(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<StudioListResponse, AniListError> {
+        self.fetch(FetchStudioOptions {
+            page,
+            per_page,
+            sort: Some(vec![StudioSort::FavouritesDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Search studios by name
+    pub async fn search(
+        &self,
+        query: &str,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<StudioListResponse, AniListError> {
+        self.fetch(FetchStudioOptions {
+            search: Some(query.to_string()),
+            page,
+            per_page,
+            sort: Some(vec![StudioSort::SearchMatch]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get studio by ID
+    pub async fn get_by_id(&self, id: i32) -> Result<StudioSingleResponse, AniListError> {
+        self.fetch_one(FetchStudioOneOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
+    }
 }

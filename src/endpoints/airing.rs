@@ -68,4 +68,65 @@ impl AiringEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions
+
+    /// Get upcoming airing episodes
+    pub async fn get_upcoming(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<AiringListResponse, AniListError> {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i32;
+
+        self.fetch(FetchAiringOptions {
+            airing_at_greater: Some(now),
+            sort: Some(vec![AiringSort::Time]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get recently aired episodes
+    pub async fn get_recent(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<AiringListResponse, AniListError> {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i32;
+
+        self.fetch(FetchAiringOptions {
+            airing_at_lesser: Some(now),
+            sort: Some(vec![AiringSort::TimeDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get airing schedule for a specific media ID
+    pub async fn get_by_media_id(
+        &self,
+        media_id: i32,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<AiringListResponse, AniListError> {
+        self.fetch(FetchAiringOptions {
+            media_id: Some(media_id),
+            sort: Some(vec![AiringSort::Time]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
 }

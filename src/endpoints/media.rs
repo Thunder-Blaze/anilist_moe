@@ -228,4 +228,246 @@ impl MediaEndpoint {
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
+
+    // Convenience functions - Anime
+
+    /// Get popular anime
+    pub async fn get_popular_anime(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get trending anime
+    pub async fn get_trending_anime(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            sort: Some(vec![MediaSort::TrendingDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get currently airing anime
+    pub async fn get_airing_anime(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            status: Some(MediaStatus::Releasing),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get upcoming anime (not yet released)
+    pub async fn get_upcoming_anime(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            status: Some(MediaStatus::NotYetReleased),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get anime by season and year
+    pub async fn get_by_season(
+        &self,
+        season: MediaSeason,
+        year: i32,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            season: Some(season),
+            season_year: Some(year),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Search anime by title
+    pub async fn search_anime(
+        &self,
+        query: &str,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            search: Some(query.to_string()),
+            sort: Some(vec![MediaSort::SearchMatch]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get anime by ID
+    pub async fn get_anime_by_id(&self, id: i32) -> Result<MediaSingleResponse, AniListError> {
+        self.fetch_one(FetchMediaOneOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get top rated anime
+    pub async fn get_top_rated_anime(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Anime),
+            sort: Some(vec![MediaSort::ScoreDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    // Convenience functions - Manga
+
+    /// Get popular manga
+    pub async fn get_popular_manga(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Manga),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get trending manga
+    pub async fn get_trending_manga(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Manga),
+            sort: Some(vec![MediaSort::TrendingDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get currently releasing manga
+    pub async fn get_releasing_manga(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Manga),
+            status: Some(MediaStatus::Releasing),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get completed manga
+    pub async fn get_completed_manga(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Manga),
+            status: Some(MediaStatus::Finished),
+            sort: Some(vec![MediaSort::PopularityDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Search manga by title
+    pub async fn search_manga(
+        &self,
+        query: &str,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Manga),
+            search: Some(query.to_string()),
+            sort: Some(vec![MediaSort::SearchMatch]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get manga by ID
+    pub async fn get_manga_by_id(&self, id: i32) -> Result<MediaSingleResponse, AniListError> {
+        self.fetch_one(FetchMediaOneOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get top rated manga
+    pub async fn get_top_rated_manga(
+        &self,
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<MediaListResponse, AniListError> {
+        self.fetch(FetchMediaOptions {
+            media_type: Some(MediaType::Manga),
+            sort: Some(vec![MediaSort::ScoreDesc]),
+            page,
+            per_page,
+            ..Default::default()
+        })
+        .await
+    }
 }
