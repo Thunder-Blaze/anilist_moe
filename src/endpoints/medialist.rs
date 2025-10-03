@@ -126,7 +126,6 @@ impl MediaListEndpoint {
         let query = medialist::FETCH;
         let variables = serde_json::to_value(options)?;
         let variables_map = crate::utils::json_to_hashmap(variables);
-        print!("{:#?}", variables_map);
         self.client.query_typed(query, Some(&variables_map)).await
     }
 

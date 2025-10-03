@@ -42,10 +42,11 @@ async fn test_fetch_media_list() {
 
 #[tokio::test]
 async fn test_fetch_media_list_by_media() {
-    let client = AniListClient::new();
+    let client = get_authenticated_client();
     let options = FetchMediaListOptions {
         media_id: Some(1), // Cowboy Bebop
         per_page: Some(5),
+        is_following: Some(true),
         ..Default::default()
     };
 
