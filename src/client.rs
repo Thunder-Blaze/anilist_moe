@@ -220,6 +220,7 @@ impl AniListClient {
         self.token.is_some()
     }
 
+    #[allow(dead_code)]
     pub(crate) async fn query(
         &self,
         query: &'static str,

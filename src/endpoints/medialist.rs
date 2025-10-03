@@ -124,7 +124,7 @@ impl MediaListEndpoint {
         options: FetchMediaListOptions,
     ) -> Result<UserMediaListResponse, AniListError> {
         let query = medialist::FETCH;
-        let variables = serde_json::to_value(options)?;
+        let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
     }
@@ -157,5 +157,236 @@ impl MediaListEndpoint {
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
         self.client.query_typed(query, Some(&variables_map)).await
+    }
+
+    // Convenience functions
+
+    /// Get user's anime list by username
+    pub async fn get_user_anime_list(
+        &self,
+        username: &str,
+        status: Option<MediaListStatus>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: Some(username.to_string()),
+            media_type: Some(MediaType::Anime),
+            status,
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's manga list by username
+    pub async fn get_user_manga_list(
+        &self,
+        username: &str,
+        status: Option<MediaListStatus>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: Some(username.to_string()),
+            media_type: Some(MediaType::Manga),
+            status,
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get current user's anime list (requires authentication)
+    pub async fn get_my_anime_list(
+        &self,
+        status: Option<MediaListStatus>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            media_type: Some(MediaType::Anime),
+            status,
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get current user's manga list (requires authentication)
+    pub async fn get_my_manga_list(
+        &self,
+        status: Option<MediaListStatus>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            media_type: Some(MediaType::Manga),
+            status,
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's currently watching anime
+    pub async fn get_watching(
+        &self,
+        username: Option<&str>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: username.map(|s| s.to_string()),
+            media_type: Some(MediaType::Anime),
+            status: Some(MediaListStatus::Current),
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's currently reading manga
+    pub async fn get_reading(
+        &self,
+        username: Option<&str>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: username.map(|s| s.to_string()),
+            media_type: Some(MediaType::Manga),
+            status: Some(MediaListStatus::Current),
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's completed anime
+    pub async fn get_completed_anime(
+        &self,
+        username: Option<&str>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: username.map(|s| s.to_string()),
+            media_type: Some(MediaType::Anime),
+            status: Some(MediaListStatus::Completed),
+            sort: Some(vec![MediaListSort::ScoreDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's completed manga
+    pub async fn get_completed_manga(
+        &self,
+        username: Option<&str>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: username.map(|s| s.to_string()),
+            media_type: Some(MediaType::Manga),
+            status: Some(MediaListStatus::Completed),
+            sort: Some(vec![MediaListSort::ScoreDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's plan to watch list
+    pub async fn get_plan_to_watch(
+        &self,
+        username: Option<&str>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: username.map(|s| s.to_string()),
+            media_type: Some(MediaType::Anime),
+            status: Some(MediaListStatus::Planning),
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Get user's plan to read list
+    pub async fn get_plan_to_read(
+        &self,
+        username: Option<&str>,
+    ) -> Result<UserMediaListResponse, AniListError> {
+        self.fetch(FetchMediaListOptions {
+            user_name: username.map(|s| s.to_string()),
+            media_type: Some(MediaType::Manga),
+            status: Some(MediaListStatus::Planning),
+            sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Add anime to list
+    pub async fn add_anime(
+        &self,
+        media_id: i32,
+        status: MediaListStatus,
+    ) -> Result<SaveMediaListEntryResponse, AniListError> {
+        self.save(SaveMediaListOptions {
+            media_id: Some(media_id),
+            status: Some(status),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Add manga to list
+    pub async fn add_manga(
+        &self,
+        media_id: i32,
+        status: MediaListStatus,
+    ) -> Result<SaveMediaListEntryResponse, AniListError> {
+        self.save(SaveMediaListOptions {
+            media_id: Some(media_id),
+            status: Some(status),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Update progress for an entry
+    pub async fn update_progress(
+        &self,
+        entry_id: i32,
+        progress: i32,
+    ) -> Result<SaveMediaListEntryResponse, AniListError> {
+        self.save(SaveMediaListOptions {
+            id: Some(entry_id),
+            progress: Some(progress),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Update score for an entry
+    pub async fn update_score(
+        &self,
+        entry_id: i32,
+        score: f64,
+    ) -> Result<SaveMediaListEntryResponse, AniListError> {
+        self.save(SaveMediaListOptions {
+            id: Some(entry_id),
+            score: Some(score),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Update status for an entry
+    pub async fn update_status(
+        &self,
+        entry_id: i32,
+        status: MediaListStatus,
+    ) -> Result<SaveMediaListEntryResponse, AniListError> {
+        self.save(SaveMediaListOptions {
+            id: Some(entry_id),
+            status: Some(status),
+            ..Default::default()
+        })
+        .await
+    }
+
+    /// Delete a media list entry
+    pub async fn delete_entry(
+        &self,
+        entry_id: i32,
+    ) -> Result<DeleteMediaListEntryResponse, AniListError> {
+        self.delete(DeleteMediaListOptions { id: entry_id })
+            .await
     }
 }

@@ -9,6 +9,7 @@ use crate::objects::recommendation::Recommendation;
 use crate::objects::review::Review;
 use crate::objects::staff::Staff;
 use crate::objects::studio::Studio;
+use crate::objects::thread::{Thread, ThreadComment};
 use crate::objects::user::User;
 use crate::unions::activity::ActivityUnion;
 use crate::unions::likeable::LikeableUnion;
@@ -210,6 +211,76 @@ pub struct RecommendationResponse {
     pub recommendation: Recommendation,
 }
 
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadData {
+    pub threads: Vec<Thread>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadResponse {
+    #[serde(rename = "Thread")]
+    pub thread: Thread,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadCommentData {
+    pub thread_comments: Vec<ThreadComment>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadCommentResponse {
+    #[serde(rename = "ThreadComment")]
+    pub thread_comment: ThreadComment,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveThreadData {
+    #[serde(rename = "SaveThread")]
+    pub save_thread: Thread,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteThreadData {
+    #[serde(rename = "DeleteThread")]
+    pub deleted: DeletedResponse,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveThreadCommentData {
+    #[serde(rename = "SaveThreadComment")]
+    pub save_thread_comment: ThreadComment,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteThreadCommentData {
+    #[serde(rename = "DeleteThreadComment")]
+    pub deleted: DeletedResponse,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ToggleThreadSubscriptionData {
+    #[serde(rename = "ToggleThreadSubscription")]
+    pub toggle_thread_subscription: Thread,
+}
+
 /// Viewer-specific response data types
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -348,3 +419,14 @@ pub struct ToggleFavouriteData {
 pub type ToggleLikeResponse = GraphQLResponse<ToggleLikeData>;
 pub type ToggleFollowResponse = GraphQLResponse<ToggleFollowData>;
 pub type ToggleFavouriteResponse = GraphQLResponse<ToggleFavouriteData>;
+
+// Thread/Forum endpoint response types
+pub type ThreadListResponse = GraphQLResponse<PageResponse<ThreadData>>;
+pub type ThreadSingleResponse = GraphQLResponse<ThreadResponse>;
+pub type ThreadCommentListResponse = GraphQLResponse<PageResponse<ThreadCommentData>>;
+pub type ThreadCommentSingleResponse = GraphQLResponse<ThreadCommentResponse>;
+pub type SaveThreadResponse = GraphQLResponse<SaveThreadData>;
+pub type DeleteThreadResponse = GraphQLResponse<DeleteThreadData>;
+pub type SaveThreadCommentResponse = GraphQLResponse<SaveThreadCommentData>;
+pub type DeleteThreadCommentResponse = GraphQLResponse<DeleteThreadCommentData>;
+pub type ToggleThreadSubscriptionResponse = GraphQLResponse<ToggleThreadSubscriptionData>;
