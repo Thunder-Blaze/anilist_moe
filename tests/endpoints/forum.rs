@@ -129,7 +129,11 @@ async fn test_forum_data_types() {
         let thread = &threads[0];
         assert!(thread.id > 0, "Thread ID should be positive");
         assert!(
-            thread.title.as_ref().map(|s| !s.is_empty()).unwrap_or(false),
+            thread
+                .title
+                .as_ref()
+                .map(|s| !s.is_empty())
+                .unwrap_or(false),
             "Thread should have a title"
         );
     }
@@ -225,10 +229,7 @@ async fn test_save_forum_comment() {
                     println!("Successfully created forum comment");
                 }
                 Err(e) => {
-                    println!(
-                        "Expected authentication error or permission issue: {:?}",
-                        e
-                    );
+                    println!("Expected authentication error or permission issue: {:?}", e);
                 }
             }
         }
@@ -301,10 +302,7 @@ async fn test_delete_forum_comment() {
                         println!("Successfully deleted forum comment");
                     }
                     Err(e) => {
-                        println!(
-                            "Expected authentication error or permission issue: {:?}",
-                            e
-                        );
+                        println!("Expected authentication error or permission issue: {:?}", e);
                     }
                 }
             }
@@ -344,10 +342,7 @@ async fn test_toggle_thread_subscription() {
                     let _ = client.forum().subscription(unsub_options).await;
                 }
                 Err(e) => {
-                    println!(
-                        "Expected authentication error or permission issue: {:?}",
-                        e
-                    );
+                    println!("Expected authentication error or permission issue: {:?}", e);
                 }
             }
         }

@@ -2,8 +2,8 @@ use crate::enums::activity::{ActivitySort, ActivityType};
 use crate::errors::AniListError;
 use crate::objects::responses::{
     ActivityListResponse, ActivityReplyListResponse, ActivitySingleResponse,
-    SaveTextActivityResponse, SaveMessageActivityResponse, DeleteActivityResponse,
-    SaveActivityReplyResponse, DeleteActivityReplyResponse,
+    DeleteActivityReplyResponse, DeleteActivityResponse, SaveActivityReplyResponse,
+    SaveMessageActivityResponse, SaveTextActivityResponse,
 };
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
@@ -358,10 +358,7 @@ impl ActivityEndpoint {
     }
 
     /// Delete an activity
-    pub async fn delete_activity(
-        &self,
-        id: i32,
-    ) -> Result<DeleteActivityResponse, AniListError> {
+    pub async fn delete_activity(&self, id: i32) -> Result<DeleteActivityResponse, AniListError> {
         self.delete(DeleteActivityOptions { id }).await
     }
 

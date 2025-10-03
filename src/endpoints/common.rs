@@ -89,10 +89,7 @@ impl CommonEndpoint {
     }
 
     /// Like or unlike an activity reply
-    pub async fn like_activity_reply(
-        &self,
-        id: i32,
-    ) -> Result<ToggleLikeResponse, AniListError> {
+    pub async fn like_activity_reply(&self, id: i32) -> Result<ToggleLikeResponse, AniListError> {
         self.toggle_like(ToggleLikeOptions {
             id,
             like_type: LikeableType::ActivityReply,
@@ -110,10 +107,7 @@ impl CommonEndpoint {
     }
 
     /// Like or unlike a thread comment
-    pub async fn like_thread_comment(
-        &self,
-        id: i32,
-    ) -> Result<ToggleLikeResponse, AniListError> {
+    pub async fn like_thread_comment(&self, id: i32) -> Result<ToggleLikeResponse, AniListError> {
         self.toggle_like(ToggleLikeOptions {
             id,
             like_type: LikeableType::ThreadComment,

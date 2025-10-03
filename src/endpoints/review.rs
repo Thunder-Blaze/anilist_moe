@@ -197,7 +197,6 @@ impl ReviewEndpoint {
         review_id: i32,
         rating: i32,
     ) -> Result<ReviewSingleResponse, AniListError> {
-        self.rate(RateReviewOptions { review_id, rating })
-            .await
+        self.rate(RateReviewOptions { review_id, rating }).await
     }
 }

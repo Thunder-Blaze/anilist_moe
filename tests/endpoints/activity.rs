@@ -190,7 +190,10 @@ async fn test_message_activity_full_lifecycle() {
         as_mod: None,
     };
 
-    let modify_result = client.activity().save_message_activity(modify_options).await;
+    let modify_result = client
+        .activity()
+        .save_message_activity(modify_options)
+        .await;
     match modify_result {
         Ok(response) => {
             info!("Modify Response: {:?}", response);

@@ -391,7 +391,6 @@ impl MediaListEndpoint {
         &self,
         entry_id: i32,
     ) -> Result<DeleteMediaListEntryResponse, AniListError> {
-        self.delete(DeleteMediaListOptions { id: entry_id })
-            .await
+        self.delete(DeleteMediaListOptions { id: entry_id }).await
     }
 }
