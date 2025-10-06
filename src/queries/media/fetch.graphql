@@ -184,8 +184,18 @@ query MediaSearch(
             coverImage {
                 large
                 medium
+                color
             }
             siteUrl
+            studios(isMain: true) {
+                edges {
+                    node {
+                        id
+                        name
+                        siteUrl
+                    }
+                }
+            }
         }
     }
 }
