@@ -2,7 +2,7 @@ use crate::enums::media::{MediaSort, MediaType};
 use crate::enums::media_list::MediaListStatus;
 use crate::enums::user::{UserSort, UserStatisticsSort};
 use crate::errors::AniListError;
-use crate::objects::responses::{UserListResponse, UserSingleResponse};
+use crate::objects::responses::{UserListResponse, UserSingleResponse, ViewerFinalResponse};
 use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_json::json;
@@ -168,7 +168,7 @@ impl UserEndpoint {
     }
 
     /// Fetch basic user information
-    pub async fn fetch_basic(&self) -> Result<UserSingleResponse, AniListError> {
+    pub async fn fetch_basic(&self) -> Result<ViewerFinalResponse, AniListError> {
         let query = user::BASIC;
         self.client.query_typed(query, None).await
     }
@@ -233,7 +233,7 @@ impl UserEndpoint {
     /// Get current authenticated user
     pub async fn get_current_user(&self) -> Result<UserSingleResponse, AniListError> {
         let response = self.client.user().fetch_basic().await?;
-        let id = response.data.user.id;
+        let id = response.data.viewer.id;
         self.fetch_one(FetchUserOneOptions {
             id: Some(id),
             ..Default::default()
