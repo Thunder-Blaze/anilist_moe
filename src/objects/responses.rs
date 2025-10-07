@@ -8,9 +8,10 @@ use crate::objects::media_list::MediaList;
 use crate::objects::recommendation::Recommendation;
 use crate::objects::review::Review;
 use crate::objects::staff::Staff;
+use crate::objects::stats::UserStatisticTypes;
 use crate::objects::studio::Studio;
 use crate::objects::thread::{Thread, ThreadComment};
-use crate::objects::user::User;
+use crate::objects::user::{User, UserAvatar};
 use crate::unions::activity::ActivityUnion;
 use crate::unions::likeable::LikeableUnion;
 use crate::unions::notification::NotificationUnion;
@@ -285,9 +286,11 @@ pub struct ToggleThreadSubscriptionData {
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ViewerUnreadCount {
+pub struct ViewerUserData {
     pub id: i32,
     pub name: String,
+    pub avatar: Option<UserAvatar>,
+    pub statistics: Option<UserStatisticTypes>,
     pub unread_notification_count: i32,
 }
 
@@ -305,7 +308,7 @@ pub type AiringListResponse = GraphQLResponse<PageResponse<AiringData>>;
 pub type AiringSingleResponse = GraphQLResponse<AiringScheduleResponse>;
 pub type RecommendationListResponse = GraphQLResponse<PageResponse<RecommendationData>>;
 pub type ReviewListResponse = GraphQLResponse<PageResponse<ReviewData>>;
-pub type UnreadCountResponse = GraphQLResponse<ViewerResponse<ViewerUnreadCount>>;
+pub type ViewerFinalResponse = GraphQLResponse<ViewerResponse<ViewerUserData>>;
 
 // Single item response types
 pub type MediaSingleResponse = GraphQLResponse<MediaResponse>;
