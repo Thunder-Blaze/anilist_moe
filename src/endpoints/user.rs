@@ -35,15 +35,6 @@ pub struct FetchUserOneOptions {
     pub name: Option<String>,
 }
 
-/// Options for fetching basic user information.
-#[derive(Default, Serialize)]
-pub struct FetchUserBasicOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-}
-
 /// Options for fetching a user's followers.
 #[derive(Default, Serialize)]
 pub struct FetchUserFollowersOptions {
@@ -177,14 +168,9 @@ impl UserEndpoint {
     }
 
     /// Fetch basic user information
-    pub async fn fetch_basic(
-        &self,
-        options: FetchUserBasicOptions,
-    ) -> Result<UserSingleResponse, AniListError> {
+    pub async fn fetch_basic(&self) -> Result<UserSingleResponse, AniListError> {
         let query = user::BASIC;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        self.client.query_typed(query, None).await
     }
 
     /// Fetch user followers
@@ -246,7 +232,10 @@ impl UserEndpoint {
 
     /// Get current authenticated user
     pub async fn get_current_user(&self) -> Result<UserSingleResponse, AniListError> {
+        let response = self.client.user().fetch_basic().await?;
+        let id = response.data.user.id;
         self.fetch_one(FetchUserOneOptions {
+            id: Some(id),
             ..Default::default()
         })
         .await
