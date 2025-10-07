@@ -127,6 +127,9 @@ pub struct Anime {
     /// Number of users who have favorited this anime
     pub favourites: Option<i32>,
 
+    /// Other media in the same or connecting franchise
+    pub relations: Option<MediaConnection>,
+
     /// Official hashtag for social media
     pub hashtag: Option<String>,
 
@@ -277,4 +280,69 @@ pub struct Studio {
     pub is_animation_studio: bool,
     #[serde(rename = "siteUrl")]
     pub site_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AiringMedia {
+    pub id: i32,
+    pub title: Option<MediaTitle>,
+    #[serde(rename = "coverImage")]
+    pub cover_image: Option<MediaCoverImage>,
+    #[serde(rename = "bannerImage")]
+    pub banner_image: Option<String>,
+    pub episodes: Option<i32>,
+    #[serde(rename = "siteUrl")]
+    pub site_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MediaConnection {
+    pub edges: Vec<MediaEdge>,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaEdge {
+    pub node: ConnectionMedia,
+    pub id: i32,
+    pub relation_type: MediaRelation,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum MediaRelation {
+    /// An adaption of this media into a different format
+    Adaptation,
+    /// Released before the relation
+    Prequel,
+    /// Released after the relation
+    Sequel,
+    /// The media a side story is from
+    Parent,
+    /// A side story of the parent media
+    SideStory,
+    /// Shares at least 1 character
+    Character,
+    /// A shortened and summarized version
+    Summary,
+    /// An alternative version of the same media
+    Alternative,
+    /// An alternative version of the media with a different primary focus
+    SpinOff,
+    /// Other
+    Other,
+    /// Version 2 only. The source material the media was adapted from
+    Source,
+    /// Version 2 only.
+    Compilation,
+    /// Version 2 only.
+    Contains,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConnectionMedia {
+    pub id: i32,
+    pub title: Option<MediaTitle>,
+    pub format: Option<MediaFormat>,
+    pub start_date: FuzzyDate,
+    pub end_date: FuzzyDate,
 }

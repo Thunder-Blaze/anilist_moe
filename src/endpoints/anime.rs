@@ -252,6 +252,32 @@ impl AnimeEndpoint {
                     meanScore
                     popularity
                     favourites
+                    relations {
+                        edges {
+                            node {
+                                id
+                                title {
+                                    romaji
+                                    english
+                                    native
+                                    userPreferred
+                                }
+                                format
+                                startDate {
+                                    year
+                                    month
+                                    day
+                                }
+                                endDate {
+                                    year
+                                    month
+                                    day
+                                }
+                            }
+                            id
+                            relationType
+                        }
+                    }   
                     hashtag
                     countryOfOrigin
                     isAdult
