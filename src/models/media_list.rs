@@ -1,5 +1,5 @@
+use super::{FuzzyDate, MediaCoverImage, MediaTitle};
 use serde::{Deserialize, Serialize};
-use super::{FuzzyDate, MediaTitle, MediaCoverImage};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MediaList {

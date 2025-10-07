@@ -14,7 +14,11 @@ impl NotificationEndpoint {
     }
 
     /// Get user notifications (requires authentication)
-    pub async fn get_notifications(&self, page: i32, per_page: i32) -> Result<Vec<Notification>, AniListError> {
+    pub async fn get_notifications(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Notification>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -378,7 +382,10 @@ impl NotificationEndpoint {
     }
 
     /// Mark notifications as read (requires authentication)
-    pub async fn mark_notifications_as_read(&self, notification_ids: Vec<i32>) -> Result<bool, AniListError> {
+    pub async fn mark_notifications_as_read(
+        &self,
+        notification_ids: Vec<i32>,
+    ) -> Result<bool, AniListError> {
         let query = r#"
             mutation ($notificationIds: [Int]) {
                 SaveNotificationSettings(notificationIds: $notificationIds) {

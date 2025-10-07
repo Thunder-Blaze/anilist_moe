@@ -1,6 +1,6 @@
 use crate::client::AniListClient;
 use crate::error::AniListError;
-use crate::models::social::{Activity, TextActivity, ActivityReply};
+use crate::models::social::{Activity, ActivityReply, TextActivity};
 use crate::queries;
 use serde_json::json;
 use std::collections::HashMap;
@@ -15,7 +15,11 @@ impl ActivityEndpoint {
     }
 
     /// Get recent activities from the global feed
-    pub async fn get_recent_activities(&self, page: i32, per_page: i32) -> Result<Vec<Activity>, AniListError> {
+    pub async fn get_recent_activities(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Activity>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -100,7 +104,11 @@ impl ActivityEndpoint {
     }
 
     /// Get activities from following users (requires authentication)
-    pub async fn get_following_activities(&self, page: i32, per_page: i32) -> Result<Vec<Activity>, AniListError> {
+    pub async fn get_following_activities(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Activity>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -158,7 +166,12 @@ impl ActivityEndpoint {
     }
 
     /// Get user activities by user ID
-    pub async fn get_user_activities(&self, user_id: i32, page: i32, per_page: i32) -> Result<Vec<Activity>, AniListError> {
+    pub async fn get_user_activities(
+        &self,
+        user_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Activity>, AniListError> {
         let query = r#"
             query ($userId: Int, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -217,7 +230,11 @@ impl ActivityEndpoint {
     }
 
     /// Get text activities
-    pub async fn get_text_activities(&self, page: i32, per_page: i32) -> Result<Vec<TextActivity>, AniListError> {
+    pub async fn get_text_activities(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<TextActivity>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -339,7 +356,12 @@ impl ActivityEndpoint {
     }
 
     /// Get activity replies
-    pub async fn get_activity_replies(&self, activity_id: i32, page: i32, per_page: i32) -> Result<Vec<ActivityReply>, AniListError> {
+    pub async fn get_activity_replies(
+        &self,
+        activity_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<ActivityReply>, AniListError> {
         let query = r#"
             query ($activityId: Int, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -411,7 +433,11 @@ impl ActivityEndpoint {
     }
 
     /// Post a reply to an activity (requires authentication)
-    pub async fn post_activity_reply(&self, activity_id: i32, text: &str) -> Result<ActivityReply, AniListError> {
+    pub async fn post_activity_reply(
+        &self,
+        activity_id: i32,
+        text: &str,
+    ) -> Result<ActivityReply, AniListError> {
         let query = queries::activity::REPLY_TO_ACTIVITY;
 
         let mut variables = HashMap::new();
@@ -477,7 +503,9 @@ impl ActivityEndpoint {
         variables.insert("id".to_string(), json!(id));
 
         let response = self.client.query(query, Some(variables)).await?;
-        let deleted = response["data"]["DeleteActivity"]["deleted"].as_bool().unwrap_or(false);
+        let deleted = response["data"]["DeleteActivity"]["deleted"]
+            .as_bool()
+            .unwrap_or(false);
         Ok(deleted)
     }
 }

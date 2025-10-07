@@ -1,6 +1,6 @@
 use anilist_moe::client::AniListClient;
 use chrono::prelude::*;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 /// Helper function to add rate limiting between test requests
 async fn rate_limit() {
@@ -22,14 +22,14 @@ async fn test_get_popular_staff() {
         assert!(staff.id > 0);
         assert!(staff.name.is_some());
     }
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_staff_by_id() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     // Using Ikue Ootani's ID (95128)
     let result = client.staff().get_by_id(95128).await;
@@ -38,14 +38,14 @@ async fn test_get_staff_by_id() {
     let staff = result.unwrap();
     assert_eq!(staff.id, 95128);
     assert!(staff.name.is_some());
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_search_staff() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let result = client.staff().search("Miyazaki", 1, 5).await;
 
@@ -68,14 +68,14 @@ async fn test_search_staff() {
         }
     });
     assert!(has_miyazaki);
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_staff_today_birthday() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let today = Local::now().date_naive();
     let day = today.day() as i32;
@@ -93,14 +93,14 @@ async fn test_get_staff_today_birthday() {
             assert_eq!(birth_date.day, Some(day));
         }
     }
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_most_favorited_staff() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let result = client.staff().get_most_favorited(1, 5).await;
 
@@ -117,6 +117,6 @@ async fn test_get_most_favorited_staff() {
             prev_favorites = favourites;
         }
     }
-    
+
     rate_limit().await;
 }

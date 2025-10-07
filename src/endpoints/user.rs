@@ -1,7 +1,7 @@
 use crate::client::AniListClient;
 use crate::error::AniListError;
-use crate::models::user::User;
 use crate::models::media_list::MediaList;
+use crate::models::user::User;
 use crate::queries;
 use serde_json::json;
 use std::collections::HashMap;
@@ -129,7 +129,10 @@ impl UserEndpoint {
     }
 
     /// Get the current user's anime list (requires token)
-    pub async fn get_current_user_anime_list(&self, status: Option<&str>) -> Result<Vec<MediaList>, AniListError> {
+    pub async fn get_current_user_anime_list(
+        &self,
+        status: Option<&str>,
+    ) -> Result<Vec<MediaList>, AniListError> {
         // For now, we'll use a simpler approach
         let query = r#"
             query ($userId: Int, $type: MediaType, $status: MediaListStatus) {
@@ -190,13 +193,13 @@ impl UserEndpoint {
 
         let mut variables = HashMap::new();
         variables.insert("type".to_string(), json!("ANIME"));
-        
+
         if let Some(status) = status {
             variables.insert("status".to_string(), json!(status.to_uppercase()));
         }
 
         let response = self.client.query(query, Some(variables)).await?;
-        
+
         // Extract entries from all lists
         let mut all_entries = Vec::new();
         if let Some(lists) = response["data"]["MediaListCollection"]["lists"].as_array() {
@@ -210,7 +213,7 @@ impl UserEndpoint {
                 }
             }
         }
-        
+
         Ok(all_entries)
     }
 
@@ -602,18 +605,18 @@ impl UserEndpoint {
     }
 
     /// Toggle follow/unfollow a user (requires authentication)
-    /// 
+    ///
     /// # Arguments
     /// * `user_id` - The ID of the user to follow/unfollow
-    /// 
+    ///
     /// # Returns
     /// Returns the updated User object with follow status
-    /// 
+    ///
     /// # Errors
     /// * `AniListError::Unauthorized` - If no authentication token is provided
     /// * `AniListError::Network` - If there's a network connectivity issue
     /// * `AniListError::ApiError` - If the AniList API returns an error
-    /// 
+    ///
     /// # Example
     /// ```rust
     /// let user = client.user().toggle_follow(123456).await?;
@@ -632,32 +635,36 @@ impl UserEndpoint {
     }
 
     /// Toggle favorite anime/manga for the authenticated user
-    /// 
+    ///
     /// # Arguments
     /// * `anime_id` - The ID of the anime to favorite/unfavorite (optional)
     /// * `manga_id` - The ID of the manga to favorite/unfavorite (optional)
-    /// 
+    ///
     /// # Returns
     /// Returns a simple boolean indicating success
-    /// 
+    ///
     /// # Errors
     /// * `AniListError::Unauthorized` - If no authentication token is provided
     /// * `AniListError::InvalidInput` - If neither anime_id nor manga_id is provided
     /// * `AniListError::Network` - If there's a network connectivity issue
     /// * `AniListError::ApiError` - If the AniList API returns an error
-    /// 
+    ///
     /// # Example
     /// ```rust
     /// // Favorite an anime
     /// let success = client.user().toggle_favorite(Some(21), None).await?;
-    /// 
+    ///
     /// // Favorite a manga
     /// let success = client.user().toggle_favorite(None, Some(30013)).await?;
     /// ```
-    pub async fn toggle_favorite(&self, anime_id: Option<i32>, manga_id: Option<i32>) -> Result<bool, AniListError> {
+    pub async fn toggle_favorite(
+        &self,
+        anime_id: Option<i32>,
+        manga_id: Option<i32>,
+    ) -> Result<bool, AniListError> {
         if anime_id.is_none() && manga_id.is_none() {
-            return Err(AniListError::BadRequest { 
-                message: "Either anime_id or manga_id must be provided".to_string() 
+            return Err(AniListError::BadRequest {
+                message: "Either anime_id or manga_id must be provided".to_string(),
             });
         }
 

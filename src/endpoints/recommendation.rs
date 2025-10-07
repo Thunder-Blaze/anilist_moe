@@ -14,7 +14,11 @@ impl RecommendationEndpoint {
     }
 
     /// Get recent recommendations
-    pub async fn get_recent_recommendations(&self, page: i32, per_page: i32) -> Result<Vec<Recommendation>, AniListError> {
+    pub async fn get_recent_recommendations(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Recommendation>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -80,7 +84,12 @@ impl RecommendationEndpoint {
     }
 
     /// Get recommendations for a specific media
-    pub async fn get_recommendations_for_media(&self, media_id: i32, page: i32, per_page: i32) -> Result<Vec<Recommendation>, AniListError> {
+    pub async fn get_recommendations_for_media(
+        &self,
+        media_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Recommendation>, AniListError> {
         let query = r#"
             query ($mediaId: Int, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -147,7 +156,11 @@ impl RecommendationEndpoint {
     }
 
     /// Get top rated recommendations
-    pub async fn get_top_rated_recommendations(&self, page: i32, per_page: i32) -> Result<Vec<Recommendation>, AniListError> {
+    pub async fn get_top_rated_recommendations(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Recommendation>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -276,7 +289,12 @@ impl RecommendationEndpoint {
     }
 
     /// Create a recommendation (requires authentication)
-    pub async fn save_recommendation(&self, media_id: i32, media_recommendation_id: i32, rating: Option<i32>) -> Result<Recommendation, AniListError> {
+    pub async fn save_recommendation(
+        &self,
+        media_id: i32,
+        media_recommendation_id: i32,
+        rating: Option<i32>,
+    ) -> Result<Recommendation, AniListError> {
         let query = r#"
             mutation ($mediaId: Int, $mediaRecommendationId: Int, $rating: RecommendationRating) {
                 SaveRecommendation(mediaId: $mediaId, mediaRecommendationId: $mediaRecommendationId, rating: $rating) {
@@ -331,7 +349,10 @@ impl RecommendationEndpoint {
 
         let mut variables = HashMap::new();
         variables.insert("mediaId".to_string(), json!(media_id));
-        variables.insert("mediaRecommendationId".to_string(), json!(media_recommendation_id));
+        variables.insert(
+            "mediaRecommendationId".to_string(),
+            json!(media_recommendation_id),
+        );
         if let Some(r) = rating {
             let rating_str = match r {
                 1 => "RATE_UP",
@@ -348,7 +369,11 @@ impl RecommendationEndpoint {
     }
 
     /// Rate a recommendation (requires authentication)
-    pub async fn rate_recommendation(&self, recommendation_id: i32, rating: i32) -> Result<Recommendation, AniListError> {
+    pub async fn rate_recommendation(
+        &self,
+        recommendation_id: i32,
+        rating: i32,
+    ) -> Result<Recommendation, AniListError> {
         let rating_str = match rating {
             1 => "RATE_UP",
             -1 => "RATE_DOWN",

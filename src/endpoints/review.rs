@@ -14,7 +14,11 @@ impl ReviewEndpoint {
     }
 
     /// Get recent reviews
-    pub async fn get_recent_reviews(&self, page: i32, per_page: i32) -> Result<Vec<Review>, AniListError> {
+    pub async fn get_recent_reviews(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Review>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -73,7 +77,12 @@ impl ReviewEndpoint {
     }
 
     /// Get reviews by media ID
-    pub async fn get_reviews_for_media(&self, media_id: i32, page: i32, per_page: i32) -> Result<Vec<Review>, AniListError> {
+    pub async fn get_reviews_for_media(
+        &self,
+        media_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Review>, AniListError> {
         let query = r#"
             query ($mediaId: Int, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -133,7 +142,12 @@ impl ReviewEndpoint {
     }
 
     /// Get reviews by user ID
-    pub async fn get_reviews_by_user(&self, user_id: i32, page: i32, per_page: i32) -> Result<Vec<Review>, AniListError> {
+    pub async fn get_reviews_by_user(
+        &self,
+        user_id: i32,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Review>, AniListError> {
         let query = r#"
             query ($userId: Int, $page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {
@@ -359,12 +373,18 @@ impl ReviewEndpoint {
         variables.insert("id".to_string(), json!(id));
 
         let response = self.client.query(query, Some(variables)).await?;
-        let deleted = response["data"]["DeleteReview"]["deleted"].as_bool().unwrap_or(false);
+        let deleted = response["data"]["DeleteReview"]["deleted"]
+            .as_bool()
+            .unwrap_or(false);
         Ok(deleted)
     }
 
     /// Get top rated reviews
-    pub async fn get_top_rated_reviews(&self, page: i32, per_page: i32) -> Result<Vec<Review>, AniListError> {
+    pub async fn get_top_rated_reviews(
+        &self,
+        page: i32,
+        per_page: i32,
+    ) -> Result<Vec<Review>, AniListError> {
         let query = r#"
             query ($page: Int, $perPage: Int) {
                 Page(page: $page, perPage: $perPage) {

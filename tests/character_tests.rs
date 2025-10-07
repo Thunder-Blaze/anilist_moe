@@ -1,6 +1,6 @@
 use anilist_moe::client::AniListClient;
 use chrono::prelude::*;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 /// Helper function to add rate limiting between test requests
 async fn rate_limit() {
@@ -22,14 +22,14 @@ async fn test_get_popular_characters() {
         assert!(character.id > 0);
         assert!(character.name.is_some());
     }
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_character_by_id() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     // Using Lelouch vi Britannia's ID (417)
     let result = client.character().get_by_id(417).await;
@@ -38,14 +38,14 @@ async fn test_get_character_by_id() {
     let character = result.unwrap();
     assert_eq!(character.id, 417);
     assert!(character.name.is_some());
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_search_characters() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let result = client.character().search("Luffy", 1, 5).await;
 
@@ -68,14 +68,14 @@ async fn test_search_characters() {
         }
     });
     assert!(has_luffy);
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_characters_today_birthday() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let today = Local::now().date_naive();
     let day = today.day() as i32;
@@ -93,14 +93,14 @@ async fn test_get_characters_today_birthday() {
             assert_eq!(birth_date.day, Some(day));
         }
     }
-    
+
     rate_limit().await;
 }
 
 #[tokio::test]
 async fn test_get_most_favorited_characters() {
     rate_limit().await;
-    
+
     let client = AniListClient::new();
     let result = client.character().get_most_favorited(1, 5).await;
 
@@ -117,6 +117,6 @@ async fn test_get_most_favorited_characters() {
             prev_favorites = favourites;
         }
     }
-    
+
     rate_limit().await;
 }
