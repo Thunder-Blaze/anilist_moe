@@ -3,51 +3,49 @@ use crate::{client::AniListClient, queries::airing};
 use crate::{enums::airing::AiringSort, objects::responses::AiringListResponse};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching airing schedule information.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchAiringOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId")]
     pub media_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub episode: Option<i32>,
-    #[serde(rename = "airingAt", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "airingAt")]
     pub airing_at: Option<i32>,
-    #[serde(rename = "notYetAired", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "notYetAired")]
     pub not_yet_aired: Option<bool>,
-    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
-    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_in")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "mediaId_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId_not")]
     pub media_id_not: Option<i32>,
-    #[serde(rename = "mediaId_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId_in")]
     pub media_id_in: Option<Vec<i32>>,
-    #[serde(rename = "mediaId_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId_not_in")]
     pub media_id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "episode_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episode_not")]
     pub episode_not: Option<i32>,
-    #[serde(rename = "episode_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episode_in")]
     pub episode_in: Option<Vec<i32>>,
-    #[serde(rename = "episode_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episode_not_in")]
     pub episode_not_in: Option<Vec<i32>>,
-    #[serde(rename = "episode_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episode_greater")]
     pub episode_greater: Option<i32>,
-    #[serde(rename = "episode_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episode_lesser")]
     pub episode_lesser: Option<i32>,
-    #[serde(rename = "airingAt_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "airingAt_greater")]
     pub airing_at_greater: Option<i32>,
-    #[serde(rename = "airingAt_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "airingAt_lesser")]
     pub airing_at_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<AiringSort>>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
 }
 

@@ -79,6 +79,9 @@ query MediaSearch(
     $sort: [MediaSort]
     $page: Int = 1
     $perPage: Int = 20
+
+    # Extra
+    $description_as_html: Boolean = true
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -186,6 +189,8 @@ query MediaSearch(
                 medium
                 color
             }
+            bannerImage
+            description(asHtml: $description_as_html)
             siteUrl
             studios(isMain: true) {
                 edges {

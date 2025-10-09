@@ -4,200 +4,158 @@ use crate::objects::responses::{MediaListResponse, MediaSingleResponse};
 use crate::{client::AniListClient, queries::media};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching media (anime/manga) with various filters.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchMediaOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "idMal", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "idMal")]
     pub id_mal: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<MediaFormat>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<MediaStatus>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub season: Option<MediaSeason>,
-    #[serde(rename = "seasonYear", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "seasonYear")]
     pub season_year: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub genre: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
-    #[serde(rename = "tagCategory", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "tagCategory")]
     pub tag_category: Option<String>,
-    #[serde(rename = "minimumTagRank", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "minimumTagRank")]
     pub minimum_tag_rank: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
-    #[serde(rename = "countryOfOrigin", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "countryOfOrigin")]
     pub country_of_origin: Option<String>,
-    #[serde(rename = "isLicensed", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isLicensed")]
     pub is_licensed: Option<bool>,
-    #[serde(rename = "isAdult", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isAdult")]
     pub is_adult: Option<bool>,
-    #[serde(rename = "onList", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "onList")]
     pub on_list: Option<bool>,
-    #[serde(rename = "licensedBy", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "licensedBy")]
     pub licensed_by: Option<String>,
-    #[serde(rename = "licensedById", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "licensedById")]
     pub licensed_by_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "idMal_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "idMal_not")]
     pub id_mal_not: Option<i32>,
-    #[serde(rename = "idMal_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "idMal_in")]
     pub id_mal_in: Option<Vec<i32>>,
-    #[serde(rename = "idMal_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "idMal_not_in")]
     pub id_mal_not_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub format_not: Option<MediaFormat>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub format_in: Option<Vec<MediaFormat>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub format_not_in: Option<Vec<MediaFormat>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub status_not: Option<MediaStatus>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub status_in: Option<Vec<MediaStatus>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub status_not_in: Option<Vec<MediaStatus>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub genre_in: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub genre_not_in: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag_in: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub tag_not_in: Option<Vec<String>>,
-    #[serde(rename = "tagCategory_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "tagCategory_in")]
     pub tag_category_in: Option<Vec<String>>,
-    #[serde(rename = "tagCategory_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "tagCategory_not_in")]
     pub tag_category_not_in: Option<Vec<String>>,
-    #[serde(rename = "licensedBy_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "licensedBy_in")]
     pub licensed_by_in: Option<Vec<String>>,
-    #[serde(rename = "licensedById_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "licensedById_in")]
     pub licensed_by_id_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub source_in: Option<Vec<String>>,
-    #[serde(rename = "startDate", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startDate")]
     pub start_date: Option<i32>,
-    #[serde(rename = "endDate", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "endDate")]
     pub end_date: Option<i32>,
-    #[serde(rename = "startDate_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startDate_greater")]
     pub start_date_greater: Option<i32>,
-    #[serde(rename = "startDate_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startDate_lesser")]
     pub start_date_lesser: Option<i32>,
-    #[serde(rename = "startDate_like", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startDate_like")]
     pub start_date_like: Option<String>,
-    #[serde(rename = "endDate_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "endDate_greater")]
     pub end_date_greater: Option<i32>,
-    #[serde(rename = "endDate_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "endDate_lesser")]
     pub end_date_lesser: Option<i32>,
-    #[serde(rename = "endDate_like", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "endDate_like")]
     pub end_date_like: Option<String>,
-    #[serde(rename = "averageScore", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "averageScore")]
     pub average_score: Option<i32>,
-    #[serde(rename = "averageScore_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "averageScore_not")]
     pub average_score_not: Option<i32>,
-    #[serde(
-        rename = "averageScore_greater",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "averageScore_greater")]
     pub average_score_greater: Option<i32>,
-    #[serde(
-        rename = "averageScore_lesser",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "averageScore_lesser")]
     pub average_score_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub popularity: Option<i32>,
-    #[serde(rename = "popularity_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "popularity_not")]
     pub popularity_not: Option<i32>,
-    #[serde(rename = "popularity_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "popularity_greater")]
     pub popularity_greater: Option<i32>,
-    #[serde(rename = "popularity_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "popularity_lesser")]
     pub popularity_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub episodes: Option<i32>,
-    #[serde(rename = "episodes_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episodes_greater")]
     pub episodes_greater: Option<i32>,
-    #[serde(rename = "episodes_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "episodes_lesser")]
     pub episodes_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i32>,
-    #[serde(rename = "duration_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "duration_greater")]
     pub duration_greater: Option<i32>,
-    #[serde(rename = "duration_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "duration_lesser")]
     pub duration_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub chapters: Option<i32>,
-    #[serde(rename = "chapters_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "chapters_greater")]
     pub chapters_greater: Option<i32>,
-    #[serde(rename = "chapters_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "chapters_lesser")]
     pub chapters_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub volumes: Option<i32>,
-    #[serde(rename = "volumes_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "volumes_greater")]
     pub volumes_greater: Option<i32>,
-    #[serde(rename = "volumes_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "volumes_lesser")]
     pub volumes_lesser: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<MediaSort>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchMediaOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
     // Characters pagination
-    #[serde(rename = "fetchCharacters", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchCharacters")]
     pub fetch_characters: Option<bool>,
-    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
     // Staff pagination
-    #[serde(rename = "fetchStaff", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchStaff")]
     pub fetch_staff: Option<bool>,
-    #[serde(rename = "staffPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffPage")]
     pub staff_page: Option<i32>,
-    #[serde(rename = "staffPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffPerPage")]
     pub staff_per_page: Option<i32>,
     // Reviews pagination
-    #[serde(rename = "fetchReviews", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchReviews")]
     pub fetch_reviews: Option<bool>,
-    #[serde(rename = "reviewsPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "reviewsPage")]
     pub reviews_page: Option<i32>,
-    #[serde(rename = "reviewsPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "reviewsPerPage")]
     pub reviews_per_page: Option<i32>,
     // Recommendations pagination
-    #[serde(
-        rename = "fetchRecommendations",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "fetchRecommendations")]
     pub fetch_recommendations: Option<bool>,
-    #[serde(
-        rename = "recommendationsPage",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "recommendationsPage")]
     pub recommendations_page: Option<i32>,
-    #[serde(
-        rename = "recommendationsPerPage",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "recommendationsPerPage")]
     pub recommendations_per_page: Option<i32>,
 }
 

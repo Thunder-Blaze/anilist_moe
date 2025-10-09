@@ -8,85 +8,76 @@ use crate::objects::responses::{
 use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching forum threads.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchThreadOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    #[serde(rename = "replyUserId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "replyUserId")]
     pub reply_user_id: Option<i32>,
-    #[serde(rename = "subscribed", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "subscribed")]
     pub subscribed: Option<bool>,
-    #[serde(rename = "categoryId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "categoryId")]
     pub category_id: Option<i32>,
-    #[serde(rename = "mediaCategoryId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaCategoryId")]
     pub media_category_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<ThreadSort>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
 /// Options for fetching a single forum thread by ID.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchThreadOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "commentsPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "commentsPage")]
     pub comments_page: Option<i32>,
-    #[serde(rename = "commentsPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "commentsPerPage")]
     pub comments_per_page: Option<i32>,
-    #[serde(rename = "commentsSort", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "commentsSort")]
     pub comments_sort: Option<Vec<ThreadCommentSort>>,
 }
 
 /// Options for fetching thread comments.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchThreadCommentOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "threadId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "threadId")]
     pub thread_id: Option<i32>,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<ThreadCommentSort>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
 /// Options for fetching a single thread comment by ID.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchThreadCommentOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
 }
 
 /// Options for creating or updating a forum thread.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SaveThreadOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub categories: Option<Vec<i32>>,
-    #[serde(rename = "mediaCategories", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaCategories")]
     pub media_categories: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sticky: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub locked: Option<bool>,
 }
 
@@ -97,17 +88,15 @@ pub struct DeleteThreadOptions {
 }
 
 /// Options for creating or updating a thread comment.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SaveThreadCommentOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "threadId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "threadId")]
     pub thread_id: Option<i32>,
-    #[serde(rename = "parentCommentId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "parentCommentId")]
     pub parent_comment_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub locked: Option<bool>,
 }
 
@@ -118,11 +107,11 @@ pub struct DeleteThreadCommentOptions {
 }
 
 /// Options for subscribing or unsubscribing to a thread.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct ToggleThreadSubscriptionOptions {
     #[serde(rename = "threadId")]
     pub thread_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub subscribe: Option<bool>,
 }
 

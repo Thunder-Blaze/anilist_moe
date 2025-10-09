@@ -5,57 +5,46 @@ use crate::objects::responses::{CharacterListResponse, CharacterSingleResponse};
 use crate::{client::AniListClient, queries::character};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching multiple characters with pagination and filters.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchCharacterOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<CharacterSort>>,
-    #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not_in: Option<Vec<i32>>,
 }
 
 /// Options for fetching a single character.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchCharacterOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<CharacterSort>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     // Sub-pagination variables
-    #[serde(rename = "mediaSort", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaSort")]
     pub media_sort: Option<Vec<MediaSort>>,
-    #[serde(rename = "mediaPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaPerPage")]
     pub media_per_page: Option<i32>,
 }
 

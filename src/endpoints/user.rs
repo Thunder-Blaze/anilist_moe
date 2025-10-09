@@ -6,135 +6,128 @@ use crate::objects::responses::{UserListResponse, UserSingleResponse, ViewerFina
 use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching users.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<UserSort>>,
-    #[serde(rename = "isModerator", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isModerator")]
     pub is_moderator: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
 /// Options for fetching a single user by ID or name.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 }
 
 /// Options for fetching a user's followers.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserFollowersOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
 /// Options for fetching users a user is following.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserFollowingOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
 /// Options for fetching a user's favorites.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserFavoritesOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
     // Toggle what to fetch
-    #[serde(rename = "fetchAnime", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchAnime")]
     pub fetch_anime: Option<bool>,
-    #[serde(rename = "fetchManga", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchManga")]
     pub fetch_manga: Option<bool>,
-    #[serde(rename = "fetchCharacters", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchCharacters")]
     pub fetch_characters: Option<bool>,
-    #[serde(rename = "fetchStaff", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchStaff")]
     pub fetch_staff: Option<bool>,
-    #[serde(rename = "fetchStudios", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fetchStudios")]
     pub fetch_studios: Option<bool>,
     // Anime pagination
-    #[serde(rename = "animePage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "animePage")]
     pub anime_page: Option<i32>,
-    #[serde(rename = "animePerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "animePerPage")]
     pub anime_per_page: Option<i32>,
-    #[serde(rename = "animeSort", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "animeSort")]
     pub anime_sort: Option<Vec<MediaSort>>,
     // Manga pagination
-    #[serde(rename = "mangaPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mangaPage")]
     pub manga_page: Option<i32>,
-    #[serde(rename = "mangaPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mangaPerPage")]
     pub manga_per_page: Option<i32>,
-    #[serde(rename = "mangaSort", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mangaSort")]
     pub manga_sort: Option<Vec<MediaSort>>,
     // Characters pagination
-    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
     // Staff pagination
-    #[serde(rename = "staffPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffPage")]
     pub staff_page: Option<i32>,
-    #[serde(rename = "staffPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffPerPage")]
     pub staff_per_page: Option<i32>,
     // Studios pagination
-    #[serde(rename = "studiosPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "studiosPage")]
     pub studios_page: Option<i32>,
-    #[serde(rename = "studiosPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "studiosPerPage")]
     pub studios_per_page: Option<i32>,
 }
 
 /// Options for fetching a user's media list.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserMediaListOptions {
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub username: Option<String>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<MediaListStatus>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
-    #[serde(rename = "startedAt", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startedAt")]
     pub started_at: Option<i32>,
-    #[serde(rename = "completedAt", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "completedAt")]
     pub completed_at: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<MediaSort>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 }
 
 /// Options for fetching user statistics.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchUserStatsOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<UserStatisticsSort>>,
 }
 

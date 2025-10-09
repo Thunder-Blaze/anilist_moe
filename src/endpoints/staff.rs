@@ -4,58 +4,52 @@ use crate::objects::responses::{StaffListResponse, StaffSingleResponse};
 use crate::{client::AniListClient, queries::staff};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching staff members.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchStaffOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
-    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_in")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<StaffSort>>,
 }
 
 /// Options for fetching a single staff member by ID.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchStaffOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "isBirthday", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
-    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_in")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<StaffSort>>,
     // Sub-pagination variables
-    #[serde(rename = "staffMediaPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffMediaPage")]
     pub staff_media_page: Option<i32>,
-    #[serde(rename = "staffMediaPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffMediaPerPage")]
     pub staff_media_per_page: Option<i32>,
-    #[serde(rename = "charactersPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
-    #[serde(rename = "characterMediaPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "characterMediaPage")]
     pub character_media_page: Option<i32>,
-    #[serde(
-        rename = "characterMediaPerPage",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "characterMediaPerPage")]
     pub character_media_per_page: Option<i32>,
 }
 
