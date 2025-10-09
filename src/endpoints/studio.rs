@@ -4,47 +4,43 @@ use crate::objects::responses::{StudioListResponse, StudioSingleResponse};
 use crate::{client::AniListClient, queries::studio};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching studios.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchStudioOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
-    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_in")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<StudioSort>>,
 }
 
 /// Options for fetching a single studio by ID.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchStudioOneOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
-    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
-    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_in")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<StudioSort>>,
     // Sub-pagination variables
-    #[serde(rename = "mediaPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaPerPage")]
     pub media_per_page: Option<i32>,
 }
 

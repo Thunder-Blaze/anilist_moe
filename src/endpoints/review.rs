@@ -5,40 +5,35 @@ use crate::objects::responses::{ReviewListResponse, ReviewSingleResponse};
 use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching reviews.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchReviewOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
-    #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId")]
     pub media_id: Option<i32>,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    #[serde(rename = "mediaType", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<ReviewSort>>,
 }
 
 /// Options for creating or updating a review.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SaveReviewOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]
     pub media_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub private: Option<bool>,
 }
 

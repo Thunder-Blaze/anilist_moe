@@ -8,75 +8,74 @@ use crate::objects::responses::{
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for fetching activity feed entries.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchActivityOptions {
     // # Pagination
-    #[serde(rename = "page", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "page")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 
     // # Filters
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id")]
     pub id: Option<i32>,
-    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    #[serde(rename = "messengerId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "messengerId")]
     pub messenger_id: Option<i32>,
-    #[serde(rename = "mediaId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId")]
     pub media_id: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub type_: Option<ActivityType>,
-    #[serde(rename = "isFollowing", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "isFollowing")]
     pub is_following: Option<bool>,
-    #[serde(rename = "hasReplies", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "hasReplies")]
     pub has_replies: Option<bool>,
-    #[serde(
-        rename = "hasRepliesOrTypeText",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "hasRepliesOrTypeText")]
     pub has_replies_or_type_text: Option<bool>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "createdAt")]
     pub created_at: Option<i32>,
-    #[serde(rename = "id_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
-    #[serde(rename = "id_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_in")]
     pub id_in: Option<Vec<i32>>,
-    #[serde(rename = "id_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "userId_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId_not")]
     pub user_id_not: Option<i32>,
-    #[serde(rename = "userId_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId_in")]
     pub user_id_in: Option<Vec<i32>>,
-    #[serde(rename = "userId_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "userId_not_in")]
     pub user_id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "messengerId_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "messengerId_not")]
     pub messenger_id_not: Option<i32>,
-    #[serde(rename = "messengerId_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "messengerId_in")]
     pub messenger_id_in: Option<Vec<i32>>,
-    #[serde(rename = "messengerId_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "messengerId_not_in")]
     pub messenger_id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "mediaId_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId_not")]
     pub media_id_not: Option<i32>,
-    #[serde(rename = "mediaId_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId_in")]
     pub media_id_in: Option<Vec<i32>>,
-    #[serde(rename = "mediaId_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mediaId_not_in")]
     pub media_id_not_in: Option<Vec<i32>>,
-    #[serde(rename = "type_not", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type_not")]
     pub type_not: Option<ActivityType>,
-    #[serde(rename = "type_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type_in")]
     pub type_in: Option<Vec<ActivityType>>,
-    #[serde(rename = "type_not_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type_not_in")]
     pub type_not_in: Option<Vec<ActivityType>>,
-    #[serde(rename = "createdAt_greater", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "createdAt_greater")]
     pub created_at_greater: Option<i32>,
-    #[serde(rename = "createdAt_lesser", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "createdAt_lesser")]
     pub created_at_lesser: Option<i32>,
 
     // # Sort
-    #[serde(rename = "sort", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sort")]
     pub sort: Option<Vec<ActivitySort>>,
 }
 
@@ -87,16 +86,17 @@ pub struct FetchActivityOneOptions {
 }
 
 /// Options for fetching replies to an activity.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
-    #[serde(rename = "page", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "page")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 
     // # Filters
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "id")]
     pub id: Option<i32>,
     #[serde(rename = "activityId")]
     pub activity_id: i32,
@@ -129,35 +129,31 @@ pub struct SubscribeActivityOptions {
 }
 
 /// Options for saving a message activity.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SaveMessageActivityOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
     pub message: String,
     #[serde(rename = "recipientId")]
     pub recipient_id: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub private: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub locked: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub as_mod: Option<bool>,
 }
 
 /// Options for saving a text activity.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SaveTextActivityOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
     pub text: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub locked: Option<bool>,
 }
 
 /// Options for saving a reply to an activity.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SaveActivityReplyOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i32>,
     pub text: String,
     #[serde(rename = "activityId")]

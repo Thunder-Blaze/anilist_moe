@@ -4,22 +4,20 @@ use crate::objects::responses::NotificationResponse;
 use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for searching and filtering notifications.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct NotificationSearchOptions {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
     pub notification_type: Option<NotificationType>,
-    #[serde(rename = "type_in", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type_in")]
     pub type_in: Option<Vec<NotificationType>>,
-    #[serde(
-        rename = "resetNotificationCount",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "resetNotificationCount")]
     pub reset_notification_count: Option<bool>,
 }
 

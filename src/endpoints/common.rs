@@ -6,6 +6,7 @@ use crate::objects::responses::{
 use crate::{client::AniListClient, queries::common};
 use serde::Serialize;
 use serde_json::json;
+use serde_with::skip_serializing_none;
 
 /// Options for toggling a like on various entities.
 #[derive(Serialize)]
@@ -23,17 +24,18 @@ pub struct ToggleFollowOptions {
 }
 
 /// Options for adding or removing favourites.
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct ToggleFavouriteOptions {
-    #[serde(rename = "animeId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "animeId")]
     pub anime_id: Option<i32>,
-    #[serde(rename = "mangaId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "mangaId")]
     pub manga_id: Option<i32>,
-    #[serde(rename = "characterId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "characterId")]
     pub character_id: Option<i32>,
-    #[serde(rename = "staffId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "staffId")]
     pub staff_id: Option<i32>,
-    #[serde(rename = "studioId", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "studioId")]
     pub studio_id: Option<i32>,
 }
 
