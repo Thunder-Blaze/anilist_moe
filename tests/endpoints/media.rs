@@ -17,15 +17,17 @@ async fn test_fetch_media_with_search() {
         ..Default::default()
     };
 
-    let result = client.media().fetch(options).await;
+    let result = client.media().fetch(&options).await;
+
+    println!("Result: {:?}", result);
 
     assert!(result.is_ok(), "Should successfully fetch media");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    assert!(response.data.page.page_info.current_page.is_some());
+    assert!(response.page_info.as_ref().map(|p| p.current_page).is_some());
 
-    let media_list = &response.data.page.data.media;
+    let media_list = &response.data;
     assert!(
         !media_list.is_empty(),
         "Should return at least one media result"
@@ -48,7 +50,7 @@ async fn test_fetch_media_by_id() {
         ..Default::default()
     };
 
-    let result = client.media().fetch(options).await;
+    let result = client.media().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching media: {:?}", e);
     }
@@ -60,7 +62,7 @@ async fn test_fetch_media_by_id() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let media_list = &response.data.page.data.media;
+    let media_list = &response.data;
     assert_eq!(media_list.len(), 1, "Should return exactly one media");
 
     let media = &media_list[0];
@@ -76,7 +78,7 @@ async fn test_fetch_one_media() {
         ..Default::default()
     };
 
-    let result = client.media().fetch_one(options).await;
+    let result = client.media().fetch_one(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching one media: {:?}", e);
     }
@@ -88,7 +90,7 @@ async fn test_fetch_one_media() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let media = &response.data.media;
+    let media = &response;
     assert_eq!(media.id, Some(1), "Should return media with ID 1");
     assert!(media.title.is_some(), "Media should have a title");
 }
@@ -101,12 +103,12 @@ async fn test_media_data_types() {
         ..Default::default()
     };
 
-    let result = client.media().fetch(options).await;
+    let result = client.media().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch media");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let media = &response.data.page.data.media[0];
+    let media = &response.data[0];
 
     // Verify ID is required and positive
     assert!(media.id.unwrap_or(0) > 0, "ID should be positive");
@@ -141,7 +143,7 @@ async fn test_fetch_media_pagination() {
         ..Default::default()
     };
 
-    let result1 = client.media().fetch(options_page1).await;
+    let result1 = client.media().fetch(&options_page1).await;
     assert!(result1.is_ok(), "Should successfully fetch page 1");
 
     let options_page2 = FetchMediaOptions {
@@ -152,14 +154,14 @@ async fn test_fetch_media_pagination() {
         ..Default::default()
     };
 
-    let result2 = client.media().fetch(options_page2).await;
+    let result2 = client.media().fetch(&options_page2).await;
     assert!(result2.is_ok(), "Should successfully fetch page 2");
 
     let response1 = result1.unwrap();
     let response2 = result2.unwrap();
 
-    let media_list1 = &response1.data.page.data.media;
-    let media_list2 = &response2.data.page.data.media;
+    let media_list1 = &response1.data;
+    let media_list2 = &response2.data;
 
     assert_eq!(media_list1.len(), 5, "Page 1 should have 5 results");
     assert_eq!(media_list2.len(), 5, "Page 2 should have 5 results");

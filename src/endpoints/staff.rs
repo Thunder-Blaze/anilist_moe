@@ -1,6 +1,7 @@
 use crate::enums::staff::StaffSort;
 use crate::errors::AniListError;
-use crate::objects::responses::{StaffListResponse, StaffSingleResponse};
+use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::staff::Staff;
 use crate::{client::AniListClient, queries::staff};
 use serde::Serialize;
 use serde_json::json;
@@ -8,7 +9,7 @@ use serde_with::skip_serializing_none;
 
 /// Options for fetching staff members.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchStaffOptions {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
@@ -21,11 +22,14 @@ pub struct FetchStaffOptions {
     #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
     pub sort: Option<Vec<StaffSort>>,
+    pub page: Option<i32>,
+    #[serde(rename = "perPage")]
+    pub per_page: Option<i32>,
 }
 
 /// Options for fetching a single staff member by ID.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchStaffOneOptions {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
@@ -65,22 +69,30 @@ impl StaffEndpoint {
 
     pub async fn fetch(
         &self,
-        options: FetchStaffOptions,
-    ) -> Result<StaffListResponse, AniListError> {
+        options: &FetchStaffOptions,
+    ) -> Result<Page<Vec<Staff>>, AniListError> {
         let query = staff::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<Staff>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn fetch_one(
         &self,
-        options: FetchStaffOneOptions,
-    ) -> Result<StaffSingleResponse, AniListError> {
+        options: &FetchStaffOneOptions,
+    ) -> Result<Staff, AniListError> {
         let query = staff::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Staff>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -88,11 +100,13 @@ impl StaffEndpoint {
     /// Get popular staff sorted by favorites
     pub async fn get_popular(
         &self,
-        _page: Option<i32>,
-        _per_page: Option<i32>,
-    ) -> Result<StaffListResponse, AniListError> {
-        self.fetch(FetchStaffOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<Staff>>, AniListError> {
+        self.fetch(&FetchStaffOptions {
             sort: Some(vec![StaffSort::FavouritesDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -101,30 +115,32 @@ impl StaffEndpoint {
     /// Get most favorited staff (alias for get_popular)
     pub async fn get_most_favorited(
         &self,
-        _page: Option<i32>,
-        _per_page: Option<i32>,
-    ) -> Result<StaffListResponse, AniListError> {
-        self.get_popular(_page, _per_page).await
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<Staff>>, AniListError> {
+        self.get_popular(page, per_page).await
     }
 
     /// Search staff by name
     pub async fn search(
         &self,
         query: &str,
-        _page: Option<i32>,
-        _per_page: Option<i32>,
-    ) -> Result<StaffListResponse, AniListError> {
-        self.fetch(FetchStaffOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<Staff>>, AniListError> {
+        self.fetch(&FetchStaffOptions {
             search: Some(query.to_string()),
             sort: Some(vec![StaffSort::SearchMatch]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
     }
 
     /// Get staff by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<StaffSingleResponse, AniListError> {
-        self.fetch_one(FetchStaffOneOptions {
+    pub async fn get_by_id(&self, id: i32) -> Result<Staff, AniListError> {
+        self.fetch_one(&FetchStaffOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -134,12 +150,14 @@ impl StaffEndpoint {
     /// Get staff with birthday today
     pub async fn get_today_birthday(
         &self,
-        _page: Option<i32>,
-        _per_page: Option<i32>,
-    ) -> Result<StaffListResponse, AniListError> {
-        self.fetch(FetchStaffOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<Staff>>, AniListError> {
+        self.fetch(&FetchStaffOptions {
             is_birthday: Some(true),
             sort: Some(vec![StaffSort::FavouritesDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await

@@ -24,7 +24,7 @@ async fn test_fetch_user_by_search() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let users = &response.data.page.data.users;
+    let users = &response.data;
     assert!(!users.is_empty(), "Should return at least one user");
 
     let first_user = &users[0];
@@ -48,7 +48,7 @@ async fn test_fetch_user_by_id() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let users = &response.data.page.data.users;
+    let users = &response.data;
     assert_eq!(users.len(), 1, "Should return exactly one user");
 }
 
@@ -60,12 +60,12 @@ async fn test_fetch_one_user() {
         ..Default::default()
     };
 
-    let result = client.user().fetch_one(options).await;
+    let result = client.user().fetch_one(&options).await;
     assert!(result.is_ok(), "Should successfully fetch one user");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let user = &response.data.user;
+    let user = &response;
     assert!(user.id > 0, "User should have positive ID");
     assert!(
         !user.name.as_ref().unwrap().is_empty(),
@@ -86,7 +86,7 @@ async fn test_user_data_types() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let user = &response.data.page.data.users[0];
+    let user = &response.data[0];
 
     assert!(
         !user.name.as_ref().unwrap().is_empty(),

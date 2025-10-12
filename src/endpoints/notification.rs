@@ -1,6 +1,7 @@
 use crate::enums::notification::NotificationType;
 use crate::errors::AniListError;
-use crate::objects::responses::NotificationResponse;
+use crate::objects::responses::{GraphQLResponse, Page};
+use crate::unions::notification::NotificationUnion;
 use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
 use serde_json::json;
@@ -8,7 +9,7 @@ use serde_with::skip_serializing_none;
 
 /// Options for searching and filtering notifications.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct NotificationSearchOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -33,15 +34,16 @@ impl NotificationEndpoint {
 
     pub async fn fetch(
         &self,
-        options: NotificationSearchOptions,
-    ) -> Result<NotificationResponse, AniListError> {
+        options: &NotificationSearchOptions,
+    ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
         let query = notification::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        println!("Variables Map: {:?}", variables_map);
-        let x = self.client.query_typed(query, Some(&variables_map)).await;
-        println!("Query Result: {:?}", x);
-        x
+        let response: Result<GraphQLResponse<Page<Vec<NotificationUnion>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -51,8 +53,8 @@ impl NotificationEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<NotificationResponse, AniListError> {
-        self.fetch(NotificationSearchOptions {
+    ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
+        self.fetch(&NotificationSearchOptions {
             page,
             per_page,
             ..Default::default()
@@ -65,8 +67,8 @@ impl NotificationEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<NotificationResponse, AniListError> {
-        self.fetch(NotificationSearchOptions {
+    ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
+        self.fetch(&NotificationSearchOptions {
             page,
             per_page,
             reset_notification_count: Some(true),
@@ -81,8 +83,8 @@ impl NotificationEndpoint {
         notification_type: NotificationType,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<NotificationResponse, AniListError> {
-        self.fetch(NotificationSearchOptions {
+    ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
+        self.fetch(&NotificationSearchOptions {
             notification_type: Some(notification_type),
             page,
             per_page,

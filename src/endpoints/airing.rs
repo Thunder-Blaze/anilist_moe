@@ -1,13 +1,15 @@
 use crate::errors::AniListError;
+use crate::objects::airing::AiringSchedule;
+use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::airing};
-use crate::{enums::airing::AiringSort, objects::responses::AiringListResponse};
+use crate::{enums::airing::AiringSort};
 use serde::Serialize;
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching airing schedule information.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchAiringOptions {
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]
@@ -61,12 +63,16 @@ impl AiringEndpoint {
 
     pub async fn fetch(
         &self,
-        options: FetchAiringOptions,
-    ) -> Result<AiringListResponse, AniListError> {
+        options: &FetchAiringOptions,
+    ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         let query = airing::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<AiringSchedule>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -76,13 +82,13 @@ impl AiringEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<AiringListResponse, AniListError> {
+    ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(FetchAiringOptions {
+        self.fetch(&FetchAiringOptions {
             airing_at_greater: Some(now),
             sort: Some(vec![AiringSort::Time]),
             page,
@@ -97,13 +103,13 @@ impl AiringEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<AiringListResponse, AniListError> {
+    ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(FetchAiringOptions {
+        self.fetch(&FetchAiringOptions {
             airing_at_lesser: Some(now),
             sort: Some(vec![AiringSort::TimeDesc]),
             page,
@@ -119,8 +125,8 @@ impl AiringEndpoint {
         media_id: i32,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<AiringListResponse, AniListError> {
-        self.fetch(FetchAiringOptions {
+    ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
+        self.fetch(&FetchAiringOptions {
             media_id: Some(media_id),
             sort: Some(vec![AiringSort::Time]),
             page,

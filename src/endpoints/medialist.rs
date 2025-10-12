@@ -1,9 +1,10 @@
 use crate::enums::media::MediaType;
 use crate::enums::media_list::{MediaListSort, MediaListStatus};
 use crate::errors::AniListError;
-use crate::objects::common::FuzzyDate;
+use crate::objects::common::{Deleted, FuzzyDate};
+use crate::objects::media_list::MediaList;
 use crate::objects::responses::{
-    DeleteMediaListEntryResponse, SaveMediaListEntryResponse, UserMediaListResponse,
+    GraphQLResponse, Page
 };
 use crate::{client::AniListClient, queries::medialist};
 use serde::Serialize;
@@ -12,7 +13,7 @@ use serde_with::skip_serializing_none;
 
 /// Options for fetching media list entries.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchMediaListOptions {
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
@@ -66,7 +67,7 @@ pub struct FetchMediaListOptions {
 
 /// Options for creating or updating a media list entry.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListOptions {
     pub id: Option<i32>,
@@ -89,7 +90,7 @@ pub struct SaveMediaListOptions {
 
 /// Options for bulk updating multiple media list entries.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListMultipleOptions {
     pub status: Option<MediaListStatus>,
@@ -109,7 +110,7 @@ pub struct SaveMediaListMultipleOptions {
 }
 
 /// Options for deleting a media list entry.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteMediaListOptions {
     pub id: i32,
 }
@@ -126,42 +127,58 @@ impl MediaListEndpoint {
 
     pub async fn fetch(
         &self,
-        options: FetchMediaListOptions,
-    ) -> Result<UserMediaListResponse, AniListError> {
+        options: &FetchMediaListOptions,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
         let query = medialist::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<MediaList>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn save(
         &self,
-        options: SaveMediaListOptions,
-    ) -> Result<SaveMediaListEntryResponse, AniListError> {
+        options: &SaveMediaListOptions,
+    ) -> Result<MediaList, AniListError> {
         let query = medialist::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<MediaList>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn save_multiple(
         &self,
-        options: SaveMediaListMultipleOptions,
-    ) -> Result<Vec<SaveMediaListEntryResponse>, AniListError> {
+        options: &SaveMediaListMultipleOptions,
+    ) -> Result<Vec<MediaList>, AniListError> {
         let query = medialist::SAVE_MULTIPLE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Vec<MediaList>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn delete(
         &self,
-        options: DeleteMediaListOptions,
-    ) -> Result<DeleteMediaListEntryResponse, AniListError> {
+        options: &DeleteMediaListOptions,
+    ) -> Result<bool, AniListError> {
         let query = medialist::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -171,12 +188,16 @@ impl MediaListEndpoint {
         &self,
         username: &str,
         status: Option<MediaListStatus>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: Some(username.to_string()),
             media_type: Some(MediaType::Anime),
             status,
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -187,12 +208,16 @@ impl MediaListEndpoint {
         &self,
         username: &str,
         status: Option<MediaListStatus>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: Some(username.to_string()),
             media_type: Some(MediaType::Manga),
             status,
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -202,11 +227,15 @@ impl MediaListEndpoint {
     pub async fn get_my_anime_list(
         &self,
         status: Option<MediaListStatus>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             media_type: Some(MediaType::Anime),
             status,
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -216,11 +245,15 @@ impl MediaListEndpoint {
     pub async fn get_my_manga_list(
         &self,
         status: Option<MediaListStatus>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             media_type: Some(MediaType::Manga),
             status,
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -230,12 +263,16 @@ impl MediaListEndpoint {
     pub async fn get_watching(
         &self,
         username: Option<&str>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: username.map(|s| s.to_string()),
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Current),
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -245,12 +282,16 @@ impl MediaListEndpoint {
     pub async fn get_reading(
         &self,
         username: Option<&str>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: username.map(|s| s.to_string()),
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Current),
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -260,12 +301,16 @@ impl MediaListEndpoint {
     pub async fn get_completed_anime(
         &self,
         username: Option<&str>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: username.map(|s| s.to_string()),
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Completed),
             sort: Some(vec![MediaListSort::ScoreDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -275,12 +320,16 @@ impl MediaListEndpoint {
     pub async fn get_completed_manga(
         &self,
         username: Option<&str>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: username.map(|s| s.to_string()),
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Completed),
             sort: Some(vec![MediaListSort::ScoreDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -290,12 +339,16 @@ impl MediaListEndpoint {
     pub async fn get_plan_to_watch(
         &self,
         username: Option<&str>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: username.map(|s| s.to_string()),
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Planning),
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -305,12 +358,16 @@ impl MediaListEndpoint {
     pub async fn get_plan_to_read(
         &self,
         username: Option<&str>,
-    ) -> Result<UserMediaListResponse, AniListError> {
-        self.fetch(FetchMediaListOptions {
+        page: Option<i32>,
+        per_page: Option<i32>,
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
+        self.fetch(&FetchMediaListOptions {
             user_name: username.map(|s| s.to_string()),
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Planning),
             sort: Some(vec![MediaListSort::UpdatedTimeDesc]),
+            page,
+            per_page,
             ..Default::default()
         })
         .await
@@ -321,8 +378,8 @@ impl MediaListEndpoint {
         &self,
         media_id: i32,
         status: MediaListStatus,
-    ) -> Result<SaveMediaListEntryResponse, AniListError> {
-        self.save(SaveMediaListOptions {
+    ) -> Result<MediaList, AniListError> {
+        self.save(&SaveMediaListOptions {
             media_id: Some(media_id),
             status: Some(status),
             ..Default::default()
@@ -335,8 +392,8 @@ impl MediaListEndpoint {
         &self,
         media_id: i32,
         status: MediaListStatus,
-    ) -> Result<SaveMediaListEntryResponse, AniListError> {
-        self.save(SaveMediaListOptions {
+    ) -> Result<MediaList, AniListError> {
+        self.save(&SaveMediaListOptions {
             media_id: Some(media_id),
             status: Some(status),
             ..Default::default()
@@ -349,8 +406,8 @@ impl MediaListEndpoint {
         &self,
         entry_id: i32,
         progress: i32,
-    ) -> Result<SaveMediaListEntryResponse, AniListError> {
-        self.save(SaveMediaListOptions {
+    ) -> Result<MediaList, AniListError> {
+        self.save(&SaveMediaListOptions {
             id: Some(entry_id),
             progress: Some(progress),
             ..Default::default()
@@ -363,8 +420,8 @@ impl MediaListEndpoint {
         &self,
         entry_id: i32,
         score: f64,
-    ) -> Result<SaveMediaListEntryResponse, AniListError> {
-        self.save(SaveMediaListOptions {
+    ) -> Result<MediaList, AniListError> {
+        self.save(&SaveMediaListOptions {
             id: Some(entry_id),
             score: Some(score),
             ..Default::default()
@@ -377,8 +434,8 @@ impl MediaListEndpoint {
         &self,
         entry_id: i32,
         status: MediaListStatus,
-    ) -> Result<SaveMediaListEntryResponse, AniListError> {
-        self.save(SaveMediaListOptions {
+    ) -> Result<MediaList, AniListError> {
+        self.save(&SaveMediaListOptions {
             id: Some(entry_id),
             status: Some(status),
             ..Default::default()
@@ -390,7 +447,7 @@ impl MediaListEndpoint {
     pub async fn delete_entry(
         &self,
         entry_id: i32,
-    ) -> Result<DeleteMediaListEntryResponse, AniListError> {
-        self.delete(DeleteMediaListOptions { id: entry_id }).await
+    ) -> Result<bool, AniListError> {
+        self.delete(&DeleteMediaListOptions { id: entry_id }).await
     }
 }

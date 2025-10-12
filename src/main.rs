@@ -7,7 +7,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Example usage
     let popular_anime = client
         .media()
-        .fetch(FetchMediaOptions {
+        .fetch(&FetchMediaOptions {
             sort: Some(vec![anilist_moe::enums::media::MediaSort::PopularityDesc]),
             per_page: Some(5),
             page: Some(1),
