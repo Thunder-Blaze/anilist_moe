@@ -12,12 +12,12 @@ async fn test_fetch_studio_by_search() {
         ..Default::default()
     };
 
-    let result = client.studio().fetch(options).await;
+    let result = client.studio().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch studios");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let studios = &response.data.page.data.studios;
+    let studios = &response.data;
     assert!(!studios.is_empty(), "Should return at least one studio");
 
     let first_studio = &studios[0];
@@ -36,12 +36,12 @@ async fn test_fetch_studio_by_id() {
         ..Default::default()
     };
 
-    let result = client.studio().fetch(options).await;
+    let result = client.studio().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch studio by ID");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let studios = &response.data.page.data.studios;
+    let studios = &response.data;
     assert_eq!(studios.len(), 1, "Should return exactly one studio");
     assert_eq!(studios[0].id, Some(2), "Should return correct studio ID");
 }
@@ -54,7 +54,7 @@ async fn test_fetch_one_studio() {
         ..Default::default()
     };
 
-    let result = client.studio().fetch_one(options).await;
+    let result = client.studio().fetch_one(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching one studio: {:?}", e);
     }
@@ -66,7 +66,7 @@ async fn test_fetch_one_studio() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let studio = &response.data.studio;
+    let studio = &response;
     assert_eq!(studio.id, Some(2), "Should return studio with ID 2");
 }
 
@@ -78,12 +78,12 @@ async fn test_studio_data_types() {
         ..Default::default()
     };
 
-    let result = client.studio().fetch(options).await;
+    let result = client.studio().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch studio");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let studio = &response.data.page.data.studios[0];
+    let studio = &response.data[0];
 
     if let Some(id) = studio.id {
         assert!(id > 0, "ID should be positive");

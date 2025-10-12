@@ -1,8 +1,11 @@
 use crate::enums::likable::LikeableType;
 use crate::errors::AniListError;
+use crate::objects::favourites::Favourites;
 use crate::objects::responses::{
     ToggleFavouriteResponse, ToggleFollowResponse, ToggleLikeResponse,
 };
+use crate::objects::user::User;
+use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
 use serde::Serialize;
 use serde_json::json;
@@ -17,7 +20,7 @@ pub struct ToggleLikeOptions {
 }
 
 /// Options for toggling follow status of a user.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct ToggleFollowOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
@@ -25,7 +28,7 @@ pub struct ToggleFollowOptions {
 
 /// Options for adding or removing favourites.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct ToggleFavouriteOptions {
     #[serde(rename = "animeId")]
     pub anime_id: Option<i32>,
@@ -51,39 +54,51 @@ impl CommonEndpoint {
 
     pub async fn toggle_like(
         &self,
-        options: ToggleLikeOptions,
-    ) -> Result<ToggleLikeResponse, AniListError> {
+        options: &ToggleLikeOptions,
+    ) -> Result<LikeableUnion, AniListError> {
         let query = common::TOGGLE_LIKE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<ToggleLikeResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.toggle_like_v2),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn toggle_follow(
         &self,
-        options: ToggleFollowOptions,
-    ) -> Result<ToggleFollowResponse, AniListError> {
+        options: &ToggleFollowOptions,
+    ) -> Result<User, AniListError> {
         let query = common::TOGGLE_FOLLOW;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<ToggleFollowResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.toggle_follow),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn toggle_favourite(
         &self,
-        options: ToggleFavouriteOptions,
-    ) -> Result<ToggleFavouriteResponse, AniListError> {
+        options: &ToggleFavouriteOptions,
+    ) -> Result<Favourites, AniListError> {
         let query = common::TOGGLE_FAVOURITE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<ToggleFavouriteResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.toggle_favourite),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
 
     /// Like or unlike an activity
-    pub async fn like_activity(&self, id: i32) -> Result<ToggleLikeResponse, AniListError> {
-        self.toggle_like(ToggleLikeOptions {
+    pub async fn like_activity(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+        self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::Activity,
         })
@@ -91,8 +106,8 @@ impl CommonEndpoint {
     }
 
     /// Like or unlike an activity reply
-    pub async fn like_activity_reply(&self, id: i32) -> Result<ToggleLikeResponse, AniListError> {
-        self.toggle_like(ToggleLikeOptions {
+    pub async fn like_activity_reply(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+        self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::ActivityReply,
         })
@@ -100,8 +115,8 @@ impl CommonEndpoint {
     }
 
     /// Like or unlike a thread
-    pub async fn like_thread(&self, id: i32) -> Result<ToggleLikeResponse, AniListError> {
-        self.toggle_like(ToggleLikeOptions {
+    pub async fn like_thread(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+        self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::Thread,
         })
@@ -109,8 +124,8 @@ impl CommonEndpoint {
     }
 
     /// Like or unlike a thread comment
-    pub async fn like_thread_comment(&self, id: i32) -> Result<ToggleLikeResponse, AniListError> {
-        self.toggle_like(ToggleLikeOptions {
+    pub async fn like_thread_comment(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+        self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::ThreadComment,
         })
@@ -118,16 +133,16 @@ impl CommonEndpoint {
     }
 
     /// Follow or unfollow a user
-    pub async fn follow_user(&self, user_id: i32) -> Result<ToggleFollowResponse, AniListError> {
-        self.toggle_follow(ToggleFollowOptions { user_id }).await
+    pub async fn follow_user(&self, user_id: i32) -> Result<User, AniListError> {
+        self.toggle_follow(&ToggleFollowOptions { user_id }).await
     }
 
     /// Add or remove anime from favorites
     pub async fn favourite_anime(
         &self,
         anime_id: i32,
-    ) -> Result<ToggleFavouriteResponse, AniListError> {
-        self.toggle_favourite(ToggleFavouriteOptions {
+    ) -> Result<Favourites, AniListError> {
+        self.toggle_favourite(&ToggleFavouriteOptions {
             anime_id: Some(anime_id),
             ..Default::default()
         })
@@ -138,8 +153,8 @@ impl CommonEndpoint {
     pub async fn favourite_manga(
         &self,
         manga_id: i32,
-    ) -> Result<ToggleFavouriteResponse, AniListError> {
-        self.toggle_favourite(ToggleFavouriteOptions {
+    ) -> Result<Favourites, AniListError> {
+        self.toggle_favourite(&ToggleFavouriteOptions {
             manga_id: Some(manga_id),
             ..Default::default()
         })
@@ -150,8 +165,8 @@ impl CommonEndpoint {
     pub async fn favourite_character(
         &self,
         character_id: i32,
-    ) -> Result<ToggleFavouriteResponse, AniListError> {
-        self.toggle_favourite(ToggleFavouriteOptions {
+    ) -> Result<Favourites, AniListError> {
+        self.toggle_favourite(&ToggleFavouriteOptions {
             character_id: Some(character_id),
             ..Default::default()
         })
@@ -162,8 +177,8 @@ impl CommonEndpoint {
     pub async fn favourite_staff(
         &self,
         staff_id: i32,
-    ) -> Result<ToggleFavouriteResponse, AniListError> {
-        self.toggle_favourite(ToggleFavouriteOptions {
+    ) -> Result<Favourites, AniListError> {
+        self.toggle_favourite(&ToggleFavouriteOptions {
             staff_id: Some(staff_id),
             ..Default::default()
         })
@@ -174,8 +189,8 @@ impl CommonEndpoint {
     pub async fn favourite_studio(
         &self,
         studio_id: i32,
-    ) -> Result<ToggleFavouriteResponse, AniListError> {
-        self.toggle_favourite(ToggleFavouriteOptions {
+    ) -> Result<Favourites, AniListError> {
+        self.toggle_favourite(&ToggleFavouriteOptions {
             studio_id: Some(studio_id),
             ..Default::default()
         })

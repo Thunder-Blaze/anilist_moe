@@ -1,7 +1,8 @@
 use crate::enums::media::MediaType;
 use crate::enums::review::ReviewSort;
 use crate::errors::AniListError;
-use crate::objects::responses::{ReviewListResponse, ReviewSingleResponse};
+use crate::objects::responses::{DeleteReviewResponse, GraphQLResponse, Page};
+use crate::objects::review::Review;
 use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
 use serde_json::json;
@@ -9,7 +10,7 @@ use serde_with::skip_serializing_none;
 
 /// Options for fetching reviews.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchReviewOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -26,7 +27,7 @@ pub struct FetchReviewOptions {
 
 /// Options for creating or updating a review.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct SaveReviewOptions {
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]
@@ -38,13 +39,13 @@ pub struct SaveReviewOptions {
 }
 
 /// Options for deleting a review.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteReviewOptions {
     pub id: i32,
 }
 
 /// Options for rating a review.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct RateReviewOptions {
     #[serde(rename = "reviewId")]
     pub review_id: i32,
@@ -63,42 +64,58 @@ impl ReviewEndpoint {
 
     pub async fn fetch(
         &self,
-        options: FetchReviewOptions,
-    ) -> Result<ReviewListResponse, AniListError> {
+        options: &FetchReviewOptions,
+    ) -> Result<Page<Vec<Review>>, AniListError> {
         let query = review::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<Review>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn save(
         &self,
-        options: SaveReviewOptions,
-    ) -> Result<ReviewSingleResponse, AniListError> {
+        options: &SaveReviewOptions,
+    ) -> Result<Review, AniListError> {
         let query = review::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Review>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn delete(
         &self,
-        options: DeleteReviewOptions,
-    ) -> Result<ReviewSingleResponse, AniListError> {
+        options: &DeleteReviewOptions,
+    ) -> Result<bool, AniListError> {
         let query = review::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<DeleteReviewResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.deleted),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn rate(
         &self,
-        options: RateReviewOptions,
-    ) -> Result<ReviewSingleResponse, AniListError> {
+        options: &RateReviewOptions,
+    ) -> Result<Review, AniListError> {
         let query = review::RATE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Review>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -109,8 +126,8 @@ impl ReviewEndpoint {
         media_id: i32,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<ReviewListResponse, AniListError> {
-        self.fetch(FetchReviewOptions {
+    ) -> Result<Page<Vec<Review>>, AniListError> {
+        self.fetch(&FetchReviewOptions {
             media_id: Some(media_id),
             page,
             per_page,
@@ -126,8 +143,8 @@ impl ReviewEndpoint {
         user_id: i32,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<ReviewListResponse, AniListError> {
-        self.fetch(FetchReviewOptions {
+    ) -> Result<Page<Vec<Review>>, AniListError> {
+        self.fetch(&FetchReviewOptions {
             user_id: Some(user_id),
             page,
             per_page,
@@ -142,8 +159,8 @@ impl ReviewEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<ReviewListResponse, AniListError> {
-        self.fetch(FetchReviewOptions {
+    ) -> Result<Page<Vec<Review>>, AniListError> {
+        self.fetch(&FetchReviewOptions {
             page,
             per_page,
             sort: Some(vec![ReviewSort::CreatedAtDesc]),
@@ -153,12 +170,16 @@ impl ReviewEndpoint {
     }
 
     /// Get review by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<ReviewListResponse, AniListError> {
-        self.fetch(FetchReviewOptions {
+    pub async fn get_by_id(&self, id: i32) -> Result<Review, AniListError> {
+        let response = self.fetch(&FetchReviewOptions {
             id: Some(id),
             ..Default::default()
         })
-        .await
+        .await;
+        match response {
+            Ok(res) => Ok(res.data[0].clone()),
+            Err(err) => Err(err),
+        }
     }
 
     /// Create a new review
@@ -169,8 +190,8 @@ impl ReviewEndpoint {
         summary: &str,
         body: &str,
         private: Option<bool>,
-    ) -> Result<ReviewSingleResponse, AniListError> {
-        self.save(SaveReviewOptions {
+    ) -> Result<Review, AniListError> {
+        self.save(&SaveReviewOptions {
             id: None,
             media_id,
             score: Some(score),
@@ -182,8 +203,8 @@ impl ReviewEndpoint {
     }
 
     /// Delete a review
-    pub async fn delete_review(&self, id: i32) -> Result<ReviewSingleResponse, AniListError> {
-        self.delete(DeleteReviewOptions { id }).await
+    pub async fn delete_review(&self, id: i32) -> Result<bool, AniListError> {
+        self.delete(&DeleteReviewOptions { id }).await
     }
 
     /// Rate a review
@@ -191,7 +212,7 @@ impl ReviewEndpoint {
         &self,
         review_id: i32,
         rating: i32,
-    ) -> Result<ReviewSingleResponse, AniListError> {
-        self.rate(RateReviewOptions { review_id, rating }).await
+    ) -> Result<Review, AniListError> {
+        self.rate(&RateReviewOptions { review_id, rating }).await
     }
 }

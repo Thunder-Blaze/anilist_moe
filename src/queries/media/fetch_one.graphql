@@ -256,6 +256,31 @@ query (
                 }
             }
         }
+        mediaListEntry {
+            id
+            status
+            score
+            progress
+            progressVolumes
+            repeat
+            priority
+            notes
+            hiddenFromStatusLists
+            customLists
+            advancedScores
+            startedAt {
+                year
+                month
+                day
+            }
+            completedAt {
+                year
+                month
+                day
+            }
+            updatedAt
+            createdAt
+        }
         reviews(page: $reviewsPage, perPage: $reviewsPerPage, sort: RATING_DESC) @include(if: $fetchReviews) {
             pageInfo {
                 total

@@ -19,7 +19,7 @@ async fn test_fetch_recommendations() {
         ..Default::default()
     };
 
-    let result = client.recommendation().fetch(options).await;
+    let result = client.recommendation().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching recommendations: {:?}", e);
     }
@@ -31,7 +31,7 @@ async fn test_fetch_recommendations() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let recommendations = &response.data.page.data.recommendations;
+    let recommendations = &response.data;
     assert!(
         !recommendations.is_empty(),
         "Should return at least one recommendation"
@@ -47,7 +47,7 @@ async fn test_fetch_recommendations_by_media() {
         ..Default::default()
     };
 
-    let result = client.recommendation().fetch(options).await;
+    let result = client.recommendation().fetch(&options).await;
     assert!(
         result.is_ok(),
         "Should successfully fetch recommendations by media"
@@ -55,7 +55,7 @@ async fn test_fetch_recommendations_by_media() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let recommendations = &response.data.page.data.recommendations;
+    let recommendations = &response.data;
     if !recommendations.is_empty() {
         let first_rec = &recommendations[0];
         assert!(first_rec.id > 0, "Recommendation should have a positive ID");
@@ -70,12 +70,12 @@ async fn test_recommendation_data_types() {
         ..Default::default()
     };
 
-    let result = client.recommendation().fetch(options).await;
+    let result = client.recommendation().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch recommendations");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let recommendations = &response.data.page.data.recommendations;
+    let recommendations = &response.data;
 
     if !recommendations.is_empty() {
         let rec = &recommendations[0];
@@ -97,16 +97,13 @@ async fn test_save_recommendation() {
         rating: 1, // 1 = upvote, -1 = downvote
     };
 
-    let result = client.recommendation().save(options).await;
+    let result = client.recommendation().save(&options).await;
 
     match result {
         Ok(response) => {
             info!("Save Response: {:?}", response);
             println!("Successfully saved recommendation");
-            let recs = &response.data.page.data.recommendations;
-            if let Some(rec) = recs.first() {
-                println!("Recommendation ID: {}", rec.id);
-            }
+            println!("Recommendation ID: {}", response.id);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);

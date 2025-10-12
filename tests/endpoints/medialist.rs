@@ -21,7 +21,7 @@ async fn test_fetch_media_list() {
         ..Default::default()
     };
 
-    let result = client.medialist().fetch(options).await;
+    let result = client.medialist().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching media list: {:?}", e);
     }
@@ -33,7 +33,7 @@ async fn test_fetch_media_list() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let lists = &response.data.page.data.media_list;
+    let lists = &response.data;
     assert!(
         !lists.is_empty(),
         "Should return at least one media list entry"
@@ -50,7 +50,7 @@ async fn test_fetch_media_list_by_media() {
         ..Default::default()
     };
 
-    let result = client.medialist().fetch(options).await;
+    let result = client.medialist().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching media list by media: {:?}", e);
     }
@@ -62,7 +62,7 @@ async fn test_fetch_media_list_by_media() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let lists = &response.data.page.data.media_list;
+    let lists = &response.data;
     if !lists.is_empty() {
         let first_entry = &lists[0];
         assert!(
@@ -81,12 +81,12 @@ async fn test_media_list_data_types() {
         ..Default::default()
     };
 
-    let result = client.medialist().fetch(options).await;
+    let result = client.medialist().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch media list");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let lists = &response.data.page.data.media_list;
+    let lists = &response.data;
 
     if !lists.is_empty() {
         let entry = &lists[0];
@@ -108,13 +108,13 @@ async fn test_save_media_list() {
         ..Default::default()
     };
 
-    let result = client.medialist().save(options).await;
+    let result = client.medialist().save(&options).await;
 
     match result {
         Ok(response) => {
             println!(
                 "Successfully saved media list entry with ID: {}",
-                response.data.save_media_list_entry.id
+                response.id
             );
         }
         Err(e) => {
@@ -134,7 +134,7 @@ async fn test_save_multiple_media_lists() {
         ..Default::default()
     };
 
-    let result = client.medialist().save_multiple(options).await;
+    let result = client.medialist().save_multiple(&options).await;
 
     match result {
         Ok(responses) => {
@@ -142,7 +142,7 @@ async fn test_save_multiple_media_lists() {
             for response in responses {
                 println!(
                     "Updated entry ID: {}",
-                    response.data.save_media_list_entry.id
+                    response.id
                 );
             }
         }
@@ -163,19 +163,20 @@ async fn test_delete_media_list() {
         ..Default::default()
     };
 
-    if let Ok(response) = client.medialist().save(save_options).await {
-        let entry_id = response.data.save_media_list_entry.id;
+    if let Ok(response) = client.medialist().save(&save_options).await {
+        let entry_id = response.id;
 
         let delete_options = DeleteMediaListOptions { id: entry_id };
 
-        let result = client.medialist().delete(delete_options).await;
+        let result = client.medialist().delete(&delete_options).await;
 
         match result {
             Ok(response) => {
-                println!(
-                    "Successfully deleted media list entry: {}",
-                    response.data.deleted
-                );
+                if response == true {
+                    println!("Successfully deleted media list entry");
+                } else {
+                    println!("Failed to delete media list entry");
+                }
             }
             Err(e) => {
                 println!("Expected authentication error or permission issue: {:?}", e);

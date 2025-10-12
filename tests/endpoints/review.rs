@@ -19,7 +19,7 @@ async fn test_fetch_reviews() {
         ..Default::default()
     };
 
-    let result = client.review().fetch(options).await;
+    let result = client.review().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching reviews: {:?}", e);
     }
@@ -31,7 +31,7 @@ async fn test_fetch_reviews() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let reviews = &response.data.page.data.reviews;
+    let reviews = &response.data;
     assert!(!reviews.is_empty(), "Should return at least one review");
 }
 
@@ -44,12 +44,12 @@ async fn test_fetch_reviews_by_media() {
         ..Default::default()
     };
 
-    let result = client.review().fetch(options).await;
+    let result = client.review().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch reviews by media");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let reviews = &response.data.page.data.reviews;
+    let reviews = &response.data;
     if !reviews.is_empty() {
         let first_review = &reviews[0];
         assert!(first_review.id > 0, "Review should have a positive ID");
@@ -64,12 +64,12 @@ async fn test_review_data_types() {
         ..Default::default()
     };
 
-    let result = client.review().fetch(options).await;
+    let result = client.review().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch reviews");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let reviews = &response.data.page.data.reviews;
+    let reviews = &response.data;
 
     if !reviews.is_empty() {
         let review = &reviews[0];
@@ -94,14 +94,14 @@ async fn test_save_review() {
         id: None,
     };
 
-    let result = client.review().save(options).await;
+    let result = client.review().save(&options).await;
 
     match result {
         Ok(response) => {
             info!("Save Response: {:?}", response);
             println!(
                 "Successfully saved review with ID: {}",
-                response.data.review.id
+                response.id
             );
         }
         Err(e) => {
@@ -120,8 +120,8 @@ async fn test_rate_review() {
         ..Default::default()
     };
 
-    if let Ok(response) = client.review().fetch(fetch_options).await {
-        let reviews = &response.data.page.data.reviews;
+    if let Ok(response) = client.review().fetch(&fetch_options).await {
+        let reviews = &response.data;
         if !reviews.is_empty() {
             let review_id = reviews[0].id;
 
@@ -130,7 +130,7 @@ async fn test_rate_review() {
                 rating: 1, // 1 = upvote, 0 = no vote, -1 = downvote
             };
 
-            let result = client.review().rate(rate_options).await;
+            let result = client.review().rate(&rate_options).await;
 
             match result {
                 Ok(_) => {
@@ -140,7 +140,7 @@ async fn test_rate_review() {
                         review_id,
                         rating: 0,
                     };
-                    let _ = client.review().rate(reset_options).await;
+                    let _ = client.review().rate(&reset_options).await;
                 }
                 Err(e) => {
                     println!("Expected authentication error or permission issue: {:?}", e);
@@ -164,12 +164,12 @@ async fn test_delete_review() {
         id: None,
     };
 
-    if let Ok(response) = client.review().save(save_options).await {
-        let review_id = response.data.review.id;
+    if let Ok(response) = client.review().save(&save_options).await {
+        let review_id = response.id;
 
         let delete_options = DeleteReviewOptions { id: review_id };
 
-        let result = client.review().delete(delete_options).await;
+        let result = client.review().delete(&delete_options).await;
 
         match result {
             Ok(_) => {

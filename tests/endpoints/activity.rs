@@ -1,6 +1,6 @@
 //! Tests for Activity endpoint
 
-use anilist_moe::{AniListClient, endpoints::activity::*};
+use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion, AniListClient};
 use dotenv::dotenv;
 use log::info;
 use std::env;
@@ -19,7 +19,7 @@ async fn test_fetch_activities() {
         ..Default::default()
     };
 
-    let result = client.activity().fetch(options).await;
+    let result = client.activity().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching activities: {:?}", e);
     }
@@ -31,7 +31,7 @@ async fn test_fetch_activities() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let activities = &response.data.page.data.activities;
+    let activities = &response.data;
     println!("Fetched {} activities", activities.len());
 }
 
@@ -44,14 +44,14 @@ async fn test_fetch_activities_by_user() {
         ..Default::default()
     };
 
-    let result = client.activity().fetch(options).await;
+    let result = client.activity().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching activities by user: {:?}", e);
     }
     if result.is_ok() {
         let response = result.unwrap();
         info!("Response: {:?}", response);
-        let activities = &response.data.page.data.activities;
+        let activities = &response.data;
         println!("Fetched {} activities for user", activities.len());
     }
 }
@@ -70,7 +70,7 @@ async fn test_text_activity_full_lifecycle() {
         locked: None,
     };
 
-    let create_result = client.activity().save_text_activity(save_options).await;
+    let create_result = client.activity().save_text_activity(&save_options).await;
     if let Err(ref e) = create_result {
         println!("Failed to create activity: {:?}", e);
         return;
@@ -78,7 +78,7 @@ async fn test_text_activity_full_lifecycle() {
 
     let create_response = create_result.unwrap();
     info!("Create Response: {:?}", create_response);
-    let activity_id = match &create_response.data.save_text_activity {
+    let activity_id = match &create_response {
         anilist_moe::unions::activity::ActivityUnion::TextActivity(a) => {
             println!("✓ Created activity with ID: {}", a.id);
             a.id
@@ -97,7 +97,7 @@ async fn test_text_activity_full_lifecycle() {
         locked: None,
     };
 
-    let modify_result = client.activity().save_text_activity(modify_options).await;
+    let modify_result = client.activity().save_text_activity(&modify_options).await;
     match modify_result {
         Ok(response) => {
             info!("Modify Response: {:?}", response);
@@ -110,11 +110,11 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 3: Fetching activity...");
     let fetch_options = FetchActivityOneOptions { id: activity_id };
 
-    let fetch_result = client.activity().fetch_one(fetch_options).await;
+    let fetch_result = client.activity().fetch_one(&fetch_options).await;
     match fetch_result {
         Ok(response) => {
             info!("Fetch Response: {:?}", response);
-            match &response.data.activity {
+            match &response {
                 anilist_moe::unions::activity::ActivityUnion::TextActivity(a) => {
                     println!(
                         "✓ Fetched activity: {}",
@@ -131,7 +131,7 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 4: Deleting activity...");
     let delete_options = DeleteActivityOptions { id: activity_id };
 
-    let delete_result = client.activity().delete(delete_options).await;
+    let delete_result = client.activity().delete(&delete_options).await;
     match delete_result {
         Ok(response) => {
             info!("Delete Response: {:?}", response);
@@ -164,7 +164,7 @@ async fn test_message_activity_full_lifecycle() {
         as_mod: None,
     };
 
-    let create_result = client.activity().save_message_activity(save_options).await;
+    let create_result = client.activity().save_message_activity(&save_options).await;
     if let Err(ref e) = create_result {
         println!("Failed to create message activity: {:?}", e);
         return;
@@ -172,11 +172,12 @@ async fn test_message_activity_full_lifecycle() {
 
     let create_response = create_result.unwrap();
     info!("Create Response: {:?}", create_response);
-    let activity_id = match &create_response.data.save_message_activity {
-        a => {
+    let activity_id = match &create_response {
+        ActivityUnion::MessageActivity(a) => {
             println!("✓ Created message activity with ID: {}", a.id);
             a.id
         }
+        _ => return,
     };
 
     // Step 2: Modify the message activity
@@ -192,7 +193,7 @@ async fn test_message_activity_full_lifecycle() {
 
     let modify_result = client
         .activity()
-        .save_message_activity(modify_options)
+        .save_message_activity(&modify_options)
         .await;
     match modify_result {
         Ok(response) => {
@@ -206,11 +207,11 @@ async fn test_message_activity_full_lifecycle() {
     println!("Step 3: Fetching message activity...");
     let fetch_options = FetchActivityOneOptions { id: activity_id };
 
-    let fetch_result = client.activity().fetch_one(fetch_options).await;
+    let fetch_result = client.activity().fetch_one(&fetch_options).await;
     match fetch_result {
         Ok(response) => {
             info!("Fetch Response: {:?}", response);
-            match &response.data.activity {
+            match &response {
                 anilist_moe::unions::activity::ActivityUnion::MessageActivity(a) => {
                     println!(
                         "✓ Fetched message activity: {}",
@@ -232,7 +233,7 @@ async fn test_message_activity_full_lifecycle() {
     println!("Step 4: Deleting message activity...");
     let delete_options = DeleteActivityOptions { id: activity_id };
 
-    let delete_result = client.activity().delete(delete_options).await;
+    let delete_result = client.activity().delete(&delete_options).await;
     match delete_result {
         Ok(response) => {
             info!("Delete Response: {:?}", response);
@@ -260,7 +261,7 @@ async fn test_activity_reply() {
         id: None,
     };
 
-    let create_result = client.activity().save_reply(save_reply_options).await;
+    let create_result = client.activity().save_reply(&save_reply_options).await;
     if let Err(ref e) = create_result {
         println!("Failed to create reply: {:?}", e);
         return;
@@ -268,7 +269,7 @@ async fn test_activity_reply() {
 
     let create_response = create_result.unwrap();
     info!("Create Reply Response: {:?}", create_response);
-    let reply_id = create_response.data.save_activity_reply.id;
+    let reply_id = create_response.id;
     println!("✓ Created reply with ID: {}", reply_id);
 
     // Step 2: Modify the reply
@@ -279,7 +280,7 @@ async fn test_activity_reply() {
         activity_id,
     };
 
-    let modify_result = client.activity().save_reply(modify_reply_options).await;
+    let modify_result = client.activity().save_reply(&modify_reply_options).await;
     match modify_result {
         Ok(response) => {
             info!("Modify Reply Response: {:?}", response);
@@ -297,11 +298,11 @@ async fn test_activity_reply() {
         id: None,
     };
 
-    let fetch_result = client.activity().fetch_replies(fetch_replies_options).await;
+    let fetch_result = client.activity().fetch_replies(&fetch_replies_options).await;
     match fetch_result {
         Ok(response) => {
             info!("Fetch Replies Response: {:?}", response);
-            let replies = &response.data.page.data.activity_replies;
+            let replies = &response.data;
             let found = replies.iter().find(|r| r.id == reply_id);
             if let Some(reply) = found {
                 println!(
@@ -319,7 +320,7 @@ async fn test_activity_reply() {
     println!("Step 4: Deleting reply...");
     let delete_reply_options = DeleteActivityReplyOptions { id: reply_id };
 
-    let delete_result = client.activity().delete_reply(delete_reply_options).await;
+    let delete_result = client.activity().delete_reply(&delete_reply_options).await;
     match delete_result {
         Ok(response) => {
             info!("Delete Reply Response: {:?}", response);

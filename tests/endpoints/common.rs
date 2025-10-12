@@ -23,13 +23,13 @@ async fn test_toggle_like() {
         like_type: LikeableType::Activity,
     };
 
-    let result = client.common().toggle_like(options).await;
+    let result = client.common().toggle_like(&options).await;
 
     match result {
         Ok(response) => {
             info!("Response: {:?}", response);
             println!("Successfully toggled like on item");
-            println!("Response data: {:?}", response.data.toggle_like_v2);
+            println!("Response data: {:?}", response);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);
@@ -44,7 +44,7 @@ async fn test_toggle_follow() {
     // Try to follow a user
     let options = ToggleFollowOptions { user_id: 5429396 };
 
-    let result = client.common().toggle_follow(options).await;
+    let result = client.common().toggle_follow(&options).await;
 
     match result {
         Ok(response) => {
@@ -52,8 +52,8 @@ async fn test_toggle_follow() {
             println!("Successfully toggled follow");
             println!(
                 "User: {} (ID: {})",
-                response.data.toggle_follow.name.as_ref().unwrap(),
-                response.data.toggle_follow.id
+                response.name.as_ref().unwrap(),
+                response.id
             );
         }
         Err(e) => {
@@ -75,13 +75,13 @@ async fn test_toggle_favourite() {
         studio_id: None,
     };
 
-    let result = client.common().toggle_favourite(options).await;
+    let result = client.common().toggle_favourite(&options).await;
 
     match result {
         Ok(response) => {
             info!("Response: {:?}", response);
             println!("Successfully toggled favourite");
-            println!("Favourites data: {:?}", response.data.toggle_favourite);
+            println!("Favourites data: {:?}", response);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);

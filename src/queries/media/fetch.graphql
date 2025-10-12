@@ -201,6 +201,12 @@ query MediaSearch(
                     }
                 }
             }
+            mediaListEntry {
+                id
+                status
+                score
+                progress
+            }
         }
     }
 }

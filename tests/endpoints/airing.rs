@@ -11,7 +11,7 @@ async fn test_fetch_airing_schedules() {
         ..Default::default()
     };
 
-    let result = client.airing().fetch(options).await;
+    let result = client.airing().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching airing schedules: {:?}", e);
     }
@@ -23,7 +23,7 @@ async fn test_fetch_airing_schedules() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let schedules = &response.data.page.data.airing_schedules;
+    let schedules = &response.data;
     assert!(!schedules.is_empty(), "Should return airing schedules");
 
     let first_schedule = &schedules[0];
@@ -51,7 +51,7 @@ async fn test_fetch_airing_pagination() {
         ..Default::default()
     };
 
-    let result1 = client.airing().fetch(options_page1).await;
+    let result1 = client.airing().fetch(&options_page1).await;
     if let Err(ref e) = result1 {
         eprintln!("Error fetching airing page 1: {:?}", e);
     }
@@ -67,14 +67,14 @@ async fn test_fetch_airing_pagination() {
         ..Default::default()
     };
 
-    let result2 = client.airing().fetch(options_page2).await;
+    let result2 = client.airing().fetch(&options_page2).await;
     assert!(result2.is_ok(), "Should successfully fetch page 2");
 
     let response1 = result1.unwrap();
     let response2 = result2.unwrap();
 
-    let schedules1 = &response1.data.page.data.airing_schedules;
-    let schedules2 = &response2.data.page.data.airing_schedules;
+    let schedules1 = &response1.data;
+    let schedules2 = &response2.data;
 
     let ids1: Vec<Option<i32>> = schedules1.iter().map(|s| s.id).collect();
     let ids2: Vec<Option<i32>> = schedules2.iter().map(|s| s.id).collect();
@@ -89,7 +89,7 @@ async fn test_airing_data_types() {
         ..Default::default()
     };
 
-    let result = client.airing().fetch(options).await;
+    let result = client.airing().fetch(&options).await;
     if let Err(ref e) = result {
         eprintln!("Error fetching airing schedule: {:?}", e);
     }
@@ -101,7 +101,7 @@ async fn test_airing_data_types() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    if let Some(schedule) = response.data.page.data.airing_schedules.first() {
+    if let Some(schedule) = response.data.first() {
         assert!(
             schedule.id.is_some() && schedule.id.unwrap() > 0,
             "ID should be positive"

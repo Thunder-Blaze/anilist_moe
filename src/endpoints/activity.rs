@@ -1,10 +1,11 @@
 use crate::enums::activity::{ActivitySort, ActivityType};
 use crate::errors::AniListError;
+use crate::objects::activity::{ActivityReply, MessageActivity, TextActivity};
+use crate::objects::common::Deleted;
 use crate::objects::responses::{
-    ActivityListResponse, ActivityReplyListResponse, ActivitySingleResponse,
-    DeleteActivityReplyResponse, DeleteActivityResponse, SaveActivityReplyResponse,
-    SaveMessageActivityResponse, SaveTextActivityResponse,
+    GraphQLResponse, Page
 };
+use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
 use serde_json::json;
@@ -12,7 +13,7 @@ use serde_with::skip_serializing_none;
 
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchActivityOptions {
     // # Pagination
     #[serde(rename = "page")]
@@ -80,14 +81,14 @@ pub struct FetchActivityOptions {
 }
 
 /// Options for fetching a single activity by ID.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchActivityOneOptions {
     pub id: i32,
 }
 
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
     #[serde(rename = "page")]
@@ -103,26 +104,26 @@ pub struct FetchActivityRepliesOptions {
 }
 
 /// Options for deleting an activity.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteActivityOptions {
     pub id: i32,
 }
 
 /// Options for deleting an activity reply.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteActivityReplyOptions {
     pub id: i32,
 }
 
 /// Options for pinning or unpinning an activity.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct PinActivityOptions {
     pub id: i32,
     pub pinned: bool,
 }
 
 /// Options for subscribing or unsubscribing to an activity.
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct SubscribeActivityOptions {
     pub id: i32,
     pub subscribe: bool,
@@ -130,7 +131,7 @@ pub struct SubscribeActivityOptions {
 
 /// Options for saving a message activity.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct SaveMessageActivityOptions {
     pub id: Option<i32>,
     pub message: String,
@@ -143,7 +144,7 @@ pub struct SaveMessageActivityOptions {
 
 /// Options for saving a text activity.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct SaveTextActivityOptions {
     pub id: Option<i32>,
     pub text: String,
@@ -152,7 +153,7 @@ pub struct SaveTextActivityOptions {
 
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct SaveActivityReplyOptions {
     pub id: Option<i32>,
     pub text: String,
@@ -172,102 +173,142 @@ impl ActivityEndpoint {
 
     pub async fn fetch(
         &self,
-        options: FetchActivityOptions,
-    ) -> Result<ActivityListResponse, AniListError> {
+        options: &FetchActivityOptions,
+    ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
         let query = activity::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<ActivityUnion>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn fetch_one(
         &self,
-        options: FetchActivityOneOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+        options: &FetchActivityOneOptions,
+    ) -> Result<ActivityUnion, AniListError> {
         let query = activity::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> =self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn fetch_replies(
         &self,
-        options: FetchActivityRepliesOptions,
-    ) -> Result<ActivityReplyListResponse, AniListError> {
+        options: &FetchActivityRepliesOptions,
+    ) -> Result<Page<Vec<ActivityReply>>, AniListError> {
         let query = activity::FETCH_REPLIES;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<ActivityReply>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn delete(
         &self,
-        options: DeleteActivityOptions,
-    ) -> Result<DeleteActivityResponse, AniListError> {
+        options: &DeleteActivityOptions,
+    ) -> Result<bool, AniListError> {
         let query = activity::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn delete_reply(
         &self,
-        options: DeleteActivityReplyOptions,
-    ) -> Result<DeleteActivityReplyResponse, AniListError> {
+        options: &DeleteActivityReplyOptions,
+    ) -> Result<bool, AniListError> {
         let query = activity::DELETE_REPLY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn pin(
         &self,
-        options: PinActivityOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+        options: &PinActivityOptions,
+    ) -> Result<ActivityUnion, AniListError> {
         let query = activity::PIN;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn subscribe(
         &self,
-        options: SubscribeActivityOptions,
-    ) -> Result<ActivitySingleResponse, AniListError> {
+        options: &SubscribeActivityOptions,
+    ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SUBSCRIBE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn save_message_activity(
         &self,
-        options: SaveMessageActivityOptions,
-    ) -> Result<SaveMessageActivityResponse, AniListError> {
+        options: &SaveMessageActivityOptions,
+    ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<MessageActivity>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(ActivityUnion::MessageActivity(res.data)),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn save_text_activity(
         &self,
-        options: SaveTextActivityOptions,
-    ) -> Result<SaveTextActivityResponse, AniListError> {
+        options: &SaveTextActivityOptions,
+    ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<TextActivity>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(ActivityUnion::TextActivity(res.data)),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn save_reply(
         &self,
-        options: SaveActivityReplyOptions,
-    ) -> Result<SaveActivityReplyResponse, AniListError> {
+        options: &SaveActivityReplyOptions,
+    ) -> Result<ActivityReply, AniListError> {
         let query = activity::SAVE_REPLY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<ActivityReply>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -277,8 +318,8 @@ impl ActivityEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<ActivityListResponse, AniListError> {
-        self.fetch(FetchActivityOptions {
+    ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
+        self.fetch(&FetchActivityOptions {
             page,
             per_page,
             sort: Some(vec![ActivitySort::IdDesc]),
@@ -292,8 +333,8 @@ impl ActivityEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<ActivityListResponse, AniListError> {
-        self.fetch(FetchActivityOptions {
+    ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
+        self.fetch(&FetchActivityOptions {
             is_following: Some(true),
             page,
             per_page,
@@ -304,16 +345,16 @@ impl ActivityEndpoint {
     }
 
     /// Get activity by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<ActivitySingleResponse, AniListError> {
-        self.fetch_one(FetchActivityOneOptions { id }).await
+    pub async fn get_by_id(&self, id: i32) -> Result<ActivityUnion, AniListError> {
+        self.fetch_one(&FetchActivityOneOptions { id }).await
     }
 
     /// Create a text activity
     pub async fn create_text_activity(
         &self,
         text: &str,
-    ) -> Result<SaveTextActivityResponse, AniListError> {
-        self.save_text_activity(SaveTextActivityOptions {
+    ) -> Result<ActivityUnion, AniListError> {
+        self.save_text_activity(&SaveTextActivityOptions {
             id: None,
             text: text.to_string(),
             locked: None,
@@ -327,8 +368,8 @@ impl ActivityEndpoint {
         recipient_id: i32,
         message: &str,
         private: Option<bool>,
-    ) -> Result<SaveMessageActivityResponse, AniListError> {
-        self.save_message_activity(SaveMessageActivityOptions {
+    ) -> Result<ActivityUnion, AniListError> {
+        self.save_message_activity(&SaveMessageActivityOptions {
             id: None,
             message: message.to_string(),
             recipient_id,
@@ -344,8 +385,8 @@ impl ActivityEndpoint {
         &self,
         activity_id: i32,
         text: &str,
-    ) -> Result<SaveActivityReplyResponse, AniListError> {
-        self.save_reply(SaveActivityReplyOptions {
+    ) -> Result<ActivityReply, AniListError> {
+        self.save_reply(&SaveActivityReplyOptions {
             id: None,
             text: text.to_string(),
             activity_id,
@@ -354,16 +395,16 @@ impl ActivityEndpoint {
     }
 
     /// Delete an activity
-    pub async fn delete_activity(&self, id: i32) -> Result<DeleteActivityResponse, AniListError> {
-        self.delete(DeleteActivityOptions { id }).await
+    pub async fn delete_activity(&self, id: i32) -> Result<bool, AniListError> {
+        self.delete(&DeleteActivityOptions { id }).await
     }
 
     /// Delete an activity reply
     pub async fn delete_activity_reply(
         &self,
         id: i32,
-    ) -> Result<DeleteActivityReplyResponse, AniListError> {
-        self.delete_reply(DeleteActivityReplyOptions { id }).await
+    ) -> Result<bool, AniListError> {
+        self.delete_reply(&DeleteActivityReplyOptions { id }).await
     }
 
     /// Toggle activity subscription
@@ -371,8 +412,8 @@ impl ActivityEndpoint {
         &self,
         id: i32,
         subscribe: bool,
-    ) -> Result<ActivitySingleResponse, AniListError> {
-        self.subscribe(SubscribeActivityOptions { id, subscribe })
+    ) -> Result<ActivityUnion, AniListError> {
+        self.subscribe(&SubscribeActivityOptions { id, subscribe })
             .await
     }
 
@@ -381,7 +422,7 @@ impl ActivityEndpoint {
         &self,
         id: i32,
         pinned: bool,
-    ) -> Result<ActivitySingleResponse, AniListError> {
-        self.pin(PinActivityOptions { id, pinned }).await
+    ) -> Result<ActivityUnion, AniListError> {
+        self.pin(&PinActivityOptions { id, pinned }).await
     }
 }

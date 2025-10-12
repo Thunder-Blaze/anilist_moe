@@ -19,14 +19,14 @@ async fn test_fetch_notifications() {
         ..Default::default()
     };
 
-    let result = client.notification().fetch(options).await;
+    let result = client.notification().fetch(&options).await;
 
     // Notifications require authentication
     match result {
         Ok(response) => {
             info!("Response: {:?}", response);
             println!("Successfully fetched notifications");
-            let notifications = &response.data.page.data.notifications;
+            let notifications = &response.data;
             println!("Number of notifications: {}", notifications.len());
         }
         Err(e) => {
@@ -46,11 +46,11 @@ async fn test_notification_data_types() {
         ..Default::default()
     };
 
-    let result = client.notification().fetch(options).await;
+    let result = client.notification().fetch(&options).await;
 
     if let Ok(response) = result {
         println!("Response: {:?}", response);
-        let notifications = &response.data.page.data.notifications;
+        let notifications = &response.data;
         if !notifications.is_empty() {
             let notification_id = match &notifications[0] {
                 anilist_moe::unions::notification::NotificationUnion::Airing(n) => n.id,

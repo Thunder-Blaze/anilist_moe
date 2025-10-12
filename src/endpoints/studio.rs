@@ -1,6 +1,7 @@
 use crate::enums::studio::StudioSort;
 use crate::errors::AniListError;
-use crate::objects::responses::{StudioListResponse, StudioSingleResponse};
+use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::studio::Studio;
 use crate::{client::AniListClient, queries::studio};
 use serde::Serialize;
 use serde_json::json;
@@ -8,7 +9,7 @@ use serde_with::skip_serializing_none;
 
 /// Options for fetching studios.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchStudioOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -26,7 +27,7 @@ pub struct FetchStudioOptions {
 
 /// Options for fetching a single studio by ID.
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchStudioOneOptions {
     pub id: Option<i32>,
     pub search: Option<String>,
@@ -56,22 +57,30 @@ impl StudioEndpoint {
 
     pub async fn fetch(
         &self,
-        options: FetchStudioOptions,
-    ) -> Result<StudioListResponse, AniListError> {
+        options: &FetchStudioOptions,
+    ) -> Result<Page<Vec<Studio>>, AniListError> {
         let query = studio::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<Studio>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn fetch_one(
         &self,
-        options: FetchStudioOneOptions,
-    ) -> Result<StudioSingleResponse, AniListError> {
+        options: &FetchStudioOneOptions,
+    ) -> Result<Studio, AniListError> {
         let query = studio::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Studio>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     // Convenience functions
@@ -81,8 +90,8 @@ impl StudioEndpoint {
         &self,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<StudioListResponse, AniListError> {
-        self.fetch(FetchStudioOptions {
+    ) -> Result<Page<Vec<Studio>>, AniListError> {
+        self.fetch(&FetchStudioOptions {
             page,
             per_page,
             sort: Some(vec![StudioSort::FavouritesDesc]),
@@ -97,8 +106,8 @@ impl StudioEndpoint {
         query: &str,
         page: Option<i32>,
         per_page: Option<i32>,
-    ) -> Result<StudioListResponse, AniListError> {
-        self.fetch(FetchStudioOptions {
+    ) -> Result<Page<Vec<Studio>>, AniListError> {
+        self.fetch(&FetchStudioOptions {
             search: Some(query.to_string()),
             page,
             per_page,
@@ -109,8 +118,8 @@ impl StudioEndpoint {
     }
 
     /// Get studio by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<StudioSingleResponse, AniListError> {
-        self.fetch_one(FetchStudioOneOptions {
+    pub async fn get_by_id(&self, id: i32) -> Result<Studio, AniListError> {
+        self.fetch_one(&FetchStudioOneOptions {
             id: Some(id),
             ..Default::default()
         })

@@ -11,12 +11,12 @@ async fn test_fetch_staff_by_search() {
         ..Default::default()
     };
 
-    let result = client.staff().fetch(options).await;
+    let result = client.staff().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch staff");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let staff_list = &response.data.page.data.staff;
+    let staff_list = &response.data;
     assert!(
         !staff_list.is_empty(),
         "Should return at least one staff member"
@@ -35,12 +35,12 @@ async fn test_fetch_staff_by_id() {
         ..Default::default()
     };
 
-    let result = client.staff().fetch(options).await;
+    let result = client.staff().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch staff by ID");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let staff_list = &response.data.page.data.staff;
+    let staff_list = &response.data;
     assert_eq!(
         staff_list.len(),
         1,
@@ -57,12 +57,12 @@ async fn test_fetch_one_staff() {
         ..Default::default()
     };
 
-    let result = client.staff().fetch_one(options).await;
+    let result = client.staff().fetch_one(&options).await;
     assert!(result.is_ok(), "Should successfully fetch one staff");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let staff = &response.data.staff;
+    let staff = &response;
     assert_eq!(staff.id, 95269, "Should return correct staff ID");
 }
 
@@ -74,12 +74,12 @@ async fn test_staff_data_types() {
         ..Default::default()
     };
 
-    let result = client.staff().fetch(options).await;
+    let result = client.staff().fetch(&options).await;
     assert!(result.is_ok(), "Should successfully fetch staff");
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    let staff = &response.data.page.data.staff[0];
+    let staff = &response.data[0];
 
     assert!(staff.id > 0, "ID should be positive");
 
