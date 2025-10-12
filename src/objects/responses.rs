@@ -15,11 +15,11 @@ use crate::objects::user::{User, UserAvatar};
 use crate::unions::activity::ActivityUnion;
 use crate::unions::likeable::LikeableUnion;
 use crate::unions::notification::NotificationUnion;
-use serde::{Deserialize, Serialize};
 use serde::de::{self, Deserializer, MapAccess, Visitor};
+use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use std::fmt;
 use std::marker::PhantomData;
-use serde_with::skip_serializing_none;
 
 /// Top-level GraphQL response wrapper
 #[skip_serializing_none]
@@ -345,7 +345,6 @@ pub struct DeleteActivityData {
     pub deleted: DeletedResponse,
 }
 
-
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -454,9 +453,6 @@ pub type SaveThreadCommentResponse = GraphQLResponse<SaveThreadCommentData>;
 pub type DeleteThreadCommentResponse = GraphQLResponse<DeleteThreadCommentData>;
 pub type ToggleThreadSubscriptionResponse = GraphQLResponse<ToggleThreadSubscriptionData>;
 
-
-
-
 // The high-performance custom deserialization logic
 impl<'de, T> Deserialize<'de> for Page<T>
 where
@@ -554,8 +550,9 @@ where
                 A: MapAccess<'de>,
             {
                 // 1. Ignore the key of the single inner field.
-                map.next_key::<de::IgnoredAny>()?
-                    .ok_or_else(|| de::Error::custom("expected a single data field, but the object was empty"))?;
+                map.next_key::<de::IgnoredAny>()?.ok_or_else(|| {
+                    de::Error::custom("expected a single data field, but the object was empty")
+                })?;
 
                 // 2. Deserialize the value directly into our final T.
                 let data: T = map.next_value()?;
@@ -594,10 +591,14 @@ where
                 A: MapAccess<'de>,
             {
                 // 1. Expect the outer key to be "data".
-                let key = map.next_key::<String>()?
-                    .ok_or_else(|| de::Error::custom("expected field 'data', but object was empty"))?;
+                let key = map.next_key::<String>()?.ok_or_else(|| {
+                    de::Error::custom("expected field 'data', but object was empty")
+                })?;
                 if key != "data" {
-                    return Err(de::Error::invalid_value(de::Unexpected::Str(&key), &"the field 'data'"));
+                    return Err(de::Error::invalid_value(
+                        de::Unexpected::Str(&key),
+                        &"the field 'data'",
+                    ));
                 }
 
                 // 2. Deserialize the value using the custom logic we defined for InnerData.

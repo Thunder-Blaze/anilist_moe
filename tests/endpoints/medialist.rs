@@ -140,10 +140,7 @@ async fn test_save_multiple_media_lists() {
         Ok(responses) => {
             println!("Successfully saved {} media list entries", responses.len());
             for response in responses {
-                println!(
-                    "Updated entry ID: {}",
-                    response.id
-                );
+                println!("Updated entry ID: {}", response.id);
             }
         }
         Err(e) => {

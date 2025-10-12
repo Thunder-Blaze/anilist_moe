@@ -2,9 +2,7 @@ use crate::enums::activity::{ActivitySort, ActivityType};
 use crate::errors::AniListError;
 use crate::objects::activity::{ActivityReply, MessageActivity, TextActivity};
 use crate::objects::common::Deleted;
-use crate::objects::responses::{
-    GraphQLResponse, Page
-};
+use crate::objects::responses::{GraphQLResponse, Page};
 use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
@@ -178,7 +176,8 @@ impl ActivityEndpoint {
         let query = activity::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<ActivityUnion>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<ActivityUnion>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -192,7 +191,8 @@ impl ActivityEndpoint {
         let query = activity::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> =self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -206,21 +206,20 @@ impl ActivityEndpoint {
         let query = activity::FETCH_REPLIES;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<ActivityReply>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<ActivityReply>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn delete(
-        &self,
-        options: &DeleteActivityOptions,
-    ) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: &DeleteActivityOptions) -> Result<bool, AniListError> {
         let query = activity::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Deleted>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -234,21 +233,20 @@ impl ActivityEndpoint {
         let query = activity::DELETE_REPLY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Deleted>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn pin(
-        &self,
-        options: &PinActivityOptions,
-    ) -> Result<ActivityUnion, AniListError> {
+    pub async fn pin(&self, options: &PinActivityOptions) -> Result<ActivityUnion, AniListError> {
         let query = activity::PIN;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -262,7 +260,8 @@ impl ActivityEndpoint {
         let query = activity::SUBSCRIBE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<ActivityUnion>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -276,7 +275,8 @@ impl ActivityEndpoint {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<MessageActivity>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<MessageActivity>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(ActivityUnion::MessageActivity(res.data)),
             Err(err) => Err(err),
@@ -290,7 +290,8 @@ impl ActivityEndpoint {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<TextActivity>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<TextActivity>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(ActivityUnion::TextActivity(res.data)),
             Err(err) => Err(err),
@@ -304,7 +305,8 @@ impl ActivityEndpoint {
         let query = activity::SAVE_REPLY;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ActivityReply>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<ActivityReply>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -350,10 +352,7 @@ impl ActivityEndpoint {
     }
 
     /// Create a text activity
-    pub async fn create_text_activity(
-        &self,
-        text: &str,
-    ) -> Result<ActivityUnion, AniListError> {
+    pub async fn create_text_activity(&self, text: &str) -> Result<ActivityUnion, AniListError> {
         self.save_text_activity(&SaveTextActivityOptions {
             id: None,
             text: text.to_string(),
@@ -400,10 +399,7 @@ impl ActivityEndpoint {
     }
 
     /// Delete an activity reply
-    pub async fn delete_activity_reply(
-        &self,
-        id: i32,
-    ) -> Result<bool, AniListError> {
+    pub async fn delete_activity_reply(&self, id: i32) -> Result<bool, AniListError> {
         self.delete_reply(&DeleteActivityReplyOptions { id }).await
     }
 
@@ -418,11 +414,7 @@ impl ActivityEndpoint {
     }
 
     /// Toggle activity pin status
-    pub async fn toggle_pin(
-        &self,
-        id: i32,
-        pinned: bool,
-    ) -> Result<ActivityUnion, AniListError> {
+    pub async fn toggle_pin(&self, id: i32, pinned: bool) -> Result<ActivityUnion, AniListError> {
         self.pin(&PinActivityOptions { id, pinned }).await
     }
 }

@@ -1,8 +1,8 @@
+use crate::enums::airing::AiringSort;
 use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::airing};
-use crate::{enums::airing::AiringSort};
 use serde::Serialize;
 use serde_json::json;
 use serde_with::skip_serializing_none;
@@ -68,7 +68,8 @@ impl AiringEndpoint {
         let query = airing::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<AiringSchedule>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<AiringSchedule>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),

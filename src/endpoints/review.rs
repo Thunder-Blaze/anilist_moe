@@ -69,49 +69,44 @@ impl ReviewEndpoint {
         let query = review::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Review>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<Review>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn save(
-        &self,
-        options: &SaveReviewOptions,
-    ) -> Result<Review, AniListError> {
+    pub async fn save(&self, options: &SaveReviewOptions) -> Result<Review, AniListError> {
         let query = review::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Review>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Review>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn delete(
-        &self,
-        options: &DeleteReviewOptions,
-    ) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: &DeleteReviewOptions) -> Result<bool, AniListError> {
         let query = review::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<DeleteReviewResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<DeleteReviewResponse, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.deleted),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn rate(
-        &self,
-        options: &RateReviewOptions,
-    ) -> Result<Review, AniListError> {
+    pub async fn rate(&self, options: &RateReviewOptions) -> Result<Review, AniListError> {
         let query = review::RATE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Review>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Review>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -171,11 +166,12 @@ impl ReviewEndpoint {
 
     /// Get review by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Review, AniListError> {
-        let response = self.fetch(&FetchReviewOptions {
-            id: Some(id),
-            ..Default::default()
-        })
-        .await;
+        let response = self
+            .fetch(&FetchReviewOptions {
+                id: Some(id),
+                ..Default::default()
+            })
+            .await;
         match response {
             Ok(res) => Ok(res.data[0].clone()),
             Err(err) => Err(err),
@@ -208,11 +204,7 @@ impl ReviewEndpoint {
     }
 
     /// Rate a review
-    pub async fn rate_review(
-        &self,
-        review_id: i32,
-        rating: i32,
-    ) -> Result<Review, AniListError> {
+    pub async fn rate_review(&self, review_id: i32, rating: i32) -> Result<Review, AniListError> {
         self.rate(&RateReviewOptions { review_id, rating }).await
     }
 }

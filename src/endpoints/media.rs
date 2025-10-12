@@ -177,21 +177,20 @@ impl MediaEndpoint {
         let query = media::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Media>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<Media>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn fetch_one(
-        &self,
-        options: &FetchMediaOneOptions,
-    ) -> Result<Media, AniListError> {
+    pub async fn fetch_one(&self, options: &FetchMediaOneOptions) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Media>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Media>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),

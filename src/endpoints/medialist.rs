@@ -3,9 +3,7 @@ use crate::enums::media_list::{MediaListSort, MediaListStatus};
 use crate::errors::AniListError;
 use crate::objects::common::{Deleted, FuzzyDate};
 use crate::objects::media_list::MediaList;
-use crate::objects::responses::{
-    GraphQLResponse, Page
-};
+use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::medialist};
 use serde::Serialize;
 use serde_json::json;
@@ -132,21 +130,20 @@ impl MediaListEndpoint {
         let query = medialist::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<MediaList>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<MediaList>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn save(
-        &self,
-        options: &SaveMediaListOptions,
-    ) -> Result<MediaList, AniListError> {
+    pub async fn save(&self, options: &SaveMediaListOptions) -> Result<MediaList, AniListError> {
         let query = medialist::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<MediaList>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<MediaList>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -160,21 +157,20 @@ impl MediaListEndpoint {
         let query = medialist::SAVE_MULTIPLE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Vec<MediaList>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Vec<MediaList>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn delete(
-        &self,
-        options: &DeleteMediaListOptions,
-    ) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: &DeleteMediaListOptions) -> Result<bool, AniListError> {
         let query = medialist::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Deleted>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -416,11 +412,7 @@ impl MediaListEndpoint {
     }
 
     /// Update score for an entry
-    pub async fn update_score(
-        &self,
-        entry_id: i32,
-        score: f64,
-    ) -> Result<MediaList, AniListError> {
+    pub async fn update_score(&self, entry_id: i32, score: f64) -> Result<MediaList, AniListError> {
         self.save(&SaveMediaListOptions {
             id: Some(entry_id),
             score: Some(score),
@@ -444,10 +436,7 @@ impl MediaListEndpoint {
     }
 
     /// Delete a media list entry
-    pub async fn delete_entry(
-        &self,
-        entry_id: i32,
-    ) -> Result<bool, AniListError> {
+    pub async fn delete_entry(&self, entry_id: i32) -> Result<bool, AniListError> {
         self.delete(&DeleteMediaListOptions { id: entry_id }).await
     }
 }

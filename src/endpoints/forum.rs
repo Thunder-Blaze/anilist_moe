@@ -1,9 +1,7 @@
 use crate::enums::thread::{ThreadCommentSort, ThreadSort};
 use crate::errors::AniListError;
 use crate::objects::common::Deleted;
-use crate::objects::responses::{
-    GraphQLResponse, Page
-};
+use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::thread::{Thread, ThreadComment};
 use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
@@ -133,7 +131,8 @@ impl ForumEndpoint {
         let query = forum::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Thread>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<Thread>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -141,14 +140,12 @@ impl ForumEndpoint {
     }
 
     /// Fetch a single thread with full details
-    pub async fn fetch_one(
-        &self,
-        options: &FetchThreadOneOptions,
-    ) -> Result<Thread, AniListError> {
+    pub async fn fetch_one(&self, options: &FetchThreadOneOptions) -> Result<Thread, AniListError> {
         let query: &str = forum::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Thread>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Thread>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -163,7 +160,8 @@ impl ForumEndpoint {
         let query = forum::FETCH_COMMENT;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<ThreadComment>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<ThreadComment>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -178,7 +176,8 @@ impl ForumEndpoint {
         let query = forum::FETCH_COMMENT_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ThreadComment>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<ThreadComment>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -186,14 +185,12 @@ impl ForumEndpoint {
     }
 
     /// Create or update a thread
-    pub async fn save(
-        &self,
-        options: &SaveThreadOptions,
-    ) -> Result<Thread, AniListError> {
+    pub async fn save(&self, options: &SaveThreadOptions) -> Result<Thread, AniListError> {
         let query = forum::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Thread>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Thread>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -201,14 +198,12 @@ impl ForumEndpoint {
     }
 
     /// Delete a thread
-    pub async fn delete(
-        &self,
-        options: &DeleteThreadOptions,
-    ) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: &DeleteThreadOptions) -> Result<bool, AniListError> {
         let query = forum::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Deleted>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -223,7 +218,8 @@ impl ForumEndpoint {
         let query = forum::SAVE_COMMENT;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ThreadComment>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<ThreadComment>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -238,7 +234,8 @@ impl ForumEndpoint {
         let query = forum::DELETE_COMMENT;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Deleted>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -253,7 +250,8 @@ impl ForumEndpoint {
         let query = forum::SUBSCRIPTION;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Thread>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Thread>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -424,10 +422,7 @@ impl ForumEndpoint {
     }
 
     /// Get comment by ID
-    pub async fn get_comment_by_id(
-        &self,
-        id: i32,
-    ) -> Result<ThreadComment, AniListError> {
+    pub async fn get_comment_by_id(&self, id: i32) -> Result<ThreadComment, AniListError> {
         self.fetch_comment_one(&FetchThreadCommentOneOptions { id: Some(id) })
             .await
     }
@@ -479,18 +474,13 @@ impl ForumEndpoint {
     }
 
     /// Delete a comment
-    pub async fn delete_thread_comment(
-        &self,
-        id: i32,
-    ) -> Result<bool, AniListError> {
-        self.delete_comment(&DeleteThreadCommentOptions { id }).await
+    pub async fn delete_thread_comment(&self, id: i32) -> Result<bool, AniListError> {
+        self.delete_comment(&DeleteThreadCommentOptions { id })
+            .await
     }
 
     /// Subscribe to a thread
-    pub async fn subscribe_to_thread(
-        &self,
-        thread_id: i32,
-    ) -> Result<Thread, AniListError> {
+    pub async fn subscribe_to_thread(&self, thread_id: i32) -> Result<Thread, AniListError> {
         self.subscription(&ToggleThreadSubscriptionOptions {
             thread_id,
             subscribe: Some(true),
@@ -499,10 +489,7 @@ impl ForumEndpoint {
     }
 
     /// Unsubscribe from a thread
-    pub async fn unsubscribe_from_thread(
-        &self,
-        thread_id: i32,
-    ) -> Result<Thread, AniListError> {
+    pub async fn unsubscribe_from_thread(&self, thread_id: i32) -> Result<Thread, AniListError> {
         self.subscription(&ToggleThreadSubscriptionOptions {
             thread_id,
             subscribe: Some(false),
@@ -511,10 +498,7 @@ impl ForumEndpoint {
     }
 
     /// Toggle thread subscription
-    pub async fn toggle_thread_subscription(
-        &self,
-        thread_id: i32,
-    ) -> Result<Thread, AniListError> {
+    pub async fn toggle_thread_subscription(&self, thread_id: i32) -> Result<Thread, AniListError> {
         self.subscription(&ToggleThreadSubscriptionOptions {
             thread_id,
             subscribe: None,

@@ -1,6 +1,6 @@
 //! Tests for Activity endpoint
 
-use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion, AniListClient};
+use anilist_moe::{AniListClient, endpoints::activity::*, unions::activity::ActivityUnion};
 use dotenv::dotenv;
 use log::info;
 use std::env;
@@ -298,7 +298,10 @@ async fn test_activity_reply() {
         id: None,
     };
 
-    let fetch_result = client.activity().fetch_replies(&fetch_replies_options).await;
+    let fetch_result = client
+        .activity()
+        .fetch_replies(&fetch_replies_options)
+        .await;
     match fetch_result {
         Ok(response) => {
             info!("Fetch Replies Response: {:?}", response);

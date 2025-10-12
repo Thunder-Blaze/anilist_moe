@@ -25,7 +25,13 @@ async fn test_fetch_media_with_search() {
 
     let response = result.unwrap();
     info!("Response: {:?}", response);
-    assert!(response.page_info.as_ref().map(|p| p.current_page).is_some());
+    assert!(
+        response
+            .page_info
+            .as_ref()
+            .map(|p| p.current_page)
+            .is_some()
+    );
 
     let media_list = &response.data;
     assert!(
