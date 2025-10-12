@@ -59,21 +59,20 @@ impl CommonEndpoint {
         let query = common::TOGGLE_LIKE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<ToggleLikeResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<ToggleLikeResponse, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.toggle_like_v2),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn toggle_follow(
-        &self,
-        options: &ToggleFollowOptions,
-    ) -> Result<User, AniListError> {
+    pub async fn toggle_follow(&self, options: &ToggleFollowOptions) -> Result<User, AniListError> {
         let query = common::TOGGLE_FOLLOW;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<ToggleFollowResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<ToggleFollowResponse, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.toggle_follow),
             Err(err) => Err(err),
@@ -87,7 +86,8 @@ impl CommonEndpoint {
         let query = common::TOGGLE_FAVOURITE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<ToggleFavouriteResponse, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<ToggleFavouriteResponse, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data.toggle_favourite),
             Err(err) => Err(err),
@@ -138,10 +138,7 @@ impl CommonEndpoint {
     }
 
     /// Add or remove anime from favorites
-    pub async fn favourite_anime(
-        &self,
-        anime_id: i32,
-    ) -> Result<Favourites, AniListError> {
+    pub async fn favourite_anime(&self, anime_id: i32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&ToggleFavouriteOptions {
             anime_id: Some(anime_id),
             ..Default::default()
@@ -150,10 +147,7 @@ impl CommonEndpoint {
     }
 
     /// Add or remove manga from favorites
-    pub async fn favourite_manga(
-        &self,
-        manga_id: i32,
-    ) -> Result<Favourites, AniListError> {
+    pub async fn favourite_manga(&self, manga_id: i32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&ToggleFavouriteOptions {
             manga_id: Some(manga_id),
             ..Default::default()
@@ -162,10 +156,7 @@ impl CommonEndpoint {
     }
 
     /// Add or remove character from favorites
-    pub async fn favourite_character(
-        &self,
-        character_id: i32,
-    ) -> Result<Favourites, AniListError> {
+    pub async fn favourite_character(&self, character_id: i32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&ToggleFavouriteOptions {
             character_id: Some(character_id),
             ..Default::default()
@@ -174,10 +165,7 @@ impl CommonEndpoint {
     }
 
     /// Add or remove staff from favorites
-    pub async fn favourite_staff(
-        &self,
-        staff_id: i32,
-    ) -> Result<Favourites, AniListError> {
+    pub async fn favourite_staff(&self, staff_id: i32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&ToggleFavouriteOptions {
             staff_id: Some(staff_id),
             ..Default::default()
@@ -186,10 +174,7 @@ impl CommonEndpoint {
     }
 
     /// Add or remove studio from favorites
-    pub async fn favourite_studio(
-        &self,
-        studio_id: i32,
-    ) -> Result<Favourites, AniListError> {
+    pub async fn favourite_studio(&self, studio_id: i32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&ToggleFavouriteOptions {
             studio_id: Some(studio_id),
             ..Default::default()

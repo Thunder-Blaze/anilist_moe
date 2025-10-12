@@ -99,10 +99,7 @@ async fn test_save_review() {
     match result {
         Ok(response) => {
             info!("Save Response: {:?}", response);
-            println!(
-                "Successfully saved review with ID: {}",
-                response.id
-            );
+            println!("Successfully saved review with ID: {}", response.id);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);

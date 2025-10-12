@@ -58,7 +58,8 @@ impl RecommendationEndpoint {
         let query = recommendation::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Recommendation>>>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Page<Vec<Recommendation>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
@@ -72,7 +73,8 @@ impl RecommendationEndpoint {
         let query = recommendation::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Recommendation>, AniListError> = self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<GraphQLResponse<Recommendation>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
         match response {
             Ok(res) => Ok(res.data),
             Err(err) => Err(err),
