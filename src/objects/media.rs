@@ -141,11 +141,11 @@ pub struct MediaEdge {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaExternalLink {
-    id: i32,
-    url: Option<String>,
-    site: Option<String>,
-    site_id: Option<i32>,
-    link_type: Option<ExternalLinkType>,
+    pub id: i32,
+    pub url: Option<String>,
+    pub site: Option<String>,
+    pub site_id: Option<i32>,
+    pub link_type: Option<ExternalLinkType>,
     pub language: Option<String>,
     pub color: Option<String>,
     pub icon: Option<String>,
