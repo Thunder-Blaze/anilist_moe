@@ -9,7 +9,7 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 ## Features
 
 - **Type Safety**: Fully typed responses with proper error handling
-- **Simplified Response Format**: Clean and intuitive API responses (v0.2.2+)
+- **Simplified Response Format**: Clean and intuitive API responses (v0.3.0+)
 - **Modular Design**: Organized endpoints for all AniList features
 - **Authentication Support**: Both authenticated and unauthenticated clients
 - **Async/Await**: Built with Tokio for high-performance asynchronous operations
@@ -50,7 +50,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anilist_moe = "0.2.2"
+anilist_moe = "0.3.0"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
