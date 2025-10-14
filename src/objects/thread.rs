@@ -48,7 +48,6 @@ pub struct ThreadComment {
     pub thread_id: Option<i32>,
     pub comment: Option<String>,
     pub as_html: Option<bool>,
-
     pub like_count: Option<i32>,
     pub is_liked: Option<bool>,
     pub site_url: Option<String>,

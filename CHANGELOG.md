@@ -2,8 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## Versioning
+
+This project uses [Semantic Versioning](https://semver.org/):
+- **MAJOR** version for incompatible API changes
+- **MINOR** version for new functionality in a backwards compatible manner
+- **PATCH** version for backwards compatible bug fixes
 
 ## [Unreleased]
 
@@ -11,7 +15,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-## [0.2.0] - 2024
+### Fixed
+
+### Breaking Changes
+
+## [0.3.0] - 2024-10-14
+
+### Added
+- **Husky Pre-commit Hooks**: Added husky-rs for automated code quality checks
+  - Runs `cargo fmt --check` before commits
+  - Runs `cargo clippy -- -D warnings` before commits
+  - Ensures consistent code style and catches common issues
+
+### Changed
+- **Response Format Simplification**: Major refactoring of response types for cleaner API
+  - Removed redundant wrapper types (`PageResponse`, `ViewerResponse`, etc.)
+  - Simplified response access patterns: `response.data` instead of nested wrappers
+  - All endpoints now use `GraphQLResponse<T>` and `Page<T>` directly
+  - Example: `GraphQLResponse<Page<Vec<Media>>>` instead of `GraphQLResponse<PageResponse<MediaData>>`
+- **Common Endpoint**: Simplified return types
+  - `toggle_like()` now returns `LikeableUnion` directly instead of `ToggleLikeResponse`
+  - `toggle_follow()` now returns `User` directly instead of `ToggleFollowResponse`
+  - `toggle_favourite()` now returns `Favourites` directly instead of `ToggleFavouriteResponse`
+- **Review Endpoint**: Simplified delete operation
+  - `delete()` now returns `bool` directly
+  - Uses `Deleted` struct internally for consistency
+- **User Endpoint**: Fixed authenticated user fetch
+  - `fetch_basic()` now returns `User` directly instead of `ViewerUserData`
+  - Simplified viewer query responses
+
+### Fixed
+- **MediaExternalLink**: Made all fields public for proper access (#4 by @Nachtalb, fixed #3)
+  - Fields `id`, `url`, `site`, `type`, `language`, `color`, `icon`, and `isDisabled` are now public
+- **ListActivity**: Made `status` field public for proper access
+- **MediaConnection**: Made `edges`, `nodes`, and `page_info` fields public
+- **MediaEdge**: Made `node`, `id`, and `relation_type` fields public
+- **ThreadComment**: Removed extra blank line for code consistency
+
+### Breaking Changes
+- Response structure changed from `response.data.page.data.media` to `response.data` for paginated endpoints
+- Response wrapper types removed - direct access to data types
+- All endpoints return simplified response types
+
+## [0.2.2] - 2024-10-13
+
+### Fixed
+- **Authenticated User Fetch**: Fixed issue with fetching current authenticated user
+- Added `color` and `main_studio` fields in media fetch operations
+
+## [0.2.1] - 2024-10-13
+
+### Fixed
+- **Critical Hotfix**: Fixed authenticated user fetch functionality
+  - Resolved issue where fetching the current authenticated user would fail
+  - Updated user query to properly handle viewer context
+
+## [0.2.0] - 2024-10
 
 ### Added
 - **Type Safety**: All endpoints now return properly typed responses instead of `serde_json::Value`
@@ -155,15 +214,10 @@ let response = client.anime().get_popular_anime(Some(1), Some(10)).await?;
 - GraphQL query execution
 - Basic pagination support
 - Async/await support with tokio
+- Added Support for Synonyms (#1 By @Random-Scientist)
+- Added Basic Support for Anime Relations (#2 By @Random-Scientist)
 
 ---
-
-## Versioning
-
-This project uses [Semantic Versioning](https://semver.org/):
-- **MAJOR** version for incompatible API changes
-- **MINOR** version for new functionality in a backwards compatible manner
-- **PATCH** version for backwards compatible bug fixes
 
 ## Links
 

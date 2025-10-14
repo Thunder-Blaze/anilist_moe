@@ -2,7 +2,7 @@ use crate::enums::media::{MediaSort, MediaType};
 use crate::enums::media_list::MediaListStatus;
 use crate::enums::user::{UserSort, UserStatisticsSort};
 use crate::errors::AniListError;
-use crate::objects::responses::{GraphQLResponse, Page, ViewerUserData};
+use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::user::User;
 use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
@@ -169,9 +169,9 @@ impl UserEndpoint {
     }
 
     /// Fetch basic user information
-    pub async fn fetch_basic(&self) -> Result<ViewerUserData, AniListError> {
+    pub async fn fetch_basic(&self) -> Result<User, AniListError> {
         let query = user::BASIC;
-        let response: Result<GraphQLResponse<ViewerUserData>, AniListError> =
+        let response: Result<GraphQLResponse<User>, AniListError> =
             self.client.query_typed(query, None).await;
         match response {
             Ok(res) => Ok(res.data),

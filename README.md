@@ -9,6 +9,7 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 ## Features
 
 - **Type Safety**: Fully typed responses with proper error handling
+- **Simplified Response Format**: Clean and intuitive API responses (v0.2.2+)
 - **Modular Design**: Organized endpoints for all AniList features
 - **Authentication Support**: Both authenticated and unauthenticated clients
 - **Async/Await**: Built with Tokio for high-performance asynchronous operations
@@ -17,6 +18,7 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 - **Pagination Support**: Built-in helpers for paginated results
 - **Well Tested**: Extensive test suite covering all endpoints
 - **Convenience Functions**: Easy-to-use helper methods for common queries
+- **Code Quality**: Pre-commit hooks with Husky for consistent code style
 
 ## Supported Endpoints
 
@@ -48,7 +50,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anilist_moe = "0.2.0"
+anilist_moe = "0.2.2"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -57,7 +59,7 @@ tokio = { version = "1.0", features = ["full"] }
 ### Example 1: Get Trending Anime
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -67,10 +69,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get trending anime with proper type safety
     let response = client.anime().get_trending(Some(1), Some(10)).await?;
 
-    // Access the data with full type information
-    let anime_list = &response.data.page.data.media;
-
-    for anime in anime_list {
+    // Access the data with clean, simple structure (v0.2.2+)
+    for anime in &response.data {
         println!(
             "Title: {} - Score: {}/100",
             anime.title.as_ref().and_then(|t| t.romaji.as_ref()).unwrap_or(&"Unknown".to_string()),
@@ -85,21 +85,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Example 2: Search and Get Detailed Information
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     // Search for an anime
-    let search_results = client.anime().search("Attack on Titan", Some(1), Some(5)).await?;
+    let search_results = client.anime().search_anime("Attack on Titan", Some(1), Some(5)).await?;
 
-    if let Some(first_result) = search_results.data.page.data.media.first() {
-        // Get detailed information by ID
-        let anime_id = first_result.id;
-        let detailed = client.anime().get_by_id(anime_id).await?;
+    // Access the data - search_results is Page<Vec<Media>>
+    if let Some(first_result) = search_results.data.first() {
+        let anime_id = first_result.id.unwrap_or(0);
 
-        let anime = &detailed.data.media;
+        // Get detailed information by ID - returns just Media
+        let anime = client.anime().get_by_id(anime_id).await?;
 
         println!("Title: {}", anime.title.as_ref()
             .and_then(|t| t.romaji.as_ref())
@@ -126,32 +126,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Anime Operations
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    // Get popular anime
-    let popular = client.anime().get_popular(Some(1), Some(5)).await?;
+    // Get popular anime - returns Page<Vec<Media>>
+    let popular = client.anime().get_popular_anime(Some(1), Some(5)).await?;
+    for anime in &popular.data {
+        println!("{}", anime.title.as_ref().unwrap().romaji.as_ref().unwrap());
+    }
 
     // Get trending anime
-    let trending = client.anime().get_trending(Some(1), Some(5)).await?;
+    let trending = client.anime().get_trending_anime(Some(1), Some(5)).await?;
 
-    // Get anime by ID
+    // Get anime by ID - returns Media directly
     let anime = client.anime().get_by_id(16498).await?; // Attack on Titan
 
     // Search anime
-    let search_results = client.anime().search("Naruto", Some(1), Some(10)).await?;
+    let search_results = client.anime().search_anime("Naruto", Some(1), Some(10)).await?;
 
     // Get anime by season
-    let fall_2023 = client.anime().get_by_season("FALL", 2023, Some(1), Some(10)).await?;
+    use anilist_moe::enums::media::MediaSeason;
+    let fall_2023 = client.anime().get_by_season(MediaSeason::Fall, 2023, Some(1), Some(10)).await?;
 
     // Get top rated anime
-    let top_rated = client.anime().get_top_rated(Some(1), Some(10)).await?;
+    let top_rated = client.anime().get_top_rated_anime(Some(1), Some(10)).await?;
 
     // Get currently airing anime
-    let airing = client.anime().get_airing(Some(1), Some(10)).await?;
+    let airing = client.anime().get_airing_anime(Some(1), Some(10)).await?;
 
     Ok(())
 }
@@ -160,23 +164,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Manga Operations
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     // Get popular manga
-    let popular = client.manga().get_popular(Some(1), Some(5)).await?;
+    let popular = client.manga().get_popular_manga(Some(1), Some(5)).await?;
 
     // Search manga
-    let search_results = client.manga().search("One Piece", Some(1), Some(10)).await?;
+    let search_results = client.manga().search_manga("One Piece", Some(1), Some(10)).await?;
 
     // Get top rated manga
-    let top_rated = client.manga().get_top_rated(Some(1), Some(10)).await?;
+    let top_rated = client.manga().get_top_rated_manga(Some(1), Some(10)).await?;
 
     // Get currently releasing manga
-    let releasing = client.manga().get_releasing(Some(1), Some(10)).await?;
+    let releasing = client.manga().get_releasing_manga(Some(1), Some(10)).await?;
 
     Ok(())
 }
@@ -185,26 +189,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Character Operations
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    // Get popular characters
-    let popular = client.character().get_popular(Some(1), Some(10)).await?;
+    // Get popular characters - returns Page<Vec<Character>>
+    let popular = client.character().get_popular_characters(Some(1), Some(10)).await?;
 
-    // Get character by ID
+    // Get character by ID - returns Character directly
     let character = client.character().get_by_id(40).await?; // Luffy
 
-    // Search characters
-    let search_results = client.character().search("Luffy", Some(1), Some(10)).await?;
+    // Search characters - returns Page<Vec<Character>>
+    let search_results = client.character().search_character("Luffy", Some(1), Some(10)).await?;
 
-    // Get characters with birthday today
+    // Get characters with birthday today - returns Page<Vec<Character>>
     let birthday_chars = client.character().get_by_birthday(5, 5, Some(1), Some(10)).await?;
 
-    // Get most favorited characters
-    let most_favorited = client.character().get_most_favorited(Some(1), Some(10)).await?;
+    // Get most favorited characters - returns Page<Vec<Character>>
+    let most_favorited = client.character().get_most_favorited_characters(Some(1), Some(10)).await?;
 
     Ok(())
 }
@@ -213,26 +217,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Forum Operations
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    // Get recent threads
-    let recent = client.forum().get_recent(Some(1), Some(10)).await?;
+    // Get recent threads - returns Page<Vec<Thread>>
+    let recent = client.forum().get_recent_threads(Some(1), Some(10)).await?;
 
-    for thread in &recent.data.page.data.threads {
+    for thread in &recent.data {
         println!("Thread: {}", thread.title.as_ref().unwrap_or(&"Untitled".to_string()));
     }
 
-    // Search threads
-    let search = client.forum().search("recommendation", Some(1), Some(10)).await?;
+    // Search threads - returns Page<Vec<Thread>>
+    let search = client.forum().search_thread("recommendation", Some(1), Some(10)).await?;
 
-    // Get thread by ID
-    let thread = client.forum().get_by_id(12345).await?;
+    // Get thread by ID - returns Thread directly
+    let thread = client.forum().get_thread_by_id(12345).await?;
 
-    // Get thread comments
+    // Get thread comments - returns Page<Vec<ThreadComment>>
     let comments = client.forum().get_thread_comments(12345, Some(1), Some(20)).await?;
 
     Ok(())
@@ -244,21 +248,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 For endpoints requiring authentication:
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create an authenticated client
     let token = std::env::var("ANILIST_TOKEN")?;
-    let client = AniListClient::with_token(token);
+    let client = AniListClient::with_token(&token);
 
-    // Get current user information
+    // Get current user information - returns User directly
     let current_user = client.user().get_current_user().await?;
-    println!("Logged in as: {}", current_user.data.viewer.name);
+    println!("Logged in as: {}", current_user.name);
 
-    // Get current user's anime list
+    // Get current user's anime list - returns Page<Vec<MediaList>>
     let anime_list = client.medialist()
-        .get_user_anime_list("username", None, Some(1), Some(50))
+        .get_user_anime_list(&current_user.name, None, Some(1), Some(50))
         .await?;
 
     Ok(())
@@ -279,7 +283,7 @@ To get an access token for authentication:
 The library provides comprehensive error handling:
 
 ```rust
-use anilist_moe::{client::AniListClient, errors::AniListError};
+use anilist_moe::{AniListClient, errors::AniListError};
 
 #[tokio::main]
 async fn main() {
@@ -301,15 +305,21 @@ async fn main() {
 All responses are fully typed. No more dealing with `serde_json::Value`:
 
 ```rust
-// Fully typed response
-let response = client.anime().get_trending(Some(1), Some(10)).await?;
+// Fully typed response - Page<Vec<Media>>
+let response = client.anime().get_trending_anime(Some(1), Some(10)).await?;
 
-// Access nested data with type safety
-let anime = &response.data.page.data.media[0];
+// Access the Vec<Media> directly through response.data
+let anime = &response.data[0];
 let title = anime.title.as_ref().unwrap();
 let romaji_title = &title.romaji;
 let score = anime.average_score.unwrap_or(0);
 let genres = anime.genres.as_ref().unwrap();
+
+// Access pagination info
+if let Some(page_info) = &response.page_info {
+    println!("Current page: {:?}", page_info.current_page);
+    println!("Has next page: {:?}", page_info.has_next_page);
+}
 ```
 
 ## Data Models
@@ -350,6 +360,7 @@ The library includes comprehensive tests for:
 The AniList API has rate limiting (90 requests per minute). The client handles basic error responses, but you should implement your own rate limiting logic for production applications:
 
 ```rust
+use anilist_moe::{AniListClient, errors::AniListError};
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -358,7 +369,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     for page in 1..=10 {
-        match client.anime().get_popular(Some(page), Some(50)).await {
+        match client.anime().get_popular_anime(Some(page), Some(50)).await {
             Ok(response) => {
                 // Process response
             }
@@ -383,7 +394,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 All list endpoints support pagination:
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -393,16 +404,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let per_page = 50;
 
     loop {
-        let response = client.anime().get_popular(Some(page), Some(per_page)).await?;
-        let page_info = &response.data.page.page_info;
+        let response = client.anime().get_popular_anime(Some(page), Some(per_page)).await?;
 
-        // Process current page
-        for anime in &response.data.page.data.media {
+        // Process current page - response.data is Vec<Media>
+        for anime in &response.data {
             println!("{:?}", anime.title);
         }
 
-        // Check if there are more pages
-        if !page_info.has_next_page.unwrap_or(false) {
+        // Check pagination info
+        if let Some(page_info) = &response.page_info {
+            if !page_info.has_next_page.unwrap_or(false) {
+                break;
+            }
+        } else {
             break;
         }
 
@@ -415,27 +429,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/Thunder-Blaze/anilist_moe.git
-cd anilist_moe
-
-# Run tests
-cargo test
-
-# Run tests with output
-cargo test -- --nocapture
-
-# Check code formatting
-cargo fmt --check
-
-# Run clippy
-cargo clippy
-```
+Contributions are welcome! Please feel free to submit a Pull Request. See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 
@@ -443,22 +437,11 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Resources
 
-- [AniList API Documentation](https://anilist.gitbook.io/anilist-apiv2-docs/)
-- [AniList GraphQL Explorer](https://anilist.co/graphiql)
+- [AniList API Documentation](https://docs.anilist.co/)
+- [Apollo GraphQL Explorer](https://studio.apollographql.com/sandbox/explorer)
 - [Crates.io Package](https://crates.io/crates/anilist_moe)
 - [Documentation](https://docs.rs/anilist_moe)
 
 ## Changelog
 
-### Version 0.2.0
-
-- **Type Safety Improvements**: All endpoints now return properly typed responses instead of `serde_json::Value`
-- **Forum Endpoints**: Added full type safety for forum/thread operations
-- **Response Types**: Added comprehensive response wrapper types for all endpoints
-- **Convenience Functions**: Added 80+ convenience functions across all endpoints for easier API usage
-- **Bug Fixes**: Fixed ActivityUnion deserialization with tagged union approach
-- **Breaking Changes**: All return types have changed from `Value` to strongly typed responses
-
-### Version 0.1.0
-
-- Initial release with basic endpoint support
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.

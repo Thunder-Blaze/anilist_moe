@@ -1,27 +1,23 @@
-use crate::objects::activity::{ActivityReply, MessageActivity, TextActivity};
-use crate::objects::airing::AiringSchedule;
-use crate::objects::character::Character;
 use crate::objects::common::PageInfo;
-use crate::objects::favourites::Favourites;
-use crate::objects::media::Media;
-use crate::objects::media_list::MediaList;
-use crate::objects::recommendation::Recommendation;
-use crate::objects::review::Review;
-use crate::objects::staff::Staff;
-use crate::objects::stats::UserStatisticTypes;
-use crate::objects::studio::Studio;
-use crate::objects::thread::{Thread, ThreadComment};
-use crate::objects::user::{User, UserAvatar};
-use crate::unions::activity::ActivityUnion;
-use crate::unions::likeable::LikeableUnion;
-use crate::unions::notification::NotificationUnion;
 use serde::de::{self, Deserializer, MapAccess, Visitor};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::fmt;
 use std::marker::PhantomData;
 
-/// Top-level GraphQL response wrapper
+/// Top-level GraphQL response wrapper.
+///
+/// This struct wraps all responses from the AniList GraphQL API.
+/// The generic type `T` represents the actual data returned by the query.
+///
+/// # Type Parameters
+///
+/// * `T` - The type of data contained in the response
+///
+/// # Notes
+///
+/// This wrapper is handled internally by the client and is transparent
+/// to users in most cases. Endpoint methods return the inner `T` directly.
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -29,429 +25,52 @@ pub struct GraphQLResponse<T> {
     pub data: T,
 }
 
-/// Generic response wrapper for paginated data
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PageResponse<T> {
-    #[serde(rename = "Page")]
-    pub page: Page<T>,
-}
-
-/// Generic page structure
+/// Pagination wrapper for list responses.
+///
+/// This struct wraps paginated list responses from the AniList API.
+/// It contains pagination metadata and the actual data list.
+///
+/// # Type Parameters
+///
+/// * `T` - The type of data list (typically `Vec<SomeType>`)
+///
+/// # Fields
+///
+/// * `page_info` - Optional pagination metadata (current page, total, has_next_page, etc.)
+/// * `data` - The actual list of items returned by the query
+///
+/// # Examples
+///
+/// ```rust
+/// # use anilist_moe::AniListClient;
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let client = AniListClient::new();
+///
+/// // Returns Page<Vec<Media>>
+/// let response = client.anime().get_trending_anime(Some(1), Some(10)).await?;
+///
+/// // Access the Vec<Media> through response.data
+/// for anime in &response.data {
+///     println!("Title: {:?}", anime.title);
+/// }
+///
+/// // Access pagination info
+/// if let Some(page_info) = &response.page_info {
+///     println!("Current page: {:?}", page_info.current_page);
+///     println!("Has next page: {:?}", page_info.has_next_page);
+/// }
+/// # Ok(())
+/// # }
+/// ```
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Page<T> {
+    /// Pagination metadata including current page, total items, and whether there are more pages
     pub page_info: Option<PageInfo>,
+    /// The list of items for this page
     pub data: T,
 }
-
-/// Generic viewer response wrapper
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerResponse<T> {
-    #[serde(rename = "Viewer")]
-    pub viewer: T,
-}
-
-/// Specific response data types
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NotificationData {
-    pub notifications: Vec<NotificationUnion>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaData {
-    pub media: Vec<Media>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaListData {
-    pub media_list: Vec<MediaList>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CharacterData {
-    pub characters: Vec<Character>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct StaffData {
-    pub staff: Vec<Staff>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct StudioData {
-    pub studios: Vec<Studio>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UserData {
-    pub users: Vec<User>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivityData {
-    pub activities: Vec<ActivityUnion>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivityReplyData {
-    pub activity_replies: Vec<ActivityReply>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AiringData {
-    pub airing_schedules: Vec<AiringSchedule>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AiringScheduleResponse {
-    #[serde(rename = "AiringSchedule")]
-    pub airing_schedule: AiringSchedule,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RecommendationData {
-    pub recommendations: Vec<Recommendation>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReviewData {
-    pub reviews: Vec<Review>,
-}
-
-/// Single item response wrappers
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaResponse {
-    #[serde(rename = "Media")]
-    pub media: Media,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CharacterResponse {
-    #[serde(rename = "Character")]
-    pub character: Character,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct StaffResponse {
-    #[serde(rename = "Staff")]
-    pub staff: Staff,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct StudioResponse {
-    #[serde(rename = "Studio")]
-    pub studio: Studio,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UserResponse {
-    #[serde(rename = "User")]
-    pub user: User,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivityResponse {
-    #[serde(rename = "Activity")]
-    pub activity: ActivityUnion,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ReviewResponse {
-    #[serde(rename = "Review")]
-    pub review: Review,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RecommendationResponse {
-    #[serde(rename = "Recommendation")]
-    pub recommendation: Recommendation,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadData {
-    pub threads: Vec<Thread>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadResponse {
-    #[serde(rename = "Thread")]
-    pub thread: Thread,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadCommentData {
-    pub thread_comments: Vec<ThreadComment>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadCommentResponse {
-    #[serde(rename = "ThreadComment")]
-    pub thread_comment: ThreadComment,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SaveThreadData {
-    #[serde(rename = "SaveThread")]
-    pub save_thread: Thread,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteThreadData {
-    #[serde(rename = "DeleteThread")]
-    pub deleted: DeletedResponse,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SaveThreadCommentData {
-    #[serde(rename = "SaveThreadComment")]
-    pub save_thread_comment: ThreadComment,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteThreadCommentData {
-    #[serde(rename = "DeleteThreadComment")]
-    pub deleted: DeletedResponse,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggleThreadSubscriptionData {
-    #[serde(rename = "ToggleThreadSubscription")]
-    pub toggle_thread_subscription: Thread,
-}
-
-/// Viewer-specific response data types
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerUserData {
-    pub id: i32,
-    pub name: String,
-    pub avatar: Option<UserAvatar>,
-    pub statistics: Option<UserStatisticTypes>,
-    pub unread_notification_count: i32,
-}
-
-/// Type aliases for common response patterns
-pub type NotificationResponse = GraphQLResponse<Page<Vec<NotificationUnion>>>;
-pub type UserMediaListResponse = GraphQLResponse<Page<Vec<MediaList>>>;
-pub type CharacterListResponse = GraphQLResponse<Page<Vec<Character>>>;
-pub type StaffListResponse = GraphQLResponse<Page<Vec<Staff>>>;
-pub type StudioListResponse = GraphQLResponse<Page<Vec<Studio>>>;
-pub type UserListResponse = GraphQLResponse<Page<Vec<User>>>;
-pub type ActivityListResponse = GraphQLResponse<Page<Vec<ActivityUnion>>>;
-pub type ActivityReplyListResponse = GraphQLResponse<Page<Vec<ActivityReply>>>;
-pub type AiringListResponse = GraphQLResponse<Page<Vec<AiringSchedule>>>;
-pub type AiringSingleResponse = GraphQLResponse<AiringScheduleResponse>;
-pub type RecommendationListResponse = GraphQLResponse<Page<Vec<Recommendation>>>;
-pub type ReviewListResponse = GraphQLResponse<Page<Vec<Review>>>;
-pub type ViewerFinalResponse = GraphQLResponse<ViewerResponse<ViewerUserData>>;
-
-// Single item response types
-pub type CharacterSingleResponse = GraphQLResponse<Character>;
-pub type StaffSingleResponse = GraphQLResponse<Staff>;
-pub type StudioSingleResponse = GraphQLResponse<Studio>;
-pub type UserSingleResponse = GraphQLResponse<User>;
-pub type ActivitySingleResponse = GraphQLResponse<ActivityUnion>;
-pub type ReviewSingleResponse = GraphQLResponse<Review>;
-pub type RecommendationSingleResponse = GraphQLResponse<Recommendation>;
-
-// Activity mutation response types
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SaveTextActivityData {
-    #[serde(rename = "SaveTextActivity")]
-    pub save_text_activity: TextActivity,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SaveMessageActivityData {
-    #[serde(rename = "SaveMessageActivity")]
-    pub save_message_activity: MessageActivity,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteActivityData {
-    #[serde(rename = "DeleteActivity")]
-    pub deleted: DeletedResponse,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteReviewData {
-    #[serde(rename = "DeleteReview")]
-    pub deleted: bool,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeletedResponse {
-    pub deleted: bool,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SaveActivityReplyData {
-    #[serde(rename = "SaveActivityReply")]
-    pub save_activity_reply: ActivityReply,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteActivityReplyData {
-    #[serde(rename = "DeleteActivityReply")]
-    pub deleted: DeletedResponse,
-}
-
-pub type SaveTextActivityResponse = GraphQLResponse<SaveTextActivityData>;
-pub type SaveMessageActivityResponse = GraphQLResponse<SaveMessageActivityData>;
-pub type DeleteActivityResponse = GraphQLResponse<DeleteActivityData>;
-pub type DeleteReviewResponse = GraphQLResponse<DeleteReviewData>;
-pub type SaveActivityReplyResponse = GraphQLResponse<SaveActivityReplyData>;
-pub type DeleteActivityReplyResponse = GraphQLResponse<DeleteActivityReplyData>;
-
-// MediaList single item response types
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaListEntryData {
-    #[serde(rename = "SaveMediaListEntry")]
-    pub save_media_list_entry: MediaList,
-}
-
-// MediaList multiple item response types
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MultipleMediaListEntryData {
-    #[serde(rename = "UpdateMediaListEntries")]
-    pub update_media_list_entries: Vec<MediaList>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteMediaListData {
-    #[serde(rename = "DeleteMediaListEntry")]
-    pub deleted: bool,
-}
-
-pub type SaveMediaListEntryResponse = GraphQLResponse<MediaListEntryData>;
-pub type SaveMediaListMultipleResponse = GraphQLResponse<MultipleMediaListEntryData>;
-pub type DeleteMediaListEntryResponse = GraphQLResponse<DeleteMediaListData>;
-
-// Common endpoint response types
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggleLikeData {
-    #[serde(rename = "ToggleLikeV2")]
-    pub toggle_like_v2: LikeableUnion,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggleFollowData {
-    #[serde(rename = "ToggleFollow")]
-    pub toggle_follow: User,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggleFavouriteData {
-    #[serde(rename = "ToggleFavourite")]
-    pub toggle_favourite: Favourites,
-}
-
-pub type ToggleLikeResponse = GraphQLResponse<ToggleLikeData>;
-pub type ToggleFollowResponse = GraphQLResponse<ToggleFollowData>;
-pub type ToggleFavouriteResponse = GraphQLResponse<ToggleFavouriteData>;
-
-// Thread/Forum endpoint response types
-pub type ThreadListResponse = GraphQLResponse<Page<ThreadData>>;
-pub type ThreadSingleResponse = GraphQLResponse<ThreadResponse>;
-pub type ThreadCommentListResponse = GraphQLResponse<Page<ThreadCommentData>>;
-pub type ThreadCommentSingleResponse = GraphQLResponse<ThreadCommentResponse>;
-pub type SaveThreadResponse = GraphQLResponse<SaveThreadData>;
-pub type DeleteThreadResponse = GraphQLResponse<DeleteThreadData>;
-pub type SaveThreadCommentResponse = GraphQLResponse<SaveThreadCommentData>;
-pub type DeleteThreadCommentResponse = GraphQLResponse<DeleteThreadCommentData>;
-pub type ToggleThreadSubscriptionResponse = GraphQLResponse<ToggleThreadSubscriptionData>;
 
 // The high-performance custom deserialization logic
 impl<'de, T> Deserialize<'de> for Page<T>

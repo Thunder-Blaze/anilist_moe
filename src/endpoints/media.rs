@@ -8,6 +8,25 @@ use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching media (anime/manga) with various filters.
+///
+/// This struct provides comprehensive filtering and pagination options
+/// for querying anime and manga from the AniList API.
+///
+/// # Examples
+///
+/// ```rust
+/// # use anilist_moe::endpoints::media::FetchMediaOptions;
+/// # use anilist_moe::enums::media::{MediaType, MediaSeason, MediaSort};
+/// let options = FetchMediaOptions {
+///     media_type: Some(MediaType::Anime),
+///     season: Some(MediaSeason::Fall),
+///     season_year: Some(2024),
+///     sort: Some(vec![MediaSort::Popularity]),
+///     page: Some(1),
+///     per_page: Some(20),
+///     ..Default::default()
+/// };
+/// ```
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchMediaOptions {
@@ -126,6 +145,10 @@ pub struct FetchMediaOptions {
     pub per_page: Option<i32>,
 }
 
+/// Options for fetching detailed information about a single media item.
+///
+/// This struct allows fetching a single anime/manga with optional pagination
+/// for related data like characters, staff, reviews, and recommendations.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchMediaOneOptions {
@@ -161,15 +184,73 @@ pub struct FetchMediaOneOptions {
 }
 
 /// Endpoint for anime and manga operations.
+///
+/// This endpoint provides methods for querying anime and manga data
+/// from the AniList API, including search, filtering, and detailed
+/// information retrieval.
+///
+/// # Examples
+///
+/// ```rust
+/// # use anilist_moe::AniListClient;
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let client = AniListClient::new();
+///
+/// // Get trending anime
+/// let trending = client.anime().get_trending_anime(Some(1), Some(10)).await?;
+///
+/// // Search for specific anime
+/// let results = client.anime().search_anime("Steins Gate", Some(1), Some(5)).await?;
+///
+/// // Get anime by ID
+/// let anime = client.anime().get_by_id(16498).await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct MediaEndpoint {
     client: AniListClient,
 }
 
 impl MediaEndpoint {
+    /// Creates a new MediaEndpoint instance.
     pub fn new(client: AniListClient) -> Self {
         Self { client }
     }
 
+    /// Fetches a list of media (anime/manga) with custom options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Filtering and pagination options
+    ///
+    /// # Returns
+    ///
+    /// Returns `Page<Vec<Media>>` containing the list of media items and pagination info.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use anilist_moe::AniListClient;
+    /// # use anilist_moe::endpoints::media::FetchMediaOptions;
+    /// # use anilist_moe::enums::media::{MediaType, MediaSort};
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = AniListClient::new();
+    ///
+    /// let options = FetchMediaOptions {
+    ///     media_type: Some(MediaType::Anime),
+    ///     sort: Some(vec![MediaSort::Popularity]),
+    ///     page: Some(1),
+    ///     per_page: Some(10),
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let response = client.anime().fetch(&options).await?;
+    /// for anime in &response.data {
+    ///     println!("Title: {:?}", anime.title);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn fetch(
         &self,
         options: &FetchMediaOptions,
@@ -185,6 +266,35 @@ impl MediaEndpoint {
         }
     }
 
+    /// Fetches detailed information about a single media item.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Options including the media ID and optional pagination for related data
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Media` object directly (not wrapped in a page structure).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use anilist_moe::AniListClient;
+    /// # use anilist_moe::endpoints::media::FetchMediaOneOptions;
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = AniListClient::new();
+    ///
+    /// let options = FetchMediaOneOptions {
+    ///     id: Some(16498), // Attack on Titan
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let anime = client.anime().fetch_one(&options).await?;
+    /// println!("Title: {:?}", anime.title);
+    /// println!("Score: {:?}", anime.average_score);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn fetch_one(&self, options: &FetchMediaOneOptions) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
         let variables = json!(options);
