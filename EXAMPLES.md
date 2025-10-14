@@ -19,14 +19,14 @@ Comprehensive examples for using the anilist_moe crate.
 ### Creating a Client
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 // Unauthenticated client for public data
 let client = AniListClient::new();
 
 // Authenticated client for user-specific operations
 let token = std::env::var("ANILIST_TOKEN").expect("Token required");
-let auth_client = AniListClient::with_token(token);
+let auth_client = AniListClient::with_token(&token);
 ```
 
 ## Anime Examples
@@ -34,15 +34,17 @@ let auth_client = AniListClient::with_token(token);
 ### Get Trending Anime
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.anime().get_trending(Some(1), Some(10)).await?;
+    // Returns Page<Vec<Media>>
+    let response = client.anime().get_trending_anime(Some(1), Some(10)).await?;
 
-    for anime in &response.data.page.data.media {
+    // Access the Vec<Media> through response.data
+    for anime in &response.data {
         if let Some(title) = &anime.title {
             if let Some(romaji) = &title.romaji {
                 println!("Anime: {}", romaji);
@@ -59,18 +61,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Search Anime by Title
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     let search_query = "Steins Gate";
-    let response = client.anime().search(search_query, Some(1), Some(10)).await?;
+    // Returns Page<Vec<Media>>
+    let response = client.anime().search_anime(search_query, Some(1), Some(10)).await?;
 
-    for anime in &response.data.page.data.media {
+    // Access pagination info
+    if let Some(page_info) = &response.page_info {
+        println!("Total results: {:?}", page_info.total);
+    }
+
+    // Iterate through media list
+    for anime in &response.data {
         if let Some(title) = &anime.title {
-            println!("Found: {} (ID: {})",
+            println!("Found: {} (ID: {:?})",
                 title.romaji.as_ref().unwrap_or(&"Unknown".to_string()),
                 anime.id
             );
@@ -84,7 +93,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Anime by Season
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::{AniListClient, enums::media::MediaSeason};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -92,11 +101,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get Fall 2024 anime
     let response = client.anime()
-        .get_by_season("FALL", 2024, Some(1), Some(20))
+        .get_by_season(MediaSeason::Fall, 2024, Some(1), Some(20))
         .await?;
 
     println!("Fall 2024 Anime:");
-    for anime in &response.data.page.data.media {
+    for anime in &response.data {
         if let Some(title) = &anime.title {
             println!("  - {}", title.romaji.as_ref().unwrap_or(&"Unknown".to_string()));
         }
@@ -109,15 +118,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Detailed Anime Information
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     // Attack on Titan ID: 16498
-    let response = client.anime().get_by_id(16498).await?;
-    let anime = &response.data.media;
+    // Returns Media directly (not wrapped)
+    let anime = client.anime().get_by_id(16498).await?;
 
     println!("=== Anime Details ===");
 
@@ -148,16 +157,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Top Rated Manga
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.manga().get_top_rated(Some(1), Some(10)).await?;
+    // Returns Page<Vec<Media>>
+    let response = client.manga().get_top_rated_manga(Some(1), Some(10)).await?;
 
     println!("Top Rated Manga:");
-    for (i, manga) in response.data.page.data.media.iter().enumerate() {
+    for (i, manga) in response.data.iter().enumerate() {
         if let Some(title) = &manga.title {
             println!("{}. {} - Score: {}/100",
                 i + 1,
@@ -174,16 +184,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Currently Releasing Manga
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.manga().get_releasing(Some(1), Some(20)).await?;
+    // Returns Page<Vec<Media>>
+    let response = client.manga().get_releasing_manga(Some(1), Some(20)).await?;
 
     println!("Currently Releasing Manga:");
-    for manga in &response.data.page.data.media {
+    for manga in &response.data {
         if let Some(title) = &manga.title {
             println!("  - {}", title.romaji.as_ref().unwrap_or(&"Unknown".to_string()));
             if let Some(chapters) = manga.chapters {
@@ -201,18 +212,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Search for Characters
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.character().search("Luffy", Some(1), Some(5)).await?;
+    // Returns Page<Vec<Character>>
+    let response = client.character().search_character("Luffy", Some(1), Some(5)).await?;
 
-    for character in &response.data.page.data.characters {
+    for character in &response.data {
         if let Some(name) = &character.name {
             println!("Character: {}", name.full.as_ref().unwrap_or(&"Unknown".to_string()));
-            println!("  ID: {}", character.id);
+            if let Some(id) = character.id {
+                println!("  ID: {}", id);
+            }
             if let Some(favourites) = character.favourites {
                 println!("  Favourites: {}", favourites);
             }
@@ -226,17 +240,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Characters by Birthday
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     // Get characters with birthday on May 5th
+    // Returns Page<Vec<Character>>
     let response = client.character().get_by_birthday(5, 5, Some(1), Some(10)).await?;
 
     println!("Characters born on May 5th:");
-    for character in &response.data.page.data.characters {
+    for character in &response.data {
         if let Some(name) = &character.name {
             println!("  - {}", name.full.as_ref().unwrap_or(&"Unknown".to_string()));
         }
@@ -251,16 +266,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Popular Staff
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.staff().get_popular(Some(1), Some(10)).await?;
+    // Returns Page<Vec<Staff>>
+    let response = client.staff().get_popular_staff(Some(1), Some(10)).await?;
 
     println!("Popular Staff:");
-    for staff in &response.data.page.data.staff {
+    for staff in &response.data {
         if let Some(name) = &staff.name {
             println!("  - {}", name.full.as_ref().unwrap_or(&"Unknown".to_string()));
             if let Some(favourites) = staff.favourites {
@@ -278,17 +294,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get User Information
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.user().get_by_username("username").await?;
-    let user = &response.data.user;
+    // Returns User directly (not wrapped)
+    let user = client.user().get_by_username("username").await?;
 
     println!("User: {}", user.name);
-    println!("ID: {}", user.id);
+    if let Some(id) = user.id {
+        println!("ID: {}", id);
+    }
 
     if let Some(about) = &user.about {
         println!("About: {}", about);
@@ -310,18 +328,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Current Authenticated User
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let token = std::env::var("ANILIST_TOKEN")?;
-    let client = AniListClient::with_token(token);
+    let client = AniListClient::with_token(&token);
 
-    let response = client.user().get_current_user().await?;
-    let user = &response.data.viewer;
+    // Returns User directly (not wrapped)
+    let user = client.user().get_current_user().await?;
 
     println!("Logged in as: {}", user.name);
-    println!("User ID: {}", user.id);
+    if let Some(id) = user.id {
+        println!("User ID: {}", id);
+    }
 
     if let Some(unread) = user.unread_notification_count {
         println!("Unread notifications: {}", unread);
@@ -336,20 +356,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Browse Forum Threads
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    // Get recent threads
-    let response = client.forum().get_recent(Some(1), Some(10)).await?;
+    // Get recent threads - Returns Page<Vec<Thread>>
+    let response = client.forum().get_recent_threads(Some(1), Some(10)).await?;
 
     println!("Recent Forum Threads:");
-    for thread in &response.data.page.data.threads {
+    for thread in &response.data {
         if let Some(title) = &thread.title {
             println!("\n  Title: {}", title);
-            println!("  ID: {}", thread.id);
+            if let Some(id) = thread.id {
+                println!("  ID: {}", id);
+            }
             println!("  Replies: {}", thread.reply_count.unwrap_or(0));
             println!("  Views: {}", thread.view_count.unwrap_or(0));
         }
@@ -362,16 +384,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Search Forum Threads
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.forum().search("recommendation", Some(1), Some(10)).await?;
+    // Returns Page<Vec<Thread>>
+    let response = client.forum().search_thread("recommendation", Some(1), Some(10)).await?;
 
     println!("Search Results:");
-    for thread in &response.data.page.data.threads {
+    for thread in &response.data {
         if let Some(title) = &thread.title {
             println!("  - {}", title);
         }
@@ -384,17 +407,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Thread Comments
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
     let thread_id = 12345;
+    // Returns Page<Vec<ThreadComment>>
     let response = client.forum().get_thread_comments(thread_id, Some(1), Some(20)).await?;
 
     println!("Comments:");
-    for comment in &response.data.page.data.thread_comments {
+    for comment in &response.data {
         if let Some(user) = &comment.user {
             println!("\n  User: {}", user.name);
         }
@@ -412,17 +436,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get User Activities
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
+use anilist_moe::unions::activity::ActivityUnion;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    let response = client.activity().get_recent(Some(1), Some(20)).await?;
+    // Returns Page<Vec<ActivityUnion>>
+    let response = client.activity().get_recent_activities(Some(1), Some(20)).await?;
 
-    for activity in &response.data.page.data.activities {
+    for activity in &response.data {
         match activity {
-            crate::unions::activity::ActivityUnion::TextActivity(text) => {
+            ActivityUnion::TextActivity(text) => {
                 if let Some(user) = &text.user {
                     println!("Text Activity by {}", user.name);
                 }
@@ -430,12 +456,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("  {}", text_content);
                 }
             },
-            crate::unions::activity::ActivityUnion::MessageActivity(msg) => {
+            ActivityUnion::MessageActivity(msg) => {
                 if let Some(messenger) = &msg.messenger {
                     println!("Message by {}", messenger.name);
                 }
             },
-            crate::unions::activity::ActivityUnion::ListActivity(list) => {
+            ActivityUnion::ListActivity(list) => {
                 if let Some(user) = &list.user {
                     println!("List Activity by {}", user.name);
                 }
@@ -452,7 +478,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Pagination with Error Handling
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 use anilist_moe::errors::AniListError;
 use std::time::Duration;
 use tokio::time::sleep;
@@ -465,27 +491,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let max_pages = 5;
 
     while page <= max_pages {
-        match client.anime().get_popular(Some(page), Some(per_page)).await {
+        match client.anime().get_popular_anime(Some(page), Some(per_page)).await {
             Ok(response) => {
-                let page_info = &response.data.page.page_info;
-
-                // Process anime
-                for anime in &response.data.page.data.media {
-                    if let Some(title) = &anime.title {
-                        println!("Anime: {}", title.romaji.as_ref().unwrap_or(&"Unknown".to_string()));
+                // Access pagination info
+                if let Some(page_info) = &response.page_info {
+                    // Process anime
+                    for anime in &response.data {
+                        if let Some(title) = &anime.title {
+                            println!("Anime: {}", title.romaji.as_ref().unwrap_or(&"Unknown".to_string()));
+                        }
                     }
-                }
 
-                // Check if there are more pages
-                if !page_info.has_next_page.unwrap_or(false) {
-                    println!("No more pages");
+                    // Check if there are more pages
+                    if !page_info.has_next_page.unwrap_or(false) {
+                        println!("No more pages");
+                        break;
+                    }
+
+                    page += 1;
+
+                    // Rate limiting - be nice to the API
+                    sleep(Duration::from_millis(700)).await;
+                } else {
                     break;
                 }
-
-                page += 1;
-
-                // Rate limiting - be nice to the API
-                sleep(Duration::from_millis(700)).await;
             }
             Err(AniListError::RateLimit) => {
                 eprintln!("Rate limited, waiting 60 seconds...");
@@ -506,7 +535,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Concurrent Requests
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 use tokio::try_join;
 
 #[tokio::main]
@@ -515,15 +544,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Fetch multiple things concurrently
     let (anime, manga, characters) = try_join!(
-        client.anime().get_popular(Some(1), Some(5)),
-        client.manga().get_popular(Some(1), Some(5)),
-        client.character().get_popular(Some(1), Some(5))
+        client.anime().get_popular_anime(Some(1), Some(5)),
+        client.manga().get_popular_manga(Some(1), Some(5)),
+        client.character().get_popular_characters(Some(1), Some(5))
     )?;
 
     println!("Fetched:");
-    println!("  {} anime", anime.data.page.data.media.len());
-    println!("  {} manga", manga.data.page.data.media.len());
-    println!("  {} characters", characters.data.page.data.characters.len());
+    println!("  {} anime", anime.data.len());
+    println!("  {} manga", manga.data.len());
+    println!("  {} characters", characters.data.len());
 
     Ok(())
 }
@@ -532,8 +561,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Building a Simple Anime Tracker
 
 ```rust
-use anilist_moe::client::AniListClient;
-use std::collections::HashMap;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -541,18 +569,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get user's anime list (requires authentication)
     let token = std::env::var("ANILIST_TOKEN")?;
-    let auth_client = AniListClient::with_token(token);
+    let auth_client = AniListClient::with_token(&token);
 
+    // Returns User directly
     let current_user = auth_client.user().get_current_user().await?;
-    let username = &current_user.data.viewer.name;
+    let username = &current_user.name;
 
-    // Get watching list
+    // Get watching list - Returns Page<Vec<MediaList>>
     let watching = auth_client.medialist()
         .get_user_anime_list(username, Some("CURRENT"), Some(1), Some(50))
         .await?;
 
     println!("Currently Watching:");
-    for entry in &watching.data.page.data.media_list {
+    for entry in &watching.data {
         if let Some(media) = &entry.media {
             if let Some(title) = &media.title {
                 println!("  - {}", title.romaji.as_ref().unwrap_or(&"Unknown".to_string()));
@@ -571,17 +600,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Type-Safe Response Access
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = AniListClient::new();
 
-    // All responses are fully typed
-    let response = client.anime().get_by_id(1).await?;
-
-    // Type-safe access to nested data
-    let anime = &response.data.media;
+    // Returns Media directly (not wrapped)
+    let anime = client.anime().get_by_id(1).await?;
 
     // Option handling with map/and_then
     let title = anime.title.as_ref()
@@ -611,7 +637,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Comprehensive Error Handling
 
 ```rust
-use anilist_moe::client::AniListClient;
+use anilist_moe::AniListClient;
 use anilist_moe::errors::AniListError;
 
 #[tokio::main]
@@ -619,8 +645,8 @@ async fn main() {
     let client = AniListClient::new();
 
     match client.anime().get_by_id(999999).await {
-        Ok(response) => {
-            println!("Success: {:?}", response);
+        Ok(anime) => {
+            println!("Success: {:?}", anime);
         }
         Err(AniListError::Network(e)) => {
             eprintln!("Network error: {}", e);
@@ -654,7 +680,7 @@ async fn main() {
 ```rust
 #[cfg(test)]
 mod tests {
-    use anilist_moe::client::AniListClient;
+    use anilist_moe::AniListClient;
 
     #[tokio::test]
     async fn test_get_anime() {
@@ -662,18 +688,18 @@ mod tests {
         let result = client.anime().get_by_id(1).await;
         assert!(result.is_ok());
 
-        let response = result.unwrap();
-        assert_eq!(response.data.media.id, 1);
+        let anime = result.unwrap();
+        assert_eq!(anime.id, Some(1));
     }
 
     #[tokio::test]
     async fn test_search_anime() {
         let client = AniListClient::new();
-        let result = client.anime().search("Cowboy Bebop", Some(1), Some(5)).await;
+        let result = client.anime().search_anime("Cowboy Bebop", Some(1), Some(5)).await;
         assert!(result.is_ok());
 
         let response = result.unwrap();
-        assert!(!response.data.page.data.media.is_empty());
+        assert!(!response.data.is_empty());
     }
 }
 ```

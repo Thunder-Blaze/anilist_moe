@@ -51,7 +51,7 @@ pub struct ListActivity {
     #[serde(rename = "type")]
     pub activity_type: Option<ActivityType>,
     pub reply_count: Option<i32>,
-    status: Option<String>,
+    pub status: Option<String>,
     pub progress: Option<String>,
     pub is_locked: Option<bool>,
     pub is_subscribed: Option<bool>,

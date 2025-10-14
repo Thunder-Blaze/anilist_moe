@@ -103,9 +103,9 @@ pub struct MediaCharacter {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaConnection {
-    edges: Option<Vec<MediaEdge>>,
-    nodes: Option<Vec<Media>>,
-    page_info: Option<PageInfo>,
+    pub edges: Option<Vec<MediaEdge>>,
+    pub nodes: Option<Vec<Media>>,
+    pub page_info: Option<PageInfo>,
 }
 
 #[skip_serializing_none]
@@ -122,9 +122,9 @@ pub struct MediaCoverImage {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaEdge {
-    node: Option<Media>,
-    id: Option<i32>,
-    relation_type: Option<MediaRelation>,
+    pub node: Option<Media>,
+    pub id: Option<i32>,
+    pub relation_type: Option<MediaRelation>,
     pub is_main_studio: Option<bool>,
     pub characters: Option<Vec<Character>>,
     pub character_role: Option<CharacterRole>,

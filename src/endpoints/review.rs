@@ -1,7 +1,8 @@
 use crate::enums::media::MediaType;
 use crate::enums::review::ReviewSort;
 use crate::errors::AniListError;
-use crate::objects::responses::{DeleteReviewResponse, GraphQLResponse, Page};
+use crate::objects::common::Deleted;
+use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::review::Review;
 use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
@@ -93,10 +94,10 @@ impl ReviewEndpoint {
         let query = review::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<DeleteReviewResponse, AniListError> =
+        let response: Result<GraphQLResponse<Deleted>, AniListError> =
             self.client.query_typed(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.deleted),
+            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
             Err(err) => Err(err),
         }
     }

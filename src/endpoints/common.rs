@@ -1,9 +1,7 @@
 use crate::enums::likable::LikeableType;
 use crate::errors::AniListError;
 use crate::objects::favourites::Favourites;
-use crate::objects::responses::{
-    ToggleFavouriteResponse, ToggleFollowResponse, ToggleLikeResponse,
-};
+use crate::objects::responses::GraphQLResponse;
 use crate::objects::user::User;
 use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
@@ -59,10 +57,10 @@ impl CommonEndpoint {
         let query = common::TOGGLE_LIKE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<ToggleLikeResponse, AniListError> =
+        let response: Result<GraphQLResponse<LikeableUnion>, AniListError> =
             self.client.query_typed(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.toggle_like_v2),
+            Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
@@ -71,10 +69,10 @@ impl CommonEndpoint {
         let query = common::TOGGLE_FOLLOW;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<ToggleFollowResponse, AniListError> =
+        let response: Result<GraphQLResponse<User>, AniListError> =
             self.client.query_typed(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.toggle_follow),
+            Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }
@@ -86,10 +84,10 @@ impl CommonEndpoint {
         let query = common::TOGGLE_FAVOURITE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<ToggleFavouriteResponse, AniListError> =
+        let response: Result<GraphQLResponse<Favourites>, AniListError> =
             self.client.query_typed(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.toggle_favourite),
+            Ok(res) => Ok(res.data),
             Err(err) => Err(err),
         }
     }

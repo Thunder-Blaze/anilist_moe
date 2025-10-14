@@ -113,7 +113,8 @@ impl NewEndpoint {
     }
 
     /// Get items with options
-    pub async fn fetch(&self, options: FetchOptions) -> Result<ItemListResponse, AniListError> {
+    /// Returns Page<Vec<Item>>
+    pub async fn fetch(&self, options: FetchOptions) -> Result<Page<Vec<Item>>, AniListError> {
         let query = queries::new_endpoint::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
@@ -121,8 +122,9 @@ impl NewEndpoint {
     }
 
     /// Convenience function - get popular items
+    /// Returns Page<Vec<Item>>
     pub async fn get_popular(&self, page: Option<i32>, per_page: Option<i32>)
-        -> Result<ItemListResponse, AniListError> {
+        -> Result<Page<Vec<Item>>, AniListError> {
         self.fetch(FetchOptions {
             sort: Some(vec![Sort::Popularity]),
             page,
@@ -130,34 +132,43 @@ impl NewEndpoint {
             ..Default::default()
         }).await
     }
+
+    /// Get a single item by ID
+    /// Returns Item directly (not wrapped)
+    pub async fn get_by_id(&self, id: i32) -> Result<Item, AniListError> {
+        let query = queries::new_endpoint::FETCH_ONE;
+        let variables = json!({ "id": id });
+        let variables_map = crate::utils::json_to_hashmap(variables);
+        self.client.query_typed(query, Some(&variables_map)).await
+    }
 }
 ```
 
 ### Adding Response Types
 
-Add to `src/objects/responses.rs`:
+Response types are defined in `src/objects/responses.rs`:
 ```rust
-// Data wrapper
+/// GraphQL response wrapper
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphQLResponse<T> {
+    pub data: T,
+}
+
+/// Pagination wrapper for list responses
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ItemData {
-    pub items: Vec<Item>,
+pub struct Page<T> {
+    pub page_info: Option<PageInfo>,
+    pub data: T,
 }
-
-// Single item wrapper
-#[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemResponse {
-    #[serde(rename = "Item")]
-    pub item: Item,
-}
-
-// Type aliases
-pub type ItemListResponse = GraphQLResponse<PageResponse<ItemData>>;
-pub type ItemSingleResponse = GraphQLResponse<ItemResponse>;
 ```
+
+Notes on response structure:
+- Paginated endpoints return `Page<Vec<T>>` - access the list through `response.data`
+- Single item endpoints return `T` directly - no extra wrapper
+- The `GraphQLResponse<T>` wrapper is handled internally by the client
+- All endpoint methods are already properly typed
 
 ### Writing Tests
 
@@ -170,7 +181,27 @@ async fn test_get_popular() {
 
     assert!(result.is_ok());
     let response = result.unwrap();
-    assert!(!response.data.page.data.items.is_empty());
+
+    // Response is Page<Vec<Item>>
+    // Access the Vec<Item> through response.data
+    assert!(!response.data.is_empty());
+
+    // Access pagination info
+    if let Some(page_info) = &response.page_info {
+        assert!(page_info.current_page.is_some());
+    }
+}
+
+#[tokio::test]
+async fn test_get_by_id() {
+    let client = get_test_client();
+    let result = client.new_endpoint().get_by_id(1).await;
+
+    assert!(result.is_ok());
+    let item = result.unwrap();
+
+    // Response is Item directly (not wrapped)
+    assert_eq!(item.id, Some(1));
 }
 ```
 
@@ -182,7 +213,7 @@ async fn test_get_popular() {
 4. Run all tests and ensure they pass:
    ```bash
    cargo test
-   cargo clippy
+   cargo clippy -- -D warning
    cargo fmt --check
    ```
 
