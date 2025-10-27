@@ -3,13 +3,13 @@ use crate::errors::AniListError;
 use crate::objects::recommendation::Recommendation;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::recommendation};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching media recommendations.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchRecommendationOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -32,7 +32,7 @@ pub struct FetchRecommendationOptions {
 }
 
 /// Options for saving a recommendation rating.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveRecommendationOptions {
     #[serde(rename = "mediaId")]
     pub media_id: i32,

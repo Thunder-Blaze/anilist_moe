@@ -3,7 +3,7 @@ use crate::errors::AniListError;
 use crate::objects::media::Media;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::media};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
@@ -28,7 +28,7 @@ use serde_with::skip_serializing_none;
 /// };
 /// ```
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchMediaOptions {
     pub id: Option<i32>,
     #[serde(rename = "idMal")]
@@ -150,7 +150,7 @@ pub struct FetchMediaOptions {
 /// This struct allows fetching a single anime/manga with optional pagination
 /// for related data like characters, staff, reviews, and recommendations.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchMediaOneOptions {
     pub id: Option<i32>,
     // Characters pagination

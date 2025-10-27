@@ -3,13 +3,13 @@ use crate::errors::AniListError;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::studio::Studio;
 use crate::{client::AniListClient, queries::studio};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching studios.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchStudioOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -27,7 +27,7 @@ pub struct FetchStudioOptions {
 
 /// Options for fetching a single studio by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchStudioOneOptions {
     pub id: Option<i32>,
     pub search: Option<String>,

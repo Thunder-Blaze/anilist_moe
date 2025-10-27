@@ -3,13 +3,13 @@ use crate::errors::AniListError;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::staff::Staff;
 use crate::{client::AniListClient, queries::staff};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching staff members.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchStaffOptions {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
@@ -29,7 +29,7 @@ pub struct FetchStaffOptions {
 
 /// Options for fetching a single staff member by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchStaffOneOptions {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]

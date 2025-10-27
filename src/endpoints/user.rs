@@ -5,13 +5,13 @@ use crate::errors::AniListError;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::user::User;
 use crate::{client::AniListClient, queries::user};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching users.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserOptions {
     pub id: Option<i32>,
     pub name: Option<String>,
@@ -26,7 +26,7 @@ pub struct FetchUserOptions {
 
 /// Options for fetching a single user by ID or name.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserOneOptions {
     pub id: Option<i32>,
     pub name: Option<String>,
@@ -34,7 +34,7 @@ pub struct FetchUserOneOptions {
 
 /// Options for fetching a user's followers.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserFollowersOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
@@ -45,7 +45,7 @@ pub struct FetchUserFollowersOptions {
 
 /// Options for fetching users a user is following.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserFollowingOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
@@ -56,7 +56,7 @@ pub struct FetchUserFollowingOptions {
 
 /// Options for fetching a user's favorites.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserFavoritesOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
@@ -104,7 +104,7 @@ pub struct FetchUserFavoritesOptions {
 
 /// Options for fetching a user's media list.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserMediaListOptions {
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
@@ -125,7 +125,7 @@ pub struct FetchUserMediaListOptions {
 
 /// Options for fetching user statistics.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchUserStatsOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,

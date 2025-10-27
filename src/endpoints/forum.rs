@@ -4,13 +4,13 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::thread::{Thread, ThreadComment};
 use crate::{client::AniListClient, queries::forum};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching forum threads.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchThreadOptions {
     pub id: Option<i32>,
     pub search: Option<String>,
@@ -32,7 +32,7 @@ pub struct FetchThreadOptions {
 
 /// Options for fetching a single forum thread by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchThreadOneOptions {
     pub id: Option<i32>,
     #[serde(rename = "commentsPage")]
@@ -45,7 +45,7 @@ pub struct FetchThreadOneOptions {
 
 /// Options for fetching thread comments.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchThreadCommentOptions {
     pub id: Option<i32>,
     #[serde(rename = "threadId")]
@@ -60,14 +60,14 @@ pub struct FetchThreadCommentOptions {
 
 /// Options for fetching a single thread comment by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchThreadCommentOneOptions {
     pub id: Option<i32>,
 }
 
 /// Options for creating or updating a forum thread.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveThreadOptions {
     pub id: Option<i32>,
     pub title: Option<String>,
@@ -80,14 +80,14 @@ pub struct SaveThreadOptions {
 }
 
 /// Options for deleting a forum thread.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct DeleteThreadOptions {
     pub id: i32,
 }
 
 /// Options for creating or updating a thread comment.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveThreadCommentOptions {
     pub id: Option<i32>,
     #[serde(rename = "threadId")]
@@ -99,14 +99,14 @@ pub struct SaveThreadCommentOptions {
 }
 
 /// Options for deleting a thread comment.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct DeleteThreadCommentOptions {
     pub id: i32,
 }
 
 /// Options for subscribing or unsubscribing to a thread.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct ToggleThreadSubscriptionOptions {
     #[serde(rename = "threadId")]
     pub thread_id: i32,

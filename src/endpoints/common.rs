@@ -5,7 +5,7 @@ use crate::objects::responses::GraphQLResponse;
 use crate::objects::user::User;
 use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
@@ -18,7 +18,7 @@ pub struct ToggleLikeOptions {
 }
 
 /// Options for toggling follow status of a user.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct ToggleFollowOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
@@ -26,7 +26,7 @@ pub struct ToggleFollowOptions {
 
 /// Options for adding or removing favourites.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct ToggleFavouriteOptions {
     #[serde(rename = "animeId")]
     pub anime_id: Option<i32>,

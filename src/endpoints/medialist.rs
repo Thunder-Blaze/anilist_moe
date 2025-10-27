@@ -5,13 +5,13 @@ use crate::objects::common::{Deleted, FuzzyDate};
 use crate::objects::media_list::MediaList;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::medialist};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching media list entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchMediaListOptions {
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
@@ -65,7 +65,7 @@ pub struct FetchMediaListOptions {
 
 /// Options for creating or updating a media list entry.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListOptions {
     pub id: Option<i32>,
@@ -88,7 +88,7 @@ pub struct SaveMediaListOptions {
 
 /// Options for bulk updating multiple media list entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListMultipleOptions {
     pub status: Option<MediaListStatus>,
@@ -108,7 +108,7 @@ pub struct SaveMediaListMultipleOptions {
 }
 
 /// Options for deleting a media list entry.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct DeleteMediaListOptions {
     pub id: i32,
 }

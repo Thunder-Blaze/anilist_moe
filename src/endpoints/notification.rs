@@ -3,13 +3,13 @@ use crate::errors::AniListError;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::unions::notification::NotificationUnion;
 use crate::{client::AniListClient, queries::notification};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for searching and filtering notifications.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct NotificationSearchOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
