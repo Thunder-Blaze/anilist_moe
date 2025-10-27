@@ -5,13 +5,13 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::objects::review::Review;
 use crate::{client::AniListClient, queries::review};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching reviews.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchReviewOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -28,7 +28,7 @@ pub struct FetchReviewOptions {
 
 /// Options for creating or updating a review.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveReviewOptions {
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]
@@ -40,13 +40,13 @@ pub struct SaveReviewOptions {
 }
 
 /// Options for deleting a review.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct DeleteReviewOptions {
     pub id: i32,
 }
 
 /// Options for rating a review.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct RateReviewOptions {
     #[serde(rename = "reviewId")]
     pub review_id: i32,

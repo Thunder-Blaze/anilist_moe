@@ -3,13 +3,13 @@ use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::airing};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching airing schedule information.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchAiringOptions {
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]

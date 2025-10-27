@@ -5,13 +5,13 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchActivityOptions {
     // # Pagination
     #[serde(rename = "page")]
@@ -79,14 +79,14 @@ pub struct FetchActivityOptions {
 }
 
 /// Options for fetching a single activity by ID.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchActivityOneOptions {
     pub id: i32,
 }
 
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
     #[serde(rename = "page")]
@@ -102,26 +102,26 @@ pub struct FetchActivityRepliesOptions {
 }
 
 /// Options for deleting an activity.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct DeleteActivityOptions {
     pub id: i32,
 }
 
 /// Options for deleting an activity reply.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct DeleteActivityReplyOptions {
     pub id: i32,
 }
 
 /// Options for pinning or unpinning an activity.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct PinActivityOptions {
     pub id: i32,
     pub pinned: bool,
 }
 
 /// Options for subscribing or unsubscribing to an activity.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SubscribeActivityOptions {
     pub id: i32,
     pub subscribe: bool,
@@ -129,7 +129,7 @@ pub struct SubscribeActivityOptions {
 
 /// Options for saving a message activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveMessageActivityOptions {
     pub id: Option<i32>,
     pub message: String,
@@ -142,7 +142,7 @@ pub struct SaveMessageActivityOptions {
 
 /// Options for saving a text activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveTextActivityOptions {
     pub id: Option<i32>,
     pub text: String,
@@ -151,7 +151,7 @@ pub struct SaveTextActivityOptions {
 
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveActivityReplyOptions {
     pub id: Option<i32>,
     pub text: String,

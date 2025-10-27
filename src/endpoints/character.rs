@@ -4,13 +4,13 @@ use crate::errors::AniListError;
 use crate::objects::character::Character;
 use crate::objects::responses::{GraphQLResponse, Page};
 use crate::{client::AniListClient, queries::character};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching multiple characters with pagination and filters.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchCharacterOptions {
     pub page: Option<i32>,
     pub id: Option<i32>,
@@ -27,7 +27,7 @@ pub struct FetchCharacterOptions {
 
 /// Options for fetching a single character.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchCharacterOneOptions {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
