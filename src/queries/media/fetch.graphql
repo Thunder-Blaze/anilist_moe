@@ -82,6 +82,48 @@ query MediaSearch(
 
     # Extra
     $description_as_html: Boolean = true
+    $includeStartDate: Boolean = false
+    $includeEndDate: Boolean = false
+    $includeDuration: Boolean = false
+    $includeVolumes: Boolean = false
+    $includeCountryOfOrigin: Boolean = false
+    $includeIsLicensed: Boolean = false
+    $includeSource: Boolean = false
+    $includeHashtag: Boolean = false
+    $includeTrailer: Boolean = false
+    $includeUpdatedAt: Boolean = false
+    $includeCoverImageExtraLarge: Boolean = false
+    $includeMeanScore: Boolean = false
+    $includeIsLocked: Boolean = false
+    $includeTrending: Boolean = false
+    $includeTags: Boolean = false
+    $includeNextAiringEpisode: Boolean = false
+    $includeRelations: Boolean = false
+    $includeCharacters: Boolean = false
+    $includeStaff: Boolean = false
+    $includeStudios: Boolean = false
+    $includeMediaListEntryDetails: Boolean = false
+    $includeReviews: Boolean = false
+    $includeRecommendations: Boolean = false
+    $includeExternalLinks: Boolean = false
+    $includeStreamingEpisodes: Boolean = false
+    $includeRankings: Boolean = false
+    $includeStats: Boolean = false
+    $includeAutoCreateForumThread: Boolean = false
+    $includeIsRecommendationBlocked: Boolean = false
+    $includeIsReviewBlocked: Boolean = false
+    $includeModNotes: Boolean = false
+    # Pagination
+    $charactersPage: Int = 1
+    $charactersPerPage: Int = 10
+    $staffPage: Int = 1
+    $staffPerPage: Int = 10
+    $reviewsPage: Int = 1
+    $reviewsPerPage: Int = 10
+    $recommendationsPage: Int = 1
+    $recommendationsPerPage: Int = 10
+    # Included connection filters
+    $voiceActorLanguage: StaffLanguage
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -173,25 +215,158 @@ query MediaSearch(
             type
             format
             status
+            description(asHtml: $description_as_html)
+            startDate @include(if: $includeStartDate) {
+                year
+                month
+                day
+            }
+            endDate @include(if: $includeEndDate) {
+                year
+                month
+                day
+            }
             season
             seasonYear
             episodes
+            duration @include(if: $includeDuration)
             chapters
-            genres
-            averageScore
-            popularity
-            favourites
-            isFavourite
-            isFavouriteBlocked
-            isAdult
+            volumes @include(if: $includeVolumes)
+            countryOfOrigin @include(if: $includeCountryOfOrigin)
+            isLicensed @include(if: $includeIsLicensed)
+            source @include(if: $includeSource)
+            hashtag @include(if: $includeHashtag)
+            trailer @include(if: $includeTrailer) {
+                id
+                site
+                thumbnail
+            }
+            updatedAt @include(if: $includeUpdatedAt)
             coverImage {
+                extraLarge @include(if: $includeCoverImageExtraLarge)
                 large
                 medium
                 color
             }
             bannerImage
-            description(asHtml: $description_as_html)
-            siteUrl
+            genres
+            synonyms
+            averageScore
+            meanScore @include(if: $includeMeanScore)
+            popularity
+            isLocked @include(if: $includeIsLocked)
+            trending @include(if: $includeTrending)
+            favourites
+            tags @include(if: $includeTags) {
+                id
+                name
+                description
+                category
+                rank
+                isGeneralSpoiler
+                isMediaSpoiler
+                isAdult
+                userId
+            }
+            relations @include(if: $includeRelations) {
+                edges {
+                    id
+                    relationType
+                    node {
+                        id
+                        title {
+                            romaji
+                            english
+                            native
+                            userPreferred
+                        }
+                        type
+                        format
+                        status
+                        coverImage {
+                            large
+                        }
+                    }
+                }
+            }
+            characters(page: $charactersPage, perPage: $charactersPerPage, sort: ROLE) @include(if: $includeCharacters) {
+                pageInfo {
+                    total
+                    perPage
+                    currentPage
+                    lastPage
+                    hasNextPage
+                }
+                edges {
+                    id
+                    role
+                    name
+                    voiceActorRoles(language: $voiceActorLanguage) {
+                        voiceActor {
+                            id
+                            name {
+                                first
+                                middle
+                                last
+                                full
+                                native
+                                alternative
+                                userPreferred
+                            }
+                            language
+                            image {
+                                large
+                            }
+                        }
+                        roleNotes
+                        dubGroup
+                    }
+                    node {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                            alternative
+                            userPreferred
+                        }
+                        image {
+                            large
+                        }
+                    }
+                }
+            }
+            staff(page: $staffPage, perPage: $staffPerPage, sort: ROLE) @include(if: $includeStaff) {
+                pageInfo {
+                    total
+                    perPage
+                    currentPage
+                    lastPage
+                    hasNextPage
+                }
+                edges {
+                    id
+                    role
+                    node {
+                        id
+                        name {
+                            first
+                            middle
+                            last
+                            full
+                            native
+                            alternative
+                            userPreferred
+                        }
+                        image {
+                            large
+                        }
+                        primaryOccupations
+                    }
+                }
+            }
             studios(isMain: true) {
                 edges {
                     node {
@@ -201,12 +376,156 @@ query MediaSearch(
                     }
                 }
             }
+            fullStudios: studios @include(if: $includeStudios) {
+                edges {
+                    id
+                    isMain
+                    node {
+                        id
+                        name
+                        isAnimationStudio
+                        siteUrl
+                        favourites
+                    }
+                }
+            }
+            isFavourite
+            isFavouriteBlocked
+            isAdult
+            nextAiringEpisode @include(if: $includeNextAiringEpisode) {
+                id
+                airingAt
+                timeUntilAiring
+                episode
+            }
             mediaListEntry {
                 id
                 status
                 score
                 progress
+                progressVolumes @include(if: $includeMediaListEntryDetails)
+                repeat @include(if: $includeMediaListEntryDetails)
+                priority @include(if: $includeMediaListEntryDetails)
+                notes @include(if: $includeMediaListEntryDetails)
+                hiddenFromStatusLists @include(if: $includeMediaListEntryDetails)
+                customLists @include(if: $includeMediaListEntryDetails)
+                advancedScores @include(if: $includeMediaListEntryDetails)
+                startedAt @include(if: $includeMediaListEntryDetails) {
+                    year
+                    month
+                    day
+                }
+                completedAt @include(if: $includeMediaListEntryDetails) {
+                    year
+                    month
+                    day
+                }
+                updatedAt @include(if: $includeMediaListEntryDetails)
+                createdAt @include(if: $includeMediaListEntryDetails)
             }
+            reviews(page: $reviewsPage, perPage: $reviewsPerPage, sort: RATING_DESC) @include(if: $includeReviews) {
+                 pageInfo {
+                    total
+                    perPage
+                    currentPage
+                    lastPage
+                    hasNextPage
+                }
+                nodes {
+                    id
+                    summary
+                    rating
+                    ratingAmount
+                    userRating
+                    score
+                    user {
+                        id
+                        name
+                        avatar {
+                            large
+                        }
+                    }
+                }
+            }
+            recommendations(page: $recommendationsPage, perPage: $recommendationsPerPage, sort: RATING_DESC) @include(if: $includeRecommendations) {
+                 pageInfo {
+                    total
+                    perPage
+                    currentPage
+                    lastPage
+                    hasNextPage
+                }
+                nodes {
+                    id
+                    rating
+                    userRating
+                    mediaRecommendation {
+                        id
+                        title {
+                            romaji
+                            english
+                            native
+                            userPreferred
+                        }
+                        type
+                        format
+                        status
+                        coverImage {
+                            large
+                        }
+                    }
+                    user {
+                        id
+                        name
+                        avatar {
+                            large
+                        }
+                    }
+                }
+            }
+            externalLinks @include(if: $includeExternalLinks) {
+                id
+                url
+                site
+                siteId
+                type
+                language
+                color
+                icon
+                notes
+                isDisabled
+            }
+            streamingEpisodes @include(if: $includeStreamingEpisodes) {
+                title
+                thumbnail
+                url
+                site
+            }
+            rankings @include(if: $includeRankings) {
+                id
+                rank
+                type
+                format
+                year
+                season
+                allTime
+                context
+            }
+            stats @include(if: $includeStats) {
+                scoreDistribution {
+                    score
+                    amount
+                }
+                statusDistribution {
+                    status
+                    amount
+                }
+            }
+            siteUrl
+            autoCreateForumThread @include(if: $includeAutoCreateForumThread)
+            isRecommendationBlocked @include(if: $includeIsRecommendationBlocked)
+            isReviewBlocked @include(if: $includeIsReviewBlocked)
+            modNotes @include(if: $includeModNotes)
         }
     }
 }

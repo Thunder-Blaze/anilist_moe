@@ -23,6 +23,14 @@ pub struct FetchStudioOptions {
     #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Vec<i32>>,
     pub sort: Option<Vec<StudioSort>>,
+    // Extra
+    #[serde(rename = "includeMedia")]
+    pub include_media: Option<bool>,
+    // Sub-pagination variables
+    #[serde(rename = "mediaPage")]
+    pub media_page: Option<i32>,
+    #[serde(rename = "mediaPerPage")]
+    pub media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single studio by ID.

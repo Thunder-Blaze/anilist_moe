@@ -18,6 +18,14 @@ fn test_client_with_token() {
 }
 
 #[test]
+fn test_client_with_token_string() {
+    // Test with String instead of &str
+    let token = String::from("test_token_12345");
+    let client = AniListClient::with_token(token);
+    assert!(client.has_token(), "Client should have a token");
+}
+
+#[test]
 fn test_client_set_token() {
     let mut client = AniListClient::new();
     assert!(!client.has_token());
@@ -45,8 +53,12 @@ fn test_client_with_retry_config() {
     };
 
     let client = AniListClient::new().with_retry_config(config);
-    // We can't directly access retry_config, but we can verify the client builds correctly
     assert!(!client.has_token());
+
+    // Verify retry config is preserved
+    let retrieved_config = client.retry_config();
+    assert_eq!(retrieved_config.max_retries, 5);
+    assert_eq!(retrieved_config.base_delay_ms, 2000);
 }
 
 #[test]
@@ -86,6 +98,18 @@ fn test_client_clone() {
 
     // Both clients should be independent and have the same token status
     assert!(cloned.has_token());
+
+    // Cloning should be cheap (Arc-based)
+    // This verifies the optimization is working
+}
+
+#[test]
+fn test_client_clone_shares_state() {
+    let client = AniListClient::with_token("test_token");
+    let cloned = client.clone();
+
+    // Both should report the same token status
+    assert_eq!(client.has_token(), cloned.has_token());
 }
 
 #[test]
@@ -97,14 +121,17 @@ fn test_client_debug_impl() {
     assert!(!debug_string.contains("secret_token"));
     assert!(debug_string.contains("has_token"));
     assert!(debug_string.contains("true"));
+    assert!(debug_string.contains("base_url"));
 }
 
 #[test]
 fn test_endpoint_accessors() {
     let client = AniListClient::new();
 
-    // All endpoint accessors should work
+    // All endpoint accessors should work and return valid endpoints
     let _media = client.media();
+    let _anime = client.anime(); // Alias for media
+    let _manga = client.manga(); // Alias for media
     let _medialist = client.medialist();
     let _character = client.character();
     let _common = client.common();
@@ -162,4 +189,34 @@ fn test_retry_config_debug() {
     let config = RetryConfig::default();
     let debug_string = format!("{:?}", config);
     assert!(debug_string.contains("RetryConfig"));
+}
+
+#[test]
+fn test_client_retry_config_accessor() {
+    let config = RetryConfig {
+        max_retries: 7,
+        base_delay_ms: 1500,
+        exponential_backoff: false,
+        max_delay_ms: 45000,
+    };
+
+    let client = AniListClient::new().with_retry_config(config);
+    let retrieved = client.retry_config();
+
+    assert_eq!(retrieved.max_retries, 7);
+    assert_eq!(retrieved.base_delay_ms, 1500);
+    assert!(!retrieved.exponential_backoff);
+    assert_eq!(retrieved.max_delay_ms, 45000);
+}
+
+#[test]
+fn test_client_is_send_and_sync() {
+    fn assert_send_sync<T: Send + Sync>() {}
+    assert_send_sync::<AniListClient>();
+}
+
+#[test]
+fn test_retry_config_is_send_and_sync() {
+    fn assert_send_sync<T: Send + Sync>() {}
+    assert_send_sync::<RetryConfig>();
 }

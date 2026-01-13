@@ -11,6 +11,12 @@ query SearchThreads(
     $perPage: Int = 20
     # Additional filters
     $id_in: [Int]
+    # Extra
+    $includeBody: Boolean = false
+    $includeUser: Boolean = false
+    $includeReplyUser: Boolean = false
+    $includeCategories: Boolean = false
+    $includeMediaCategories: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -33,7 +39,7 @@ query SearchThreads(
         ) {
             id
             title
-            body(asHtml: false)
+            body(asHtml: false) @include(if: $includeBody)
             userId
             replyUserId
             replyCount
@@ -48,11 +54,11 @@ query SearchThreads(
             likeCount
             isLiked
             siteUrl
-            categories {
+            categories @include(if: $includeCategories) {
                 id
                 name
             }
-            mediaCategories {
+            mediaCategories @include(if: $includeMediaCategories) {
                 id
                 title {
                     romaji
@@ -66,7 +72,7 @@ query SearchThreads(
                     medium
                 }
             }
-            user {
+            user @include(if: $includeUser) {
                 id
                 name
                 avatar {
@@ -77,7 +83,7 @@ query SearchThreads(
                 donatorBadge
                 moderatorRoles
             }
-            replyUser {
+            replyUser @include(if: $includeReplyUser) {
                 id
                 name
                 avatar {

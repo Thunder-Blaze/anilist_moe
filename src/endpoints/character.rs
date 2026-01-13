@@ -23,6 +23,18 @@ pub struct FetchCharacterOptions {
     pub id_not: Option<i32>,
     pub id_in: Option<Vec<i32>>,
     pub id_not_in: Option<Vec<i32>>,
+    // Extra
+    #[serde(rename = "includeMedia")]
+    pub include_media: Option<bool>,
+    #[serde(rename = "includeModNotes")]
+    pub include_mod_notes: Option<bool>,
+    // Sub-pagination variables
+    #[serde(rename = "mediaSort")]
+    pub media_sort: Option<Vec<MediaSort>>,
+    #[serde(rename = "mediaPage")]
+    pub media_page: Option<i32>,
+    #[serde(rename = "mediaPerPage")]
+    pub media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single character.
@@ -66,7 +78,12 @@ impl CharacterEndpoint {
         let query = character::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let response: Result<GraphQLResponse<Page<Vec<Character>>>, AniListError> =
+            self.client.query_typed(query, Some(&variables_map)).await;
+        match response {
+            Ok(res) => Ok(res.data),
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn fetch_one(

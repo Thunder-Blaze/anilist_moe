@@ -6,15 +6,32 @@ use crate::endpoints::{
 use crate::errors::AniListError;
 use crate::utils::{RetryConfig, retry_with_backoff};
 use reqwest::{Client, Response, StatusCode};
+use serde::Serialize;
 use serde_json::{Value, from_value};
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt;
+use std::sync::Arc;
 
 /// The default AniList GraphQL API endpoint
 const ANILIST_API_URL: &str = "https://graphql.anilist.co";
 
 /// User-Agent header for identifying this library
 const USER_AGENT: &str = concat!("anilist-moe/", env!("CARGO_PKG_VERSION"), " (Rust)");
+
+/// Content-Type header value (reused to avoid allocations)
+const CONTENT_TYPE_JSON: &str = "application/json";
+
+/// Authorization header prefix
+const BEARER_PREFIX: &str = "Bearer ";
+
+/// Internal shared state for the client
+struct ClientInner {
+    client: Client,
+    token: Option<String>,
+    retry_config: RetryConfig,
+    base_url: Cow<'static, str>,
+}
 
 /// The main client for interacting with the AniList API.
 ///
@@ -35,19 +52,16 @@ const USER_AGENT: &str = concat!("anilist-moe/", env!("CARGO_PKG_VERSION"), " (R
 /// ```
 #[derive(Clone)]
 pub struct AniListClient {
-    client: Client,
-    token: Option<String>,
-    retry_config: RetryConfig,
-    base_url: String,
+    inner: Arc<ClientInner>,
 }
 
 // Implement Debug manually to avoid exposing sensitive token information
 impl fmt::Debug for AniListClient {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("AniListClient")
-            .field("base_url", &self.base_url)
-            .field("has_token", &self.token.is_some())
-            .field("retry_config", &self.retry_config)
+            .field("base_url", &self.inner.base_url)
+            .field("has_token", &self.inner.token.is_some())
+            .field("retry_config", &self.inner.retry_config)
             .finish()
     }
 }
@@ -84,10 +98,15 @@ impl AniListClient {
     /// let client = AniListClient::with_token("your_access_token");
     /// ```
     #[must_use]
-    pub fn with_token(token: &str) -> Self {
-        let mut client = Self::new();
-        client.token = Some(token.to_string());
-        client
+    pub fn with_token(token: impl Into<String>) -> Self {
+        Self {
+            inner: Arc::new(ClientInner {
+                client: Self::build_client(),
+                token: Some(token.into()),
+                retry_config: RetryConfig::default(),
+                base_url: Cow::Borrowed(ANILIST_API_URL),
+            }),
+        }
     }
 
     /// Builds a configured reqwest client with optimal settings.
@@ -96,6 +115,7 @@ impl AniListClient {
             .user_agent(USER_AGENT)
             .timeout(std::time::Duration::from_secs(30))
             .pool_max_idle_per_host(10)
+            .tcp_nodelay(true)
             .build()
             .expect("Failed to build HTTP client")
     }
@@ -103,10 +123,12 @@ impl AniListClient {
     /// Creates a client with a custom reqwest client.
     fn new_with_client(client: Client) -> Self {
         Self {
-            client,
-            token: None,
-            retry_config: RetryConfig::default(),
-            base_url: ANILIST_API_URL.to_string(),
+            inner: Arc::new(ClientInner {
+                client,
+                token: None,
+                retry_config: RetryConfig::default(),
+                base_url: Cow::Borrowed(ANILIST_API_URL),
+            }),
         }
     }
 
@@ -131,9 +153,15 @@ impl AniListClient {
     /// let client = AniListClient::new().with_retry_config(config);
     /// ```
     #[must_use]
-    pub fn with_retry_config(mut self, config: RetryConfig) -> Self {
-        self.retry_config = config;
-        self
+    pub fn with_retry_config(self, config: RetryConfig) -> Self {
+        Self {
+            inner: Arc::new(ClientInner {
+                client: self.inner.client.clone(),
+                token: self.inner.token.clone(),
+                retry_config: config,
+                base_url: self.inner.base_url.clone(),
+            }),
+        }
     }
 
     /// Sets a custom base URL for the API (useful for testing or custom endpoints).
@@ -151,99 +179,145 @@ impl AniListClient {
     ///     .with_base_url("https://custom-api.example.com");
     /// ```
     #[must_use]
-    pub fn with_base_url(mut self, base_url: &str) -> Self {
-        self.base_url = base_url.to_string();
-        self
+    pub fn with_base_url(self, base_url: impl Into<String>) -> Self {
+        Self {
+            inner: Arc::new(ClientInner {
+                client: self.inner.client.clone(),
+                token: self.inner.token.clone(),
+                retry_config: self.inner.retry_config,
+                base_url: Cow::Owned(base_url.into()),
+            }),
+        }
     }
 
     /// Returns the media endpoint for anime and manga operations.
+    #[inline]
     pub fn media(&self) -> MediaEndpoint {
         MediaEndpoint::new(self.clone())
     }
 
     /// Returns the media endpoint for anime operations (alias for media()).
+    #[inline]
     pub fn anime(&self) -> MediaEndpoint {
         self.media()
     }
 
     /// Returns the media endpoint for manga operations (alias for media()).
+    #[inline]
     pub fn manga(&self) -> MediaEndpoint {
         self.media()
     }
 
     /// Returns the medialist endpoint for user anime/manga list operations.
+    #[inline]
     pub fn medialist(&self) -> MediaListEndpoint {
         MediaListEndpoint::new(self.clone())
     }
 
     /// Returns the character endpoint for character operations.
+    #[inline]
     pub fn character(&self) -> CharacterEndpoint {
         CharacterEndpoint::new(self.clone())
     }
 
     /// Returns the common endpoint for likes, follows, and favorites.
+    #[inline]
     pub fn common(&self) -> CommonEndpoint {
         CommonEndpoint::new(self.clone())
     }
 
     /// Returns the staff endpoint for staff member operations.
+    #[inline]
     pub fn staff(&self) -> StaffEndpoint {
         StaffEndpoint::new(self.clone())
     }
 
     /// Returns the user endpoint for user profile operations.
+    #[inline]
     pub fn user(&self) -> UserEndpoint {
         UserEndpoint::new(self.clone())
     }
 
     /// Returns the studio endpoint for studio operations.
+    #[inline]
     pub fn studio(&self) -> StudioEndpoint {
         StudioEndpoint::new(self.clone())
     }
 
     /// Returns the forum endpoint for thread and comment operations.
+    #[inline]
     pub fn forum(&self) -> ForumEndpoint {
         ForumEndpoint::new(self.clone())
     }
 
     /// Returns the activity endpoint for activity feed operations.
+    #[inline]
     pub fn activity(&self) -> ActivityEndpoint {
         ActivityEndpoint::new(self.clone())
     }
 
     /// Returns the review endpoint for review operations.
+    #[inline]
     pub fn review(&self) -> ReviewEndpoint {
         ReviewEndpoint::new(self.clone())
     }
 
     /// Returns the recommendation endpoint for recommendation operations.
+    #[inline]
     pub fn recommendation(&self) -> RecommendationEndpoint {
         RecommendationEndpoint::new(self.clone())
     }
 
     /// Returns the airing endpoint for airing schedule operations.
+    #[inline]
     pub fn airing(&self) -> AiringEndpoint {
         AiringEndpoint::new(self.clone())
     }
 
     /// Returns the notification endpoint for notification operations.
+    #[inline]
     pub fn notification(&self) -> NotificationEndpoint {
         NotificationEndpoint::new(self.clone())
     }
 
     /// Sets the authentication token for this client.
+    ///
+    /// Note: This creates a new client with the updated token due to Arc sharing.
     pub fn set_token(&mut self, token: &str) {
-        self.token = Some(token.to_string());
+        *self = Self {
+            inner: Arc::new(ClientInner {
+                client: self.inner.client.clone(),
+                token: Some(token.to_string()),
+                retry_config: self.inner.retry_config,
+                base_url: self.inner.base_url.clone(),
+            }),
+        };
     }
 
     /// Clears the authentication token from this client.
+    ///
+    /// Note: This creates a new client without the token due to Arc sharing.
     pub fn clear_token(&mut self) {
-        self.token = None;
+        *self = Self {
+            inner: Arc::new(ClientInner {
+                client: self.inner.client.clone(),
+                token: None,
+                retry_config: self.inner.retry_config,
+                base_url: self.inner.base_url.clone(),
+            }),
+        };
     }
 
     /// Returns whether this client has an authentication token.
+    #[inline]
     pub fn has_token(&self) -> bool {
-        self.token.is_some()
+        self.inner.token.is_some()
+    }
+
+    /// Returns the retry configuration for this client.
+    #[inline]
+    pub fn retry_config(&self) -> RetryConfig {
+        self.inner.retry_config
     }
 
     #[allow(dead_code)]
@@ -276,7 +350,7 @@ impl AniListClient {
     ) -> Result<Value, AniListError> {
         retry_with_backoff(
             || async { self.raw_query(query, variables).await },
-            self.retry_config,
+            self.inner.retry_config,
         )
         .await
     }
@@ -286,37 +360,25 @@ impl AniListClient {
         query: &'static str,
         variables: Option<&HashMap<String, Value>>,
     ) -> Result<Value, AniListError> {
-        let body = self.build_request_body(query, variables);
+        let body = RequestBody { query, variables };
 
         let mut request = self
+            .inner
             .client
-            .post(&self.base_url)
-            .header("Content-Type", "application/json");
+            .post(self.inner.base_url.as_ref())
+            .header("Content-Type", CONTENT_TYPE_JSON);
 
-        if let Some(token) = &self.token {
-            request = request.header("Authorization", format!("Bearer {}", token));
+        if let Some(token) = &self.inner.token {
+            // Preallocate the authorization header to avoid repeated allocations
+            let mut auth_header = String::with_capacity(BEARER_PREFIX.len() + token.len());
+            auth_header.push_str(BEARER_PREFIX);
+            auth_header.push_str(token);
+            request = request.header("Authorization", auth_header);
         }
 
         let response = request.json(&body).send().await?;
 
         self.handle_response(response).await
-    }
-
-    fn build_request_body(
-        &self,
-        query: &'static str,
-        variables: Option<&HashMap<String, Value>>,
-    ) -> HashMap<&'static str, Value> {
-        let mut body = HashMap::new();
-        body.insert("query", Value::String(query.to_string()));
-
-        if let Some(vars) = variables {
-            body.insert(
-                "variables",
-                Value::Object(vars.clone().into_iter().collect()),
-            );
-        }
-        body
     }
 
     async fn handle_response(&self, response: Response) -> Result<Value, AniListError> {
@@ -381,25 +443,37 @@ impl AniListClient {
 
     fn handle_graphql_errors(&self, json: Value) -> Result<Value, AniListError> {
         if let Some(errors) = json.get("errors") {
-            let error_message = if errors.is_array() {
-                errors
-                    .as_array()
-                    .unwrap()
+            let error_message = if let Some(arr) = errors.as_array() {
+                // Preallocate capacity for the joined string
+                let estimated_size: usize = arr
                     .iter()
                     .map(|e| {
                         e.get("message")
                             .and_then(|m| m.as_str())
-                            .unwrap_or("Unknown error")
+                            .map(|s| s.len() + 2)
+                            .unwrap_or(15)
                     })
-                    .collect::<Vec<_>>()
-                    .join(", ")
+                    .sum();
+
+                let mut result = String::with_capacity(estimated_size);
+                for (i, e) in arr.iter().enumerate() {
+                    if i > 0 {
+                        result.push_str(", ");
+                    }
+                    result.push_str(
+                        e.get("message")
+                            .and_then(|m| m.as_str())
+                            .unwrap_or("Unknown error"),
+                    );
+                }
+                result
             } else {
                 errors.to_string()
             };
 
-            if error_message.to_lowercase().contains("rate limit")
-                || error_message.to_lowercase().contains("too many requests")
-            {
+            // Use bytes comparison for case-insensitive check to avoid allocation
+            let lower = error_message.to_lowercase();
+            if lower.contains("rate limit") || lower.contains("too many requests") {
                 return Err(AniListError::BurstLimit);
             }
 
@@ -410,6 +484,14 @@ impl AniListClient {
             Ok(json)
         }
     }
+}
+
+/// Optimized request body structure that avoids HashMap allocation
+#[derive(Serialize)]
+struct RequestBody<'a> {
+    query: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    variables: Option<&'a HashMap<String, Value>>,
 }
 
 impl Default for AniListClient {
