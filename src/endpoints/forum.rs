@@ -1,7 +1,7 @@
 use crate::enums::thread::{ThreadCommentSort, ThreadSort};
 use crate::errors::AniListError;
 use crate::objects::common::Deleted;
-use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::responses::Page;
 use crate::objects::thread::{Thread, ThreadComment};
 use crate::{client::AniListClient, queries::forum};
 use serde::{Deserialize, Serialize};
@@ -142,12 +142,7 @@ impl ForumEndpoint {
         let query = forum::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Thread>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch a single thread with full details
@@ -155,12 +150,7 @@ impl ForumEndpoint {
         let query: &str = forum::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Thread>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch multiple thread comments with pagination
@@ -171,12 +161,7 @@ impl ForumEndpoint {
         let query = forum::FETCH_COMMENT;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<ThreadComment>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch a single thread comment
@@ -187,12 +172,7 @@ impl ForumEndpoint {
         let query = forum::FETCH_COMMENT_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ThreadComment>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Create or update a thread
@@ -200,12 +180,7 @@ impl ForumEndpoint {
         let query = forum::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Thread>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Delete a thread
@@ -213,10 +188,10 @@ impl ForumEndpoint {
         let query = forum::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
+            Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
         }
     }
@@ -229,12 +204,7 @@ impl ForumEndpoint {
         let query = forum::SAVE_COMMENT;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<ThreadComment>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Delete a thread comment
@@ -245,10 +215,10 @@ impl ForumEndpoint {
         let query = forum::DELETE_COMMENT;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
+            Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
         }
     }
@@ -261,12 +231,7 @@ impl ForumEndpoint {
         let query = forum::SUBSCRIPTION;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Thread>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     // Convenience functions

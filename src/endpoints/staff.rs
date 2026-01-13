@@ -1,6 +1,6 @@
 use crate::enums::staff::StaffSort;
 use crate::errors::AniListError;
-use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::responses::Page;
 use crate::objects::staff::Staff;
 use crate::{client::AniListClient, queries::staff};
 use serde::{Deserialize, Serialize};
@@ -102,24 +102,14 @@ impl StaffEndpoint {
         let query = staff::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Staff>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     pub async fn fetch_one(&self, options: &FetchStaffOneOptions) -> Result<Staff, AniListError> {
         let query = staff::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Staff>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     // Convenience functions
