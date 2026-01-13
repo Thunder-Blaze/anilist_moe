@@ -1,7 +1,4 @@
-//! # Utility Functions
-//!
-//! This module provides utility functions for handling rate limiting, retries,
-//! and other common operations when working with the AniList API.
+//! Utility helpers for rate limits, retries, and JSON.
 
 use crate::errors::AniListError;
 use serde_json::Value;
@@ -9,22 +6,14 @@ use std::collections::HashMap;
 use std::time::Duration;
 use tokio::time::sleep;
 
-/// Configuration for retry behavior when requests fail.
+/// Retry configuration.
 ///
-/// This struct controls how the client retries failed requests, including
-/// rate limit errors and transient network failures.
+/// Controls retry count, delay strategy, and backoff.
 ///
-/// # Examples
-///
+/// Example:
 /// ```rust
 /// use anilist_moe::utils::RetryConfig;
-///
-/// let config = RetryConfig {
-///     max_retries: 5,
-///     base_delay_ms: 2000,
-///     exponential_backoff: true,
-///     max_delay_ms: 60000,
-/// };
+/// let config = RetryConfig { max_retries: 5, base_delay_ms: 2000, exponential_backoff: true, max_delay_ms: 60000 };
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RetryConfig {
@@ -50,8 +39,7 @@ impl Default for RetryConfig {
 }
 
 impl RetryConfig {
-    /// Creates a configuration optimized for rate limit handling.
-    /// Uses longer delays suitable for API rate limits.
+    /// Configuration tuned for API rate limits.
     #[must_use]
     pub fn for_rate_limits() -> Self {
         Self {
@@ -62,8 +50,7 @@ impl RetryConfig {
         }
     }
 
-    /// Creates a configuration for aggressive retries.
-    /// Uses shorter delays, suitable for transient errors.
+    /// Configuration for aggressive retries (transient errors).
     #[must_use]
     pub fn aggressive() -> Self {
         Self {
@@ -86,9 +73,7 @@ impl RetryConfig {
     }
 }
 
-/// Retries an operation with exponential backoff on rate limit errors.
-///
-/// Automatically handles rate limits by sleeping and retrying according to the provided config.
+/// Retry an operation with backoff on rate limits.
 pub async fn retry_with_backoff<F, Fut, T>(
     mut operation: F,
     config: RetryConfig,
