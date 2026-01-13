@@ -2,7 +2,7 @@ use crate::enums::media::{MediaSort, MediaType};
 use crate::enums::media_list::MediaListStatus;
 use crate::enums::user::{UserSort, UserStatisticsSort};
 use crate::errors::AniListError;
-use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::responses::Page;
 use crate::objects::user::User;
 use crate::{client::AniListClient, queries::user};
 use serde::{Deserialize, Serialize};
@@ -152,12 +152,7 @@ impl UserEndpoint {
         let query = user::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<User>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch a single user with full details
@@ -165,23 +160,13 @@ impl UserEndpoint {
         let query = user::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<User>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch basic user information
     pub async fn fetch_basic(&self) -> Result<User, AniListError> {
         let query = user::BASIC;
-        let response: Result<GraphQLResponse<User>, AniListError> =
-            self.client.query_typed(query, None).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, None).await
     }
 
     /// Fetch user followers
@@ -192,12 +177,7 @@ impl UserEndpoint {
         let query = user::FOLLOWERS;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<User>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch users that the user is following
@@ -208,12 +188,7 @@ impl UserEndpoint {
         let query = user::FOLLOWING;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<User>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch user favorites with conditional sections and independent pagination
@@ -224,12 +199,7 @@ impl UserEndpoint {
         let query = user::FAVORITES;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<User>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch user's media list
@@ -240,12 +210,7 @@ impl UserEndpoint {
         let query = user::MEDIA_LIST;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<User>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetch user statistics
@@ -253,12 +218,7 @@ impl UserEndpoint {
         let query = user::STATS;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<User>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(e) => Err(e),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     // Convenience functions

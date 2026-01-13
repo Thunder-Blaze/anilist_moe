@@ -4,6 +4,7 @@ use crate::endpoints::{
     StaffEndpoint, StudioEndpoint, UserEndpoint,
 };
 use crate::errors::AniListError;
+use crate::objects::responses::GraphQLResponse;
 use crate::utils::{RetryConfig, retry_with_backoff};
 use reqwest::{Client, Response, StatusCode};
 use serde::Serialize;
@@ -329,7 +330,7 @@ impl AniListClient {
         self.execute_query(query, variables).await
     }
 
-    pub(crate) async fn query_typed<T>(
+    pub async fn fetch<T>(
         &self,
         query: &'static str,
         variables: Option<&HashMap<String, Value>>,
@@ -338,9 +339,11 @@ impl AniListClient {
         T: serde::de::DeserializeOwned,
     {
         let response_data = self.execute_query(query, variables).await?;
-        from_value(response_data).map_err(|e| AniListError::ParseError {
-            message: format!("Failed to deserialize response: {}", e),
-        })
+        let wrapper: GraphQLResponse<T> =
+            from_value(response_data).map_err(|e| AniListError::ParseError {
+                message: format!("Failed to deserialize response: {}", e),
+            })?;
+        Ok(wrapper.data)
     }
 
     async fn execute_query(

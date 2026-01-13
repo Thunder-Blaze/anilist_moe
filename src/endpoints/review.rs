@@ -2,7 +2,7 @@ use crate::enums::media::MediaType;
 use crate::enums::review::ReviewSort;
 use crate::errors::AniListError;
 use crate::objects::common::Deleted;
-use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::responses::Page;
 use crate::objects::review::Review;
 use crate::{client::AniListClient, queries::review};
 use serde::{Deserialize, Serialize};
@@ -70,34 +70,24 @@ impl ReviewEndpoint {
         let query = review::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Review>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     pub async fn save(&self, options: &SaveReviewOptions) -> Result<Review, AniListError> {
         let query = review::SAVE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Review>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     pub async fn delete(&self, options: &DeleteReviewOptions) -> Result<bool, AniListError> {
         let query = review::DELETE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Deleted>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&variables_map)).await;
         match response {
-            Ok(res) => Ok(res.data.deleted.unwrap_or_default()),
+            Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
         }
     }
@@ -106,12 +96,7 @@ impl ReviewEndpoint {
         let query = review::RATE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Review>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     // Convenience functions

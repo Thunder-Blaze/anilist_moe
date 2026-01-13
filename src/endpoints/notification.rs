@@ -1,6 +1,6 @@
 use crate::enums::notification::NotificationType;
 use crate::errors::AniListError;
-use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::responses::Page;
 use crate::unions::notification::NotificationUnion;
 use crate::{client::AniListClient, queries::notification};
 use serde::{Deserialize, Serialize};
@@ -39,12 +39,7 @@ impl NotificationEndpoint {
         let query = notification::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<NotificationUnion>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     // Convenience functions

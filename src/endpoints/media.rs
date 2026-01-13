@@ -2,7 +2,7 @@ use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, Medi
 use crate::enums::staff::StaffLanguage;
 use crate::errors::AniListError;
 use crate::objects::media::Media;
-use crate::objects::responses::{GraphQLResponse, Page};
+use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::media};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -341,12 +341,7 @@ impl MediaEndpoint {
         let query = media::FETCH;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Page<Vec<Media>>>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     /// Fetches detailed information about a single media item.
@@ -382,12 +377,7 @@ impl MediaEndpoint {
         let query = media::FETCH_ONE;
         let variables = json!(options);
         let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<GraphQLResponse<Media>, AniListError> =
-            self.client.query_typed(query, Some(&variables_map)).await;
-        match response {
-            Ok(res) => Ok(res.data),
-            Err(err) => Err(err),
-        }
+        self.client.fetch(query, Some(&variables_map)).await
     }
 
     // Convenience functions - Anime
