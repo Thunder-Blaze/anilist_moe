@@ -1,8 +1,7 @@
-//! Test utilities and harness for handling AniList API rate limits.
+//! Test utilities for AniList rate limits.
 //!
-//! This module provides a test runner that automatically handles rate limits
-//! by pausing ALL threads for a minute when any thread encounters a 429 error.
-//! It also retries on transient network errors.
+//! Coordinates pauses across threads on 429 responses and retries
+//! transient network failures.
 
 use anilist_moe::{AniListClient, AniListError};
 use std::future::Future;
@@ -12,24 +11,24 @@ use tokio::sync::Mutex;
 use tokio::time::sleep;
 
 /// Rate limit configuration for tests
-const RATE_LIMIT_PAUSE_SECS: u64 = 61; // Pause for 61 seconds on rate limit
-const MIN_DELAY_BETWEEN_REQUESTS_MS: u64 = 700; // Minimum delay between API calls
-const RATE_LIMIT_WINDOW_REQUESTS: u32 = 80; // Be conservative, AniList allows 90/min
-const MAX_NETWORK_RETRIES: u32 = 3; // Max retries for network errors
-const NETWORK_RETRY_DELAY_MS: u64 = 2000; // Delay before retrying network errors
+const RATE_LIMIT_PAUSE_SECS: u64 = 61; // Pause duration after 429
+const MIN_DELAY_BETWEEN_REQUESTS_MS: u64 = 700; // Per-request delay
+const RATE_LIMIT_WINDOW_REQUESTS: u32 = 80; // Soft cap (< 90/min)
+const MAX_NETWORK_RETRIES: u32 = 3; // Retry budget
+const NETWORK_RETRY_DELAY_MS: u64 = 2000; // Backoff between retries
 
-/// Global rate limit coordinator - shared across ALL tests
+/// Global rate limiter shared across tests
 static GLOBAL_RATE_LIMITER: GlobalRateLimiter = GlobalRateLimiter::new();
 
-/// Global rate limiter that coordinates all test threads
+/// Coordinates rate limit state across threads
 pub struct GlobalRateLimiter {
-    /// Whether we're currently in a rate limit pause
+    /// Whether a pause is active
     is_paused: AtomicBool,
-    /// Unix timestamp (seconds) when the pause ends
+    /// Pause end (unix seconds)
     pause_until: AtomicU64,
-    /// Total request count in the current window
+    /// Requests in current window
     request_count: AtomicU32,
-    /// Unix timestamp when the current window started
+    /// Window start (unix seconds)
     window_start: AtomicU64,
 }
 
@@ -43,7 +42,7 @@ impl GlobalRateLimiter {
         }
     }
 
-    /// Get current unix timestamp in seconds
+    /// Current unix timestamp (seconds)
     fn now_secs() -> u64 {
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -51,30 +50,25 @@ impl GlobalRateLimiter {
             .as_secs()
     }
 
-    /// Trigger a global pause for all threads
+    /// Start a global pause
     pub fn trigger_pause(&self) {
         let pause_end = Self::now_secs() + RATE_LIMIT_PAUSE_SECS;
         self.pause_until.store(pause_end, Ordering::SeqCst);
         self.is_paused.store(true, Ordering::SeqCst);
-        eprintln!(
-            "\n🚨 RATE LIMIT HIT! All threads pausing for {} seconds...\n",
-            RATE_LIMIT_PAUSE_SECS
-        );
+        eprintln!("Rate limit hit. Pausing {}s", RATE_LIMIT_PAUSE_SECS);
     }
 
-    /// Check if we need to pause, and if so, wait until pause is over
+    /// Wait while a pause is active
     pub async fn wait_if_paused(&self) {
         loop {
             let pause_until = self.pause_until.load(Ordering::SeqCst);
             let now = Self::now_secs();
 
             if pause_until > now {
-                // We need to wait
                 let wait_secs = pause_until - now;
                 eprintln!("⏳ Waiting {} seconds for rate limit reset...", wait_secs);
                 sleep(Duration::from_secs(wait_secs + 1)).await;
             } else {
-                // Pause is over, reset the flag
                 self.is_paused.store(false, Ordering::SeqCst);
                 break;
             }
@@ -83,19 +77,16 @@ impl GlobalRateLimiter {
 
     /// Track a request and enforce delays
     pub async fn pre_request(&self) {
-        // First, check if we need to wait for a global pause
         self.wait_if_paused().await;
 
         let now = Self::now_secs();
         let window_start = self.window_start.load(Ordering::SeqCst);
 
-        // Check if we need to start a new window (60 seconds elapsed)
         if now - window_start >= 60 {
             self.window_start.store(now, Ordering::SeqCst);
             self.request_count.store(0, Ordering::SeqCst);
         }
 
-        // Check if we're approaching the rate limit
         let count = self.request_count.fetch_add(1, Ordering::SeqCst);
         if count >= RATE_LIMIT_WINDOW_REQUESTS {
             let window_start = self.window_start.load(Ordering::SeqCst);
@@ -108,21 +99,18 @@ impl GlobalRateLimiter {
                     count, RATE_LIMIT_WINDOW_REQUESTS, wait_secs
                 );
                 sleep(Duration::from_secs(wait_secs + 1)).await;
-                // Reset the window
                 self.window_start.store(Self::now_secs(), Ordering::SeqCst);
                 self.request_count.store(0, Ordering::SeqCst);
             }
         }
 
-        // Add small delay between requests
         sleep(Duration::from_millis(MIN_DELAY_BETWEEN_REQUESTS_MS)).await;
     }
 
-    /// Handle a rate limit error - triggers global pause
+    /// Handle a rate limit error (global pause)
     pub async fn handle_rate_limit(&self) {
         self.trigger_pause();
         self.wait_if_paused().await;
-        // Reset counters after pause
         self.window_start.store(Self::now_secs(), Ordering::SeqCst);
         self.request_count.store(0, Ordering::SeqCst);
     }

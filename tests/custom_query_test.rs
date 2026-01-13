@@ -1,7 +1,6 @@
-//! Test demonstrating custom query usage with the fetch method
+//! Custom query usage with `fetch`.
 //!
-//! This test shows how to use the fetch method with a custom GraphQL query
-//! to fetch only specific fields from media items.
+//! Fetches a subset of media fields via a manual GraphQL query.
 
 mod test_harness;
 
@@ -9,7 +8,7 @@ use anilist_moe::objects::{media::Media, responses::Page};
 use std::collections::HashMap;
 use test_harness::{TestHarness, delay_between_tests};
 
-/// Custom GraphQL query to fetch only id and title for 5 media items
+/// GraphQL query: id + title for up to 5 media
 const CUSTOM_MEDIA_QUERY: &str = r#"
 query ($page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
@@ -60,15 +59,12 @@ async fn test_custom_query_with_fetch() {
         media_list.len()
     );
 
-    // Verify each media has the requested fields
     for media in &media_list {
         assert!(media.id.is_some(), "Media should have an id");
         assert!(media.id.unwrap() > 0, "Media id should be positive");
         assert!(media.title.is_some(), "Media should have a title");
 
-        // Verify title structure
         if let Some(ref title) = media.title {
-            // At least one title variant should be present
             let has_title =
                 title.romaji.is_some() || title.english.is_some() || title.native.is_some();
             assert!(has_title, "At least one title variant should be present");
@@ -76,7 +72,7 @@ async fn test_custom_query_with_fetch() {
     }
 }
 
-/// Test demonstrating that Media objects from custom queries are fully compatible
+/// Media from custom queries remains compatible
 #[tokio::test]
 async fn test_custom_query_media_compatibility() {
     delay_between_tests().await;
@@ -98,7 +94,6 @@ async fn test_custom_query_media_compatibility() {
     assert!(result.is_ok(), "Custom query should succeed");
     let media_list = result.unwrap().data;
 
-    // Verify Media objects work with standard Media operations
     for media in media_list {
         let id = media.id.expect("Media should have id");
         let title = media.title.as_ref().expect("Media should have title");

@@ -58,7 +58,9 @@ Be respectful and constructive in all interactions. We aim to maintain a welcomi
 ### Documentation
 
 - Add doc comments for all public functions and types
-- Include examples in doc comments where appropriate
+- Prefer concise, meaningful comments; avoid AI-generated fluff
+- Do not narrate obvious behavior (e.g., asserts, simple control flow)
+- Include examples in doc comments where they add value
 - Update README.md if adding new features
 - Add entries to EXAMPLES.md for new endpoints
 

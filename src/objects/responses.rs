@@ -7,17 +7,8 @@ use std::marker::PhantomData;
 
 /// Top-level GraphQL response wrapper.
 ///
-/// This struct wraps all responses from the AniList GraphQL API.
-/// The generic type `T` represents the actual data returned by the query.
-///
-/// # Type Parameters
-///
-/// * `T` - The type of data contained in the response
-///
-/// # Notes
-///
-/// This wrapper is handled internally by the client and is transparent
-/// to users in most cases. Endpoint methods return the inner `T` directly.
+/// Wraps AniList GraphQL responses. The generic `T` is the actual data.
+/// Notes: handled internally; endpoints typically return the inner `T`.
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -27,37 +18,23 @@ pub struct GraphQLResponse<T> {
 
 /// Pagination wrapper for list responses.
 ///
-/// This struct wraps paginated list responses from the AniList API.
-/// It contains pagination metadata and the actual data list.
-///
-/// # Type Parameters
-///
-/// * `T` - The type of data list (typically `Vec<SomeType>`)
-///
-/// # Fields
-///
-/// * `page_info` - Optional pagination metadata (current page, total, has_next_page, etc.)
-/// * `data` - The actual list of items returned by the query
-///
-/// # Examples
-///
+/// Contains optional `page_info` metadata and the `data` list (`T`).
+/// Example:
 /// ```rust
 /// # use anilist_moe::AniListClient;
 /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let client = AniListClient::new();
+/// let response = client
+///     .anime()
+///     .get_trending_anime(Some(1), Some(10))
+///     .await?; // Page<Vec<Media>>
 ///
-/// // Returns Page<Vec<Media>>
-/// let response = client.anime().get_trending_anime(Some(1), Some(10)).await?;
-///
-/// // Access the Vec<Media> through response.data
 /// for anime in &response.data {
 ///     println!("Title: {:?}", anime.title);
 /// }
 ///
-/// // Access pagination info
-/// if let Some(page_info) = &response.page_info {
-///     println!("Current page: {:?}", page_info.current_page);
-///     println!("Has next page: {:?}", page_info.has_next_page);
+/// if let Some(info) = &response.page_info {
+///     println!("Has next: {:?}", info.has_next_page);
 /// }
 /// # Ok(())
 /// # }
