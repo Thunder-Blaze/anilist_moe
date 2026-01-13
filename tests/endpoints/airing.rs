@@ -1,20 +1,27 @@
 //! Tests for Airing endpoint
 
-use anilist_moe::{AniListClient, endpoints::airing::*};
-use log::info;
+use crate::test_harness::{TestHarness, delay_between_tests};
+use anilist_moe::endpoints::airing::*;
+
+fn harness() -> TestHarness {
+    TestHarness::new()
+}
 
 #[tokio::test]
 async fn test_fetch_airing_schedules() {
-    let client = AniListClient::new();
-    let options = FetchAiringOptions {
-        per_page: Some(10),
-        ..Default::default()
-    };
+    let h = harness();
+    let client = h.client();
 
-    let result = client.airing().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching airing schedules: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchAiringOptions {
+                per_page: Some(10),
+                ..Default::default()
+            };
+            client.airing().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch airing schedules: {:?}",
@@ -22,7 +29,6 @@ async fn test_fetch_airing_schedules() {
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let schedules = &response.data;
     assert!(!schedules.is_empty(), "Should return airing schedules");
 
@@ -43,32 +49,47 @@ async fn test_fetch_airing_schedules() {
 
 #[tokio::test]
 async fn test_fetch_airing_pagination() {
-    let client = AniListClient::new();
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let options_page1 = FetchAiringOptions {
-        per_page: Some(5),
-        page: Some(1),
-        ..Default::default()
-    };
+    // Fetch page 1
+    let result1 = h
+        .run(|| async {
+            let options = FetchAiringOptions {
+                per_page: Some(5),
+                page: Some(1),
+                ..Default::default()
+            };
+            client.airing().fetch(&options).await
+        })
+        .await;
 
-    let result1 = client.airing().fetch(&options_page1).await;
-    if let Err(ref e) = result1 {
-        eprintln!("Error fetching airing page 1: {:?}", e);
-    }
     assert!(
         result1.is_ok(),
         "Should successfully fetch page 1: {:?}",
-        result1.as_ref().err()
+        result1.err()
     );
 
-    let options_page2 = FetchAiringOptions {
-        per_page: Some(5),
-        page: Some(2),
-        ..Default::default()
-    };
+    delay_between_tests().await;
 
-    let result2 = client.airing().fetch(&options_page2).await;
-    assert!(result2.is_ok(), "Should successfully fetch page 2");
+    // Fetch page 2
+    let result2 = h
+        .run(|| async {
+            let options = FetchAiringOptions {
+                per_page: Some(5),
+                page: Some(2),
+                ..Default::default()
+            };
+            client.airing().fetch(&options).await
+        })
+        .await;
+
+    assert!(
+        result2.is_ok(),
+        "Should successfully fetch page 2: {:?}",
+        result2.err()
+    );
 
     let response1 = result1.unwrap();
     let response2 = result2.unwrap();
@@ -76,6 +97,11 @@ async fn test_fetch_airing_pagination() {
     let schedules1 = &response1.data;
     let schedules2 = &response2.data;
 
+    // Verify we got results
+    assert!(!schedules1.is_empty(), "Page 1 should have results");
+    assert!(!schedules2.is_empty(), "Page 2 should have results");
+
+    // Verify different pages have different results
     let ids1: Vec<Option<i32>> = schedules1.iter().map(|s| s.id).collect();
     let ids2: Vec<Option<i32>> = schedules2.iter().map(|s| s.id).collect();
     assert_ne!(ids1, ids2, "Different pages should have different results");
@@ -83,16 +109,20 @@ async fn test_fetch_airing_pagination() {
 
 #[tokio::test]
 async fn test_airing_data_types() {
-    let client = AniListClient::new();
-    let options = FetchAiringOptions {
-        per_page: Some(1),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.airing().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching airing schedule: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchAiringOptions {
+                per_page: Some(1),
+                ..Default::default()
+            };
+            client.airing().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch airing schedule: {:?}",
@@ -100,7 +130,6 @@ async fn test_airing_data_types() {
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     if let Some(schedule) = response.data.first() {
         assert!(
             schedule.id.is_some() && schedule.id.unwrap() > 0,

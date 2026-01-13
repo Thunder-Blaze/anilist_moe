@@ -32,6 +32,7 @@ pub struct Media {
     pub id: Option<i32>,
     pub id_mal: Option<i32>,
     pub title: Option<MediaTitle>,
+    #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
     pub format: Option<MediaFormat>,
     pub status: Option<MediaStatus>,
@@ -66,6 +67,8 @@ pub struct Media {
     pub characters: Option<CharacterConnection>,
     pub staff: Option<StaffConnection>,
     pub studios: Option<StudioConnection>,
+    #[serde(rename = "fullStudios")]
+    pub studios_full: Option<StudioConnection>,
     pub is_favourite: Option<bool>,
     pub is_favourite_blocked: Option<bool>,
     pub is_adult: Option<bool>,
@@ -145,6 +148,7 @@ pub struct MediaExternalLink {
     pub url: Option<String>,
     pub site: Option<String>,
     pub site_id: Option<i32>,
+    #[serde(rename = "type")]
     pub link_type: Option<ExternalLinkType>,
     pub language: Option<String>,
     pub color: Option<String>,

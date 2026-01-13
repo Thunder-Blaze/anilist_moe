@@ -22,6 +22,11 @@ pub struct FetchUserOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
+    // Extra
+    #[serde(rename = "includeFavourites")]
+    pub include_favourites: Option<bool>,
+    #[serde(rename = "includeStatistics")]
+    pub include_statistics: Option<bool>,
 }
 
 /// Options for fetching a single user by ID or name.

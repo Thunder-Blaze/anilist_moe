@@ -1,4 +1,5 @@
 use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
+use crate::enums::staff::StaffLanguage;
 use crate::errors::AniListError;
 use crate::objects::media::Media;
 use crate::objects::responses::{GraphQLResponse, Page};
@@ -143,6 +144,88 @@ pub struct FetchMediaOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
+    #[serde(rename = "includeStartDate")]
+    pub include_start_date: Option<bool>,
+    #[serde(rename = "includeEndDate")]
+    pub include_end_date: Option<bool>,
+    #[serde(rename = "includeDuration")]
+    pub include_duration: Option<bool>,
+    #[serde(rename = "includeVolumes")]
+    pub include_volumes: Option<bool>,
+    #[serde(rename = "includeCountryOfOrigin")]
+    pub include_country_of_origin: Option<bool>,
+    #[serde(rename = "includeIsLicensed")]
+    pub include_is_licensed: Option<bool>,
+    #[serde(rename = "includeSource")]
+    pub include_source: Option<bool>,
+    #[serde(rename = "includeHashtag")]
+    pub include_hashtag: Option<bool>,
+    #[serde(rename = "includeTrailer")]
+    pub include_trailer: Option<bool>,
+    #[serde(rename = "includeUpdatedAt")]
+    pub include_updated_at: Option<bool>,
+    #[serde(rename = "includeCoverImageExtraLarge")]
+    pub include_cover_image_extra_large: Option<bool>,
+    #[serde(rename = "includeMeanScore")]
+    pub include_mean_score: Option<bool>,
+    #[serde(rename = "includeIsLocked")]
+    pub include_is_locked: Option<bool>,
+    #[serde(rename = "includeTrending")]
+    pub include_trending: Option<bool>,
+    #[serde(rename = "includeTags")]
+    pub include_tags: Option<bool>,
+    #[serde(rename = "includeNextAiringEpisode")]
+    pub include_next_airing_episode: Option<bool>,
+    #[serde(rename = "includeRelations")]
+    pub include_relations: Option<bool>,
+    #[serde(rename = "includeCharacters")]
+    pub include_characters: Option<bool>,
+    #[serde(rename = "includeStaff")]
+    pub include_staff: Option<bool>,
+    #[serde(rename = "includeStudios")]
+    pub include_studios: Option<bool>,
+    #[serde(rename = "includeMediaListEntryDetails")]
+    pub include_media_list_entry_details: Option<bool>,
+    #[serde(rename = "includeReviews")]
+    pub include_reviews: Option<bool>,
+    #[serde(rename = "includeRecommendations")]
+    pub include_recommendations: Option<bool>,
+    #[serde(rename = "includeExternalLinks")]
+    pub include_external_links: Option<bool>,
+    #[serde(rename = "includeStreamingEpisodes")]
+    pub include_streaming_episodes: Option<bool>,
+    #[serde(rename = "includeRankings")]
+    pub include_rankings: Option<bool>,
+    #[serde(rename = "includeStats")]
+    pub include_stats: Option<bool>,
+    #[serde(rename = "includeAutoCreateForumThread")]
+    pub include_auto_create_forum_thread: Option<bool>,
+    #[serde(rename = "includeIsRecommendationBlocked")]
+    pub include_is_recommendation_blocked: Option<bool>,
+    #[serde(rename = "includeIsReviewBlocked")]
+    pub include_is_review_blocked: Option<bool>,
+    #[serde(rename = "includeModNotes")]
+    pub include_mod_notes: Option<bool>,
+    // Pagination fields
+    #[serde(rename = "charactersPage")]
+    pub characters_page: Option<i32>,
+    #[serde(rename = "charactersPerPage")]
+    pub characters_per_page: Option<i32>,
+    #[serde(rename = "staffPage")]
+    pub staff_page: Option<i32>,
+    #[serde(rename = "staffPerPage")]
+    pub staff_per_page: Option<i32>,
+    #[serde(rename = "reviewsPage")]
+    pub reviews_page: Option<i32>,
+    #[serde(rename = "reviewsPerPage")]
+    pub reviews_per_page: Option<i32>,
+    #[serde(rename = "recommendationsPage")]
+    pub recommendations_page: Option<i32>,
+    #[serde(rename = "recommendationsPerPage")]
+    pub recommendations_per_page: Option<i32>,
+    // Filter fields for included connections
+    #[serde(rename = "voiceActorLanguage")]
+    pub voice_actor_language: Option<StaffLanguage>,
 }
 
 /// Options for fetching detailed information about a single media item.

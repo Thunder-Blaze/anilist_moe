@@ -1,28 +1,27 @@
 //! Tests for Recommendation endpoint
 
-use anilist_moe::{AniListClient, endpoints::recommendation::*};
-use dotenv::dotenv;
-use log::info;
-use std::env;
+use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
+use anilist_moe::endpoints::recommendation::*;
 
-fn get_authenticated_client() -> AniListClient {
-    dotenv().ok();
-    let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set in .env file");
-    AniListClient::with_token(&token)
+fn harness() -> TestHarness {
+    TestHarness::new()
 }
 
 #[tokio::test]
 async fn test_fetch_recommendations() {
-    let client = AniListClient::new();
-    let options = FetchRecommendationOptions {
-        per_page: Some(5),
-        ..Default::default()
-    };
+    let h = harness();
+    let client = h.client();
 
-    let result = client.recommendation().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching recommendations: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchRecommendationOptions {
+                per_page: Some(5),
+                ..Default::default()
+            };
+            client.recommendation().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch recommendations: {:?}",
@@ -30,7 +29,6 @@ async fn test_fetch_recommendations() {
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let recommendations = &response.data;
     assert!(
         !recommendations.is_empty(),
@@ -40,21 +38,28 @@ async fn test_fetch_recommendations() {
 
 #[tokio::test]
 async fn test_fetch_recommendations_by_media() {
-    let client = AniListClient::new();
-    let options = FetchRecommendationOptions {
-        media_id: Some(1), // Cowboy Bebop
-        per_page: Some(5),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.recommendation().fetch(&options).await;
+    let result = h
+        .run(|| async {
+            let options = FetchRecommendationOptions {
+                media_id: Some(1), // Cowboy Bebop
+                per_page: Some(5),
+                ..Default::default()
+            };
+            client.recommendation().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
-        "Should successfully fetch recommendations by media"
+        "Should successfully fetch recommendations by media: {:?}",
+        result.err()
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let recommendations = &response.data;
     if !recommendations.is_empty() {
         let first_rec = &recommendations[0];
@@ -64,17 +69,27 @@ async fn test_fetch_recommendations_by_media() {
 
 #[tokio::test]
 async fn test_recommendation_data_types() {
-    let client = AniListClient::new();
-    let options = FetchRecommendationOptions {
-        per_page: Some(1),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.recommendation().fetch(&options).await;
-    assert!(result.is_ok(), "Should successfully fetch recommendations");
+    let result = h
+        .run(|| async {
+            let options = FetchRecommendationOptions {
+                per_page: Some(1),
+                ..Default::default()
+            };
+            client.recommendation().fetch(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch recommendations: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let recommendations = &response.data;
 
     if !recommendations.is_empty() {
@@ -87,23 +102,27 @@ async fn test_recommendation_data_types() {
 // Authentication required tests
 #[tokio::test]
 async fn test_save_recommendation() {
-    let client = get_authenticated_client();
-
-    // Try to save a recommendation rating
-    // Recommending Cowboy Bebop (1) -> Samurai Champloo (205)
-    let options = SaveRecommendationOptions {
-        media_id: 1,
-        media_recommendation_id: 205,
-        rating: 1, // 1 = upvote, -1 = downvote
+    let Some(h) = get_authenticated_harness() else {
+        eprintln!("Skipping test_save_recommendation: ANILIST_TOKEN not set");
+        return;
     };
+    let client = h.client().clone();
 
-    let result = client.recommendation().save(&options).await;
+    let result = h
+        .run(|| async {
+            // Recommending Cowboy Bebop (1) -> Samurai Champloo (205)
+            let options = SaveRecommendationOptions {
+                media_id: 1,
+                media_recommendation_id: 205,
+                rating: 1,
+            };
+            client.recommendation().save(&options).await
+        })
+        .await;
 
     match result {
         Ok(response) => {
-            info!("Save Response: {:?}", response);
-            println!("Successfully saved recommendation");
-            println!("Recommendation ID: {}", response.id);
+            println!("Successfully saved recommendation with ID: {}", response.id);
         }
         Err(e) => {
             println!("Expected authentication error or permission issue: {:?}", e);

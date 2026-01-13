@@ -1,22 +1,35 @@
 //! Tests for Studio endpoint
 
-use anilist_moe::{AniListClient, endpoints::studio::*};
-use log::info;
+use crate::test_harness::{TestHarness, delay_between_tests};
+use anilist_moe::endpoints::studio::*;
+
+fn harness() -> TestHarness {
+    TestHarness::new()
+}
 
 #[tokio::test]
 async fn test_fetch_studio_by_search() {
-    let client = AniListClient::new();
-    let options = FetchStudioOptions {
-        search: Some("Kyoto".to_string()),
-        per_page: Some(5),
-        ..Default::default()
-    };
+    let h = harness();
+    let client = h.client();
 
-    let result = client.studio().fetch(&options).await;
-    assert!(result.is_ok(), "Should successfully fetch studios");
+    let result = h
+        .run(|| async {
+            let options = FetchStudioOptions {
+                search: Some("Kyoto".to_string()),
+                per_page: Some(5),
+                ..Default::default()
+            };
+            client.studio().fetch(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch studios: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let studios = &response.data;
     assert!(!studios.is_empty(), "Should return at least one studio");
 
@@ -30,17 +43,27 @@ async fn test_fetch_studio_by_search() {
 
 #[tokio::test]
 async fn test_fetch_studio_by_id() {
-    let client = AniListClient::new();
-    let options = FetchStudioOptions {
-        id: Some(2), // Kyoto Animation
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.studio().fetch(&options).await;
-    assert!(result.is_ok(), "Should successfully fetch studio by ID");
+    let result = h
+        .run(|| async {
+            let options = FetchStudioOptions {
+                id: Some(2), // Kyoto Animation
+                ..Default::default()
+            };
+            client.studio().fetch(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch studio by ID: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let studios = &response.data;
     assert_eq!(studios.len(), 1, "Should return exactly one studio");
     assert_eq!(studios[0].id, Some(2), "Should return correct studio ID");
@@ -48,41 +71,53 @@ async fn test_fetch_studio_by_id() {
 
 #[tokio::test]
 async fn test_fetch_one_studio() {
-    let client = AniListClient::new();
-    let options = FetchStudioOneOptions {
-        id: Some(2),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.studio().fetch_one(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching one studio: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchStudioOneOptions {
+                id: Some(2),
+                ..Default::default()
+            };
+            client.studio().fetch_one(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch one studio: {:?}",
         result.err()
     );
 
-    let response = result.unwrap();
-    info!("Response: {:?}", response);
-    let studio = &response;
+    let studio = result.unwrap();
     assert_eq!(studio.id, Some(2), "Should return studio with ID 2");
 }
 
 #[tokio::test]
 async fn test_studio_data_types() {
-    let client = AniListClient::new();
-    let options = FetchStudioOptions {
-        id: Some(2),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.studio().fetch(&options).await;
-    assert!(result.is_ok(), "Should successfully fetch studio");
+    let result = h
+        .run(|| async {
+            let options = FetchStudioOptions {
+                id: Some(2),
+                ..Default::default()
+            };
+            client.studio().fetch(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch studio: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let studio = &response.data[0];
 
     if let Some(id) = studio.id {

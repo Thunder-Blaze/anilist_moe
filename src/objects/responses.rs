@@ -113,6 +113,10 @@ where
                             // Deserialize the value directly into the PageInfo struct.
                             page_info = Some(map.next_value()?);
                         }
+                        "extensions" => {
+                            // Ignore extensions field if present
+                            let _ = map.next_value::<de::IgnoredAny>()?;
+                        }
                         // Any other key is treated as the data field.
                         _ => {
                             if data.is_some() {

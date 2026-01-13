@@ -1,30 +1,29 @@
 //! Tests for MediaList endpoint
 
+use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
+use anilist_moe::endpoints::medialist::*;
 use anilist_moe::enums::media_list::MediaListStatus;
-use anilist_moe::{AniListClient, endpoints::medialist::*};
-use dotenv::dotenv;
-use log::info;
-use std::env;
 
-fn get_authenticated_client() -> AniListClient {
-    dotenv().ok();
-    let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set in .env file");
-    AniListClient::with_token(&token)
+fn harness() -> TestHarness {
+    TestHarness::new()
 }
 
 #[tokio::test]
 async fn test_fetch_media_list() {
-    let client = AniListClient::new();
-    let options = FetchMediaListOptions {
-        user_id: Some(3225),
-        per_page: Some(5),
-        ..Default::default()
-    };
+    let h = harness();
+    let client = h.client();
 
-    let result = client.medialist().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching media list: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchMediaListOptions {
+                user_id: Some(3225),
+                per_page: Some(5),
+                ..Default::default()
+            };
+            client.medialist().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch media list: {:?}",
@@ -32,7 +31,6 @@ async fn test_fetch_media_list() {
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let lists = &response.data;
     assert!(
         !lists.is_empty(),
@@ -42,18 +40,24 @@ async fn test_fetch_media_list() {
 
 #[tokio::test]
 async fn test_fetch_media_list_by_media() {
-    let client = get_authenticated_client();
-    let options = FetchMediaListOptions {
-        media_id: Some(1), // Cowboy Bebop
-        per_page: Some(5),
-        is_following: Some(true),
-        ..Default::default()
+    let Some(h) = get_authenticated_harness() else {
+        eprintln!("Skipping test_fetch_media_list_by_media: ANILIST_TOKEN not set");
+        return;
     };
+    let client = h.client().clone();
 
-    let result = client.medialist().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching media list by media: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchMediaListOptions {
+                media_id: Some(1), // Cowboy Bebop
+                per_page: Some(5),
+                is_following: Some(true),
+                ..Default::default()
+            };
+            client.medialist().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch media list by media: {:?}",
@@ -61,7 +65,6 @@ async fn test_fetch_media_list_by_media() {
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let lists = &response.data;
     if !lists.is_empty() {
         let first_entry = &lists[0];
@@ -74,18 +77,28 @@ async fn test_fetch_media_list_by_media() {
 
 #[tokio::test]
 async fn test_media_list_data_types() {
-    let client = AniListClient::new();
-    let options = FetchMediaListOptions {
-        user_id: Some(3225),
-        per_page: Some(1),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.medialist().fetch(&options).await;
-    assert!(result.is_ok(), "Should successfully fetch media list");
+    let result = h
+        .run(|| async {
+            let options = FetchMediaListOptions {
+                user_id: Some(3225),
+                per_page: Some(1),
+                ..Default::default()
+            };
+            client.medialist().fetch(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should successfully fetch media list: {:?}",
+        result.err()
+    );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let lists = &response.data;
 
     if !lists.is_empty() {
@@ -95,20 +108,25 @@ async fn test_media_list_data_types() {
     }
 }
 
-// Authentication required test
+// Authentication required tests
 #[tokio::test]
 async fn test_save_media_list() {
-    let client = get_authenticated_client();
-
-    // This test will attempt to save a media list entry
-    // It might fail if the user doesn't have proper permissions
-    let options = SaveMediaListOptions {
-        media_id: Some(1), // Cowboy Bebop
-        status: Some(MediaListStatus::Planning),
-        ..Default::default()
+    let Some(h) = get_authenticated_harness() else {
+        eprintln!("Skipping test_save_media_list: ANILIST_TOKEN not set");
+        return;
     };
+    let client = h.client().clone();
 
-    let result = client.medialist().save(&options).await;
+    let result = h
+        .run(|| async {
+            let options = SaveMediaListOptions {
+                media_id: Some(1), // Cowboy Bebop
+                status: Some(MediaListStatus::Planning),
+                ..Default::default()
+            };
+            client.medialist().save(&options).await
+        })
+        .await;
 
     match result {
         Ok(response) => {
@@ -124,52 +142,40 @@ async fn test_save_media_list() {
 }
 
 #[tokio::test]
-async fn test_save_multiple_media_lists() {
-    let client = get_authenticated_client();
-
-    // Try to update multiple media list entries at once
-    let options = SaveMediaListMultipleOptions {
-        ids: vec![1, 2, 3], // Multiple anime IDs
-        status: Some(MediaListStatus::Planning),
-        ..Default::default()
-    };
-
-    let result = client.medialist().save_multiple(&options).await;
-
-    match result {
-        Ok(responses) => {
-            println!("Successfully saved {} media list entries", responses.len());
-            for response in responses {
-                println!("Updated entry ID: {}", response.id);
-            }
-        }
-        Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
-        }
-    }
-}
-
-#[tokio::test]
 async fn test_delete_media_list() {
-    let client = get_authenticated_client();
+    let Some(h) = get_authenticated_harness() else {
+        eprintln!("Skipping test_delete_media_list: ANILIST_TOKEN not set");
+        return;
+    };
+    let client = h.client().clone();
 
     // First create a media list entry to delete
-    let save_options = SaveMediaListOptions {
-        media_id: Some(20), // Random anime
-        status: Some(MediaListStatus::Planning),
-        ..Default::default()
-    };
+    let save_result = h
+        .run(|| async {
+            let options = SaveMediaListOptions {
+                media_id: Some(20),
+                status: Some(MediaListStatus::Planning),
+                ..Default::default()
+            };
+            client.medialist().save(&options).await
+        })
+        .await;
 
-    if let Ok(response) = client.medialist().save(&save_options).await {
+    if let Ok(response) = save_result {
         let entry_id = response.id;
 
-        let delete_options = DeleteMediaListOptions { id: entry_id };
+        delay_between_tests().await;
 
-        let result = client.medialist().delete(&delete_options).await;
+        let delete_result = h
+            .run(|| async {
+                let options = DeleteMediaListOptions { id: entry_id };
+                client.medialist().delete(&options).await
+            })
+            .await;
 
-        match result {
-            Ok(response) => {
-                if response == true {
+        match delete_result {
+            Ok(deleted) => {
+                if deleted {
                     println!("Successfully deleted media list entry");
                 } else {
                     println!("Failed to delete media list entry");

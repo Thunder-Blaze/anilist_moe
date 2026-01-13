@@ -1,28 +1,36 @@
 //! Tests for Activity endpoint
 
-use anilist_moe::{AniListClient, endpoints::activity::*, unions::activity::ActivityUnion};
+use crate::test_harness::{TestHarness, delay_between_tests};
+use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion};
 use dotenv::dotenv;
-use log::info;
 use std::env;
 
-fn get_authenticated_client() -> AniListClient {
+fn harness() -> TestHarness {
+    TestHarness::new()
+}
+
+fn authenticated_harness() -> Option<TestHarness> {
     dotenv().ok();
-    let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set in .env file");
-    AniListClient::with_token(&token)
+    env::var("ANILIST_TOKEN")
+        .ok()
+        .map(|token| TestHarness::with_token(&token))
 }
 
 #[tokio::test]
 async fn test_fetch_activities() {
-    let client = AniListClient::new();
-    let options = FetchActivityOptions {
-        per_page: Some(5),
-        ..Default::default()
-    };
+    let h = harness();
+    let client = h.client();
 
-    let result = client.activity().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching activities: {:?}", e);
-    }
+    let result = h
+        .run(|| async {
+            let options = FetchActivityOptions {
+                per_page: Some(5),
+                ..Default::default()
+            };
+            client.activity().fetch(&options).await
+        })
+        .await;
+
     assert!(
         result.is_ok(),
         "Should successfully fetch activities: {:?}",
@@ -30,114 +38,152 @@ async fn test_fetch_activities() {
     );
 
     let response = result.unwrap();
-    info!("Response: {:?}", response);
     let activities = &response.data;
+
+    // Activities feed should return results
+    assert!(activities.len() <= 5, "Should respect per_page limit");
     println!("Fetched {} activities", activities.len());
 }
 
 #[tokio::test]
 async fn test_fetch_activities_by_user() {
-    let client = AniListClient::new();
-    let options = FetchActivityOptions {
-        user_id: Some(5429396),
-        per_page: Some(5),
-        ..Default::default()
-    };
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
 
-    let result = client.activity().fetch(&options).await;
-    if let Err(ref e) = result {
-        eprintln!("Error fetching activities by user: {:?}", e);
-    }
-    if result.is_ok() {
-        let response = result.unwrap();
-        info!("Response: {:?}", response);
+    let result = h
+        .run(|| async {
+            let options = FetchActivityOptions {
+                user_id: Some(5429396),
+                per_page: Some(5),
+                ..Default::default()
+            };
+            client.activity().fetch(&options).await
+        })
+        .await;
+
+    if let Ok(response) = result {
         let activities = &response.data;
         println!("Fetched {} activities for user", activities.len());
+
+        // Verify all activities have valid IDs
+        for activity in activities {
+            match activity {
+                ActivityUnion::TextActivity(a) => {
+                    assert!(
+                        a.id > 0 && a.user.as_ref().map(|u| u.id).is_some(),
+                        "Text activity should have valid ID"
+                    );
+                }
+                ActivityUnion::ListActivity(a) => {
+                    assert!(
+                        a.id > 0 && a.user.as_ref().map(|u| u.id).is_some(),
+                        "List activity should have valid ID"
+                    );
+                }
+                ActivityUnion::MessageActivity(a) => {
+                    assert!(a.id > 0, "Message activity should have valid ID");
+                }
+            }
+        }
     }
 }
 
 #[tokio::test]
 async fn test_text_activity_full_lifecycle() {
-    let client = get_authenticated_client();
+    let Some(h) = authenticated_harness() else {
+        eprintln!("Skipping test_text_activity_full_lifecycle: ANILIST_TOKEN not set");
+        return;
+    };
+    let client = h.client().clone();
 
     println!("\n=== Testing Activity Full Lifecycle ===");
 
     // Step 1: Create a text activity
     println!("Step 1: Creating text activity...");
-    let save_options = SaveTextActivityOptions {
-        text: "Test activity from anilist_moe library - full lifecycle test".to_string(),
-        id: None,
-        locked: None,
-    };
+    let create_result = h
+        .run(|| async {
+            let save_options = SaveTextActivityOptions {
+                text: "Test activity from anilist_moe library - full lifecycle test".to_string(),
+                id: None,
+                locked: None,
+            };
+            client.activity().save_text_activity(&save_options).await
+        })
+        .await;
 
-    let create_result = client.activity().save_text_activity(&save_options).await;
-    if let Err(ref e) = create_result {
-        println!("Failed to create activity: {:?}", e);
-        return;
-    }
-
-    let create_response = create_result.unwrap();
-    info!("Create Response: {:?}", create_response);
-    let activity_id = match &create_response {
-        anilist_moe::unions::activity::ActivityUnion::TextActivity(a) => {
-            println!("✓ Created activity with ID: {}", a.id);
+    let activity_id = match create_result {
+        Ok(ActivityUnion::TextActivity(a)) => {
+            println!("Created activity with ID: {}", a.id);
             a.id
         }
-        _ => {
-            println!("✗ Unexpected activity type");
+        Ok(_) => {
+            println!("Unexpected activity type returned");
+            return;
+        }
+        Err(e) => {
+            println!("Failed to create activity: {:?}", e);
             return;
         }
     };
 
+    delay_between_tests().await;
+
     // Step 2: Modify the activity
     println!("Step 2: Modifying activity...");
-    let modify_options = SaveTextActivityOptions {
-        id: Some(activity_id),
-        text: "Modified test activity from anilist_moe library".to_string(),
-        locked: None,
-    };
+    let modify_result = h
+        .run(|| async {
+            let modify_options = SaveTextActivityOptions {
+                id: Some(activity_id),
+                text: "Modified test activity from anilist_moe library".to_string(),
+                locked: None,
+            };
+            client.activity().save_text_activity(&modify_options).await
+        })
+        .await;
 
-    let modify_result = client.activity().save_text_activity(&modify_options).await;
     match modify_result {
-        Ok(response) => {
-            info!("Modify Response: {:?}", response);
-            println!("✓ Modified activity successfully");
-        }
-        Err(e) => println!("✗ Failed to modify activity: {:?}", e),
+        Ok(_) => println!("Modified activity successfully"),
+        Err(e) => println!("Failed to modify activity: {:?}", e),
     }
+
+    delay_between_tests().await;
 
     // Step 3: Fetch the activity
     println!("Step 3: Fetching activity...");
-    let fetch_options = FetchActivityOneOptions { id: activity_id };
+    let fetch_result = h
+        .run(|| async {
+            let fetch_options = FetchActivityOneOptions { id: activity_id };
+            client.activity().fetch_one(&fetch_options).await
+        })
+        .await;
 
-    let fetch_result = client.activity().fetch_one(&fetch_options).await;
     match fetch_result {
-        Ok(response) => {
-            info!("Fetch Response: {:?}", response);
-            match &response {
-                anilist_moe::unions::activity::ActivityUnion::TextActivity(a) => {
-                    println!(
-                        "✓ Fetched activity: {}",
-                        a.text.as_ref().unwrap_or(&"".to_string())
-                    );
-                }
-                _ => println!("✗ Unexpected activity type"),
-            }
+        Ok(ActivityUnion::TextActivity(a)) => {
+            assert_eq!(a.id, activity_id, "Should fetch correct activity");
+            println!("Fetched activity: {:?}", a.text);
         }
-        Err(e) => println!("✗ Failed to fetch activity: {:?}", e),
+        Ok(_) => println!("Got unexpected activity type"),
+        Err(e) => println!("Failed to fetch activity: {:?}", e),
     }
+
+    delay_between_tests().await;
 
     // Step 4: Delete the activity
     println!("Step 4: Deleting activity...");
-    let delete_options = DeleteActivityOptions { id: activity_id };
+    let delete_result = h
+        .run(|| async {
+            let delete_options = DeleteActivityOptions { id: activity_id };
+            client.activity().delete(&delete_options).await
+        })
+        .await;
 
-    let delete_result = client.activity().delete(&delete_options).await;
     match delete_result {
-        Ok(response) => {
-            info!("Delete Response: {:?}", response);
-            println!("✓ Deleted activity successfully");
+        Ok(deleted) => {
+            assert!(deleted, "Activity should be marked as deleted");
+            println!("Deleted activity successfully");
         }
-        Err(e) => println!("✗ Failed to delete activity: {:?}", e),
+        Err(e) => println!("Failed to delete activity: {:?}", e),
     }
 
     println!("=== Activity Lifecycle Test Complete ===\n");
@@ -145,101 +191,90 @@ async fn test_text_activity_full_lifecycle() {
 
 #[tokio::test]
 async fn test_message_activity_full_lifecycle() {
-    let client = get_authenticated_client();
+    let Some(h) = authenticated_harness() else {
+        eprintln!("Skipping test_message_activity_full_lifecycle: ANILIST_TOKEN not set");
+        return;
+    };
+    let client = h.client().clone();
 
     println!("\n=== Testing Message Activity Full Lifecycle ===");
 
-    // Get the authenticated user's ID first (using a simple fetch to get our own user)
-    // For this test, we'll send a message to ourselves
-    let user_id = 5429396; // Your user ID - you can change this to send to another user
+    let user_id = 5429396; // Your user ID - sending message to self
 
     // Step 1: Create a message activity
     println!("Step 1: Creating message activity...");
-    let save_options = SaveMessageActivityOptions {
-        message: "Heya".to_string(),
-        recipient_id: user_id,
-        id: None,
-        private: Some(true),
-        locked: None,
-        as_mod: None,
-    };
+    let create_result = h
+        .run(|| async {
+            let save_options = SaveMessageActivityOptions {
+                message: "Heya - test from anilist_moe".to_string(),
+                recipient_id: user_id,
+                id: None,
+                private: Some(true),
+                locked: None,
+                as_mod: None,
+            };
+            client.activity().save_message_activity(&save_options).await
+        })
+        .await;
 
-    let create_result = client.activity().save_message_activity(&save_options).await;
-    if let Err(ref e) = create_result {
-        println!("Failed to create message activity: {:?}", e);
-        return;
-    }
-
-    let create_response = create_result.unwrap();
-    info!("Create Response: {:?}", create_response);
-    let activity_id = match &create_response {
-        ActivityUnion::MessageActivity(a) => {
-            println!("✓ Created message activity with ID: {}", a.id);
+    let activity_id = match create_result {
+        Ok(ActivityUnion::MessageActivity(a)) => {
+            println!("Created message activity with ID: {}", a.id);
             a.id
         }
-        _ => return,
+        Ok(_) => {
+            println!("Unexpected activity type");
+            return;
+        }
+        Err(e) => {
+            println!("Failed to create message activity: {:?}", e);
+            return;
+        }
     };
+
+    delay_between_tests().await;
 
     // Step 2: Modify the message activity
     println!("Step 2: Modifying message activity...");
-    let modify_options = SaveMessageActivityOptions {
-        id: Some(activity_id),
-        message: "Heya ThunderBlaze".to_string(),
-        recipient_id: user_id,
-        private: Some(true),
-        locked: None,
-        as_mod: None,
-    };
-
-    let modify_result = client
-        .activity()
-        .save_message_activity(&modify_options)
+    let modify_result = h
+        .run(|| async {
+            let modify_options = SaveMessageActivityOptions {
+                id: Some(activity_id),
+                message: "Modified message from anilist_moe".to_string(),
+                recipient_id: user_id,
+                private: Some(true),
+                locked: None,
+                as_mod: None,
+            };
+            client
+                .activity()
+                .save_message_activity(&modify_options)
+                .await
+        })
         .await;
+
     match modify_result {
-        Ok(response) => {
-            info!("Modify Response: {:?}", response);
-            println!("✓ Modified message activity successfully");
-        }
-        Err(e) => println!("✗ Failed to modify message activity: {:?}", e),
+        Ok(_) => println!("Modified message activity successfully"),
+        Err(e) => println!("Failed to modify message activity: {:?}", e),
     }
 
-    // Step 3: Fetch the message activity
-    println!("Step 3: Fetching message activity...");
-    let fetch_options = FetchActivityOneOptions { id: activity_id };
+    delay_between_tests().await;
 
-    let fetch_result = client.activity().fetch_one(&fetch_options).await;
-    match fetch_result {
-        Ok(response) => {
-            info!("Fetch Response: {:?}", response);
-            match &response {
-                anilist_moe::unions::activity::ActivityUnion::MessageActivity(a) => {
-                    println!(
-                        "✓ Fetched message activity: {}",
-                        a.message.as_ref().unwrap_or(&"".to_string())
-                    );
-                }
-                anilist_moe::unions::activity::ActivityUnion::TextActivity(a) => {
-                    println!("✗ Got TextActivity instead of MessageActivity: id={}", a.id);
-                }
-                anilist_moe::unions::activity::ActivityUnion::ListActivity(a) => {
-                    println!("✗ Got ListActivity instead of MessageActivity: id={}", a.id);
-                }
-            }
-        }
-        Err(e) => println!("✗ Failed to fetch message activity: {:?}", e),
-    }
+    // Step 3: Delete the message activity
+    println!("Step 3: Deleting message activity...");
+    let delete_result = h
+        .run(|| async {
+            let delete_options = DeleteActivityOptions { id: activity_id };
+            client.activity().delete(&delete_options).await
+        })
+        .await;
 
-    // Step 4: Delete the message activity
-    println!("Step 4: Deleting message activity...");
-    let delete_options = DeleteActivityOptions { id: activity_id };
-
-    let delete_result = client.activity().delete(&delete_options).await;
     match delete_result {
-        Ok(response) => {
-            info!("Delete Response: {:?}", response);
-            println!("✓ Deleted message activity successfully");
+        Ok(deleted) => {
+            assert!(deleted, "Message activity should be marked as deleted");
+            println!("Deleted message activity successfully");
         }
-        Err(e) => println!("✗ Failed to delete message activity: {:?}", e),
+        Err(e) => println!("Failed to delete message activity: {:?}", e),
     }
 
     println!("=== Message Activity Lifecycle Test Complete ===\n");
@@ -247,90 +282,120 @@ async fn test_message_activity_full_lifecycle() {
 
 #[tokio::test]
 async fn test_activity_reply() {
-    let client = get_authenticated_client();
+    let Some(h) = authenticated_harness() else {
+        eprintln!("Skipping test_activity_reply: ANILIST_TOKEN not set");
+        return;
+    };
+    let client = h.client().clone();
 
     println!("\n=== Testing Activity Reply ===");
 
-    let activity_id = 964502724; // The activity ID to reply to
+    // First, create a text activity to reply to
+    let create_result = h
+        .run(|| async {
+            let save_options = SaveTextActivityOptions {
+                text: "Test activity for reply test".to_string(),
+                id: None,
+                locked: None,
+            };
+            client.activity().save_text_activity(&save_options).await
+        })
+        .await;
+
+    let activity_id = match create_result {
+        Ok(ActivityUnion::TextActivity(a)) => a.id,
+        _ => {
+            println!("Failed to create activity for reply test");
+            return;
+        }
+    };
+
+    delay_between_tests().await;
 
     // Step 1: Create a reply
     println!("Step 1: Creating reply...");
-    let save_reply_options = SaveActivityReplyOptions {
-        text: "Test reply from anilist_moe library".to_string(),
-        activity_id,
-        id: None,
-    };
-
-    let create_result = client.activity().save_reply(&save_reply_options).await;
-    if let Err(ref e) = create_result {
-        println!("Failed to create reply: {:?}", e);
-        return;
-    }
-
-    let create_response = create_result.unwrap();
-    info!("Create Reply Response: {:?}", create_response);
-    let reply_id = create_response.id;
-    println!("✓ Created reply with ID: {}", reply_id);
-
-    // Step 2: Modify the reply
-    println!("Step 2: Modifying reply...");
-    let modify_reply_options = SaveActivityReplyOptions {
-        id: Some(reply_id),
-        text: "Modified test reply from anilist_moe library".to_string(),
-        activity_id,
-    };
-
-    let modify_result = client.activity().save_reply(&modify_reply_options).await;
-    match modify_result {
-        Ok(response) => {
-            info!("Modify Reply Response: {:?}", response);
-            println!("✓ Modified reply successfully");
-        }
-        Err(e) => println!("✗ Failed to modify reply: {:?}", e),
-    }
-
-    // Step 3: Fetch replies to verify
-    println!("Step 3: Fetching replies...");
-    let fetch_replies_options = FetchActivityRepliesOptions {
-        activity_id,
-        page: Some(1),
-        per_page: Some(10),
-        id: None,
-    };
-
-    let fetch_result = client
-        .activity()
-        .fetch_replies(&fetch_replies_options)
+    let reply_result = h
+        .run(|| async {
+            let save_reply_options = SaveActivityReplyOptions {
+                text: "Test reply from anilist_moe library".to_string(),
+                activity_id,
+                id: None,
+            };
+            client.activity().save_reply(&save_reply_options).await
+        })
         .await;
+
+    let reply_id = match reply_result {
+        Ok(reply) => {
+            println!("Created reply with ID: {}", reply.id);
+            reply.id
+        }
+        Err(e) => {
+            println!("Failed to create reply: {:?}", e);
+            // Clean up the activity
+            let _ = client
+                .activity()
+                .delete(&DeleteActivityOptions { id: activity_id })
+                .await;
+            return;
+        }
+    };
+
+    delay_between_tests().await;
+
+    // Step 2: Fetch replies to verify
+    println!("Step 2: Fetching replies...");
+    let fetch_result = h
+        .run(|| async {
+            let fetch_options = FetchActivityRepliesOptions {
+                activity_id,
+                page: Some(1),
+                per_page: Some(10),
+                id: None,
+            };
+            client.activity().fetch_replies(&fetch_options).await
+        })
+        .await;
+
     match fetch_result {
         Ok(response) => {
-            info!("Fetch Replies Response: {:?}", response);
-            let replies = &response.data;
-            let found = replies.iter().find(|r| r.id == reply_id);
-            if let Some(reply) = found {
-                println!(
-                    "✓ Found reply: {}",
-                    reply.text.as_ref().unwrap_or(&"".to_string())
-                );
-            } else {
-                println!("✗ Reply not found in activity");
-            }
+            let found = response.data.iter().any(|r| r.id == reply_id);
+            assert!(found, "Reply should be found in activity replies");
+            println!("Found reply in activity");
         }
-        Err(e) => println!("✗ Failed to fetch replies: {:?}", e),
+        Err(e) => println!("Failed to fetch replies: {:?}", e),
     }
 
-    // Step 4: Delete the reply
-    println!("Step 4: Deleting reply...");
-    let delete_reply_options = DeleteActivityReplyOptions { id: reply_id };
+    delay_between_tests().await;
 
-    let delete_result = client.activity().delete_reply(&delete_reply_options).await;
-    match delete_result {
-        Ok(response) => {
-            info!("Delete Reply Response: {:?}", response);
-            println!("✓ Deleted reply successfully");
+    // Step 3: Delete the reply
+    println!("Step 3: Deleting reply...");
+    let delete_reply_result = h
+        .run(|| async {
+            let delete_options = DeleteActivityReplyOptions { id: reply_id };
+            client.activity().delete_reply(&delete_options).await
+        })
+        .await;
+
+    match delete_reply_result {
+        Ok(deleted) => {
+            assert!(deleted, "Reply should be marked as deleted");
+            println!("Deleted reply successfully");
         }
-        Err(e) => println!("✗ Failed to delete reply: {:?}", e),
+        Err(e) => println!("Failed to delete reply: {:?}", e),
     }
+
+    delay_between_tests().await;
+
+    // Clean up: delete the activity
+    let _ = h
+        .run(|| async {
+            client
+                .activity()
+                .delete(&DeleteActivityOptions { id: activity_id })
+                .await
+        })
+        .await;
 
     println!("=== Activity Reply Test Complete ===\n");
 }

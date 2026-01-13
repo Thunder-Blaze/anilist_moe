@@ -28,6 +28,17 @@ pub struct FetchThreadOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
+    // Extra
+    #[serde(rename = "includeBody")]
+    pub include_body: Option<bool>,
+    #[serde(rename = "includeUser")]
+    pub include_user: Option<bool>,
+    #[serde(rename = "includeReplyUser")]
+    pub include_reply_user: Option<bool>,
+    #[serde(rename = "includeCategories")]
+    pub include_categories: Option<bool>,
+    #[serde(rename = "includeMediaCategories")]
+    pub include_media_categories: Option<bool>,
 }
 
 /// Options for fetching a single forum thread by ID.
