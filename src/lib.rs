@@ -67,10 +67,10 @@
 //!     let client = AniListClient::new();
 //!
 //!     // Get trending anime with full type safety
-//!     let response = client.anime().get_trending(Some(1), Some(10)).await?;
+//!     let response = client.media().get_trending_anime(Some(1), Some(10)).await?;
 //!
-//!     // Access typed data
-//!     for anime in &response.data.page.data.media {
+//!     // Access typed data (Page<Vec<Media>>)
+//!     for anime in &response.data {
 //!         if let Some(title) = &anime.title {
 //!             if let Some(romaji) = &title.romaji {
 //!                 println!("Anime: {}", romaji);
@@ -92,12 +92,12 @@
 //!     let client = AniListClient::new();
 //!
 //!     // Search for anime
-//!     let search = client.anime().search("Steins Gate", Some(1), Some(5)).await?;
+//!     let search = client.media().search_anime("Steins Gate", Some(1), Some(5)).await?;
 //!
-//!     if let Some(first) = search.data.page.data.media.first() {
+//!     if let Some(first) = search.data.first() {
 //!         // Get detailed information
-//!         let details = client.anime().get_by_id(first.id).await?;
-//!         let anime = &details.data.media;
+//!         let details = client.media().get_anime_by_id(first.id.unwrap()).await?;
+//!         let anime = &details;
 //!
 //!         println!("Score: {}/100", anime.average_score.unwrap_or(0));
 //!         println!("Episodes: {}", anime.episodes.unwrap_or(0));
@@ -120,7 +120,7 @@
 //!
 //!     // Get current user
 //!     let user = client.user().get_current_user().await?;
-//!     println!("Logged in as: {}", user.data.viewer.name);
+//!     println!("Logged in as: {}", user.name.unwrap_or_default());
 //!
 //!     Ok(())
 //! }
@@ -136,12 +136,14 @@
 //! async fn main() {
 //!     let client = AniListClient::new();
 //!
-//!     match client.anime().get_by_id(999999).await {
+//!     match client.media().get_anime_by_id(999999).await {
 //!         Ok(anime) => println!("Found: {:?}", anime),
 //!         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
 //!         Err(AniListError::GraphQL { message, .. }) => eprintln!("API error: {}", message),
 //!         Err(AniListError::NotFound) => eprintln!("Not found"),
-//!         Err(AniListError::RateLimit) => eprintln!("Rate limited"),
+//!         Err(AniListError::RateLimit { .. }) => eprintln!("Rate limited"),
+//!         Err(AniListError::RateLimitSimple) => eprintln!("Rate limited"),
+//!         Err(AniListError::BurstLimit) => eprintln!("Too many requests"),
 //!         Err(e) => eprintln!("Error: {:?}", e),
 //!     }
 //! }

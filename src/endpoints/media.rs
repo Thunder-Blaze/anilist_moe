@@ -268,9 +268,9 @@ pub struct FetchMediaOneOptions {
 /// # use anilist_moe::AniListClient;
 /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let client = AniListClient::new();
-/// let trending = client.anime().get_trending_anime(Some(1), Some(10)).await?;
-/// let results = client.anime().search_anime("Steins Gate", Some(1), Some(5)).await?;
-/// let anime = client.anime().get_by_id(16498).await?;
+/// let trending = client.media().get_trending_anime(Some(1), Some(10)).await?;
+/// let results = client.media().search_anime("Steins Gate", Some(1), Some(5)).await?;
+/// let anime = client.media().get_anime_by_id(16498).await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -294,7 +294,7 @@ impl MediaEndpoint {
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = AniListClient::new();
     /// let options = FetchMediaOptions { media_type: Some(MediaType::Anime), sort: Some(vec![MediaSort::Popularity]), page: Some(1), per_page: Some(10), ..Default::default() };
-    /// let response = client.anime().fetch(&options).await?;
+    /// let response = client.media().fetch(&options).await?;
     /// for anime in &response.data { println!("Title: {:?}", anime.title); }
     /// # Ok(())
     /// # }
@@ -318,7 +318,7 @@ impl MediaEndpoint {
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = AniListClient::new();
     /// let options = FetchMediaOneOptions { id: Some(16498), ..Default::default() };
-    /// let anime = client.anime().fetch_one(&options).await?;
+    /// let anime = client.media().fetch_one(&options).await?;
     /// println!("Title: {:?}", anime.title);
     /// # Ok(())
     /// # }
