@@ -15,6 +15,8 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 - **Async/Await**: Built with Tokio for high-performance asynchronous operations
 - **Zero Unsafe Code**: Written entirely in safe Rust
 - **Comprehensive Coverage**: Full AniList API support including social features
+- **Custom Query Support**: Execute tailored GraphQL queries via the generic `AniListClient::fetch` helper
+- **Conditional Field Toggles**: Fine-grained `include_*` flags let you opt into heavy nested data only when you need it
 - **Pagination Support**: Built-in helpers for paginated results
 - **Well Tested**: Extensive test suite covering all endpoints
 - **Convenience Functions**: Easy-to-use helper methods for common queries
@@ -50,7 +52,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anilist_moe = "0.3.0"
+anilist_moe = "0.3.1"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -115,6 +117,96 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if let Some(genres) = &anime.genres {
             println!("Genres: {}", genres.join(", "));
         }
+    }
+
+    Ok(())
+}
+```
+
+## Advanced Usage
+
+### Custom GraphQL Query
+
+```rust
+use anilist_moe::{
+    AniListClient,
+    objects::{media::Media, responses::Page},
+};
+use serde_json::json;
+use std::collections::HashMap;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = AniListClient::new();
+
+    let mut variables = HashMap::new();
+    variables.insert("page".to_string(), json!(1));
+    variables.insert("perPage".to_string(), json!(5));
+
+    let query = r#"
+        query ($page: Int, $perPage: Int) {
+            Page(page: $page, perPage: $perPage) {
+                media {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                    }
+                }
+            }
+        }
+    "#;
+
+    let page: Page<Vec<Media>> = client.fetch(query, Some(&variables)).await?;
+    for media in page.data {
+        if let (Some(id), Some(title)) = (media.id, media.title.as_ref()) {
+            println!("{} - {:?}", id, title.romaji);
+        }
+    }
+
+    Ok(())
+}
+```
+
+### Conditional Fetching Controls
+
+```rust
+use anilist_moe::AniListClient;
+use anilist_moe::endpoints::media::FetchMediaOptions;
+use anilist_moe::enums::media::{MediaSort, MediaType};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = AniListClient::new();
+
+    let options = FetchMediaOptions {
+        media_type: Some(MediaType::Anime),
+        sort: Some(vec![MediaSort::PopularityDesc]),
+        page: Some(1),
+        per_page: Some(3),
+        include_characters: Some(true),
+        include_staff: Some(true),
+        include_reviews: Some(true),
+        include_recommendations: Some(true),
+        ..Default::default()
+    };
+
+    let response = client.anime().fetch(&options).await?;
+    for media in response.data {
+        println!(
+            "{} has {} character edges",
+            media.title
+                .as_ref()
+                .and_then(|t| t.romaji.as_ref())
+                .unwrap_or(&"Unknown".to_string()),
+            media
+                .characters
+                .as_ref()
+                .and_then(|c| c.edges.as_ref())
+                .map(|edges| edges.len())
+                .unwrap_or(0)
+        );
     }
 
     Ok(())

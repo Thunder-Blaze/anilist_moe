@@ -12,10 +12,18 @@ This project uses [Semantic Versioning](https://semver.org/):
 ## [Unreleased]
 
 ### Added
+- **Custom Query Support**: Added a generic `AniListClient::fetch` helper for executing user-defined GraphQL queries with typed responses.
+- **GraphQL Query Modules**: Introduced dedicated `.graphql` documents for media, character, staff, studio, and related fetch operations.
+- **Testing Infrastructure**: Added a rate-limit-aware test harness plus new conditional fetching and custom query integration tests.
 
 ### Changed
+- **Endpoint Options**: Fetch option structs now derive `Deserialize`, enabling round-tripping and fixture-driven testing.
+- **Media Endpoint Refactor**: Consolidated pagination helpers, expanded include flags, and streamlined media convenience methods.
+- **Inline Documentation**: Refined comments across endpoints, utilities, and tests for clearer guidance.
 
 ### Fixed
+- **Doctests**: Resolved doctest failures triggered by the media endpoint refactor.
+- **Documentation**: Corrected README installation instructions to reference crate version 0.3.1 (commit 4566b96)
 
 ### Breaking Changes
 
