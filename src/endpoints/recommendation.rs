@@ -1,4 +1,4 @@
-use crate::enums::recommendation::RecommendationSort;
+use crate::enums::recommendation::{RecommendationRating, RecommendationSort};
 use crate::errors::AniListError;
 use crate::objects::recommendation::Recommendation;
 use crate::objects::responses::Page;
@@ -38,7 +38,7 @@ pub struct SaveRecommendationOptions {
     pub media_id: i32,
     #[serde(rename = "mediaRecommendationId")]
     pub media_recommendation_id: i32,
-    pub rating: i32,
+    pub rating: RecommendationRating,
 }
 
 /// Endpoint for media recommendation operations.
@@ -127,7 +127,7 @@ impl RecommendationEndpoint {
         &self,
         media_id: i32,
         media_recommendation_id: i32,
-        rating: i32,
+        rating: RecommendationRating,
     ) -> Result<Recommendation, AniListError> {
         self.save(&SaveRecommendationOptions {
             media_id,

@@ -61,10 +61,10 @@ tokio = { version = "1.0", features = ["full"] }
 ### Example 1: Get Trending Anime
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     // Create a client (no authentication needed for public data)
     let client = AniListClient::new();
 
@@ -87,10 +87,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Example 2: Search and Get Detailed Information
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Search for an anime
@@ -130,13 +130,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```rust
 use anilist_moe::{
     AniListClient,
+    AniListError,
     objects::{media::Media, responses::Page},
 };
 use serde_json::json;
 use std::collections::HashMap;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     let mut variables = HashMap::new();
@@ -172,12 +173,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Conditional Fetching Controls
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::{MediaSort, MediaType};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     let options = FetchMediaOptions {
@@ -218,10 +219,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Anime Operations
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get popular anime - returns Page<Vec<Media>>
@@ -256,10 +257,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Manga Operations
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get popular manga
@@ -281,10 +282,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Character Operations
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get popular characters - returns Page<Vec<Character>>
@@ -309,10 +310,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Forum Operations
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get recent threads - returns Page<Vec<Thread>>
@@ -340,10 +341,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 For endpoints requiring authentication:
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     // Create an authenticated client
     let token = std::env::var("ANILIST_TOKEN")?;
     let client = AniListClient::with_token(&token);
@@ -457,7 +458,7 @@ use std::time::Duration;
 use tokio::time::sleep;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     for page in 1..=10 {
@@ -486,10 +487,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 All list endpoints support pagination:
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     let mut page = 1;

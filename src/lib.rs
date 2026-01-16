@@ -61,9 +61,10 @@
 //!
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
+//! use anilist_moe::AniListError;
 //!
 //! #[tokio::main]
-//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! async fn main() -> Result<(), AniListError> {
 //!     let client = AniListClient::new();
 //!
 //!     // Get trending anime with full type safety
@@ -86,9 +87,10 @@
 //!
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
+//! use anilist_moe::AniListError;
 //!
 //! #[tokio::main]
-//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! async fn main() -> Result<(), AniListError> {
 //!     let client = AniListClient::new();
 //!
 //!     // Search for anime
@@ -111,11 +113,12 @@
 //!
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
+//! use anilist_moe::AniListError;
 //! use std::env;
 //!
 //! #[tokio::main]
-//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let token = env::var("ANILIST_TOKEN")?;
+//! async fn main() -> Result<(), AniListError> {
+//!     let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set");
 //!     let client = AniListClient::with_token(token);
 //!
 //!     // Get current user

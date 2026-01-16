@@ -2,6 +2,7 @@
 
 use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::review::*;
+use anilist_moe::enums::review::ReviewRating;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -124,7 +125,7 @@ async fn test_rate_review() {
                 .run(|| async {
                     let rate_options = RateReviewOptions {
                         review_id,
-                        rating: 1, // upvote
+                        rating: ReviewRating::UpVote, // upvote
                     };
                     client.review().rate(&rate_options).await
                 })
@@ -139,7 +140,7 @@ async fn test_rate_review() {
                         .run(|| async {
                             let reset_options = RateReviewOptions {
                                 review_id,
-                                rating: 0,
+                                rating: ReviewRating::NoVote,
                             };
                             client.review().rate(&reset_options).await
                         })

@@ -22,7 +22,8 @@ pub struct GraphQLResponse<T> {
 /// Example:
 /// ```rust
 /// # use anilist_moe::AniListClient;
-/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// # use anilist_moe::AniListError;
+/// # async fn example() -> Result<(), AniListError> {
 /// let client = AniListClient::new();
 /// let response = client
 ///     .anime()

@@ -266,7 +266,8 @@ pub struct FetchMediaOneOptions {
 /// Examples:
 /// ```rust
 /// # use anilist_moe::AniListClient;
-/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// # use anilist_moe::AniListError;
+/// # async fn example() -> Result<(), AniListError> {
 /// let client = AniListClient::new();
 /// let trending = client.media().get_trending_anime(Some(1), Some(10)).await?;
 /// let results = client.media().search_anime("Steins Gate", Some(1), Some(5)).await?;
@@ -289,9 +290,10 @@ impl MediaEndpoint {
     /// Example:
     /// ```rust
     /// # use anilist_moe::AniListClient;
+    /// # use anilist_moe::AniListError;
     /// # use anilist_moe::endpoints::media::FetchMediaOptions;
     /// # use anilist_moe::enums::media::{MediaType, MediaSort};
-    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example() -> Result<(), AniListError> {
     /// let client = AniListClient::new();
     /// let options = FetchMediaOptions { media_type: Some(MediaType::Anime), sort: Some(vec![MediaSort::Popularity]), page: Some(1), per_page: Some(10), ..Default::default() };
     /// let response = client.media().fetch(&options).await?;
@@ -314,8 +316,9 @@ impl MediaEndpoint {
     /// Example:
     /// ```rust
     /// # use anilist_moe::AniListClient;
+    /// # use anilist_moe::AniListError;
     /// # use anilist_moe::endpoints::media::FetchMediaOneOptions;
-    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example() -> Result<(), AniListError> {
     /// let client = AniListClient::new();
     /// let options = FetchMediaOneOptions { id: Some(16498), ..Default::default() };
     /// let anime = client.media().fetch_one(&options).await?;
