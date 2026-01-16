@@ -2,6 +2,7 @@
 
 use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::recommendation::*;
+use anilist_moe::enums::recommendation::RecommendationRating;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -114,7 +115,7 @@ async fn test_save_recommendation() {
             let options = SaveRecommendationOptions {
                 media_id: 1,
                 media_recommendation_id: 205,
-                rating: 1,
+                rating: RecommendationRating::RateUp,
             };
             client.recommendation().save(&options).await
         })

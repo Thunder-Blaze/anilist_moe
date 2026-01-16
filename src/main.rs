@@ -1,7 +1,7 @@
-use anilist_moe::{AniListClient, endpoints::media::FetchMediaOptions};
+use anilist_moe::{AniListClient, AniListError, endpoints::media::FetchMediaOptions};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Example usage

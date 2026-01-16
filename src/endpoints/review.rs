@@ -1,5 +1,5 @@
 use crate::enums::media::MediaType;
-use crate::enums::review::ReviewSort;
+use crate::enums::review::{ReviewRating, ReviewSort};
 use crate::errors::AniListError;
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
@@ -50,7 +50,7 @@ pub struct DeleteReviewOptions {
 pub struct RateReviewOptions {
     #[serde(rename = "reviewId")]
     pub review_id: i32,
-    pub rating: i32,
+    pub rating: ReviewRating,
 }
 
 /// Endpoint for review operations.
@@ -190,7 +190,11 @@ impl ReviewEndpoint {
     }
 
     /// Rate a review
-    pub async fn rate_review(&self, review_id: i32, rating: i32) -> Result<Review, AniListError> {
+    pub async fn rate_review(
+        &self,
+        review_id: i32,
+        rating: ReviewRating,
+    ) -> Result<Review, AniListError> {
         self.rate(&RateReviewOptions { review_id, rating }).await
     }
 }

@@ -34,10 +34,10 @@ let auth_client = AniListClient::with_token(&token);
 ### Get Trending Anime
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Media>>
@@ -61,10 +61,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Search Anime by Title
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     let search_query = "Steins Gate";
@@ -93,10 +93,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Anime by Season
 
 ```rust
-use anilist_moe::{AniListClient, enums::media::MediaSeason};
+use anilist_moe::{AniListClient, AniListError, enums::media::MediaSeason};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get Fall 2024 anime
@@ -118,10 +118,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Detailed Anime Information
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Attack on Titan ID: 16498
@@ -157,10 +157,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Top Rated Manga
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Media>>
@@ -184,10 +184,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Currently Releasing Manga
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Media>>
@@ -212,10 +212,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Search for Characters
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Character>>
@@ -240,10 +240,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Characters by Birthday
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get characters with birthday on May 5th
@@ -266,10 +266,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Popular Staff
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Staff>>
@@ -294,10 +294,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get User Information
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns User directly (not wrapped)
@@ -328,10 +328,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Current Authenticated User
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let token = std::env::var("ANILIST_TOKEN")?;
     let client = AniListClient::with_token(&token);
 
@@ -356,10 +356,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Browse Forum Threads
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get recent threads - Returns Page<Vec<Thread>>
@@ -384,10 +384,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Search Forum Threads
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Thread>>
@@ -407,10 +407,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get Thread Comments
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     let thread_id = 12345;
@@ -436,11 +436,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Get User Activities
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 use anilist_moe::unions::activity::ActivityUnion;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<ActivityUnion>>
@@ -478,13 +478,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Pagination with Error Handling
 
 ```rust
-use anilist_moe::AniListClient;
-use anilist_moe::errors::AniListError;
+use anilist_moe::{AniListClient, errors::AniListError};
 use std::time::Duration;
 use tokio::time::sleep;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
     let mut page = 1;
     let per_page = 50;
@@ -535,11 +534,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Concurrent Requests
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 use tokio::try_join;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Fetch multiple things concurrently
@@ -561,10 +560,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Building a Simple Anime Tracker
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get user's anime list (requires authentication)
@@ -600,10 +599,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Type-Safe Response Access
 
 ```rust
-use anilist_moe::AniListClient;
+use anilist_moe::{AniListClient, AniListError};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Media directly (not wrapped)
