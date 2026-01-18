@@ -6,7 +6,6 @@ use crate::objects::responses::Page;
 use crate::objects::user::User;
 use crate::{client::AniListClient, queries::user};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching users.
@@ -150,23 +149,19 @@ impl UserEndpoint {
     /// Fetch multiple users with pagination
     pub async fn fetch(&self, options: FetchUserOptions) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch a single user with full details
     pub async fn fetch_one(&self, options: &FetchUserOneOptions) -> Result<User, AniListError> {
         let query = user::FETCH_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch basic user information
     pub async fn fetch_basic(&self) -> Result<User, AniListError> {
         let query = user::BASIC;
-        self.client.fetch(query, None).await
+        self.client.fetch(query, Option::<&()>::None).await
     }
 
     /// Fetch user followers
@@ -175,9 +170,7 @@ impl UserEndpoint {
         options: &FetchUserFollowersOptions,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FOLLOWERS;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch users that the user is following
@@ -186,9 +179,7 @@ impl UserEndpoint {
         options: &FetchUserFollowingOptions,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FOLLOWING;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch user favorites with conditional sections and independent pagination
@@ -197,9 +188,7 @@ impl UserEndpoint {
         options: &FetchUserFavoritesOptions,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FAVORITES;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch user's media list
@@ -208,17 +197,13 @@ impl UserEndpoint {
         options: &FetchUserMediaListOptions,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::MEDIA_LIST;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch user statistics
     pub async fn stats(&self, options: &FetchUserStatsOptions) -> Result<User, AniListError> {
         let query = user::STATS;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

@@ -1,8 +1,6 @@
 //! Utility helpers for rate limits, retries, and JSON.
 
 use crate::errors::AniListError;
-use serde_json::Value;
-use std::collections::HashMap;
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -148,31 +146,5 @@ pub fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
         1..=9 => Duration::from_millis(2000), // 2 seconds when getting low
         10..=29 => Duration::from_millis(1000), // 1 second when moderate
         _ => Duration::from_millis(500),      // 500ms when plenty remaining
-    }
-}
-
-/// Converts a `serde_json::Value` to a `HashMap<String, Value>`.
-///
-/// If the input `Value` is not a JSON object, it returns an empty `HashMap`.
-#[inline]
-pub fn json_to_hashmap(value: Value) -> HashMap<String, Value> {
-    match value {
-        Value::Object(map) => map.into_iter().collect(),
-        _ => HashMap::new(),
-    }
-}
-
-/// Converts a `serde_json::Value` to a `HashMap<String, Value>` with capacity hint.
-///
-/// More efficient when you know the approximate size.
-#[inline]
-pub fn json_to_hashmap_with_capacity(value: Value, capacity: usize) -> HashMap<String, Value> {
-    match value {
-        Value::Object(map) => {
-            let mut result = HashMap::with_capacity(capacity.max(map.len()));
-            result.extend(map);
-            result
-        }
-        _ => HashMap::with_capacity(capacity),
     }
 }

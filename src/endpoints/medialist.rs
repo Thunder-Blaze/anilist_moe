@@ -6,7 +6,6 @@ use crate::objects::media_list::MediaList;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::medialist};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching media list entries.
@@ -128,16 +127,12 @@ impl MediaListEndpoint {
         options: &FetchMediaListOptions,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         let query = medialist::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn save(&self, options: &SaveMediaListOptions) -> Result<MediaList, AniListError> {
         let query = medialist::SAVE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn save_multiple(
@@ -145,17 +140,12 @@ impl MediaListEndpoint {
         options: &SaveMediaListMultipleOptions,
     ) -> Result<Vec<MediaList>, AniListError> {
         let query = medialist::SAVE_MULTIPLE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn delete(&self, options: &DeleteMediaListOptions) -> Result<bool, AniListError> {
         let query = medialist::DELETE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),

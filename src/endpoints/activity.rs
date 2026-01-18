@@ -6,7 +6,6 @@ use crate::objects::responses::Page;
 use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching activity feed entries.
@@ -174,9 +173,7 @@ impl ActivityEndpoint {
         options: &FetchActivityOptions,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
         let query = activity::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn fetch_one(
@@ -184,9 +181,7 @@ impl ActivityEndpoint {
         options: &FetchActivityOneOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::FETCH_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn fetch_replies(
@@ -194,17 +189,12 @@ impl ActivityEndpoint {
         options: &FetchActivityRepliesOptions,
     ) -> Result<Page<Vec<ActivityReply>>, AniListError> {
         let query = activity::FETCH_REPLIES;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn delete(&self, options: &DeleteActivityOptions) -> Result<bool, AniListError> {
         let query = activity::DELETE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -216,10 +206,7 @@ impl ActivityEndpoint {
         options: &DeleteActivityReplyOptions,
     ) -> Result<bool, AniListError> {
         let query = activity::DELETE_REPLY;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -228,9 +215,7 @@ impl ActivityEndpoint {
 
     pub async fn pin(&self, options: &PinActivityOptions) -> Result<ActivityUnion, AniListError> {
         let query = activity::PIN;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn subscribe(
@@ -238,9 +223,7 @@ impl ActivityEndpoint {
         options: &SubscribeActivityOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SUBSCRIBE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn save_message_activity(
@@ -248,10 +231,8 @@ impl ActivityEndpoint {
         options: &SaveMessageActivityOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
         let response: Result<MessageActivity, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+            self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(ActivityUnion::MessageActivity(res)),
             Err(err) => Err(err),
@@ -263,10 +244,8 @@ impl ActivityEndpoint {
         options: &SaveTextActivityOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_TEXT_ACTIVITY;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
         let response: Result<TextActivity, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+            self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(ActivityUnion::TextActivity(res)),
             Err(err) => Err(err),
@@ -278,9 +257,7 @@ impl ActivityEndpoint {
         options: &SaveActivityReplyOptions,
     ) -> Result<ActivityReply, AniListError> {
         let query = activity::SAVE_REPLY;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

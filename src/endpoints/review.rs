@@ -6,7 +6,6 @@ use crate::objects::responses::Page;
 use crate::objects::review::Review;
 use crate::{client::AniListClient, queries::review};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching reviews.
@@ -68,24 +67,17 @@ impl ReviewEndpoint {
         options: &FetchReviewOptions,
     ) -> Result<Page<Vec<Review>>, AniListError> {
         let query = review::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn save(&self, options: &SaveReviewOptions) -> Result<Review, AniListError> {
         let query = review::SAVE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn delete(&self, options: &DeleteReviewOptions) -> Result<bool, AniListError> {
         let query = review::DELETE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -94,9 +86,7 @@ impl ReviewEndpoint {
 
     pub async fn rate(&self, options: &RateReviewOptions) -> Result<Review, AniListError> {
         let query = review::RATE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

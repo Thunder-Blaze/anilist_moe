@@ -173,7 +173,12 @@ impl TestHarness {
 
             // Run the operation
             match operation().await {
-                Ok(result) => return Ok(result),
+                Ok(result) => {
+                    if network_retries > 0 {
+                        eprintln!("✅ Retry successful after {} attempts.", network_retries);
+                    }
+                    return Ok(result);
+                }
                 Err(e) if e.is_rate_limit_error() => {
                     // Trigger global pause for ALL threads
                     GLOBAL_RATE_LIMITER.handle_rate_limit().await;
@@ -188,7 +193,15 @@ impl TestHarness {
                     sleep(Duration::from_millis(NETWORK_RETRY_DELAY_MS)).await;
                     // Loop will retry
                 }
-                Err(e) => return Err(e),
+                Err(e) => {
+                    if network_retries > 0 {
+                        eprintln!(
+                            "❌ Max network retries ({}) reached. Failing test.",
+                            MAX_NETWORK_RETRIES
+                        );
+                    }
+                    return Err(e);
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ use reqwest::{Client, Response, StatusCode};
 use serde::Serialize;
 use serde_json::{Value, from_value};
 use std::borrow::Cow;
-use std::collections::HashMap;
+
 use std::fmt;
 use std::sync::Arc;
 
@@ -321,22 +321,22 @@ impl AniListClient {
         self.inner.retry_config
     }
 
-    #[allow(dead_code)]
-    pub(crate) async fn query(
+    pub async fn query<V: Serialize>(
         &self,
         query: &'static str,
-        variables: Option<&HashMap<String, Value>>,
+        variables: Option<&V>,
     ) -> Result<Value, AniListError> {
         self.execute_query(query, variables).await
     }
 
-    pub async fn fetch<T>(
+    pub async fn fetch<T, V>(
         &self,
         query: &'static str,
-        variables: Option<&HashMap<String, Value>>,
+        variables: Option<&V>,
     ) -> Result<T, AniListError>
     where
         T: serde::de::DeserializeOwned,
+        V: Serialize,
     {
         let response_data = self.execute_query(query, variables).await?;
         let wrapper: GraphQLResponse<T> =
@@ -346,10 +346,10 @@ impl AniListClient {
         Ok(wrapper.data)
     }
 
-    async fn execute_query(
+    async fn execute_query<V: Serialize>(
         &self,
         query: &'static str,
-        variables: Option<&HashMap<String, Value>>,
+        variables: Option<&V>,
     ) -> Result<Value, AniListError> {
         retry_with_backoff(
             || async { self.raw_query(query, variables).await },
@@ -358,10 +358,10 @@ impl AniListClient {
         .await
     }
 
-    async fn raw_query(
+    async fn raw_query<V: Serialize>(
         &self,
         query: &'static str,
-        variables: Option<&HashMap<String, Value>>,
+        variables: Option<&V>,
     ) -> Result<Value, AniListError> {
         let body = RequestBody { query, variables };
 
@@ -491,10 +491,10 @@ impl AniListClient {
 
 /// Optimized request body structure that avoids HashMap allocation
 #[derive(Serialize)]
-struct RequestBody<'a> {
+struct RequestBody<'a, V: Serialize> {
     query: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    variables: Option<&'a HashMap<String, Value>>,
+    variables: Option<&'a V>,
 }
 
 impl Default for AniListClient {

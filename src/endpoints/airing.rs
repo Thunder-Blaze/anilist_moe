@@ -4,7 +4,6 @@ use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::airing};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching airing schedule information.
@@ -66,9 +65,7 @@ impl AiringEndpoint {
         options: &FetchAiringOptions,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         let query = airing::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

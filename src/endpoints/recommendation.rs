@@ -4,7 +4,6 @@ use crate::objects::recommendation::Recommendation;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::recommendation};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching media recommendations.
@@ -56,9 +55,7 @@ impl RecommendationEndpoint {
         options: &FetchRecommendationOptions,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
         let query = recommendation::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn save(
@@ -66,9 +63,7 @@ impl RecommendationEndpoint {
         options: &SaveRecommendationOptions,
     ) -> Result<Recommendation, AniListError> {
         let query = recommendation::SAVE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

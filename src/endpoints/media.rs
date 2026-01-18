@@ -5,7 +5,6 @@ use crate::objects::media::Media;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::media};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Fetch media (anime/manga) with filters and pagination.
@@ -306,9 +305,7 @@ impl MediaEndpoint {
         options: &FetchMediaOptions,
     ) -> Result<Page<Vec<Media>>, AniListError> {
         let query = media::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch a single media item.
@@ -328,9 +325,7 @@ impl MediaEndpoint {
     /// ```
     pub async fn fetch_one(&self, options: &FetchMediaOneOptions) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions - Anime
