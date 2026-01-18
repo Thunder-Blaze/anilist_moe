@@ -5,7 +5,6 @@ use crate::objects::responses::Page;
 use crate::objects::thread::{Thread, ThreadComment};
 use crate::{client::AniListClient, queries::forum};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching forum threads.
@@ -140,17 +139,13 @@ impl ForumEndpoint {
         options: &FetchThreadOptions,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         let query = forum::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch a single thread with full details
     pub async fn fetch_one(&self, options: &FetchThreadOneOptions) -> Result<Thread, AniListError> {
         let query: &str = forum::FETCH_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch multiple thread comments with pagination
@@ -159,9 +154,7 @@ impl ForumEndpoint {
         options: &FetchThreadCommentOptions,
     ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
         let query = forum::FETCH_COMMENT;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Fetch a single thread comment
@@ -170,26 +163,19 @@ impl ForumEndpoint {
         options: &FetchThreadCommentOneOptions,
     ) -> Result<ThreadComment, AniListError> {
         let query = forum::FETCH_COMMENT_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Create or update a thread
     pub async fn save(&self, options: &SaveThreadOptions) -> Result<Thread, AniListError> {
         let query = forum::SAVE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Delete a thread
     pub async fn delete(&self, options: &DeleteThreadOptions) -> Result<bool, AniListError> {
         let query = forum::DELETE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -202,9 +188,7 @@ impl ForumEndpoint {
         options: &SaveThreadCommentOptions,
     ) -> Result<ThreadComment, AniListError> {
         let query = forum::SAVE_COMMENT;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     /// Delete a thread comment
@@ -213,10 +197,7 @@ impl ForumEndpoint {
         options: &DeleteThreadCommentOptions,
     ) -> Result<bool, AniListError> {
         let query = forum::DELETE_COMMENT;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&variables_map)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -229,9 +210,7 @@ impl ForumEndpoint {
         options: &ToggleThreadSubscriptionOptions,
     ) -> Result<Thread, AniListError> {
         let query = forum::SUBSCRIPTION;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

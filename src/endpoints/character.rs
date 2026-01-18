@@ -5,7 +5,6 @@ use crate::objects::character::Character;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::character};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching multiple characters with pagination and filters.
@@ -76,9 +75,7 @@ impl CharacterEndpoint {
         options: &FetchCharacterOptions,
     ) -> Result<Page<Vec<Character>>, AniListError> {
         let query = character::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn fetch_one(
@@ -86,9 +83,7 @@ impl CharacterEndpoint {
         options: &FetchCharacterOneOptions,
     ) -> Result<Character, AniListError> {
         let query = character::FETCH_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

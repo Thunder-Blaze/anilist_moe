@@ -5,7 +5,6 @@ use crate::objects::user::User;
 use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for toggling a like on various entities.
@@ -54,16 +53,12 @@ impl CommonEndpoint {
         options: &ToggleLikeOptions,
     ) -> Result<LikeableUnion, AniListError> {
         let query = common::TOGGLE_LIKE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn toggle_follow(&self, options: &ToggleFollowOptions) -> Result<User, AniListError> {
         let query = common::TOGGLE_FOLLOW;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn toggle_favourite(
@@ -71,9 +66,7 @@ impl CommonEndpoint {
         options: &ToggleFavouriteOptions,
     ) -> Result<Favourites, AniListError> {
         let query = common::TOGGLE_FAVOURITE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

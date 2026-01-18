@@ -4,7 +4,6 @@ use crate::objects::responses::Page;
 use crate::objects::studio::Studio;
 use crate::{client::AniListClient, queries::studio};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching studios.
@@ -68,16 +67,12 @@ impl StudioEndpoint {
         options: &FetchStudioOptions,
     ) -> Result<Page<Vec<Studio>>, AniListError> {
         let query = studio::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn fetch_one(&self, options: &FetchStudioOneOptions) -> Result<Studio, AniListError> {
         let query = studio::FETCH_ONE;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions

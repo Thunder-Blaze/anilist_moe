@@ -36,7 +36,7 @@ async fn test_custom_query_with_fetch() {
             variables.insert("perPage".to_string(), serde_json::json!(5));
 
             client
-                .fetch::<Page<Vec<Media>>>(CUSTOM_MEDIA_QUERY, Some(&variables))
+                .fetch::<Page<Vec<Media>>, _>(CUSTOM_MEDIA_QUERY, Some(&variables))
                 .await
         })
         .await;
@@ -86,7 +86,7 @@ async fn test_custom_query_media_compatibility() {
             variables.insert("perPage".to_string(), serde_json::json!(3));
 
             client
-                .fetch::<Page<Vec<Media>>>(CUSTOM_MEDIA_QUERY, Some(&variables))
+                .fetch::<Page<Vec<Media>>, _>(CUSTOM_MEDIA_QUERY, Some(&variables))
                 .await
         })
         .await;

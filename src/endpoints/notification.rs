@@ -4,7 +4,6 @@ use crate::objects::responses::Page;
 use crate::unions::notification::NotificationUnion;
 use crate::{client::AniListClient, queries::notification};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_with::skip_serializing_none;
 
 /// Options for searching and filtering notifications.
@@ -37,9 +36,7 @@ impl NotificationEndpoint {
         options: &NotificationSearchOptions,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
         let query = notification::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.fetch(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     // Convenience functions
