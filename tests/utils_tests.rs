@@ -1,6 +1,6 @@
 //! Unit tests for utility functions
 
-use anilist_moe::utils::{RetryConfig, calculate_delay};
+use anilist_moe::utils::{calculate_delay, RetryConfig};
 use std::time::Duration;
 
 #[test]

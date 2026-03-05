@@ -20,7 +20,6 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 - **Pagination Support**: Built-in helpers for paginated results
 - **Well Tested**: Extensive test suite covering all endpoints
 - **Convenience Functions**: Easy-to-use helper methods for common queries
-- **Code Quality**: Pre-commit hooks with Husky for consistent code style
 
 ## Supported Endpoints
 
@@ -52,7 +51,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anilist_moe = "0.3.1"
+anilist_moe = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -69,9 +68,9 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get trending anime with proper type safety
-    let response = client.anime().get_trending(Some(1), Some(10)).await?;
+    let response = client.media().get_trending_anime(Some(1), Some(10)).await?;
 
-    // Access the data with clean, simple structure (v0.2.2+)
+    // Access the data with clean, simple structure (v0.3.0+)
     for anime in &response.data {
         println!(
             "Title: {} - Score: {}/100",
@@ -94,14 +93,14 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Search for an anime
-    let search_results = client.anime().search_anime("Attack on Titan", Some(1), Some(5)).await?;
+    let search_results = client.media().search_anime("Attack on Titan", Some(1), Some(5)).await?;
 
     // Access the data - search_results is Page<Vec<Media>>
     if let Some(first_result) = search_results.data.first() {
         let anime_id = first_result.id.unwrap_or(0);
 
         // Get detailed information by ID - returns just Media
-        let anime = client.anime().get_by_id(anime_id).await?;
+        let anime = client.media().get_anime_by_id(anime_id).await?;
 
         println!("Title: {}", anime.title.as_ref()
             .and_then(|t| t.romaji.as_ref())
@@ -193,7 +192,7 @@ async fn main() -> Result<(), AniListError> {
         ..Default::default()
     };
 
-    let response = client.anime().fetch(&options).await?;
+    let response = client.media().fetch(&options).await?;
     for media in response.data {
         println!(
             "{} has {} character edges",
@@ -226,29 +225,29 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get popular anime - returns Page<Vec<Media>>
-    let popular = client.anime().get_popular_anime(Some(1), Some(5)).await?;
+    let popular = client.media().get_popular_anime(Some(1), Some(5)).await?;
     for anime in &popular.data {
         println!("{}", anime.title.as_ref().unwrap().romaji.as_ref().unwrap());
     }
 
     // Get trending anime
-    let trending = client.anime().get_trending_anime(Some(1), Some(5)).await?;
+    let trending = client.media().get_trending_anime(Some(1), Some(5)).await?;
 
     // Get anime by ID - returns Media directly
-    let anime = client.anime().get_by_id(16498).await?; // Attack on Titan
+    let anime = client.media().get_anime_by_id(16498).await?; // Attack on Titan
 
     // Search anime
-    let search_results = client.anime().search_anime("Naruto", Some(1), Some(10)).await?;
+    let search_results = client.media().search_anime("Naruto", Some(1), Some(10)).await?;
 
     // Get anime by season
     use anilist_moe::enums::media::MediaSeason;
-    let fall_2023 = client.anime().get_by_season(MediaSeason::Fall, 2023, Some(1), Some(10)).await?;
+    let fall_2023 = client.media().get_by_season(MediaSeason::Fall, 2023, Some(1), Some(10)).await?;
 
     // Get top rated anime
-    let top_rated = client.anime().get_top_rated_anime(Some(1), Some(10)).await?;
+    let top_rated = client.media().get_top_rated_anime(Some(1), Some(10)).await?;
 
     // Get currently airing anime
-    let airing = client.anime().get_airing_anime(Some(1), Some(10)).await?;
+    let airing = client.media().get_airing_anime(Some(1), Some(10)).await?;
 
     Ok(())
 }
@@ -351,11 +350,11 @@ async fn main() -> Result<(), AniListError> {
 
     // Get current user information - returns User directly
     let current_user = client.user().get_current_user().await?;
-    println!("Logged in as: {}", current_user.name);
+    println!("Logged in as: {}", current_user.name.unwrap_or_default());
 
     // Get current user's anime list - returns Page<Vec<MediaList>>
     let anime_list = client.medialist()
-        .get_user_anime_list(&current_user.name, None, Some(1), Some(50))
+        .get_user_anime_list(&current_user.name.unwrap_or_default(), None, Some(1), Some(50))
         .await?;
 
     Ok(())
@@ -382,13 +381,20 @@ use anilist_moe::{AniListClient, errors::AniListError};
 async fn main() {
     let client = AniListClient::new();
 
-    match client.anime().get_by_id(999999).await {
+    match client.media().get_anime_by_id(999999).await {
         Ok(anime) => println!("Found anime: {:?}", anime),
         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
-        Err(AniListError::GraphQL { message, .. }) => eprintln!("GraphQL error: {}", message),
+        Err(AniListError::GraphQL { message }) => eprintln!("GraphQL error: {}", message),
         Err(AniListError::Json(e)) => eprintln!("JSON parsing error: {}", e),
-        Err(AniListError::RateLimit) => eprintln!("Rate limited"),
+        Err(AniListError::RateLimit { limit, remaining, reset_at, retry_after }) => {
+            eprintln!("Rate limited - retry after {} seconds", retry_after);
+        }
+        Err(AniListError::RateLimitSimple) => eprintln!("Rate limited"),
+        Err(AniListError::BurstLimit) => eprintln!("Too many requests too quickly"),
         Err(AniListError::NotFound) => eprintln!("Not found"),
+        Err(AniListError::AuthenticationRequired) => eprintln!("Authentication required"),
+        Err(AniListError::AccessDenied) => eprintln!("Access denied"),
+        Err(e) => eprintln!("Error: {:?}", e),
     }
 }
 ```
@@ -399,7 +405,7 @@ All responses are fully typed. No more dealing with `serde_json::Value`:
 
 ```rust
 // Fully typed response - Page<Vec<Media>>
-let response = client.anime().get_trending_anime(Some(1), Some(10)).await?;
+let response = client.media().get_trending_anime(Some(1), Some(10)).await?;
 
 // Access the Vec<Media> directly through response.data
 let anime = &response.data[0];
@@ -462,16 +468,21 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     for page in 1..=10 {
-        match client.anime().get_popular_anime(Some(page), Some(50)).await {
+        match client.media().get_popular_anime(Some(page), Some(50)).await {
             Ok(response) => {
                 // Process response
             }
-            Err(AniListError::RateLimit) => {
+            Err(AniListError::RateLimit { retry_after, .. }) => {
+                // Wait and retry
+                sleep(Duration::from_secs(retry_after as u64)).await;
+                continue;
+            }
+            Err(AniListError::RateLimitSimple) => {
                 // Wait and retry
                 sleep(Duration::from_secs(60)).await;
                 continue;
             }
-            Err(e) => return Err(e.into()),
+            Err(e) => return Err(e),
         }
 
         // Be nice to the API
@@ -497,7 +508,7 @@ async fn main() -> Result<(), AniListError> {
     let per_page = 50;
 
     loop {
-        let response = client.anime().get_popular_anime(Some(page), Some(per_page)).await?;
+        let response = client.media().get_popular_anime(Some(page), Some(per_page)).await?;
 
         // Process current page - response.data is Vec<Media>
         for anime in &response.data {

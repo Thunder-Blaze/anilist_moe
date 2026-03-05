@@ -1,6 +1,6 @@
 //! Tests for Activity endpoint
 
-use crate::test_harness::{TestHarness, delay_between_tests};
+use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion};
 use dotenv::dotenv;
 use std::env;

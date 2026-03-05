@@ -10,7 +10,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 ## Environment
-- **anilist_moe version**: (e.g., 0.2.0)
+- **anilist_moe version**: (e.g., 0.3.2)
 - **Rust version**: (run `rustc --version`)
 - **Operating System**: (e.g., Ubuntu 22.04, Windows 11, macOS 14)
 

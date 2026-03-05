@@ -9,7 +9,32 @@ This project uses [Semantic Versioning](https://semver.org/):
 - **MINOR** version for new functionality in a backwards compatible manner
 - **PATCH** version for backwards compatible bug fixes
 
-## [Unreleased]
+## [Unreleased] (0.3.3)
+
+### Added
+- TBD
+
+### Changed
+- TBD
+
+### Fixed
+- Major Mistakes in Documentation
+- Typename fix for notifications and activities
+
+## [0.3.2] - 2024-01-22
+
+### Fixed
+- **Critical**: Fixed invalid Rust edition in `Cargo.toml` from "2024" to "2021"
+- **Documentation**: Updated README.md to correct method names and examples
+  - Fixed `client.anime().get_trending()` → `client.media().get_trending_anime()`
+  - Fixed `client.anime().get_by_id()` → `client.media().get_anime_by_id()`
+  - Corrected version number in installation instructions to "0.3"
+  - Updated error handling examples to show all error variants
+  - Fixed response access patterns in all examples
+- **Documentation**: Updated CONTRIBUTING.md with correct clippy command syntax
+- **Documentation**: Clarified that pre-commit hooks are for developers only
+
+## [0.3.1] - 2024-01-XX
 
 ### Added
 - **Custom Query Support**: Added a generic `AniListClient::fetch` helper for executing user-defined GraphQL queries with typed responses.
@@ -23,9 +48,6 @@ This project uses [Semantic Versioning](https://semver.org/):
 
 ### Fixed
 - **Doctests**: Resolved doctest failures triggered by the media endpoint refactor.
-- **Documentation**: Corrected README installation instructions to reference crate version 0.3.1 (commit 4566b96)
-
-### Breaking Changes
 
 ## [0.3.0] - 2024-10-14
 

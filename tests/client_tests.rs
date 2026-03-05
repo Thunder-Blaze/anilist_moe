@@ -2,7 +2,7 @@
 //!
 //! These tests verify the core functionality of the client without making actual API calls.
 
-use anilist_moe::{AniListClient, utils::RetryConfig};
+use anilist_moe::{utils::RetryConfig, AniListClient};
 
 #[test]
 fn test_client_creation() {
