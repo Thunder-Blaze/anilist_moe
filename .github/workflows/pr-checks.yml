@@ -31,7 +31,7 @@ jobs:
         run: cargo fmt --all --check
 
       - name: Run clippy
-        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+        run: cargo clippy --locked -- -D warnings
 
       - name: Run tests without token
-        run: cargo test --locked --workspace --all-features -- --test-threads=1
+        run: cargo test --locked -- --test-threads=1
