@@ -5,6 +5,9 @@ mutation SaveReview(
     $summary: String
     $score: Int
     $private: Boolean
+
+    # HTML rendering options
+    $body_as_html: Boolean = false
 ) {
     SaveReview(
         id: $id
@@ -19,7 +22,7 @@ mutation SaveReview(
         mediaId
         mediaType
         summary
-        body(asHtml: false)
+        body(asHtml: $body_as_html)
         rating
         ratingAmount
         score

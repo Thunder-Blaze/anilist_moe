@@ -20,6 +20,9 @@ query AiringSchedule(
     $sort: [AiringSort] = [TIME]
     $page: Int = 1
     $perPage: Int = 20
+
+    # HTML rendering options
+    $description_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -63,7 +66,7 @@ query AiringSchedule(
                 type
                 format
                 status
-                description(asHtml: false)
+                description(asHtml: $description_as_html)
                 season
                 seasonYear
                 episodes

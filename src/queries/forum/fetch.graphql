@@ -17,6 +17,9 @@ query SearchThreads(
     $includeReplyUser: Boolean = false
     $includeCategories: Boolean = false
     $includeMediaCategories: Boolean = false
+
+    # HTML rendering options
+    $body_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -39,7 +42,7 @@ query SearchThreads(
         ) {
             id
             title
-            body(asHtml: false) @include(if: $includeBody)
+            body(asHtml: $body_as_html) @include(if: $includeBody)
             userId
             replyUserId
             replyCount

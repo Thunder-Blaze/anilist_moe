@@ -6,6 +6,10 @@ query FetchReviews(
     $sort: [ReviewSort]
     $page: Int = 1
     $perPage: Int = 20
+
+    # HTML rendering options
+    $body_as_html: Boolean = false
+    $description_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -23,7 +27,7 @@ query FetchReviews(
             mediaId
             mediaType
             summary
-            body(asHtml: false)
+            body(asHtml: $body_as_html)
             rating
             ratingAmount
             score
@@ -53,7 +57,7 @@ query FetchReviews(
                 type
                 format
                 status
-                description(asHtml: false)
+                description(asHtml: $description_as_html)
                 episodes
                 chapters
                 volumes

@@ -23,6 +23,11 @@ pub struct FetchReviewOptions {
     #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
     pub sort: Option<Vec<ReviewSort>>,
+    // HTML rendering options
+    #[serde(rename = "body_as_html")]
+    pub body_as_html: Option<bool>,
+    #[serde(rename = "description_as_html")]
+    pub description_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a review.
@@ -36,6 +41,9 @@ pub struct SaveReviewOptions {
     pub summary: Option<String>,
     pub body: Option<String>,
     pub private: Option<bool>,
+    // HTML rendering options
+    #[serde(rename = "body_as_html")]
+    pub body_as_html: Option<bool>,
 }
 
 /// Options for deleting a review.
@@ -170,6 +178,7 @@ impl ReviewEndpoint {
             summary: Some(summary.to_string()),
             body: Some(body.to_string()),
             private,
+            ..Default::default()
         })
         .await
     }

@@ -1,8 +1,8 @@
-query GetUserById($id: Int!) {
+query GetUserById($id: Int!, $about_as_html: Boolean = false) {
     User(id: $id) {
         id
         name
-        about(asHtml: false)
+        about(asHtml: $about_as_html)
         avatar {
             large
             medium

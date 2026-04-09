@@ -1,10 +1,11 @@
 query FetchThread(
     $id: Int!
+    $body_as_html: Boolean = false
 ) {
     Thread(id: $id) {
         id
         title
-        body(asHtml: false)
+        body(asHtml: $body_as_html)
         userId
         replyUserId
         replyCount

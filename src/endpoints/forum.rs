@@ -38,6 +38,9 @@ pub struct FetchThreadOptions {
     pub include_categories: Option<bool>,
     #[serde(rename = "includeMediaCategories")]
     pub include_media_categories: Option<bool>,
+    // HTML rendering options
+    #[serde(rename = "body_as_html")]
+    pub body_as_html: Option<bool>,
 }
 
 /// Options for fetching a single forum thread by ID.
@@ -51,6 +54,9 @@ pub struct FetchThreadOneOptions {
     pub comments_per_page: Option<i32>,
     #[serde(rename = "commentsSort")]
     pub comments_sort: Option<Vec<ThreadCommentSort>>,
+    // HTML rendering options
+    #[serde(rename = "body_as_html")]
+    pub body_as_html: Option<bool>,
 }
 
 /// Options for fetching thread comments.
@@ -66,6 +72,9 @@ pub struct FetchThreadCommentOptions {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
+    // HTML rendering options
+    #[serde(rename = "comment_as_html")]
+    pub comment_as_html: Option<bool>,
 }
 
 /// Options for fetching a single thread comment by ID.
@@ -73,6 +82,9 @@ pub struct FetchThreadCommentOptions {
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchThreadCommentOneOptions {
     pub id: Option<i32>,
+    // HTML rendering options
+    #[serde(rename = "comment_as_html")]
+    pub comment_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a forum thread.
@@ -87,6 +99,9 @@ pub struct SaveThreadOptions {
     pub media_categories: Option<Vec<i32>>,
     pub sticky: Option<bool>,
     pub locked: Option<bool>,
+    // HTML rendering options
+    #[serde(rename = "body_as_html")]
+    pub body_as_html: Option<bool>,
 }
 
 /// Options for deleting a forum thread.
@@ -106,6 +121,9 @@ pub struct SaveThreadCommentOptions {
     pub parent_comment_id: Option<i32>,
     pub comment: Option<String>,
     pub locked: Option<bool>,
+    // HTML rendering options
+    #[serde(rename = "comment_as_html")]
+    pub comment_as_html: Option<bool>,
 }
 
 /// Options for deleting a thread comment.
@@ -378,8 +396,11 @@ impl ForumEndpoint {
 
     /// Get comment by ID
     pub async fn get_comment_by_id(&self, id: i32) -> Result<ThreadComment, AniListError> {
-        self.fetch_comment_one(&FetchThreadCommentOneOptions { id: Some(id) })
-            .await
+        self.fetch_comment_one(&FetchThreadCommentOneOptions {
+            id: Some(id),
+            ..Default::default()
+        })
+        .await
     }
 
     /// Create a thread comment (reply)

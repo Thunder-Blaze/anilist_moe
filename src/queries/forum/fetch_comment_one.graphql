@@ -1,11 +1,12 @@
 query FetchThreadComment(
     $id: Int!
+    $comment_as_html: Boolean = false
 ) {
     ThreadComment(id: $id) {
         id
         threadId
         userId
-        comment(asHtml: false)
+        comment(asHtml: $comment_as_html)
         likeCount
         isLiked
         siteUrl
