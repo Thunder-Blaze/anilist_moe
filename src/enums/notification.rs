@@ -36,4 +36,10 @@ pub enum NotificationType {
     MediaMerge,
     #[serde(rename = "MEDIA_DELETION")]
     MediaDeletion,
+    #[serde(rename = "MEDIA_SUBMISSION_UPDATE")]
+    MediaSubmissionUpdate,
+    #[serde(rename = "STAFF_SUBMISSION_UPDATE")]
+    StaffSubmissionUpdate,
+    #[serde(rename = "CHARACTER_SUBMISSION_UPDATE")]
+    CharacterSubmissionUpdate,
 }
