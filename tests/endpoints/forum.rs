@@ -69,6 +69,7 @@ async fn test_fetch_one_forum_thread() {
                 comments_page: None,
                 comments_per_page: None,
                 comments_sort: None,
+                ..Default::default()
             };
             client.forum().fetch_one(&options).await
         })
@@ -185,6 +186,7 @@ async fn test_fetch_comment_one() {
                 .run(|| async {
                     let options = FetchThreadCommentOneOptions {
                         id: Some(comment_id),
+                        ..Default::default()
                     };
                     client.forum().fetch_comment_one(&options).await
                 })
@@ -218,6 +220,7 @@ async fn test_save_forum_thread() {
                 media_categories: None,
                 sticky: None,
                 locked: None,
+                ..Default::default()
             };
             client.forum().save(&options).await
         })

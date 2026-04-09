@@ -153,7 +153,10 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 3: Fetching activity...");
     let fetch_result = h
         .run(|| async {
-            let fetch_options = FetchActivityOneOptions { id: activity_id };
+            let fetch_options = FetchActivityOneOptions {
+                id: activity_id,
+                ..Default::default()
+            };
             client.activity().fetch_one(&fetch_options).await
         })
         .await;
@@ -352,6 +355,7 @@ async fn test_activity_reply() {
                 page: Some(1),
                 per_page: Some(10),
                 id: None,
+                ..Default::default()
             };
             client.activity().fetch_replies(&fetch_options).await
         })
