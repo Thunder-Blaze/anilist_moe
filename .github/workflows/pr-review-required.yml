@@ -1,0 +1,62 @@
+name: PR Review Required
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  pull_request_review:
+    types:
+      - submitted
+      - edited
+      - dismissed
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  require-review:
+    name: Require reviewer approval
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check for approval
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pullNumber = context.payload.pull_request?.number;
+
+            if (!pullNumber) {
+              core.setFailed('This workflow only runs for pull request events.');
+              return;
+            }
+
+            const pr = context.payload.pull_request;
+            const authorLogin = pr.user.login;
+
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner,
+              repo,
+              pull_number: pullNumber,
+              per_page: 100,
+            });
+
+            const latestReviewsByUser = new Map();
+            for (const review of reviews) {
+              latestReviewsByUser.set(review.user.login, review.state);
+            }
+
+            const hasApprovedReview = [...latestReviewsByUser.entries()].some(
+              ([reviewer, state]) => reviewer !== authorLogin && state === 'APPROVED'
+            );
+
+            if (!hasApprovedReview) {
+              core.setFailed('At least one reviewer approval is required before merging.');
+              return;
+            }
+
+            core.info('Reviewer approval found.');
