@@ -26,6 +26,9 @@ pub struct FetchUserOptions {
     pub include_favourites: Option<bool>,
     #[serde(rename = "includeStatistics")]
     pub include_statistics: Option<bool>,
+    // HTML rendering options
+    #[serde(rename = "about_as_html")]
+    pub about_as_html: Option<bool>,
 }
 
 /// Options for fetching a single user by ID or name.
@@ -34,6 +37,9 @@ pub struct FetchUserOptions {
 pub struct FetchUserOneOptions {
     pub id: Option<i32>,
     pub name: Option<String>,
+    // HTML rendering options
+    #[serde(rename = "about_as_html")]
+    pub about_as_html: Option<bool>,
 }
 
 /// Options for fetching a user's followers.

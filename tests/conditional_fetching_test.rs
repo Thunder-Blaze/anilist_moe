@@ -65,11 +65,12 @@ async fn test_conditional_fetching() {
 
     // Check if characters are present
     assert!(media.characters.is_some());
-    if let Some(characters) = &media.characters
-        && let Some(edges) = &characters.edges
-        && !edges.is_empty()
-    {
-        assert!(edges.len() <= 5);
+    if let Some(characters) = &media.characters {
+        if let Some(edges) = &characters.edges {
+            if !edges.is_empty() {
+                assert!(edges.len() <= 5);
+            }
+        }
     }
 
     // Assert other fields are present (using assertions, not just printing)

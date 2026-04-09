@@ -10,7 +10,7 @@ Be respectful and constructive in all interactions. We aim to maintain a welcomi
 
 ### Prerequisites
 
-- Rust 1.70 or higher
+- Rust 1.70 or higher (with edition 2021 support)
 - Git
 - A GitHub account
 
@@ -45,8 +45,9 @@ Be respectful and constructive in all interactions. We aim to maintain a welcomi
 
 - Follow Rust standard naming conventions
 - Use `cargo fmt` to format your code before committing
-- Run `cargo clippy` to catch common mistakes
+- Run `cargo clippy -- -D warnings` to catch common mistakes and ensure no warnings
 - Write clear, descriptive commit messages
+- Pre-commit hooks (husky-rs) will automatically run formatting and linting checks for contributors with a local clone
 
 ### Type Safety
 
@@ -84,6 +85,9 @@ cargo test -- --nocapture
 
 # Run specific endpoint tests
 cargo test --test endpoint_tests
+
+# Run doctests
+cargo test --doc
 ```
 
 ## Making Changes
@@ -224,6 +228,8 @@ async fn test_get_by_id() {
    git add .
    git commit -m "Add feature: description of feature"
    ```
+   
+   Note: If you have a local clone, pre-commit hooks will automatically run `cargo fmt --check` and `cargo clippy -- -D warnings` before allowing the commit.
 
 6. Push to your fork:
    ```bash
@@ -334,7 +340,7 @@ cargo fmt --check
 # Run clippy for linting
 cargo clippy
 
-# Check for common issues with strict linting
+# Check for common issues with strict linting (recommended before committing)
 cargo clippy -- -D warnings
 ```
 
@@ -414,12 +420,14 @@ When requesting features:
 (For maintainers)
 
 1. Update version in `Cargo.toml`
-2. Update CHANGELOG.md
-3. Run full test suite
-4. Create release commit
-5. Tag release: `git tag -a v0.X.Y -m "Release v0.X.Y"`
-6. Push tags: `git push origin --tags`
-7. Publish to crates.io: `cargo publish`
+2. Update CHANGELOG.md with all changes
+3. Run full test suite: `cargo test --all`
+4. Run clippy: `cargo clippy -- -D warnings`
+5. Run formatting check: `cargo fmt --check`
+6. Create release commit
+7. Tag release: `git tag -a v0.X.Y -m "Release v0.X.Y"`
+8. Push tags: `git push origin --tags`
+9. Publish to crates.io: `cargo publish`
 
 ## License
 

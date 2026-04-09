@@ -48,6 +48,9 @@ pub struct FetchAiringOptions {
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub page: Option<i32>,
+    // HTML rendering options
+    #[serde(rename = "description_as_html")]
+    pub description_as_html: Option<bool>,
 }
 
 /// Endpoint for airing schedule operations.

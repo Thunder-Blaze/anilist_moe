@@ -29,10 +29,10 @@ async fn test_character_conditional_fetching() {
                     character.media.is_some(),
                     "Media should be present when requested"
                 );
-                if let Some(media) = &character.media
-                    && let Some(edges) = &media.edges
-                {
-                    assert!(edges.len() <= 5, "Should respect per_page limit");
+                if let Some(media) = &character.media {
+                    if let Some(edges) = &media.edges {
+                        assert!(edges.len() <= 5, "Should respect per_page limit");
+                    }
                 }
             }
         }

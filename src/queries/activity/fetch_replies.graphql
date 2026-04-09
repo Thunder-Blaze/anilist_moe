@@ -8,7 +8,7 @@ fragment LikesFields on User {
 
 fragment ReplyFields on ActivityReply {
     id
-    text(asHtml: true)
+    text(asHtml: $text_as_html)
     createdAt
     likeCount
     isLiked
@@ -32,6 +32,9 @@ query FetchActivityReplies(
     # Filters
     $id: Int,
     $activityId: Int
+
+    # HTML rendering options
+    $text_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {

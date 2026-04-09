@@ -4,6 +4,10 @@ query Notifications(
     $type: NotificationType
     $type_in: [NotificationType]
     $resetNotificationCount: Boolean
+    # HTML rendering options
+    $message_as_html: Boolean = false
+    $text_as_html: Boolean = false
+    $comment_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -58,7 +62,7 @@ query Notifications(
                 createdAt
                 message {
                     id
-                    message(asHtml: false)
+                    message(asHtml: $message_as_html)
                 }
                 user {
                     id
@@ -77,9 +81,10 @@ query Notifications(
                 context
                 createdAt
                 activity {
+                    __typename
                     ... on TextActivity {
                         id
-                        text(asHtml: false)
+                        text(asHtml: $text_as_html)
                     }
                     ... on ListActivity {
                         id
@@ -104,9 +109,10 @@ query Notifications(
                 context
                 createdAt
                 activity {
+                    __typename
                     ... on TextActivity {
                         id
-                        text(asHtml: false)
+                        text(asHtml: $text_as_html)
                     }
                     ... on ListActivity {
                         id
@@ -131,9 +137,10 @@ query Notifications(
                 context
                 createdAt
                 activity {
+                    __typename
                     ... on TextActivity {
                         id
-                        text(asHtml: false)
+                        text(asHtml: $text_as_html)
                     }
                     ... on ListActivity {
                         id
@@ -158,9 +165,10 @@ query Notifications(
                 context
                 createdAt
                 activity {
+                    __typename
                     ... on TextActivity {
                         id
-                        text(asHtml: false)
+                        text(asHtml: $text_as_html)
                     }
                     ... on ListActivity {
                         id
@@ -185,9 +193,10 @@ query Notifications(
                 context
                 createdAt
                 activity {
+                    __typename
                     ... on TextActivity {
                         id
-                        text(asHtml: false)
+                        text(asHtml: $text_as_html)
                     }
                     ... on ListActivity {
                         id
@@ -217,7 +226,7 @@ query Notifications(
                 }
                 comment {
                     id
-                    comment(asHtml: false)
+                    comment(asHtml: $comment_as_html)
                 }
                 user {
                     id
@@ -241,7 +250,7 @@ query Notifications(
                 }
                 comment {
                     id
-                    comment(asHtml: false)
+                    comment(asHtml: $comment_as_html)
                 }
                 user {
                     id
@@ -265,7 +274,7 @@ query Notifications(
                 }
                 comment {
                     id
-                    comment(asHtml: false)
+                    comment(asHtml: $comment_as_html)
                 }
                 user {
                     id
@@ -289,7 +298,7 @@ query Notifications(
                 }
                 comment {
                     id
-                    comment(asHtml: false)
+                    comment(asHtml: $comment_as_html)
                 }
                 user {
                     id

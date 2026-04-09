@@ -75,12 +75,24 @@ pub struct FetchActivityOptions {
     // # Sort
     #[serde(rename = "sort")]
     pub sort: Option<Vec<ActivitySort>>,
+
+    // # HTML rendering options
+    #[serde(rename = "text_as_html")]
+    pub text_as_html: Option<bool>,
+    #[serde(rename = "message_as_html")]
+    pub message_as_html: Option<bool>,
 }
 
 /// Options for fetching a single activity by ID.
+#[skip_serializing_none]
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchActivityOneOptions {
     pub id: i32,
+    // # HTML rendering options
+    #[serde(rename = "text_as_html")]
+    pub text_as_html: Option<bool>,
+    #[serde(rename = "message_as_html")]
+    pub message_as_html: Option<bool>,
 }
 
 /// Options for fetching replies to an activity.
@@ -98,6 +110,10 @@ pub struct FetchActivityRepliesOptions {
     pub id: Option<i32>,
     #[serde(rename = "activityId")]
     pub activity_id: i32,
+
+    // # HTML rendering options
+    #[serde(rename = "text_as_html")]
+    pub text_as_html: Option<bool>,
 }
 
 /// Options for deleting an activity.
@@ -295,7 +311,11 @@ impl ActivityEndpoint {
 
     /// Get activity by ID
     pub async fn get_by_id(&self, id: i32) -> Result<ActivityUnion, AniListError> {
-        self.fetch_one(&FetchActivityOneOptions { id }).await
+        self.fetch_one(&FetchActivityOneOptions {
+            id,
+            ..Default::default()
+        })
+        .await
     }
 
     /// Create a text activity

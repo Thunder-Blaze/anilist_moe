@@ -5,10 +5,10 @@ use crate::endpoints::{
 };
 use crate::errors::AniListError;
 use crate::objects::responses::GraphQLResponse;
-use crate::utils::{RetryConfig, retry_with_backoff};
+use crate::utils::{retry_with_backoff, RetryConfig};
 use reqwest::{Client, Response, StatusCode};
 use serde::Serialize;
-use serde_json::{Value, from_value};
+use serde_json::{from_value, Value};
 use std::borrow::Cow;
 
 use std::fmt;

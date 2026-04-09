@@ -41,7 +41,7 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Media>>
-    let response = client.anime().get_trending_anime(Some(1), Some(10)).await?;
+    let response = client.media().get_trending_anime(Some(1), Some(10)).await?;
 
     // Access the Vec<Media> through response.data
     for anime in &response.data {
@@ -69,7 +69,7 @@ async fn main() -> Result<(), AniListError> {
 
     let search_query = "Steins Gate";
     // Returns Page<Vec<Media>>
-    let response = client.anime().search_anime(search_query, Some(1), Some(10)).await?;
+    let response = client.media().search_anime(search_query, Some(1), Some(10)).await?;
 
     // Access pagination info
     if let Some(page_info) = &response.page_info {
@@ -100,7 +100,7 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Get Fall 2024 anime
-    let response = client.anime()
+    let response = client.media()
         .get_by_season(MediaSeason::Fall, 2024, Some(1), Some(20))
         .await?;
 
@@ -126,7 +126,7 @@ async fn main() -> Result<(), AniListError> {
 
     // Attack on Titan ID: 16498
     // Returns Media directly (not wrapped)
-    let anime = client.anime().get_by_id(16498).await?;
+    let anime = client.media().get_anime_by_id(16498).await?;
 
     println!("=== Anime Details ===");
 
@@ -164,7 +164,7 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Media>>
-    let response = client.manga().get_top_rated_manga(Some(1), Some(10)).await?;
+    let response = client.media().get_top_rated_manga(Some(1), Some(10)).await?;
 
     println!("Top Rated Manga:");
     for (i, manga) in response.data.iter().enumerate() {
@@ -191,7 +191,7 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Returns Page<Vec<Media>>
-    let response = client.manga().get_releasing_manga(Some(1), Some(20)).await?;
+    let response = client.media().get_releasing_manga(Some(1), Some(10)).await?;
 
     println!("Currently Releasing Manga:");
     for manga in &response.data {
@@ -643,7 +643,7 @@ use anilist_moe::errors::AniListError;
 async fn main() {
     let client = AniListClient::new();
 
-    match client.anime().get_by_id(999999).await {
+    match client.media().get_anime_by_id(16498).await {
         Ok(anime) => {
             println!("Success: {:?}", anime);
         }
@@ -662,7 +662,10 @@ async fn main() {
         Err(AniListError::Json(e)) => {
             eprintln!("JSON parsing error: {}", e);
         }
-        Err(AniListError::RateLimit) => {
+        Err(AniListError::RateLimit { retry_after, .. }) => {
+            eprintln!("Rate limited - retry after {} seconds", retry_after);
+        }
+        Err(AniListError::RateLimitSimple) => {
             eprintln!("Rate limited - please wait before making more requests");
         }
         Err(AniListError::NotFound) => {

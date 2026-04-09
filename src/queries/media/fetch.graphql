@@ -81,7 +81,7 @@ query MediaSearch(
     $perPage: Int = 20
 
     # Extra
-    $description_as_html: Boolean = true
+    $description_as_html: Boolean = false
     $includeStartDate: Boolean = false
     $includeEndDate: Boolean = false
     $includeDuration: Boolean = false

@@ -1,6 +1,6 @@
 //! Tests for MediaList endpoint
 
-use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
+use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::medialist::*;
 use anilist_moe::enums::media_list::MediaListStatus;
 

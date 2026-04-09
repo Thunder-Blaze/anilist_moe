@@ -221,6 +221,9 @@ pub struct FetchMediaOptions {
     // Filter fields for included connections
     #[serde(rename = "voiceActorLanguage")]
     pub voice_actor_language: Option<StaffLanguage>,
+    // HTML rendering options
+    #[serde(rename = "description_as_html")]
+    pub description_as_html: Option<bool>,
 }
 
 /// Fetch detailed info for a single media item.

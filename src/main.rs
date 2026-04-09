@@ -1,4 +1,4 @@
-use anilist_moe::{AniListClient, AniListError, endpoints::media::FetchMediaOptions};
+use anilist_moe::{endpoints::media::FetchMediaOptions, AniListClient, AniListError};
 
 #[tokio::main]
 async fn main() -> Result<(), AniListError> {

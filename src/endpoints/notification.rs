@@ -19,6 +19,13 @@ pub struct NotificationSearchOptions {
     pub type_in: Option<Vec<NotificationType>>,
     #[serde(rename = "resetNotificationCount")]
     pub reset_notification_count: Option<bool>,
+    // HTML rendering options
+    #[serde(rename = "message_as_html")]
+    pub message_as_html: Option<bool>,
+    #[serde(rename = "text_as_html")]
+    pub text_as_html: Option<bool>,
+    #[serde(rename = "comment_as_html")]
+    pub comment_as_html: Option<bool>,
 }
 
 /// Endpoint for notification operations.

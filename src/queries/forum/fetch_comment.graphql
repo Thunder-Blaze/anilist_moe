@@ -5,6 +5,9 @@ query FetchThreadComments(
     $sort: [ThreadCommentSort]
     $page: Int = 1
     $perPage: Int = 25
+
+    # HTML rendering options
+    $comment_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -23,7 +26,7 @@ query FetchThreadComments(
             id
             threadId
             userId
-            comment(asHtml: false)
+            comment(asHtml: $comment_as_html)
             likeCount
             isLiked
             siteUrl

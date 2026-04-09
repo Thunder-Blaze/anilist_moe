@@ -51,6 +51,10 @@ query FetchActivity(
 
     # Sort
     $sort: [ActivitySort] = [ID_DESC]
+
+    # HTML rendering options
+    $text_as_html: Boolean = false
+    $message_as_html: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -114,7 +118,7 @@ query FetchActivity(
                 likeCount
                 replyCount
                 isSubscribed
-                text(asHtml: true)
+                text(asHtml: $text_as_html)
                 user {
                     ...UserFields
                 }
@@ -130,7 +134,7 @@ query FetchActivity(
                 likeCount
                 replyCount
                 isSubscribed
-                message(asHtml: true)
+                message(asHtml: $message_as_html)
                 messenger {
                     ...UserFields
                 }
