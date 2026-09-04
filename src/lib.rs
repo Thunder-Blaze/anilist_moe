@@ -98,7 +98,7 @@
 //!
 //!     if let Some(first) = search.data.first() {
 //!         // Get detailed information
-//!         let details = client.media().get_anime_by_id(first.id.unwrap()).await?;
+//!         let details = client.media().get_anime_by_id(first.id).await?;
 //!         let anime = &details;
 //!
 //!         println!("Score: {}/100", anime.average_score.unwrap_or(0));
