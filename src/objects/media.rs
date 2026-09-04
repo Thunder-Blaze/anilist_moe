@@ -29,7 +29,7 @@ use crate::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Media {
-    pub id: Option<i32>,
+    pub id: i32,
     pub id_mal: Option<i32>,
     pub title: Option<MediaTitle>,
     #[serde(rename = "type")]

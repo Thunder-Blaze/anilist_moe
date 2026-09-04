@@ -60,8 +60,7 @@ async fn test_custom_query_with_fetch() {
     );
 
     for media in &media_list {
-        assert!(media.id.is_some(), "Media should have an id");
-        assert!(media.id.unwrap() > 0, "Media id should be positive");
+        assert!(media.id > 0, "Media id should be positive");
         assert!(media.title.is_some(), "Media should have a title");
 
         if let Some(ref title) = media.title {
@@ -95,7 +94,7 @@ async fn test_custom_query_media_compatibility() {
     let media_list = result.unwrap().data;
 
     for media in media_list {
-        let id = media.id.expect("Media should have id");
+        let id = media.id;
         let title = media.title.as_ref().expect("Media should have title");
 
         // Verify we can access title fields
