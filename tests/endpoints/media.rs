@@ -265,8 +265,8 @@ async fn test_fetch_media_pagination() {
     }
 
     // Verify different pages have different results
-    let ids1: Vec<i32> = media_list1.iter().map(|m| m.id).collect();
-    let ids2: Vec<i32> = media_list2.iter().map(|m| m.id).collect();
+    let ids1: Vec<u32> = media_list1.iter().map(|m| m.id).collect();
+    let ids2: Vec<u32> = media_list2.iter().map(|m| m.id).collect();
     assert_ne!(ids1, ids2, "Different pages should have different results");
 
     // Verify IDs are in descending order within each page
