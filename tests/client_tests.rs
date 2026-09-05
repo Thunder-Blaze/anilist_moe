@@ -92,27 +92,6 @@ fn test_client_default() {
 }
 
 #[test]
-fn test_client_clone() {
-    let client = AniListClient::with_token("test_token");
-    let cloned = client.clone();
-
-    // Both clients should be independent and have the same token status
-    assert!(cloned.has_token());
-
-    // Cloning should be cheap (Arc-based)
-    // This verifies the optimization is working
-}
-
-#[test]
-fn test_client_clone_shares_state() {
-    let client = AniListClient::with_token("test_token");
-    let cloned = client.clone();
-
-    // Both should report the same token status
-    assert_eq!(client.has_token(), cloned.has_token());
-}
-
-#[test]
 fn test_client_debug_impl() {
     let client = AniListClient::with_token("secret_token_should_not_appear_in_debug");
     let debug_string = format!("{:?}", client);
@@ -168,20 +147,6 @@ fn test_retry_config_custom() {
     assert_eq!(config.base_delay_ms, 500);
     assert!(!config.exponential_backoff);
     assert_eq!(config.max_delay_ms, 10000);
-}
-
-#[test]
-fn test_retry_config_copy() {
-    let config1 = RetryConfig {
-        max_retries: 5,
-        base_delay_ms: 2000,
-        exponential_backoff: true,
-        max_delay_ms: 30000,
-    };
-
-    // Use copy semantics instead of clone
-    let config2 = config1;
-    assert_eq!(config1, config2);
 }
 
 #[test]

@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaList {
     pub id: i32,
@@ -35,7 +35,7 @@ pub struct MediaList {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaListCollection {
     pub lists: Option<Vec<MediaListGroup>>,
@@ -44,7 +44,7 @@ pub struct MediaListCollection {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaListGroup {
     pub entries: Option<Vec<MediaList>>,
@@ -55,7 +55,7 @@ pub struct MediaListGroup {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaListOptions {
     pub score_format: Option<ScoreFormat>,
@@ -65,7 +65,7 @@ pub struct MediaListOptions {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaListTypeOptions {
     pub section_order: Option<Vec<String>>,

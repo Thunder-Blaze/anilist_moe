@@ -4,11 +4,11 @@
 //! transient network failures.
 
 use anilist_moe::{AniListClient, AniListError};
+use smol::lock::Mutex;
 use std::future::Future;
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
+use std::thread::sleep;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
-use tokio::sync::Mutex;
-use tokio::time::sleep;
 
 /// Rate limit configuration for tests
 const RATE_LIMIT_PAUSE_SECS: u64 = 61; // Pause duration after 429
@@ -67,7 +67,8 @@ impl GlobalRateLimiter {
             if pause_until > now {
                 let wait_secs = pause_until - now;
                 eprintln!("⏳ Waiting {} seconds for rate limit reset...", wait_secs);
-                sleep(Duration::from_secs(wait_secs + 1)).await;
+
+                smol::spawn(async move { sleep(Duration::from_secs(wait_secs + 1)) }).await;
             } else {
                 self.is_paused.store(false, Ordering::SeqCst);
                 break;
@@ -98,13 +99,14 @@ impl GlobalRateLimiter {
                     "⚠️  Approaching rate limit ({}/{} requests). Waiting {} seconds...",
                     count, RATE_LIMIT_WINDOW_REQUESTS, wait_secs
                 );
-                sleep(Duration::from_secs(wait_secs + 1)).await;
+                smol::spawn(async move { sleep(Duration::from_secs(wait_secs + 1)) }).await;
                 self.window_start.store(Self::now_secs(), Ordering::SeqCst);
                 self.request_count.store(0, Ordering::SeqCst);
             }
         }
 
-        sleep(Duration::from_millis(MIN_DELAY_BETWEEN_REQUESTS_MS)).await;
+        smol::spawn(async move { sleep(Duration::from_millis(MIN_DELAY_BETWEEN_REQUESTS_MS)) })
+            .await;
     }
 
     /// Handle a rate limit error (global pause)
@@ -132,6 +134,7 @@ impl TestHarness {
     }
 
     /// Creates a new test harness with an authenticated client
+    #[allow(warnings)]
     pub fn with_token(token: &str) -> Self {
         Self {
             client: AniListClient::with_token(token),
@@ -190,7 +193,10 @@ impl TestHarness {
                         "🔄 Network error, retrying ({}/{})...: {:?}",
                         network_retries, MAX_NETWORK_RETRIES, e
                     );
-                    sleep(Duration::from_millis(NETWORK_RETRY_DELAY_MS)).await;
+                    smol::spawn(
+                        async move { sleep(Duration::from_millis(NETWORK_RETRY_DELAY_MS)) },
+                    )
+                    .await;
                     // Loop will retry
                 }
                 Err(e) => {
@@ -235,6 +241,7 @@ impl IsRetryableError for AniListError {
 }
 
 /// Gets an authenticated test harness
+#[allow(warnings)]
 pub fn get_authenticated_harness() -> Option<TestHarness> {
     use dotenv::dotenv;
     use std::env;
@@ -245,19 +252,9 @@ pub fn get_authenticated_harness() -> Option<TestHarness> {
         .map(|token| TestHarness::with_token(&token))
 }
 
-/// Pauses for the rate limit window reset period (triggers global pause)
-pub async fn pause_for_rate_limit() {
-    GLOBAL_RATE_LIMITER.handle_rate_limit().await;
-}
-
 /// A simple delay between tests to avoid rate limiting
 pub async fn delay_between_tests() {
     GLOBAL_RATE_LIMITER.pre_request().await;
-}
-
-/// Check if we're currently paused and wait if so
-pub async fn wait_if_rate_limited() {
-    GLOBAL_RATE_LIMITER.wait_if_paused().await;
 }
 
 #[cfg(test)]

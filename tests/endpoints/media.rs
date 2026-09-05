@@ -6,13 +6,14 @@
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::enums::media::{MediaSort, MediaType};
 use anilist_moe::{endpoints::media::*, AniListError};
+use macro_rules_attribute::apply;
 
 /// Helper to create a test harness
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_media_with_search() {
     let h = harness();
     let client = h.client();
@@ -20,12 +21,12 @@ async fn test_fetch_media_with_search() {
     let result = h
         .run(|| async {
             let options = FetchMediaOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.media().fetch(&options).await
+            client.media().fetch(options).await
         })
         .await;
 
@@ -72,7 +73,7 @@ async fn test_fetch_media_with_search() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_media_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -84,7 +85,7 @@ async fn test_fetch_media_by_id() {
                 id: Some(1), // Cowboy Bebop
                 ..Default::default()
             };
-            client.media().fetch(&options).await
+            client.media().fetch(options).await
         })
         .await;
 
@@ -115,7 +116,7 @@ async fn test_fetch_media_by_id() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_one_media() {
     delay_between_tests().await;
     let h = harness();
@@ -127,7 +128,7 @@ async fn test_fetch_one_media() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.media().fetch_one(&options).await
+            client.media().fetch_one(options).await
         })
         .await;
 
@@ -142,7 +143,7 @@ async fn test_fetch_one_media() {
     assert!(media.title.is_some(), "Media should have a title");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_media_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -154,7 +155,7 @@ async fn test_media_data_types() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.media().fetch(&options).await
+            client.media().fetch(options).await
         })
         .await;
 
@@ -194,7 +195,7 @@ async fn test_media_data_types() {
     assert!(media.media_type.is_some(), "Media type should be present");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_media_pagination() {
     delay_between_tests().await;
     let h = harness();
@@ -207,10 +208,10 @@ async fn test_fetch_media_pagination() {
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(1),
-                sort: Some(vec![MediaSort::IdDesc]),
+                sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
-            client.media().fetch(&options).await
+            client.media().fetch(options).await
         })
         .await;
 
@@ -225,10 +226,10 @@ async fn test_fetch_media_pagination() {
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(2),
-                sort: Some(vec![MediaSort::IdDesc]),
+                sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
-            client.media().fetch(&options).await
+            client.media().fetch(options).await
         })
         .await;
 
@@ -276,7 +277,7 @@ async fn test_fetch_media_pagination() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_get_trending_anime() {
     delay_between_tests().await;
     let h = harness();
@@ -293,7 +294,7 @@ async fn test_get_trending_anime() {
     assert!(response.data.len() <= 10, "Should respect per_page limit");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_get_popular_anime() {
     delay_between_tests().await;
     let h = harness();
@@ -319,7 +320,7 @@ async fn test_get_popular_anime() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_search_anime() {
     delay_between_tests().await;
     let h = harness();
@@ -356,7 +357,7 @@ async fn test_search_anime() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_get_anime_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -375,7 +376,7 @@ async fn test_get_anime_by_id() {
     assert!(anime.average_score.is_some(), "Should have average score");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_nonexistent_media() {
     delay_between_tests().await;
     let h = harness();
@@ -387,7 +388,7 @@ async fn test_nonexistent_media() {
                 id: Some(999999999), // Very unlikely to exist
                 ..Default::default()
             };
-            client.media().fetch(&options).await
+            client.media().fetch(options).await
         })
         .await;
 

@@ -10,7 +10,7 @@ use thiserror::Error;
 pub enum AniListError {
     /// Network-level error (connection failed, timeout, etc.)
     #[error("Network error: {0}")]
-    Network(#[from] reqwest::Error),
+    Network(#[from] ureq::Error),
 
     /// JSON deserialization error
     #[error("JSON parsing error: {0}")]

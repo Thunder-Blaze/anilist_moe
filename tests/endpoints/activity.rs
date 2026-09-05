@@ -3,6 +3,8 @@
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion};
 use dotenv::dotenv;
+use macro_rules_attribute::apply;
+use smol_macros::test;
 use std::env;
 
 fn harness() -> TestHarness {
@@ -16,7 +18,7 @@ fn authenticated_harness() -> Option<TestHarness> {
         .map(|token| TestHarness::with_token(&token))
 }
 
-#[tokio::test]
+#[apply(test!)]
 async fn test_fetch_activities() {
     let h = harness();
     let client = h.client();
@@ -27,7 +29,7 @@ async fn test_fetch_activities() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.activity().fetch(&options).await
+            client.activity().fetch(options).await
         })
         .await;
 
@@ -45,7 +47,7 @@ async fn test_fetch_activities() {
     println!("Fetched {} activities", activities.len());
 }
 
-#[tokio::test]
+#[apply(test!)]
 async fn test_fetch_activities_by_user() {
     delay_between_tests().await;
     let h = harness();
@@ -58,7 +60,7 @@ async fn test_fetch_activities_by_user() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.activity().fetch(&options).await
+            client.activity().fetch(options).await
         })
         .await;
 
@@ -89,13 +91,13 @@ async fn test_fetch_activities_by_user() {
     }
 }
 
-#[tokio::test]
+#[apply(test!)]
 async fn test_text_activity_full_lifecycle() {
     let Some(h) = authenticated_harness() else {
         eprintln!("Skipping test_text_activity_full_lifecycle: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     println!("\n=== Testing Activity Full Lifecycle ===");
 
@@ -104,11 +106,11 @@ async fn test_text_activity_full_lifecycle() {
     let create_result = h
         .run(|| async {
             let save_options = SaveTextActivityOptions {
-                text: "Test activity from anilist_moe library - full lifecycle test".to_string(),
+                text: "Test activity from anilist_moe library - full lifecycle test",
                 id: None,
                 locked: None,
             };
-            client.activity().save_text_activity(&save_options).await
+            client.activity().save_text_activity(save_options).await
         })
         .await;
 
@@ -135,10 +137,10 @@ async fn test_text_activity_full_lifecycle() {
         .run(|| async {
             let modify_options = SaveTextActivityOptions {
                 id: Some(activity_id),
-                text: "Modified test activity from anilist_moe library".to_string(),
+                text: "Modified test activity from anilist_moe library",
                 locked: None,
             };
-            client.activity().save_text_activity(&modify_options).await
+            client.activity().save_text_activity(modify_options).await
         })
         .await;
 
@@ -157,7 +159,7 @@ async fn test_text_activity_full_lifecycle() {
                 id: activity_id,
                 ..Default::default()
             };
-            client.activity().fetch_one(&fetch_options).await
+            client.activity().fetch_one(fetch_options).await
         })
         .await;
 
@@ -177,7 +179,7 @@ async fn test_text_activity_full_lifecycle() {
     let delete_result = h
         .run(|| async {
             let delete_options = DeleteActivityOptions { id: activity_id };
-            client.activity().delete(&delete_options).await
+            client.activity().delete(delete_options).await
         })
         .await;
 
@@ -192,13 +194,13 @@ async fn test_text_activity_full_lifecycle() {
     println!("=== Activity Lifecycle Test Complete ===\n");
 }
 
-#[tokio::test]
+#[apply(test!)]
 async fn test_message_activity_full_lifecycle() {
     let Some(h) = authenticated_harness() else {
         eprintln!("Skipping test_message_activity_full_lifecycle: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     println!("\n=== Testing Message Activity Full Lifecycle ===");
 
@@ -209,14 +211,14 @@ async fn test_message_activity_full_lifecycle() {
     let create_result = h
         .run(|| async {
             let save_options = SaveMessageActivityOptions {
-                message: "Heya - test from anilist_moe".to_string(),
+                message: "Heya - test from anilist_moe",
                 recipient_id: user_id,
                 id: None,
                 private: Some(true),
                 locked: None,
                 as_mod: None,
             };
-            client.activity().save_message_activity(&save_options).await
+            client.activity().save_message_activity(save_options).await
         })
         .await;
 
@@ -243,7 +245,7 @@ async fn test_message_activity_full_lifecycle() {
         .run(|| async {
             let modify_options = SaveMessageActivityOptions {
                 id: Some(activity_id),
-                message: "Modified message from anilist_moe".to_string(),
+                message: "Modified message from anilist_moe",
                 recipient_id: user_id,
                 private: Some(true),
                 locked: None,
@@ -251,7 +253,7 @@ async fn test_message_activity_full_lifecycle() {
             };
             client
                 .activity()
-                .save_message_activity(&modify_options)
+                .save_message_activity(modify_options)
                 .await
         })
         .await;
@@ -268,7 +270,7 @@ async fn test_message_activity_full_lifecycle() {
     let delete_result = h
         .run(|| async {
             let delete_options = DeleteActivityOptions { id: activity_id };
-            client.activity().delete(&delete_options).await
+            client.activity().delete(delete_options).await
         })
         .await;
 
@@ -283,13 +285,13 @@ async fn test_message_activity_full_lifecycle() {
     println!("=== Message Activity Lifecycle Test Complete ===\n");
 }
 
-#[tokio::test]
+#[apply(test!)]
 async fn test_activity_reply() {
     let Some(h) = authenticated_harness() else {
         eprintln!("Skipping test_activity_reply: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     println!("\n=== Testing Activity Reply ===");
 
@@ -297,11 +299,11 @@ async fn test_activity_reply() {
     let create_result = h
         .run(|| async {
             let save_options = SaveTextActivityOptions {
-                text: "Test activity for reply test".to_string(),
+                text: "Test activity for reply test",
                 id: None,
                 locked: None,
             };
-            client.activity().save_text_activity(&save_options).await
+            client.activity().save_text_activity(save_options).await
         })
         .await;
 
@@ -320,11 +322,11 @@ async fn test_activity_reply() {
     let reply_result = h
         .run(|| async {
             let save_reply_options = SaveActivityReplyOptions {
-                text: "Test reply from anilist_moe library".to_string(),
+                text: "Test reply from anilist_moe library",
                 activity_id,
                 id: None,
             };
-            client.activity().save_reply(&save_reply_options).await
+            client.activity().save_reply(save_reply_options).await
         })
         .await;
 
@@ -338,7 +340,7 @@ async fn test_activity_reply() {
             // Clean up the activity
             let _ = client
                 .activity()
-                .delete(&DeleteActivityOptions { id: activity_id })
+                .delete(DeleteActivityOptions { id: activity_id })
                 .await;
             return;
         }
@@ -357,7 +359,7 @@ async fn test_activity_reply() {
                 id: None,
                 ..Default::default()
             };
-            client.activity().fetch_replies(&fetch_options).await
+            client.activity().fetch_replies(fetch_options).await
         })
         .await;
 
@@ -377,7 +379,7 @@ async fn test_activity_reply() {
     let delete_reply_result = h
         .run(|| async {
             let delete_options = DeleteActivityReplyOptions { id: reply_id };
-            client.activity().delete_reply(&delete_options).await
+            client.activity().delete_reply(delete_options).await
         })
         .await;
 
@@ -396,7 +398,7 @@ async fn test_activity_reply() {
         .run(|| async {
             client
                 .activity()
-                .delete(&DeleteActivityOptions { id: activity_id })
+                .delete(DeleteActivityOptions { id: activity_id })
                 .await
         })
         .await;

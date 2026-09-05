@@ -6,13 +6,13 @@ use crate::endpoints::{
 use crate::errors::AniListError;
 use crate::objects::responses::GraphQLResponse;
 use crate::utils::{retry_with_backoff, RetryConfig};
-use reqwest::{Client, Response, StatusCode};
 use serde::Serialize;
 use serde_json::{from_value, Value};
 use std::borrow::Cow;
+use ureq::http::{Response, StatusCode};
+use ureq::{Agent, Body};
 
 use std::fmt;
-use std::sync::Arc;
 
 /// The default AniList GraphQL API endpoint
 const ANILIST_API_URL: &str = "https://graphql.anilist.co";
@@ -28,7 +28,7 @@ const BEARER_PREFIX: &str = "Bearer ";
 
 /// Internal shared state for the client
 struct ClientInner {
-    client: Client,
+    client: Agent,
     token: Option<String>,
     retry_config: RetryConfig,
     base_url: Cow<'static, str>,
@@ -51,9 +51,8 @@ struct ClientInner {
 /// // Create a client with authentication
 /// let authenticated_client = AniListClient::with_token("your_token_here");
 /// ```
-#[derive(Clone)]
 pub struct AniListClient {
-    inner: Arc<ClientInner>,
+    inner: ClientInner,
 }
 
 // Implement Debug manually to avoid exposing sensitive token information
@@ -101,35 +100,35 @@ impl AniListClient {
     #[must_use]
     pub fn with_token(token: impl Into<String>) -> Self {
         Self {
-            inner: Arc::new(ClientInner {
+            inner: ClientInner {
                 client: Self::build_client(),
                 token: Some(token.into()),
                 retry_config: RetryConfig::default(),
                 base_url: Cow::Borrowed(ANILIST_API_URL),
-            }),
+            },
         }
     }
 
     /// Builds a configured reqwest client with optimal settings.
-    fn build_client() -> Client {
-        Client::builder()
-            .user_agent(USER_AGENT)
-            .timeout(std::time::Duration::from_secs(30))
-            .pool_max_idle_per_host(10)
-            .tcp_nodelay(true)
-            .build()
-            .expect("Failed to build HTTP client")
+    fn build_client() -> Agent {
+        Agent::new_with_config(
+            Agent::config_builder()
+                .timeout_global(Some(std::time::Duration::from_secs(30)))
+                .user_agent(USER_AGENT)
+                .no_delay(true)
+                .build(),
+        )
     }
 
-    /// Creates a client with a custom reqwest client.
-    fn new_with_client(client: Client) -> Self {
+    /// Creates a client with a custom ureq [`Agent`].
+    fn new_with_client(client: Agent) -> Self {
         Self {
-            inner: Arc::new(ClientInner {
+            inner: ClientInner {
                 client,
                 token: None,
                 retry_config: RetryConfig::default(),
                 base_url: Cow::Borrowed(ANILIST_API_URL),
-            }),
+            },
         }
     }
 
@@ -155,13 +154,16 @@ impl AniListClient {
     /// ```
     #[must_use]
     pub fn with_retry_config(self, config: RetryConfig) -> Self {
+        let inner: ClientInner = self.inner;
+        let (client, base_url, token) = (inner.client, inner.base_url, inner.token);
+
         Self {
-            inner: Arc::new(ClientInner {
-                client: self.inner.client.clone(),
-                token: self.inner.token.clone(),
+            inner: ClientInner {
+                client,
+                base_url,
+                token,
                 retry_config: config,
-                base_url: self.inner.base_url.clone(),
-            }),
+            },
         }
     }
 
@@ -182,131 +184,117 @@ impl AniListClient {
     #[must_use]
     pub fn with_base_url(self, base_url: impl Into<String>) -> Self {
         Self {
-            inner: Arc::new(ClientInner {
-                client: self.inner.client.clone(),
-                token: self.inner.token.clone(),
+            inner: ClientInner {
+                client: self.inner.client,
+                token: self.inner.token,
                 retry_config: self.inner.retry_config,
                 base_url: Cow::Owned(base_url.into()),
-            }),
+            },
         }
     }
 
     /// Returns the media endpoint for anime and manga operations.
     #[inline]
-    pub fn media(&self) -> MediaEndpoint {
-        MediaEndpoint::new(self.clone())
+    pub fn media(&self) -> MediaEndpoint<'_> {
+        MediaEndpoint::new(self)
     }
 
     /// Returns the media endpoint for anime operations (alias for media()).
     #[inline]
-    pub fn anime(&self) -> MediaEndpoint {
+    pub fn anime(&self) -> MediaEndpoint<'_> {
         self.media()
     }
 
     /// Returns the media endpoint for manga operations (alias for media()).
     #[inline]
-    pub fn manga(&self) -> MediaEndpoint {
+    pub fn manga(&self) -> MediaEndpoint<'_> {
         self.media()
     }
 
     /// Returns the medialist endpoint for user anime/manga list operations.
     #[inline]
-    pub fn medialist(&self) -> MediaListEndpoint {
-        MediaListEndpoint::new(self.clone())
+    pub fn medialist(&self) -> MediaListEndpoint<'_> {
+        MediaListEndpoint::new(self)
     }
 
     /// Returns the character endpoint for character operations.
     #[inline]
-    pub fn character(&self) -> CharacterEndpoint {
-        CharacterEndpoint::new(self.clone())
+    pub fn character(&self) -> CharacterEndpoint<'_> {
+        CharacterEndpoint::new(self)
     }
 
     /// Returns the common endpoint for likes, follows, and favorites.
     #[inline]
-    pub fn common(&self) -> CommonEndpoint {
-        CommonEndpoint::new(self.clone())
+    pub fn common(&self) -> CommonEndpoint<'_> {
+        CommonEndpoint::new(self)
     }
 
     /// Returns the staff endpoint for staff member operations.
     #[inline]
-    pub fn staff(&self) -> StaffEndpoint {
-        StaffEndpoint::new(self.clone())
+    pub fn staff(&self) -> StaffEndpoint<'_> {
+        StaffEndpoint::new(self)
     }
 
     /// Returns the user endpoint for user profile operations.
     #[inline]
-    pub fn user(&self) -> UserEndpoint {
-        UserEndpoint::new(self.clone())
+    pub fn user(&self) -> UserEndpoint<'_> {
+        UserEndpoint::new(self)
     }
 
     /// Returns the studio endpoint for studio operations.
     #[inline]
-    pub fn studio(&self) -> StudioEndpoint {
-        StudioEndpoint::new(self.clone())
+    pub fn studio(&self) -> StudioEndpoint<'_> {
+        StudioEndpoint::new(self)
     }
 
     /// Returns the forum endpoint for thread and comment operations.
     #[inline]
-    pub fn forum(&self) -> ForumEndpoint {
-        ForumEndpoint::new(self.clone())
+    pub fn forum(&self) -> ForumEndpoint<'_> {
+        ForumEndpoint::new(self)
     }
 
     /// Returns the activity endpoint for activity feed operations.
     #[inline]
-    pub fn activity(&self) -> ActivityEndpoint {
-        ActivityEndpoint::new(self.clone())
+    pub fn activity(&self) -> ActivityEndpoint<'_> {
+        ActivityEndpoint::new(self)
     }
 
     /// Returns the review endpoint for review operations.
     #[inline]
-    pub fn review(&self) -> ReviewEndpoint {
-        ReviewEndpoint::new(self.clone())
+    pub fn review(&self) -> ReviewEndpoint<'_> {
+        ReviewEndpoint::new(self)
     }
 
     /// Returns the recommendation endpoint for recommendation operations.
     #[inline]
-    pub fn recommendation(&self) -> RecommendationEndpoint {
-        RecommendationEndpoint::new(self.clone())
+    pub fn recommendation(&self) -> RecommendationEndpoint<'_> {
+        RecommendationEndpoint::new(self)
     }
 
     /// Returns the airing endpoint for airing schedule operations.
     #[inline]
-    pub fn airing(&self) -> AiringEndpoint {
-        AiringEndpoint::new(self.clone())
+    pub fn airing(&self) -> AiringEndpoint<'_> {
+        AiringEndpoint::new(self)
     }
 
     /// Returns the notification endpoint for notification operations.
     #[inline]
-    pub fn notification(&self) -> NotificationEndpoint {
-        NotificationEndpoint::new(self.clone())
+    pub fn notification(&self) -> NotificationEndpoint<'_> {
+        NotificationEndpoint::new(self)
     }
 
     /// Sets the authentication token for this client.
     ///
     /// Note: This creates a new client with the updated token due to Arc sharing.
     pub fn set_token(&mut self, token: &str) {
-        *self = Self {
-            inner: Arc::new(ClientInner {
-                client: self.inner.client.clone(),
-                token: Some(token.to_string()),
-                retry_config: self.inner.retry_config,
-                base_url: self.inner.base_url.clone(),
-            }),
-        };
+        self.inner.token = Some(token.to_string());
     }
 
     /// Clears the authentication token from this client.
     ///
     /// Note: This creates a new client without the token due to Arc sharing.
     pub fn clear_token(&mut self) {
-        *self = Self {
-            inner: Arc::new(ClientInner {
-                client: self.inner.client.clone(),
-                token: None,
-                retry_config: self.inner.retry_config,
-                base_url: self.inner.base_url.clone(),
-            }),
-        };
+        self.inner.token = None;
     }
 
     /// Returns whether this client has an authentication token.
@@ -317,8 +305,8 @@ impl AniListClient {
 
     /// Returns the retry configuration for this client.
     #[inline]
-    pub fn retry_config(&self) -> RetryConfig {
-        self.inner.retry_config
+    pub fn retry_config(&self) -> &RetryConfig {
+        &self.inner.retry_config
     }
 
     pub async fn query<V: Serialize>(
@@ -353,7 +341,7 @@ impl AniListClient {
     ) -> Result<Value, AniListError> {
         retry_with_backoff(
             || async { self.raw_query(query, variables).await },
-            self.inner.retry_config,
+            &self.inner.retry_config,
         )
         .await
     }
@@ -364,6 +352,7 @@ impl AniListClient {
         variables: Option<&V>,
     ) -> Result<Value, AniListError> {
         let body = RequestBody { query, variables };
+        let serialized_body = serde_json::to_string(&body)?;
 
         let mut request = self
             .inner
@@ -379,26 +368,28 @@ impl AniListClient {
             request = request.header("Authorization", auth_header);
         }
 
-        let response = request.json(&body).send().await?;
-
+        let response = smol::unblock(move || request.send(serialized_body)).await?;
         self.handle_response(response).await
     }
 
-    async fn handle_response(&self, response: Response) -> Result<Value, AniListError> {
+    async fn handle_response(&self, response: Response<Body>) -> Result<Value, AniListError> {
         let status = response.status();
         if status.is_success() {
-            let json: Value = response.json().await?;
+            let json: Value = smol::unblock(move || response.into_body().read_json()).await?;
             self.handle_graphql_errors(json)
         } else {
             Err(self.handle_http_error(status, response).await)
         }
     }
 
-    async fn handle_http_error(&self, status: StatusCode, response: Response) -> AniListError {
+    async fn handle_http_error(
+        &self,
+        status: StatusCode,
+        response: Response<Body>,
+    ) -> AniListError {
         match status.as_u16() {
             400 => AniListError::BadRequest {
-                message: response
-                    .text()
+                message: smol::unblock(move || response.into_body().read_to_string())
                     .await
                     .unwrap_or_else(|_| "Bad Request".to_string()),
             },
@@ -408,22 +399,20 @@ impl AniListClient {
             429 => self.parse_rate_limit_error(response),
             500..=599 => AniListError::ServerError {
                 status: status.as_u16(),
-                message: response
-                    .text()
+                message: smol::unblock(move || response.into_body().read_to_string())
                     .await
                     .unwrap_or_else(|_| "Server Error".to_string()),
             },
             _ => AniListError::ServerError {
                 status: status.as_u16(),
-                message: response
-                    .text()
+                message: smol::unblock(move || response.into_body().read_to_string())
                     .await
                     .unwrap_or_else(|_| "Unknown Error".to_string()),
             },
         }
     }
 
-    fn parse_rate_limit_error(&self, response: Response) -> AniListError {
+    fn parse_rate_limit_error(&self, response: Response<Body>) -> AniListError {
         let headers = response.headers();
         let get_header = |key: &str| headers.get(key).and_then(|v| v.to_str().ok());
 
@@ -492,7 +481,7 @@ impl AniListClient {
 /// Optimized request body structure that avoids HashMap allocation
 #[derive(Serialize)]
 struct RequestBody<'a, V: Serialize> {
-    query: &'static str,
+    query: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
     variables: Option<&'a V>,
 }

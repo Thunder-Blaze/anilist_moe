@@ -9,7 +9,7 @@ use crate::objects::{
 };
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Staff {
     pub id: i32,
@@ -40,7 +40,7 @@ pub struct Staff {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffConnection {
     pub edges: Option<Vec<StaffEdge>>,
@@ -50,7 +50,7 @@ pub struct StaffConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffEdge {
     pub node: Option<Staff>,
@@ -60,7 +60,7 @@ pub struct StaffEdge {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffImage {
     pub large: Option<String>,
@@ -68,7 +68,7 @@ pub struct StaffImage {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffName {
     pub first: Option<String>,
@@ -81,7 +81,7 @@ pub struct StaffName {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffRoleType {
     pub voice_actor: Option<Staff>,

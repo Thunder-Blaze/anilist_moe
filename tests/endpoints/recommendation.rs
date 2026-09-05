@@ -3,12 +3,13 @@
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::recommendation::*;
 use anilist_moe::enums::recommendation::RecommendationRating;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_recommendations() {
     let h = harness();
     let client = h.client();
@@ -19,7 +20,7 @@ async fn test_fetch_recommendations() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.recommendation().fetch(&options).await
+            client.recommendation().fetch(options).await
         })
         .await;
 
@@ -37,7 +38,7 @@ async fn test_fetch_recommendations() {
     );
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_recommendations_by_media() {
     delay_between_tests().await;
     let h = harness();
@@ -50,7 +51,7 @@ async fn test_fetch_recommendations_by_media() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.recommendation().fetch(&options).await
+            client.recommendation().fetch(options).await
         })
         .await;
 
@@ -68,7 +69,7 @@ async fn test_fetch_recommendations_by_media() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_recommendation_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -80,7 +81,7 @@ async fn test_recommendation_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.recommendation().fetch(&options).await
+            client.recommendation().fetch(options).await
         })
         .await;
 
@@ -101,13 +102,13 @@ async fn test_recommendation_data_types() {
 }
 
 // Authentication required tests
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_save_recommendation() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_save_recommendation: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -117,7 +118,7 @@ async fn test_save_recommendation() {
                 media_recommendation_id: 205,
                 rating: RecommendationRating::RateUp,
             };
-            client.recommendation().save(&options).await
+            client.recommendation().save(options).await
         })
         .await;
 

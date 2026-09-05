@@ -5,13 +5,13 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::review::Review;
 use crate::{client::AniListClient, queries::review};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching reviews.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchReviewOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchReviewOptions<'a> {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -22,7 +22,7 @@ pub struct FetchReviewOptions {
     pub user_id: Option<i32>,
     #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
-    pub sort: Option<Vec<ReviewSort>>,
+    pub sort: Option<&'a [ReviewSort]>,
     // HTML rendering options
     #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
@@ -32,14 +32,14 @@ pub struct FetchReviewOptions {
 
 /// Options for creating or updating a review.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct SaveReviewOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct SaveReviewOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]
     pub media_id: i32,
     pub score: Option<i32>,
-    pub summary: Option<String>,
-    pub body: Option<String>,
+    pub summary: Option<&'a str>,
+    pub body: Option<&'a str>,
     pub private: Option<bool>,
     // HTML rendering options
     #[serde(rename = "body_as_html")]
@@ -47,13 +47,13 @@ pub struct SaveReviewOptions {
 }
 
 /// Options for deleting a review.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteReviewOptions {
     pub id: i32,
 }
 
 /// Options for rating a review.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct RateReviewOptions {
     #[serde(rename = "reviewId")]
     pub review_id: i32,
@@ -61,40 +61,41 @@ pub struct RateReviewOptions {
 }
 
 /// Endpoint for review operations.
-pub struct ReviewEndpoint {
-    pub client: AniListClient,
+pub struct ReviewEndpoint<'a> {
+    pub client: &'a AniListClient,
 }
 
-impl ReviewEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> ReviewEndpoint<'a> {
+    pub fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
     pub async fn fetch(
         &self,
-        options: &FetchReviewOptions,
+        options: FetchReviewOptions<'_>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
         let query = review::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
-    pub async fn save(&self, options: &SaveReviewOptions) -> Result<Review, AniListError> {
+    pub async fn save(&self, options: SaveReviewOptions<'_>) -> Result<Review, AniListError> {
         let query = review::SAVE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
-    pub async fn delete(&self, options: &DeleteReviewOptions) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: DeleteReviewOptions) -> Result<bool, AniListError> {
         let query = review::DELETE;
-        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
         }
     }
 
-    pub async fn rate(&self, options: &RateReviewOptions) -> Result<Review, AniListError> {
+    pub async fn rate(&self, options: RateReviewOptions) -> Result<Review, AniListError> {
         let query = review::RATE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions
@@ -106,11 +107,11 @@ impl ReviewEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(&FetchReviewOptions {
+        self.fetch(FetchReviewOptions {
             media_id: Some(media_id),
             page,
             per_page,
-            sort: Some(vec![ReviewSort::RatingDesc]),
+            sort: Some(&[ReviewSort::RatingDesc]),
             ..Default::default()
         })
         .await
@@ -123,11 +124,11 @@ impl ReviewEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(&FetchReviewOptions {
+        self.fetch(FetchReviewOptions {
             user_id: Some(user_id),
             page,
             per_page,
-            sort: Some(vec![ReviewSort::CreatedAtDesc]),
+            sort: Some(&[ReviewSort::CreatedAtDesc]),
             ..Default::default()
         })
         .await
@@ -139,10 +140,10 @@ impl ReviewEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(&FetchReviewOptions {
+        self.fetch(FetchReviewOptions {
             page,
             per_page,
-            sort: Some(vec![ReviewSort::CreatedAtDesc]),
+            sort: Some(&[ReviewSort::CreatedAtDesc]),
             ..Default::default()
         })
         .await
@@ -150,16 +151,14 @@ impl ReviewEndpoint {
 
     /// Get review by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Review, AniListError> {
-        let response = self
-            .fetch(&FetchReviewOptions {
+        let mut response = self
+            .fetch(FetchReviewOptions {
                 id: Some(id),
                 ..Default::default()
             })
-            .await;
-        match response {
-            Ok(res) => Ok(res.data[0].clone()),
-            Err(err) => Err(err),
-        }
+            .await?;
+
+        Ok(response.data.swap_remove(0))
     }
 
     /// Create a new review
@@ -171,12 +170,12 @@ impl ReviewEndpoint {
         body: &str,
         private: Option<bool>,
     ) -> Result<Review, AniListError> {
-        self.save(&SaveReviewOptions {
+        self.save(SaveReviewOptions {
             id: None,
             media_id,
             score: Some(score),
-            summary: Some(summary.to_string()),
-            body: Some(body.to_string()),
+            summary: Some(summary),
+            body: Some(body),
             private,
             ..Default::default()
         })
@@ -185,7 +184,7 @@ impl ReviewEndpoint {
 
     /// Delete a review
     pub async fn delete_review(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete(&DeleteReviewOptions { id }).await
+        self.delete(DeleteReviewOptions { id }).await
     }
 
     /// Rate a review
@@ -194,6 +193,6 @@ impl ReviewEndpoint {
         review_id: i32,
         rating: ReviewRating,
     ) -> Result<Review, AniListError> {
-        self.rate(&RateReviewOptions { review_id, rating }).await
+        self.rate(RateReviewOptions { review_id, rating }).await
     }
 }

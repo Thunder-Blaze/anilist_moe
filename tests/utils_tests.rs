@@ -127,20 +127,6 @@ fn test_retry_config_inequality() {
 }
 
 #[test]
-fn test_retry_config_copy() {
-    let config1 = RetryConfig {
-        max_retries: 5,
-        base_delay_ms: 2000,
-        exponential_backoff: true,
-        max_delay_ms: 30000,
-    };
-
-    // Use copy semantics instead of clone
-    let config2 = config1;
-    assert_eq!(config1, config2);
-}
-
-#[test]
 fn test_retry_config_debug() {
     let config = RetryConfig::default();
     let debug_string = format!("{:?}", config);

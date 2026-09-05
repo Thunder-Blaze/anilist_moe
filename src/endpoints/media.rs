@@ -4,7 +4,7 @@ use crate::errors::AniListError;
 use crate::objects::media::Media;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::media};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Fetch media (anime/manga) with filters and pagination.
@@ -17,19 +17,19 @@ use serde_with::skip_serializing_none;
 ///     media_type: Some(MediaType::Anime),
 ///     season: Some(MediaSeason::Fall),
 ///     season_year: Some(2024),
-///     sort: Some(vec![MediaSort::Popularity]),
+///     sort: Some(&[MediaSort::Popularity]),
 ///     page: Some(1),
 ///     per_page: Some(20),
 ///     ..Default::default()
 /// };
 /// ```
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchMediaOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchMediaOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "idMal")]
     pub id_mal: Option<i32>,
-    pub search: Option<String>,
+    pub search: Option<&'a str>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
     pub format: Option<MediaFormat>,
@@ -37,15 +37,15 @@ pub struct FetchMediaOptions {
     pub season: Option<MediaSeason>,
     #[serde(rename = "seasonYear")]
     pub season_year: Option<i32>,
-    pub genre: Option<String>,
-    pub tag: Option<String>,
+    pub genre: Option<&'a str>,
+    pub tag: Option<&'a str>,
     #[serde(rename = "tagCategory")]
-    pub tag_category: Option<String>,
+    pub tag_category: Option<&'a str>,
     #[serde(rename = "minimumTagRank")]
     pub minimum_tag_rank: Option<i32>,
-    pub source: Option<String>,
+    pub source: Option<&'a str>,
     #[serde(rename = "countryOfOrigin")]
-    pub country_of_origin: Option<String>,
+    pub country_of_origin: Option<&'a str>,
     #[serde(rename = "isLicensed")]
     pub is_licensed: Option<bool>,
     #[serde(rename = "isAdult")]
@@ -53,37 +53,37 @@ pub struct FetchMediaOptions {
     #[serde(rename = "onList")]
     pub on_list: Option<bool>,
     #[serde(rename = "licensedBy")]
-    pub licensed_by: Option<String>,
+    pub licensed_by: Option<&'a str>,
     #[serde(rename = "licensedById")]
     pub licensed_by_id: Option<i32>,
     pub id_not: Option<i32>,
-    pub id_in: Option<Vec<i32>>,
-    pub id_not_in: Option<Vec<i32>>,
+    pub id_in: Option<&'a [i32]>,
+    pub id_not_in: Option<&'a [i32]>,
     #[serde(rename = "idMal_not")]
     pub id_mal_not: Option<i32>,
     #[serde(rename = "idMal_in")]
-    pub id_mal_in: Option<Vec<i32>>,
+    pub id_mal_in: Option<&'a [i32]>,
     #[serde(rename = "idMal_not_in")]
-    pub id_mal_not_in: Option<Vec<i32>>,
+    pub id_mal_not_in: Option<&'a [i32]>,
     pub format_not: Option<MediaFormat>,
-    pub format_in: Option<Vec<MediaFormat>>,
-    pub format_not_in: Option<Vec<MediaFormat>>,
+    pub format_in: Option<&'a [MediaFormat]>,
+    pub format_not_in: Option<&'a [MediaFormat]>,
     pub status_not: Option<MediaStatus>,
-    pub status_in: Option<Vec<MediaStatus>>,
-    pub status_not_in: Option<Vec<MediaStatus>>,
-    pub genre_in: Option<Vec<String>>,
-    pub genre_not_in: Option<Vec<String>>,
-    pub tag_in: Option<Vec<String>>,
-    pub tag_not_in: Option<Vec<String>>,
+    pub status_in: Option<&'a [MediaStatus]>,
+    pub status_not_in: Option<&'a [MediaStatus]>,
+    pub genre_in: Option<&'a [&'a str]>,
+    pub genre_not_in: Option<&'a [&'a str]>,
+    pub tag_in: Option<&'a [&'a str]>,
+    pub tag_not_in: Option<&'a [&'a str]>,
     #[serde(rename = "tagCategory_in")]
-    pub tag_category_in: Option<Vec<String>>,
+    pub tag_category_in: Option<&'a [&'a str]>,
     #[serde(rename = "tagCategory_not_in")]
-    pub tag_category_not_in: Option<Vec<String>>,
+    pub tag_category_not_in: Option<&'a [&'a str]>,
     #[serde(rename = "licensedBy_in")]
-    pub licensed_by_in: Option<Vec<String>>,
+    pub licensed_by_in: Option<&'a [&'a str]>,
     #[serde(rename = "licensedById_in")]
-    pub licensed_by_id_in: Option<Vec<i32>>,
-    pub source_in: Option<Vec<String>>,
+    pub licensed_by_id_in: Option<&'a [i32]>,
+    pub source_in: Option<&'a [&'a str]>,
     #[serde(rename = "startDate")]
     pub start_date: Option<i32>,
     #[serde(rename = "endDate")]
@@ -93,13 +93,13 @@ pub struct FetchMediaOptions {
     #[serde(rename = "startDate_lesser")]
     pub start_date_lesser: Option<i32>,
     #[serde(rename = "startDate_like")]
-    pub start_date_like: Option<String>,
+    pub start_date_like: Option<&'a str>,
     #[serde(rename = "endDate_greater")]
     pub end_date_greater: Option<i32>,
     #[serde(rename = "endDate_lesser")]
     pub end_date_lesser: Option<i32>,
     #[serde(rename = "endDate_like")]
-    pub end_date_like: Option<String>,
+    pub end_date_like: Option<&'a str>,
     #[serde(rename = "averageScore")]
     pub average_score: Option<i32>,
     #[serde(rename = "averageScore_not")]
@@ -135,7 +135,7 @@ pub struct FetchMediaOptions {
     pub volumes_greater: Option<i32>,
     #[serde(rename = "volumes_lesser")]
     pub volumes_lesser: Option<i32>,
-    pub sort: Option<Vec<MediaSort>>,
+    pub sort: Option<&'a [MediaSort]>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -230,7 +230,7 @@ pub struct FetchMediaOptions {
 ///
 /// Supports optional pagination for related data (characters, staff, reviews, recommendations).
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchMediaOneOptions {
     pub id: Option<i32>,
     // Characters pagination
@@ -277,13 +277,13 @@ pub struct FetchMediaOneOptions {
 /// # Ok(())
 /// # }
 /// ```
-pub struct MediaEndpoint {
-    client: AniListClient,
+pub struct MediaEndpoint<'a> {
+    client: &'a AniListClient,
 }
 
-impl MediaEndpoint {
+impl<'a> MediaEndpoint<'a> {
     /// Creates a new MediaEndpoint instance.
-    pub fn new(client: AniListClient) -> Self {
+    pub fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
@@ -297,7 +297,7 @@ impl MediaEndpoint {
     /// # use anilist_moe::enums::media::{MediaType, MediaSort};
     /// # async fn example() -> Result<(), AniListError> {
     /// let client = AniListClient::new();
-    /// let options = FetchMediaOptions { media_type: Some(MediaType::Anime), sort: Some(vec![MediaSort::Popularity]), page: Some(1), per_page: Some(10), ..Default::default() };
+    /// let options = FetchMediaOptions { media_type: Some(MediaType::Anime), sort: Some(&[MediaSort::Popularity]), page: Some(1), per_page: Some(10), ..Default::default() };
     /// let response = client.media().fetch(&options).await?;
     /// for anime in &response.data { println!("Title: {:?}", anime.title); }
     /// # Ok(())
@@ -305,10 +305,10 @@ impl MediaEndpoint {
     /// ```
     pub async fn fetch(
         &self,
-        options: &FetchMediaOptions,
+        options: FetchMediaOptions<'_>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
         let query = media::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch a single media item.
@@ -326,9 +326,9 @@ impl MediaEndpoint {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn fetch_one(&self, options: &FetchMediaOneOptions) -> Result<Media, AniListError> {
+    pub async fn fetch_one(&self, options: FetchMediaOneOptions) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions - Anime
@@ -339,9 +339,9 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -355,9 +355,9 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
-            sort: Some(vec![MediaSort::TrendingDesc]),
+            sort: Some(&[MediaSort::TrendingDesc]),
             page,
             per_page,
             ..Default::default()
@@ -371,10 +371,10 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             status: Some(MediaStatus::Releasing),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -388,10 +388,10 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             status: Some(MediaStatus::NotYetReleased),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -407,11 +407,11 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             season: Some(season),
             season_year: Some(year),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -426,10 +426,10 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
-            search: Some(query.to_string()),
-            sort: Some(vec![MediaSort::SearchMatch]),
+            search: Some(query),
+            sort: Some(&[MediaSort::SearchMatch]),
             page,
             per_page,
             ..Default::default()
@@ -439,7 +439,7 @@ impl MediaEndpoint {
 
     /// Get anime by ID
     pub async fn get_anime_by_id(&self, id: i32) -> Result<Media, AniListError> {
-        self.fetch_one(&FetchMediaOneOptions {
+        self.fetch_one(FetchMediaOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -452,9 +452,9 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Anime),
-            sort: Some(vec![MediaSort::ScoreDesc]),
+            sort: Some(&[MediaSort::ScoreDesc]),
             page,
             per_page,
             ..Default::default()
@@ -470,9 +470,9 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Manga),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -486,9 +486,9 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Manga),
-            sort: Some(vec![MediaSort::TrendingDesc]),
+            sort: Some(&[MediaSort::TrendingDesc]),
             page,
             per_page,
             ..Default::default()
@@ -502,10 +502,10 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             status: Some(MediaStatus::Releasing),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -519,10 +519,10 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             status: Some(MediaStatus::Finished),
-            sort: Some(vec![MediaSort::PopularityDesc]),
+            sort: Some(&[MediaSort::PopularityDesc]),
             page,
             per_page,
             ..Default::default()
@@ -537,10 +537,10 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Manga),
-            search: Some(query.to_string()),
-            sort: Some(vec![MediaSort::SearchMatch]),
+            search: Some(query),
+            sort: Some(&[MediaSort::SearchMatch]),
             page,
             per_page,
             ..Default::default()
@@ -550,7 +550,7 @@ impl MediaEndpoint {
 
     /// Get manga by ID
     pub async fn get_manga_by_id(&self, id: i32) -> Result<Media, AniListError> {
-        self.fetch_one(&FetchMediaOneOptions {
+        self.fetch_one(FetchMediaOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -563,9 +563,9 @@ impl MediaEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&FetchMediaOptions {
+        self.fetch(FetchMediaOptions {
             media_type: Some(MediaType::Manga),
-            sort: Some(vec![MediaSort::ScoreDesc]),
+            sort: Some(&[MediaSort::ScoreDesc]),
             page,
             per_page,
             ..Default::default()

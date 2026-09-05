@@ -3,12 +3,13 @@
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::review::*;
 use anilist_moe::enums::review::ReviewRating;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_reviews() {
     let h = harness();
     let client = h.client();
@@ -19,7 +20,7 @@ async fn test_fetch_reviews() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.review().fetch(&options).await
+            client.review().fetch(options).await
         })
         .await;
 
@@ -34,7 +35,7 @@ async fn test_fetch_reviews() {
     assert!(!reviews.is_empty(), "Should return at least one review");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_reviews_by_media() {
     delay_between_tests().await;
     let h = harness();
@@ -47,7 +48,7 @@ async fn test_fetch_reviews_by_media() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.review().fetch(&options).await
+            client.review().fetch(options).await
         })
         .await;
 
@@ -65,7 +66,7 @@ async fn test_fetch_reviews_by_media() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_review_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -77,7 +78,7 @@ async fn test_review_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.review().fetch(&options).await
+            client.review().fetch(options).await
         })
         .await;
 
@@ -95,13 +96,13 @@ async fn test_review_data_types() {
 }
 
 // Authentication required tests
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_rate_review() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_rate_review: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     // First fetch a review to rate
     let fetch_result = h
@@ -110,7 +111,7 @@ async fn test_rate_review() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.review().fetch(&options).await
+            client.review().fetch(options).await
         })
         .await;
 
@@ -127,7 +128,7 @@ async fn test_rate_review() {
                         review_id,
                         rating: ReviewRating::UpVote, // upvote
                     };
-                    client.review().rate(&rate_options).await
+                    client.review().rate(rate_options).await
                 })
                 .await;
 
@@ -142,7 +143,7 @@ async fn test_rate_review() {
                                 review_id,
                                 rating: ReviewRating::NoVote,
                             };
-                            client.review().rate(&reset_options).await
+                            client.review().rate(reset_options).await
                         })
                         .await;
                 }

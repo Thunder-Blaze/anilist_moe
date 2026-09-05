@@ -3,13 +3,13 @@ use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::Page;
 use crate::{client::AniListClient, queries::airing};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching airing schedule information.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchAiringOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchAiringOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "mediaId")]
     pub media_id: Option<i32>,
@@ -21,21 +21,21 @@ pub struct FetchAiringOptions {
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Vec<i32>>,
+    pub id_in: Option<&'a [i32]>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Vec<i32>>,
+    pub id_not_in: Option<&'a [i32]>,
     #[serde(rename = "mediaId_not")]
     pub media_id_not: Option<i32>,
     #[serde(rename = "mediaId_in")]
-    pub media_id_in: Option<Vec<i32>>,
+    pub media_id_in: Option<&'a [i32]>,
     #[serde(rename = "mediaId_not_in")]
-    pub media_id_not_in: Option<Vec<i32>>,
+    pub media_id_not_in: Option<&'a [i32]>,
     #[serde(rename = "episode_not")]
     pub episode_not: Option<i32>,
     #[serde(rename = "episode_in")]
-    pub episode_in: Option<Vec<i32>>,
+    pub episode_in: Option<&'a [i32]>,
     #[serde(rename = "episode_not_in")]
-    pub episode_not_in: Option<Vec<i32>>,
+    pub episode_not_in: Option<&'a [i32]>,
     #[serde(rename = "episode_greater")]
     pub episode_greater: Option<i32>,
     #[serde(rename = "episode_lesser")]
@@ -44,7 +44,7 @@ pub struct FetchAiringOptions {
     pub airing_at_greater: Option<i32>,
     #[serde(rename = "airingAt_lesser")]
     pub airing_at_lesser: Option<i32>,
-    pub sort: Option<Vec<AiringSort>>,
+    pub sort: Option<&'a [AiringSort]>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub page: Option<i32>,
@@ -54,21 +54,21 @@ pub struct FetchAiringOptions {
 }
 
 /// Endpoint for airing schedule operations.
-pub struct AiringEndpoint {
-    pub client: AniListClient,
+pub struct AiringEndpoint<'a> {
+    pub client: &'a AniListClient,
 }
 
-impl AiringEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> AiringEndpoint<'a> {
+    pub fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
     pub async fn fetch(
         &self,
-        options: &FetchAiringOptions,
+        options: FetchAiringOptions<'_>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         let query = airing::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions
@@ -84,9 +84,9 @@ impl AiringEndpoint {
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(&FetchAiringOptions {
+        self.fetch(FetchAiringOptions {
             airing_at_greater: Some(now),
-            sort: Some(vec![AiringSort::Time]),
+            sort: Some(&[AiringSort::Time]),
             page,
             per_page,
             ..Default::default()
@@ -105,9 +105,9 @@ impl AiringEndpoint {
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(&FetchAiringOptions {
+        self.fetch(FetchAiringOptions {
             airing_at_lesser: Some(now),
-            sort: Some(vec![AiringSort::TimeDesc]),
+            sort: Some(&[AiringSort::TimeDesc]),
             page,
             per_page,
             ..Default::default()
@@ -122,9 +122,9 @@ impl AiringEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
-        self.fetch(&FetchAiringOptions {
+        self.fetch(FetchAiringOptions {
             media_id: Some(media_id),
-            sort: Some(vec![AiringSort::Time]),
+            sort: Some(&[AiringSort::Time]),
             page,
             per_page,
             ..Default::default()

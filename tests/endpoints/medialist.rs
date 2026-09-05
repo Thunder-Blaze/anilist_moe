@@ -3,12 +3,13 @@
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::medialist::*;
 use anilist_moe::enums::media_list::MediaListStatus;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_media_list() {
     let h = harness();
     let client = h.client();
@@ -20,7 +21,7 @@ async fn test_fetch_media_list() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.medialist().fetch(&options).await
+            client.medialist().fetch(options).await
         })
         .await;
 
@@ -38,13 +39,13 @@ async fn test_fetch_media_list() {
     );
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_media_list_by_media() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_fetch_media_list_by_media: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -54,7 +55,7 @@ async fn test_fetch_media_list_by_media() {
                 is_following: Some(true),
                 ..Default::default()
             };
-            client.medialist().fetch(&options).await
+            client.medialist().fetch(options).await
         })
         .await;
 
@@ -75,7 +76,7 @@ async fn test_fetch_media_list_by_media() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_media_list_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -88,7 +89,7 @@ async fn test_media_list_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.medialist().fetch(&options).await
+            client.medialist().fetch(options).await
         })
         .await;
 
@@ -109,13 +110,13 @@ async fn test_media_list_data_types() {
 }
 
 // Authentication required tests
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_save_media_list() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_save_media_list: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -124,7 +125,7 @@ async fn test_save_media_list() {
                 status: Some(MediaListStatus::Planning),
                 ..Default::default()
             };
-            client.medialist().save(&options).await
+            client.medialist().save(options).await
         })
         .await;
 
@@ -141,13 +142,13 @@ async fn test_save_media_list() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_delete_media_list() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_delete_media_list: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     // First create a media list entry to delete
     let save_result = h
@@ -157,7 +158,7 @@ async fn test_delete_media_list() {
                 status: Some(MediaListStatus::Planning),
                 ..Default::default()
             };
-            client.medialist().save(&options).await
+            client.medialist().save(options).await
         })
         .await;
 
@@ -169,7 +170,7 @@ async fn test_delete_media_list() {
         let delete_result = h
             .run(|| async {
                 let options = DeleteMediaListOptions { id: entry_id };
-                client.medialist().delete(&options).await
+                client.medialist().delete(options).await
             })
             .await;
 

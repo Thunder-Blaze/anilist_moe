@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive( Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FuzzyDate {
     pub year: Option<i32>,
@@ -11,7 +11,7 @@ pub struct FuzzyDate {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive( Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PageInfo {
     pub total: Option<i32>,
@@ -22,19 +22,19 @@ pub struct PageInfo {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive( Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Json(serde_json::Value);
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive( Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Deleted {
     pub deleted: Option<bool>,
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive( Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ParsedMarkdown {
     pub html: Option<String>,

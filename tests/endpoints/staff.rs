@@ -2,12 +2,13 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::staff::*;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_staff_by_search() {
     let h = harness();
     let client = h.client();
@@ -15,10 +16,10 @@ async fn test_fetch_staff_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStaffOptions {
-                search: Some("Hayao".to_string()),
+                search: Some("Hayao"),
                 ..Default::default()
             };
-            client.staff().fetch(&options).await
+            client.staff().fetch(options).await
         })
         .await;
 
@@ -45,7 +46,7 @@ async fn test_fetch_staff_by_search() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_staff_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -57,7 +58,7 @@ async fn test_fetch_staff_by_id() {
                 id: Some(95269), // Hayao Miyazaki
                 ..Default::default()
             };
-            client.staff().fetch(&options).await
+            client.staff().fetch(options).await
         })
         .await;
 
@@ -77,7 +78,7 @@ async fn test_fetch_staff_by_id() {
     assert_eq!(staff_list[0].id, 95269, "Should return correct staff ID");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_one_staff() {
     delay_between_tests().await;
     let h = harness();
@@ -89,7 +90,7 @@ async fn test_fetch_one_staff() {
                 id: Some(95269),
                 ..Default::default()
             };
-            client.staff().fetch_one(&options).await
+            client.staff().fetch_one(options).await
         })
         .await;
 
@@ -104,7 +105,7 @@ async fn test_fetch_one_staff() {
     assert!(staff.name.is_some(), "Staff should have a name");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_staff_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -116,7 +117,7 @@ async fn test_staff_data_types() {
                 id: Some(95269),
                 ..Default::default()
             };
-            client.staff().fetch(&options).await
+            client.staff().fetch(options).await
         })
         .await;
 
@@ -148,7 +149,7 @@ async fn test_staff_data_types() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_staff_with_popularity() {
     delay_between_tests().await;
     let h = harness();
@@ -158,11 +159,11 @@ async fn test_staff_with_popularity() {
     let result = h
         .run(|| async {
             let options = FetchStaffOptions {
-                search: Some("Kamiya".to_string()), // Common voice actor name
+                search: Some("Kamiya"), // Common voice actor name
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.staff().fetch(&options).await
+            client.staff().fetch(options).await
         })
         .await;
 

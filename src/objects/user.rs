@@ -4,7 +4,7 @@ use serde_with::skip_serializing_none;
 
 use crate::{
     enums::{
-        mods::ModRole,
+        moderators::ModRole,
         user::{UserStaffNameLanguage, UserTitleLanguage},
     },
     objects::{
@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
     pub id: i32,
@@ -41,7 +41,7 @@ pub struct User {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserActivityHistory {
     pub date: Option<i32>,
@@ -50,7 +50,7 @@ pub struct UserActivityHistory {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserAvatar {
     pub large: Option<String>,
@@ -58,7 +58,7 @@ pub struct UserAvatar {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserModData {
     pub alts: Option<Vec<User>>,
@@ -70,7 +70,7 @@ pub struct UserModData {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserOptions {
     pub title_language: Option<UserTitleLanguage>,
@@ -86,7 +86,7 @@ pub struct UserOptions {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserPreviousName {
     pub name: Option<String>,

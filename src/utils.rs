@@ -1,8 +1,7 @@
 //! Utility helpers for rate limits, retries, and JSON.
 
 use crate::errors::AniListError;
-use std::time::Duration;
-use tokio::time::sleep;
+use std::{thread::sleep, time::Duration};
 
 /// Retry configuration.
 ///
@@ -13,7 +12,7 @@ use tokio::time::sleep;
 /// use anilist_moe::utils::RetryConfig;
 /// let config = RetryConfig { max_retries: 5, base_delay_ms: 2000, exponential_backoff: true, max_delay_ms: 60000 };
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct RetryConfig {
     /// Maximum number of retry attempts before giving up
     pub max_retries: u32,
@@ -74,7 +73,7 @@ impl RetryConfig {
 /// Retry an operation with backoff on rate limits.
 pub async fn retry_with_backoff<F, Fut, T>(
     mut operation: F,
-    config: RetryConfig,
+    config: &RetryConfig,
 ) -> Result<T, AniListError>
 where
     F: FnMut() -> Fut,
@@ -124,7 +123,7 @@ where
                         attempts + 1,
                         config.max_retries
                     );
-                    sleep(sleep_duration).await;
+                    smol::spawn(async move { sleep(sleep_duration) }).await;
                     attempts += 1;
                 }
             }
@@ -135,7 +134,7 @@ where
 /// Sleeps for the specified duration in milliseconds.
 #[inline]
 pub async fn rate_limit_delay(delay_ms: u64) {
-    sleep(Duration::from_millis(delay_ms)).await;
+    smol::spawn(async move { sleep(Duration::from_millis(delay_ms)) }).await;
 }
 
 /// Calculates an appropriate delay based on remaining rate limit quota.

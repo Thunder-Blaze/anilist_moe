@@ -5,6 +5,7 @@
 mod test_harness;
 
 use anilist_moe::objects::{media::Media, responses::Page};
+use macro_rules_attribute::apply;
 use std::collections::HashMap;
 use test_harness::{delay_between_tests, TestHarness};
 
@@ -24,7 +25,7 @@ query ($page: Int, $perPage: Int) {
 }
 "#;
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_custom_query_with_fetch() {
     let h = TestHarness::new();
     let client = h.client();
@@ -72,7 +73,7 @@ async fn test_custom_query_with_fetch() {
 }
 
 /// Media from custom queries remains compatible
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_custom_query_media_compatibility() {
     delay_between_tests().await;
     let h = TestHarness::new();
@@ -101,9 +102,6 @@ async fn test_custom_query_media_compatibility() {
         let _romaji = title.romaji.as_ref();
         let _english = title.english.as_ref();
         let _native = title.native.as_ref();
-
-        // Verify Media can be cloned and compared
-        let _cloned = media.clone();
 
         // Verify Media implements Debug
         let _debug = format!("{:?}", media);

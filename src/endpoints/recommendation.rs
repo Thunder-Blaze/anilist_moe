@@ -8,8 +8,8 @@ use serde_with::skip_serializing_none;
 
 /// Options for fetching media recommendations.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchRecommendationOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchRecommendationOptions<'a> {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -27,7 +27,7 @@ pub struct FetchRecommendationOptions {
     pub rating_lesser: Option<i32>,
     #[serde(rename = "onList")]
     pub on_list: Option<bool>,
-    pub sort: Option<Vec<RecommendationSort>>,
+    pub sort: Option<&'a [RecommendationSort]>,
 }
 
 /// Options for saving a recommendation rating.
@@ -41,29 +41,29 @@ pub struct SaveRecommendationOptions {
 }
 
 /// Endpoint for media recommendation operations.
-pub struct RecommendationEndpoint {
-    pub client: AniListClient,
+pub struct RecommendationEndpoint<'a> {
+    pub client: &'a AniListClient,
 }
 
-impl RecommendationEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> RecommendationEndpoint<'a> {
+    pub fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
     pub async fn fetch(
         &self,
-        options: &FetchRecommendationOptions,
+        options: FetchRecommendationOptions<'_>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
         let query = recommendation::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn save(
         &self,
-        options: &SaveRecommendationOptions,
+        options: SaveRecommendationOptions,
     ) -> Result<Recommendation, AniListError> {
         let query = recommendation::SAVE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions
@@ -75,11 +75,11 @@ impl RecommendationEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&FetchRecommendationOptions {
+        self.fetch(FetchRecommendationOptions {
             media_id: Some(media_id),
             page,
             per_page,
-            sort: Some(vec![RecommendationSort::RatingDesc]),
+            sort: Some(&[RecommendationSort::RatingDesc]),
             ..Default::default()
         })
         .await
@@ -92,11 +92,11 @@ impl RecommendationEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&FetchRecommendationOptions {
+        self.fetch(FetchRecommendationOptions {
             user_id: Some(user_id),
             page,
             per_page,
-            sort: Some(vec![RecommendationSort::IdDesc]),
+            sort: Some(&[RecommendationSort::IdDesc]),
             ..Default::default()
         })
         .await
@@ -108,10 +108,10 @@ impl RecommendationEndpoint {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&FetchRecommendationOptions {
+        self.fetch(FetchRecommendationOptions {
             page,
             per_page,
-            sort: Some(vec![RecommendationSort::IdDesc]),
+            sort: Some(&[RecommendationSort::IdDesc]),
             ..Default::default()
         })
         .await
@@ -124,7 +124,7 @@ impl RecommendationEndpoint {
         media_recommendation_id: i32,
         rating: RecommendationRating,
     ) -> Result<Recommendation, AniListError> {
-        self.save(&SaveRecommendationOptions {
+        self.save(SaveRecommendationOptions {
             media_id,
             media_recommendation_id,
             rating,
