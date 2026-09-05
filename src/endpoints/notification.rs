@@ -40,7 +40,7 @@ impl<'a> NotificationEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: NotificationSearchOptions<'a>,
+        options: &NotificationSearchOptions<'a>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
         let query = notification::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -54,7 +54,7 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(NotificationSearchOptions {
+        self.fetch(&NotificationSearchOptions {
             page,
             per_page,
             ..Default::default()
@@ -68,7 +68,7 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(NotificationSearchOptions {
+        self.fetch(&NotificationSearchOptions {
             page,
             per_page,
             reset_notification_count: Some(true),
@@ -84,7 +84,7 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(NotificationSearchOptions {
+        self.fetch(&NotificationSearchOptions {
             notification_type: Some(notification_type),
             page,
             per_page,

@@ -26,7 +26,7 @@ async fn test_fetch_media_with_search() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.media().fetch(options).await
+            client.media().fetch(&options).await
         })
         .await;
 
@@ -85,7 +85,7 @@ async fn test_fetch_media_by_id() {
                 id: Some(1), // Cowboy Bebop
                 ..Default::default()
             };
-            client.media().fetch(options).await
+            client.media().fetch(&options).await
         })
         .await;
 
@@ -128,7 +128,7 @@ async fn test_fetch_one_media() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.media().fetch_one(options).await
+            client.media().fetch_one(&options).await
         })
         .await;
 
@@ -155,7 +155,7 @@ async fn test_media_data_types() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.media().fetch(options).await
+            client.media().fetch(&options).await
         })
         .await;
 
@@ -211,7 +211,7 @@ async fn test_fetch_media_pagination() {
                 sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
-            client.media().fetch(options).await
+            client.media().fetch(&options).await
         })
         .await;
 
@@ -229,7 +229,7 @@ async fn test_fetch_media_pagination() {
                 sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
-            client.media().fetch(options).await
+            client.media().fetch(&options).await
         })
         .await;
 
@@ -388,7 +388,7 @@ async fn test_nonexistent_media() {
                 id: Some(999999999), // Very unlikely to exist
                 ..Default::default()
             };
-            client.media().fetch(options).await
+            client.media().fetch(&options).await
         })
         .await;
 

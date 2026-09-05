@@ -72,7 +72,7 @@ impl<'a> CharacterEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchCharacterOptions<'_>,
+        options: &FetchCharacterOptions<'_>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
         let query = character::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -80,7 +80,7 @@ impl<'a> CharacterEndpoint<'a> {
 
     pub async fn fetch_one(
         &self,
-        options: FetchCharacterOneOptions<'_>,
+        options: &FetchCharacterOneOptions<'_>,
     ) -> Result<Character, AniListError> {
         let query = character::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
@@ -94,7 +94,7 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(FetchCharacterOptions {
+        self.fetch(&FetchCharacterOptions {
             page,
             per_page,
             sort: Some(&[CharacterSort::FavouritesDesc]),
@@ -119,7 +119,7 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(FetchCharacterOptions {
+        self.fetch(&FetchCharacterOptions {
             search: Some(query),
             page,
             per_page,
@@ -131,7 +131,7 @@ impl<'a> CharacterEndpoint<'a> {
 
     /// Get character by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Character, AniListError> {
-        self.fetch_one(FetchCharacterOneOptions {
+        self.fetch_one(&FetchCharacterOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -144,7 +144,7 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(FetchCharacterOptions {
+        self.fetch(&FetchCharacterOptions {
             is_birthday: Some(true),
             page,
             per_page,

@@ -65,7 +65,7 @@ impl<'a> AiringEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchAiringOptions<'_>,
+        options: &FetchAiringOptions<'_>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         let query = airing::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -84,7 +84,7 @@ impl<'a> AiringEndpoint<'a> {
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(FetchAiringOptions {
+        self.fetch(&FetchAiringOptions {
             airing_at_greater: Some(now),
             sort: Some(&[AiringSort::Time]),
             page,
@@ -105,7 +105,7 @@ impl<'a> AiringEndpoint<'a> {
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(FetchAiringOptions {
+        self.fetch(&FetchAiringOptions {
             airing_at_lesser: Some(now),
             sort: Some(&[AiringSort::TimeDesc]),
             page,
@@ -122,7 +122,7 @@ impl<'a> AiringEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
-        self.fetch(FetchAiringOptions {
+        self.fetch(&FetchAiringOptions {
             media_id: Some(media_id),
             sort: Some(&[AiringSort::Time]),
             page,

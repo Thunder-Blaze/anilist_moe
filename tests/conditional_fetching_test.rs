@@ -53,7 +53,7 @@ async fn test_conditional_fetching() {
         ..Default::default()
     };
 
-    let result = client.anime().fetch(options).await;
+    let result = client.anime().fetch(&options).await;
     assert!(result.is_ok());
 
     let page = result.unwrap();
@@ -114,7 +114,7 @@ async fn test_conditional_fetching_without_includes() {
         ..Default::default()
     };
 
-    let result = client.anime().fetch(options).await;
+    let result = client.anime().fetch(&options).await;
     assert!(result.is_ok());
 
     let page = result.unwrap();

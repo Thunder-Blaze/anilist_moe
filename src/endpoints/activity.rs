@@ -186,7 +186,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchActivityOptions<'_>,
+        options: &FetchActivityOptions<'_>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
         let query = activity::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -194,7 +194,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn fetch_one(
         &self,
-        options: FetchActivityOneOptions,
+        options: &FetchActivityOneOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
@@ -202,13 +202,13 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn fetch_replies(
         &self,
-        options: FetchActivityRepliesOptions,
+        options: &FetchActivityRepliesOptions,
     ) -> Result<Page<Vec<ActivityReply>>, AniListError> {
         let query = activity::FETCH_REPLIES;
         self.client.fetch(query, Some(&options)).await
     }
 
-    pub async fn delete(&self, options: DeleteActivityOptions) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: &DeleteActivityOptions) -> Result<bool, AniListError> {
         let query = activity::DELETE;
         let response: Result<Deleted, AniListError> =
             self.client.fetch(query, Some(&options)).await;
@@ -220,7 +220,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn delete_reply(
         &self,
-        options: DeleteActivityReplyOptions,
+        options: &DeleteActivityReplyOptions,
     ) -> Result<bool, AniListError> {
         let query = activity::DELETE_REPLY;
         let response: Result<Deleted, AniListError> =
@@ -231,14 +231,14 @@ impl<'a> ActivityEndpoint<'a> {
         }
     }
 
-    pub async fn pin(&self, options: PinActivityOptions) -> Result<ActivityUnion, AniListError> {
+    pub async fn pin(&self, options: &PinActivityOptions) -> Result<ActivityUnion, AniListError> {
         let query = activity::PIN;
         self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn subscribe(
         &self,
-        options: SubscribeActivityOptions,
+        options: &SubscribeActivityOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SUBSCRIBE;
         self.client.fetch(query, Some(&options)).await
@@ -246,7 +246,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn save_message_activity(
         &self,
-        options: SaveMessageActivityOptions<'_>,
+        options: &SaveMessageActivityOptions<'_>,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let response: Result<MessageActivity, AniListError> =
@@ -259,7 +259,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn save_text_activity(
         &self,
-        options: SaveTextActivityOptions<'_>,
+        options: &SaveTextActivityOptions<'_>,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let response: Result<TextActivity, AniListError> =
@@ -272,7 +272,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     pub async fn save_reply(
         &self,
-        options: SaveActivityReplyOptions<'_>,
+        options: &SaveActivityReplyOptions<'_>,
     ) -> Result<ActivityReply, AniListError> {
         let query = activity::SAVE_REPLY;
         self.client.fetch(query, Some(&options)).await
@@ -286,7 +286,7 @@ impl<'a> ActivityEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
-        self.fetch(FetchActivityOptions {
+        self.fetch(&FetchActivityOptions {
             page,
             per_page,
             sort: Some(&[ActivitySort::IdDesc]),
@@ -301,7 +301,7 @@ impl<'a> ActivityEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
-        self.fetch(FetchActivityOptions {
+        self.fetch(&FetchActivityOptions {
             is_following: Some(true),
             page,
             per_page,
@@ -313,7 +313,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     /// Get activity by ID
     pub async fn get_by_id(&self, id: i32) -> Result<ActivityUnion, AniListError> {
-        self.fetch_one(FetchActivityOneOptions {
+        self.fetch_one(&FetchActivityOneOptions {
             id,
             ..Default::default()
         })
@@ -322,7 +322,7 @@ impl<'a> ActivityEndpoint<'a> {
 
     /// Create a text activity
     pub async fn create_text_activity(&self, text: &str) -> Result<ActivityUnion, AniListError> {
-        self.save_text_activity(SaveTextActivityOptions {
+        self.save_text_activity(&SaveTextActivityOptions {
             id: None,
             text,
             locked: None,
@@ -337,7 +337,7 @@ impl<'a> ActivityEndpoint<'a> {
         message: &str,
         private: Option<bool>,
     ) -> Result<ActivityUnion, AniListError> {
-        self.save_message_activity(SaveMessageActivityOptions {
+        self.save_message_activity(&SaveMessageActivityOptions {
             id: None,
             message,
             recipient_id,
@@ -354,7 +354,7 @@ impl<'a> ActivityEndpoint<'a> {
         activity_id: i32,
         text: &str,
     ) -> Result<ActivityReply, AniListError> {
-        self.save_reply(SaveActivityReplyOptions {
+        self.save_reply(&SaveActivityReplyOptions {
             id: None,
             text,
             activity_id,
@@ -364,12 +364,12 @@ impl<'a> ActivityEndpoint<'a> {
 
     /// Delete an activity
     pub async fn delete_activity(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete(DeleteActivityOptions { id }).await
+        self.delete(&DeleteActivityOptions { id }).await
     }
 
     /// Delete an activity reply
     pub async fn delete_activity_reply(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete_reply(DeleteActivityReplyOptions { id }).await
+        self.delete_reply(&DeleteActivityReplyOptions { id }).await
     }
 
     /// Toggle activity subscription
@@ -378,12 +378,12 @@ impl<'a> ActivityEndpoint<'a> {
         id: i32,
         subscribe: bool,
     ) -> Result<ActivityUnion, AniListError> {
-        self.subscribe(SubscribeActivityOptions { id, subscribe })
+        self.subscribe(&SubscribeActivityOptions { id, subscribe })
             .await
     }
 
     /// Toggle activity pin status
     pub async fn toggle_pin(&self, id: i32, pinned: bool) -> Result<ActivityUnion, AniListError> {
-        self.pin(PinActivityOptions { id, pinned }).await
+        self.pin(&PinActivityOptions { id, pinned }).await
     }
 }

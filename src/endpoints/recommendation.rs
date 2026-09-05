@@ -52,7 +52,7 @@ impl<'a> RecommendationEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchRecommendationOptions<'_>,
+        options: &FetchRecommendationOptions<'_>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
         let query = recommendation::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -60,7 +60,7 @@ impl<'a> RecommendationEndpoint<'a> {
 
     pub async fn save(
         &self,
-        options: SaveRecommendationOptions,
+        options: &SaveRecommendationOptions,
     ) -> Result<Recommendation, AniListError> {
         let query = recommendation::SAVE;
         self.client.fetch(query, Some(&options)).await
@@ -75,7 +75,7 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(FetchRecommendationOptions {
+        self.fetch(&FetchRecommendationOptions {
             media_id: Some(media_id),
             page,
             per_page,
@@ -92,7 +92,7 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(FetchRecommendationOptions {
+        self.fetch(&FetchRecommendationOptions {
             user_id: Some(user_id),
             page,
             per_page,
@@ -108,7 +108,7 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(FetchRecommendationOptions {
+        self.fetch(&FetchRecommendationOptions {
             page,
             per_page,
             sort: Some(&[RecommendationSort::IdDesc]),
@@ -124,7 +124,7 @@ impl<'a> RecommendationEndpoint<'a> {
         media_recommendation_id: i32,
         rating: RecommendationRating,
     ) -> Result<Recommendation, AniListError> {
-        self.save(SaveRecommendationOptions {
+        self.save(&SaveRecommendationOptions {
             media_id,
             media_recommendation_id,
             rating,

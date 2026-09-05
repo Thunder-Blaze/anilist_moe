@@ -19,7 +19,7 @@ async fn test_fetch_airing_schedules() {
                 per_page: Some(10),
                 ..Default::default()
             };
-            client.airing().fetch(options).await
+            client.airing().fetch(&options).await
         })
         .await;
 
@@ -62,7 +62,7 @@ async fn test_fetch_airing_pagination() {
                 page: Some(1),
                 ..Default::default()
             };
-            client.airing().fetch(options).await
+            client.airing().fetch(&options).await
         })
         .await;
 
@@ -82,7 +82,7 @@ async fn test_fetch_airing_pagination() {
                 page: Some(2),
                 ..Default::default()
             };
-            client.airing().fetch(options).await
+            client.airing().fetch(&options).await
         })
         .await;
 
@@ -120,7 +120,7 @@ async fn test_airing_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.airing().fetch(options).await
+            client.airing().fetch(&options).await
         })
         .await;
 

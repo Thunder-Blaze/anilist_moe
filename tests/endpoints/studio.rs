@@ -20,7 +20,7 @@ async fn test_fetch_studio_by_search() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.studio().fetch(options).await
+            client.studio().fetch(&options).await
         })
         .await;
 
@@ -54,7 +54,7 @@ async fn test_fetch_studio_by_id() {
                 id: Some(2), // Kyoto Animation
                 ..Default::default()
             };
-            client.studio().fetch(options).await
+            client.studio().fetch(&options).await
         })
         .await;
 
@@ -82,7 +82,7 @@ async fn test_fetch_one_studio() {
                 id: Some(2),
                 ..Default::default()
             };
-            client.studio().fetch_one(options).await
+            client.studio().fetch_one(&options).await
         })
         .await;
 
@@ -108,7 +108,7 @@ async fn test_studio_data_types() {
                 id: Some(2),
                 ..Default::default()
             };
-            client.studio().fetch(options).await
+            client.studio().fetch(&options).await
         })
         .await;
 

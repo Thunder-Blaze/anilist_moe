@@ -19,7 +19,7 @@ async fn test_fetch_forum_threads() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.forum().fetch(options).await
+            client.forum().fetch(&options).await
         })
         .await;
 
@@ -47,7 +47,7 @@ async fn test_fetch_one_forum_thread() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.forum().fetch(options).await
+            client.forum().fetch(&options).await
         })
         .await;
 
@@ -72,7 +72,7 @@ async fn test_fetch_one_forum_thread() {
                 comments_sort: None,
                 ..Default::default()
             };
-            client.forum().fetch_one(options).await
+            client.forum().fetch_one(&options).await
         })
         .await;
 
@@ -96,7 +96,7 @@ async fn test_fetch_forum_comments() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.forum().fetch(options).await
+            client.forum().fetch(&options).await
         })
         .await;
 
@@ -113,7 +113,7 @@ async fn test_fetch_forum_comments() {
                         per_page: Some(5),
                         ..Default::default()
                     };
-                    client.forum().fetch_comments(options).await
+                    client.forum().fetch_comments(&options).await
                 })
                 .await;
 
@@ -138,7 +138,7 @@ async fn test_forum_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.forum().fetch(options).await
+            client.forum().fetch(&options).await
         })
         .await;
 
@@ -173,7 +173,7 @@ async fn test_fetch_comment_one() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.forum().fetch_comments(options).await
+            client.forum().fetch_comments(&options).await
         })
         .await;
 
@@ -189,7 +189,7 @@ async fn test_fetch_comment_one() {
                         id: Some(comment_id),
                         ..Default::default()
                     };
-                    client.forum().fetch_comment_one(options).await
+                    client.forum().fetch_comment_one(&options).await
                 })
                 .await;
 
@@ -223,7 +223,7 @@ async fn test_save_forum_thread() {
                 locked: None,
                 ..Default::default()
             };
-            client.forum().save(options).await
+            client.forum().save(&options).await
         })
         .await;
 
@@ -235,7 +235,7 @@ async fn test_save_forum_thread() {
             let _ = h
                 .run(|| async {
                     let delete_options = DeleteThreadOptions { id: response.id };
-                    client.forum().delete(delete_options).await
+                    client.forum().delete(&delete_options).await
                 })
                 .await;
         }
@@ -260,7 +260,7 @@ async fn test_toggle_thread_subscription() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.forum().fetch(options).await
+            client.forum().fetch(&options).await
         })
         .await;
 
@@ -277,7 +277,7 @@ async fn test_toggle_thread_subscription() {
                         thread_id,
                         subscribe: Some(true),
                     };
-                    client.forum().subscription(options).await
+                    client.forum().subscription(&options).await
                 })
                 .await;
 
@@ -292,7 +292,7 @@ async fn test_toggle_thread_subscription() {
                                 thread_id,
                                 subscribe: Some(false),
                             };
-                            client.forum().subscription(unsub_options).await
+                            client.forum().subscription(&unsub_options).await
                         })
                         .await;
                 }

@@ -20,7 +20,7 @@ async fn test_fetch_character_by_search() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.character().fetch(options).await
+            client.character().fetch(&options).await
         })
         .await;
 
@@ -71,7 +71,7 @@ async fn test_fetch_character_by_id() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.character().fetch(options).await
+            client.character().fetch(&options).await
         })
         .await;
 
@@ -99,7 +99,7 @@ async fn test_fetch_one_character() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.character().fetch_one(options).await
+            client.character().fetch_one(&options).await
         })
         .await;
 
@@ -126,7 +126,7 @@ async fn test_character_data_types() {
                 id: Some(1),
                 ..Default::default()
             };
-            client.character().fetch(options).await
+            client.character().fetch(&options).await
         })
         .await;
 
@@ -170,7 +170,7 @@ async fn test_character_search_pagination() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.character().fetch(options).await
+            client.character().fetch(&options).await
         })
         .await;
 
@@ -187,7 +187,7 @@ async fn test_character_search_pagination() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.character().fetch(options).await
+            client.character().fetch(&options).await
         })
         .await;
 

@@ -29,7 +29,7 @@ async fn test_fetch_activities() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.activity().fetch(options).await
+            client.activity().fetch(&options).await
         })
         .await;
 
@@ -60,7 +60,7 @@ async fn test_fetch_activities_by_user() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.activity().fetch(options).await
+            client.activity().fetch(&options).await
         })
         .await;
 
@@ -110,7 +110,7 @@ async fn test_text_activity_full_lifecycle() {
                 id: None,
                 locked: None,
             };
-            client.activity().save_text_activity(save_options).await
+            client.activity().save_text_activity(&save_options).await
         })
         .await;
 
@@ -140,7 +140,7 @@ async fn test_text_activity_full_lifecycle() {
                 text: "Modified test activity from anilist_moe library",
                 locked: None,
             };
-            client.activity().save_text_activity(modify_options).await
+            client.activity().save_text_activity(&modify_options).await
         })
         .await;
 
@@ -159,7 +159,7 @@ async fn test_text_activity_full_lifecycle() {
                 id: activity_id,
                 ..Default::default()
             };
-            client.activity().fetch_one(fetch_options).await
+            client.activity().fetch_one(&fetch_options).await
         })
         .await;
 
@@ -179,7 +179,7 @@ async fn test_text_activity_full_lifecycle() {
     let delete_result = h
         .run(|| async {
             let delete_options = DeleteActivityOptions { id: activity_id };
-            client.activity().delete(delete_options).await
+            client.activity().delete(&delete_options).await
         })
         .await;
 
@@ -218,7 +218,7 @@ async fn test_message_activity_full_lifecycle() {
                 locked: None,
                 as_mod: None,
             };
-            client.activity().save_message_activity(save_options).await
+            client.activity().save_message_activity(&save_options).await
         })
         .await;
 
@@ -253,7 +253,7 @@ async fn test_message_activity_full_lifecycle() {
             };
             client
                 .activity()
-                .save_message_activity(modify_options)
+                .save_message_activity(&modify_options)
                 .await
         })
         .await;
@@ -270,7 +270,7 @@ async fn test_message_activity_full_lifecycle() {
     let delete_result = h
         .run(|| async {
             let delete_options = DeleteActivityOptions { id: activity_id };
-            client.activity().delete(delete_options).await
+            client.activity().delete(&delete_options).await
         })
         .await;
 
@@ -303,7 +303,7 @@ async fn test_activity_reply() {
                 id: None,
                 locked: None,
             };
-            client.activity().save_text_activity(save_options).await
+            client.activity().save_text_activity(&save_options).await
         })
         .await;
 
@@ -326,7 +326,7 @@ async fn test_activity_reply() {
                 activity_id,
                 id: None,
             };
-            client.activity().save_reply(save_reply_options).await
+            client.activity().save_reply(&save_reply_options).await
         })
         .await;
 
@@ -340,7 +340,7 @@ async fn test_activity_reply() {
             // Clean up the activity
             let _ = client
                 .activity()
-                .delete(DeleteActivityOptions { id: activity_id })
+                .delete(&DeleteActivityOptions { id: activity_id })
                 .await;
             return;
         }
@@ -359,7 +359,7 @@ async fn test_activity_reply() {
                 id: None,
                 ..Default::default()
             };
-            client.activity().fetch_replies(fetch_options).await
+            client.activity().fetch_replies(&fetch_options).await
         })
         .await;
 
@@ -379,7 +379,7 @@ async fn test_activity_reply() {
     let delete_reply_result = h
         .run(|| async {
             let delete_options = DeleteActivityReplyOptions { id: reply_id };
-            client.activity().delete_reply(delete_options).await
+            client.activity().delete_reply(&delete_options).await
         })
         .await;
 
@@ -398,7 +398,7 @@ async fn test_activity_reply() {
         .run(|| async {
             client
                 .activity()
-                .delete(DeleteActivityOptions { id: activity_id })
+                .delete(&DeleteActivityOptions { id: activity_id })
                 .await
         })
         .await;

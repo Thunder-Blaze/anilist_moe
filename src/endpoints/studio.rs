@@ -63,7 +63,7 @@ impl<'a> StudioEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchStudioOptions<'_>,
+        options: &FetchStudioOptions<'_>,
     ) -> Result<Page<Vec<Studio>>, AniListError> {
         let query = studio::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -71,7 +71,7 @@ impl<'a> StudioEndpoint<'a> {
 
     pub async fn fetch_one(
         &self,
-        options: FetchStudioOneOptions<'_>,
+        options: &FetchStudioOneOptions<'_>,
     ) -> Result<Studio, AniListError> {
         let query = studio::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
@@ -85,7 +85,7 @@ impl<'a> StudioEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Studio>>, AniListError> {
-        self.fetch(FetchStudioOptions {
+        self.fetch(&FetchStudioOptions {
             page,
             per_page,
             sort: Some(&[StudioSort::FavouritesDesc]),
@@ -101,7 +101,7 @@ impl<'a> StudioEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Studio>>, AniListError> {
-        self.fetch(FetchStudioOptions {
+        self.fetch(&FetchStudioOptions {
             search: Some(query),
             page,
             per_page,
@@ -113,7 +113,7 @@ impl<'a> StudioEndpoint<'a> {
 
     /// Get studio by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Studio, AniListError> {
-        self.fetch_one(FetchStudioOneOptions {
+        self.fetch_one(&FetchStudioOneOptions {
             id: Some(id),
             ..Default::default()
         })

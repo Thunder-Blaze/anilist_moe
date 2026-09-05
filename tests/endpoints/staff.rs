@@ -19,7 +19,7 @@ async fn test_fetch_staff_by_search() {
                 search: Some("Hayao"),
                 ..Default::default()
             };
-            client.staff().fetch(options).await
+            client.staff().fetch(&options).await
         })
         .await;
 
@@ -58,7 +58,7 @@ async fn test_fetch_staff_by_id() {
                 id: Some(95269), // Hayao Miyazaki
                 ..Default::default()
             };
-            client.staff().fetch(options).await
+            client.staff().fetch(&options).await
         })
         .await;
 
@@ -90,7 +90,7 @@ async fn test_fetch_one_staff() {
                 id: Some(95269),
                 ..Default::default()
             };
-            client.staff().fetch_one(options).await
+            client.staff().fetch_one(&options).await
         })
         .await;
 
@@ -117,7 +117,7 @@ async fn test_staff_data_types() {
                 id: Some(95269),
                 ..Default::default()
             };
-            client.staff().fetch(options).await
+            client.staff().fetch(&options).await
         })
         .await;
 
@@ -163,7 +163,7 @@ async fn test_staff_with_popularity() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.staff().fetch(options).await
+            client.staff().fetch(&options).await
         })
         .await;
 

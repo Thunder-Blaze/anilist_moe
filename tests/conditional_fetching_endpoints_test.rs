@@ -19,7 +19,7 @@ async fn test_character_conditional_fetching() {
         ..Default::default()
     };
 
-    let result = client.character().fetch(options).await;
+    let result = client.character().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
@@ -53,7 +53,7 @@ async fn test_staff_conditional_fetching() {
         ..Default::default()
     };
 
-    let result = client.staff().fetch(options).await;
+    let result = client.staff().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
@@ -77,7 +77,7 @@ async fn test_studio_conditional_fetching() {
         ..Default::default()
     };
 
-    let result = client.studio().fetch(options).await;
+    let result = client.studio().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
@@ -99,7 +99,7 @@ async fn test_user_conditional_fetching() {
         ..Default::default()
     };
 
-    let result = client.user().fetch(options).await;
+    let result = client.user().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
@@ -130,7 +130,7 @@ async fn test_forum_conditional_fetching() {
         ..Default::default()
     };
 
-    let result = client.forum().fetch(options).await;
+    let result = client.forum().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
@@ -154,7 +154,7 @@ async fn test_user_conditional_fetching_negative() {
         ..Default::default()
     };
 
-    let result = client.user().fetch(options).await;
+    let result = client.user().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {

@@ -21,7 +21,7 @@ async fn test_fetch_media_list() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.medialist().fetch(options).await
+            client.medialist().fetch(&options).await
         })
         .await;
 
@@ -55,7 +55,7 @@ async fn test_fetch_media_list_by_media() {
                 is_following: Some(true),
                 ..Default::default()
             };
-            client.medialist().fetch(options).await
+            client.medialist().fetch(&options).await
         })
         .await;
 
@@ -89,7 +89,7 @@ async fn test_media_list_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.medialist().fetch(options).await
+            client.medialist().fetch(&options).await
         })
         .await;
 
@@ -125,7 +125,7 @@ async fn test_save_media_list() {
                 status: Some(MediaListStatus::Planning),
                 ..Default::default()
             };
-            client.medialist().save(options).await
+            client.medialist().save(&options).await
         })
         .await;
 
@@ -158,7 +158,7 @@ async fn test_delete_media_list() {
                 status: Some(MediaListStatus::Planning),
                 ..Default::default()
             };
-            client.medialist().save(options).await
+            client.medialist().save(&options).await
         })
         .await;
 
@@ -170,7 +170,7 @@ async fn test_delete_media_list() {
         let delete_result = h
             .run(|| async {
                 let options = DeleteMediaListOptions { id: entry_id };
-                client.medialist().delete(options).await
+                client.medialist().delete(&options).await
             })
             .await;
 

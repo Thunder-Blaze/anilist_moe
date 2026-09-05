@@ -72,18 +72,18 @@ impl<'a> ReviewEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchReviewOptions<'_>,
+        options: &FetchReviewOptions<'_>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
         let query = review::FETCH;
         self.client.fetch(query, Some(&options)).await
     }
 
-    pub async fn save(&self, options: SaveReviewOptions<'_>) -> Result<Review, AniListError> {
+    pub async fn save(&self, options: &SaveReviewOptions<'_>) -> Result<Review, AniListError> {
         let query = review::SAVE;
         self.client.fetch(query, Some(&options)).await
     }
 
-    pub async fn delete(&self, options: DeleteReviewOptions) -> Result<bool, AniListError> {
+    pub async fn delete(&self, options: &DeleteReviewOptions) -> Result<bool, AniListError> {
         let query = review::DELETE;
         let response: Result<Deleted, AniListError> =
             self.client.fetch(query, Some(&options)).await;
@@ -93,7 +93,7 @@ impl<'a> ReviewEndpoint<'a> {
         }
     }
 
-    pub async fn rate(&self, options: RateReviewOptions) -> Result<Review, AniListError> {
+    pub async fn rate(&self, options: &RateReviewOptions) -> Result<Review, AniListError> {
         let query = review::RATE;
         self.client.fetch(query, Some(&options)).await
     }
@@ -107,7 +107,7 @@ impl<'a> ReviewEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(FetchReviewOptions {
+        self.fetch(&FetchReviewOptions {
             media_id: Some(media_id),
             page,
             per_page,
@@ -124,7 +124,7 @@ impl<'a> ReviewEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(FetchReviewOptions {
+        self.fetch(&FetchReviewOptions {
             user_id: Some(user_id),
             page,
             per_page,
@@ -140,7 +140,7 @@ impl<'a> ReviewEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(FetchReviewOptions {
+        self.fetch(&FetchReviewOptions {
             page,
             per_page,
             sort: Some(&[ReviewSort::CreatedAtDesc]),
@@ -152,7 +152,7 @@ impl<'a> ReviewEndpoint<'a> {
     /// Get review by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Review, AniListError> {
         let mut response = self
-            .fetch(FetchReviewOptions {
+            .fetch(&FetchReviewOptions {
                 id: Some(id),
                 ..Default::default()
             })
@@ -170,7 +170,7 @@ impl<'a> ReviewEndpoint<'a> {
         body: &str,
         private: Option<bool>,
     ) -> Result<Review, AniListError> {
-        self.save(SaveReviewOptions {
+        self.save(&SaveReviewOptions {
             id: None,
             media_id,
             score: Some(score),
@@ -184,7 +184,7 @@ impl<'a> ReviewEndpoint<'a> {
 
     /// Delete a review
     pub async fn delete_review(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete(DeleteReviewOptions { id }).await
+        self.delete(&DeleteReviewOptions { id }).await
     }
 
     /// Rate a review
@@ -193,6 +193,6 @@ impl<'a> ReviewEndpoint<'a> {
         review_id: i32,
         rating: ReviewRating,
     ) -> Result<Review, AniListError> {
-        self.rate(RateReviewOptions { review_id, rating }).await
+        self.rate(&RateReviewOptions { review_id, rating }).await
     }
 }

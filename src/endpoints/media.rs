@@ -305,7 +305,7 @@ impl<'a> MediaEndpoint<'a> {
     /// ```
     pub async fn fetch(
         &self,
-        options: FetchMediaOptions<'_>,
+        options: &FetchMediaOptions<'_>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
         let query = media::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -326,7 +326,7 @@ impl<'a> MediaEndpoint<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn fetch_one(&self, options: FetchMediaOneOptions) -> Result<Media, AniListError> {
+    pub async fn fetch_one(&self, options: &FetchMediaOneOptions) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
     }
@@ -339,7 +339,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             sort: Some(&[MediaSort::PopularityDesc]),
             page,
@@ -355,7 +355,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             sort: Some(&[MediaSort::TrendingDesc]),
             page,
@@ -371,7 +371,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             status: Some(MediaStatus::Releasing),
             sort: Some(&[MediaSort::PopularityDesc]),
@@ -388,7 +388,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             status: Some(MediaStatus::NotYetReleased),
             sort: Some(&[MediaSort::PopularityDesc]),
@@ -407,7 +407,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             season: Some(season),
             season_year: Some(year),
@@ -426,7 +426,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             search: Some(query),
             sort: Some(&[MediaSort::SearchMatch]),
@@ -439,7 +439,7 @@ impl<'a> MediaEndpoint<'a> {
 
     /// Get anime by ID
     pub async fn get_anime_by_id(&self, id: i32) -> Result<Media, AniListError> {
-        self.fetch_one(FetchMediaOneOptions {
+        self.fetch_one(&FetchMediaOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -452,7 +452,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             sort: Some(&[MediaSort::ScoreDesc]),
             page,
@@ -470,7 +470,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             sort: Some(&[MediaSort::PopularityDesc]),
             page,
@@ -486,7 +486,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             sort: Some(&[MediaSort::TrendingDesc]),
             page,
@@ -502,7 +502,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             status: Some(MediaStatus::Releasing),
             sort: Some(&[MediaSort::PopularityDesc]),
@@ -519,7 +519,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             status: Some(MediaStatus::Finished),
             sort: Some(&[MediaSort::PopularityDesc]),
@@ -537,7 +537,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             search: Some(query),
             sort: Some(&[MediaSort::SearchMatch]),
@@ -550,7 +550,7 @@ impl<'a> MediaEndpoint<'a> {
 
     /// Get manga by ID
     pub async fn get_manga_by_id(&self, id: i32) -> Result<Media, AniListError> {
-        self.fetch_one(FetchMediaOneOptions {
+        self.fetch_one(&FetchMediaOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -563,7 +563,7 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(FetchMediaOptions {
+        self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             sort: Some(&[MediaSort::ScoreDesc]),
             page,

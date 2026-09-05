@@ -96,7 +96,7 @@ impl<'a> StaffEndpoint<'a> {
 
     pub async fn fetch(
         &self,
-        options: FetchStaffOptions<'a>,
+        options: &FetchStaffOptions<'a>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         let query = staff::FETCH;
         self.client.fetch(query, Some(&options)).await
@@ -104,7 +104,7 @@ impl<'a> StaffEndpoint<'a> {
 
     pub async fn fetch_one(
         &self,
-        options: FetchStaffOneOptions<'_>,
+        options: &FetchStaffOneOptions<'_>,
     ) -> Result<Staff, AniListError> {
         let query = staff::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
@@ -118,7 +118,7 @@ impl<'a> StaffEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
-        self.fetch(FetchStaffOptions {
+        self.fetch(&FetchStaffOptions {
             sort: Some(&[StaffSort::FavouritesDesc]),
             page,
             per_page,
@@ -143,7 +143,7 @@ impl<'a> StaffEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
-        self.fetch(FetchStaffOptions {
+        self.fetch(&FetchStaffOptions {
             search: Some(query),
             sort: Some(&[StaffSort::SearchMatch]),
             page,
@@ -155,7 +155,7 @@ impl<'a> StaffEndpoint<'a> {
 
     /// Get staff by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Staff, AniListError> {
-        self.fetch_one(FetchStaffOneOptions {
+        self.fetch_one(&FetchStaffOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -168,7 +168,7 @@ impl<'a> StaffEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
-        self.fetch(FetchStaffOptions {
+        self.fetch(&FetchStaffOptions {
             is_birthday: Some(true),
             sort: Some(&[StaffSort::FavouritesDesc]),
             page,

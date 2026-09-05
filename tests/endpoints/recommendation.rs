@@ -20,7 +20,7 @@ async fn test_fetch_recommendations() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.recommendation().fetch(options).await
+            client.recommendation().fetch(&options).await
         })
         .await;
 
@@ -51,7 +51,7 @@ async fn test_fetch_recommendations_by_media() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.recommendation().fetch(options).await
+            client.recommendation().fetch(&options).await
         })
         .await;
 
@@ -81,7 +81,7 @@ async fn test_recommendation_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.recommendation().fetch(options).await
+            client.recommendation().fetch(&options).await
         })
         .await;
 
@@ -118,7 +118,7 @@ async fn test_save_recommendation() {
                 media_recommendation_id: 205,
                 rating: RecommendationRating::RateUp,
             };
-            client.recommendation().save(options).await
+            client.recommendation().save(&options).await
         })
         .await;
 

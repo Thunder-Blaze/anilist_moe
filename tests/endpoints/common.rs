@@ -20,7 +20,7 @@ async fn test_toggle_like() {
                 id: 870493538,
                 like_type: LikeableType::Activity,
             };
-            client.common().toggle_like(options).await
+            client.common().toggle_like(&options).await
         })
         .await;
 
@@ -48,7 +48,7 @@ async fn test_toggle_follow() {
     let result = h
         .run(|| async {
             let options = ToggleFollowOptions { user_id: 5429396 };
-            client.common().toggle_follow(options).await
+            client.common().toggle_follow(&options).await
         })
         .await;
 
@@ -86,7 +86,7 @@ async fn test_toggle_favourite() {
                 staff_id: None,
                 studio_id: None,
             };
-            client.common().toggle_favourite(options).await
+            client.common().toggle_favourite(&options).await
         })
         .await;
 

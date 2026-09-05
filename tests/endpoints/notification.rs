@@ -18,7 +18,7 @@ async fn test_fetch_notifications() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.notification().fetch(options).await
+            client.notification().fetch(&options).await
         })
         .await;
 
@@ -53,7 +53,7 @@ async fn test_notification_data_types() {
                 per_page: Some(1),
                 ..Default::default()
             };
-            client.notification().fetch(options).await
+            client.notification().fetch(&options).await
         })
         .await;
 

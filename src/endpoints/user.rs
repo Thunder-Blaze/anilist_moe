@@ -155,14 +155,14 @@ impl<'a> UserEndpoint<'a> {
     /// Fetch multiple users with pagination
     pub async fn fetch(
         &self,
-        options: FetchUserOptions<'_>,
+        options: &FetchUserOptions<'_>,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FETCH;
         self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch a single user with full details
-    pub async fn fetch_one(&self, options: FetchUserOneOptions<'_>) -> Result<User, AniListError> {
+    pub async fn fetch_one(&self, options: &FetchUserOneOptions<'_>) -> Result<User, AniListError> {
         let query = user::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
     }
@@ -176,7 +176,7 @@ impl<'a> UserEndpoint<'a> {
     /// Fetch user followers
     pub async fn followers(
         &self,
-        options: FetchUserFollowersOptions,
+        options: &FetchUserFollowersOptions,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FOLLOWERS;
         self.client.fetch(query, Some(&options)).await
@@ -185,7 +185,7 @@ impl<'a> UserEndpoint<'a> {
     /// Fetch users that the user is following
     pub async fn following(
         &self,
-        options: FetchUserFollowingOptions,
+        options: &FetchUserFollowingOptions,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FOLLOWING;
         self.client.fetch(query, Some(&options)).await
@@ -194,7 +194,7 @@ impl<'a> UserEndpoint<'a> {
     /// Fetch user favorites with conditional sections and independent pagination
     pub async fn favorites(
         &self,
-        options: FetchUserFavoritesOptions<'_>,
+        options: &FetchUserFavoritesOptions<'_>,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::FAVORITES;
         self.client.fetch(query, Some(&options)).await
@@ -203,14 +203,14 @@ impl<'a> UserEndpoint<'a> {
     /// Fetch user's media list
     pub async fn media_list(
         &self,
-        options: FetchUserMediaListOptions<'_>,
+        options: &FetchUserMediaListOptions<'_>,
     ) -> Result<Page<Vec<User>>, AniListError> {
         let query = user::MEDIA_LIST;
         self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch user statistics
-    pub async fn stats(&self, options: FetchUserStatsOptions<'_>) -> Result<User, AniListError> {
+    pub async fn stats(&self, options: &FetchUserStatsOptions<'_>) -> Result<User, AniListError> {
         let query = user::STATS;
         self.client.fetch(query, Some(&options)).await
     }
@@ -221,7 +221,7 @@ impl<'a> UserEndpoint<'a> {
     pub async fn get_current_user(&self) -> Result<User, AniListError> {
         let response = self.client.user().fetch_basic().await?;
         let id = response.id;
-        self.fetch_one(FetchUserOneOptions {
+        self.fetch_one(&FetchUserOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -230,7 +230,7 @@ impl<'a> UserEndpoint<'a> {
 
     /// Get user by ID
     pub async fn get_by_id(&self, id: i32) -> Result<User, AniListError> {
-        self.fetch_one(FetchUserOneOptions {
+        self.fetch_one(&FetchUserOneOptions {
             id: Some(id),
             ..Default::default()
         })
@@ -239,7 +239,7 @@ impl<'a> UserEndpoint<'a> {
 
     /// Get user by username
     pub async fn get_by_name(&self, name: &str) -> Result<User, AniListError> {
-        self.fetch_one(FetchUserOneOptions {
+        self.fetch_one(&FetchUserOneOptions {
             name: Some(name),
             ..Default::default()
         })
@@ -253,7 +253,7 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(FetchUserOptions {
+        self.fetch(&FetchUserOptions {
             search: Some(query),
             page,
             per_page,
@@ -269,7 +269,7 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(FetchUserOptions {
+        self.fetch(&FetchUserOptions {
             page,
             per_page,
             sort: Some(&[UserSort::WatchedTimeDesc]),
@@ -284,7 +284,7 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(FetchUserOptions {
+        self.fetch(&FetchUserOptions {
             page,
             per_page,
             sort: Some(&[UserSort::ChaptersReadDesc]),

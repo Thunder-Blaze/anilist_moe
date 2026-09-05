@@ -20,7 +20,7 @@ async fn test_fetch_user_by_search() {
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
@@ -58,7 +58,7 @@ async fn test_fetch_user_by_id() {
                 id: Some(5429396),
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
@@ -82,7 +82,7 @@ async fn test_fetch_one_user() {
                 id: Some(5429396),
                 ..Default::default()
             };
-            client.user().fetch_one(options).await
+            client.user().fetch_one(&options).await
         })
         .await;
 
@@ -108,7 +108,7 @@ async fn test_user_data_types() {
                 id: Some(3225), // A well-known user with complete profile
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
@@ -147,7 +147,7 @@ async fn test_user_search_relevance() {
                 per_page: Some(10),
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
