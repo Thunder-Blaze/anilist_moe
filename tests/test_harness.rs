@@ -5,9 +5,9 @@
 
 use anilist_moe::{AniListClient, AniListError};
 use smol::lock::Mutex;
+use smol::Timer;
 use std::future::Future;
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
-use std::thread::sleep;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 /// Rate limit configuration for tests
@@ -68,7 +68,7 @@ impl GlobalRateLimiter {
                 let wait_secs = pause_until - now;
                 eprintln!("⏳ Waiting {} seconds for rate limit reset...", wait_secs);
 
-                smol::spawn(async move { sleep(Duration::from_secs(wait_secs + 1)) }).await;
+                Timer::after(Duration::from_secs(wait_secs + 1)).await;
             } else {
                 self.is_paused.store(false, Ordering::SeqCst);
                 break;
@@ -99,14 +99,13 @@ impl GlobalRateLimiter {
                     "⚠️  Approaching rate limit ({}/{} requests). Waiting {} seconds...",
                     count, RATE_LIMIT_WINDOW_REQUESTS, wait_secs
                 );
-                smol::spawn(async move { sleep(Duration::from_secs(wait_secs + 1)) }).await;
+                Timer::after(Duration::from_secs(wait_secs + 1)).await;
                 self.window_start.store(Self::now_secs(), Ordering::SeqCst);
                 self.request_count.store(0, Ordering::SeqCst);
             }
         }
 
-        smol::spawn(async move { sleep(Duration::from_millis(MIN_DELAY_BETWEEN_REQUESTS_MS)) })
-            .await;
+        Timer::after(Duration::from_millis(MIN_DELAY_BETWEEN_REQUESTS_MS)).await;
     }
 
     /// Handle a rate limit error (global pause)
@@ -193,10 +192,7 @@ impl TestHarness {
                         "🔄 Network error, retrying ({}/{})...: {:?}",
                         network_retries, MAX_NETWORK_RETRIES, e
                     );
-                    smol::spawn(
-                        async move { sleep(Duration::from_millis(NETWORK_RETRY_DELAY_MS)) },
-                    )
-                    .await;
+                    Timer::after(Duration::from_millis(NETWORK_RETRY_DELAY_MS)).await;
                     // Loop will retry
                 }
                 Err(e) => {

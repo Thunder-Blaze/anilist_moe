@@ -1,7 +1,8 @@
 //! Utility helpers for rate limits, retries, and JSON.
 
 use crate::errors::AniListError;
-use std::{thread::sleep, time::Duration};
+use smol::Timer;
+use std::time::Duration;
 
 /// Retry configuration.
 ///
@@ -123,7 +124,7 @@ where
                         attempts + 1,
                         config.max_retries
                     );
-                    smol::spawn(async move { sleep(sleep_duration) }).await;
+                    Timer::after(sleep_duration).await;
                     attempts += 1;
                 }
             }
@@ -134,7 +135,7 @@ where
 /// Sleeps for the specified duration in milliseconds.
 #[inline]
 pub async fn rate_limit_delay(delay_ms: u64) {
-    smol::spawn(async move { sleep(Duration::from_millis(delay_ms)) }).await;
+    Timer::after(Duration::from_millis(delay_ms)).await;
 }
 
 /// Calculates an appropriate delay based on remaining rate limit quota.
