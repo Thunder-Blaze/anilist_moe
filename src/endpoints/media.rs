@@ -297,7 +297,12 @@ impl<'a> MediaEndpoint<'a> {
     /// # use anilist_moe::enums::media::{MediaType, MediaSort};
     /// # async fn example() -> Result<(), AniListError> {
     /// let client = AniListClient::new();
-    /// let options = FetchMediaOptions { media_type: Some(MediaType::Anime), sort: Some(&[MediaSort::Popularity]), page: Some(1), per_page: Some(10), ..Default::default() };
+    /// let options = FetchMediaOptions {
+    ///     media_type: Some(MediaType::Anime),
+    ///     sort: Some(&[MediaSort::Popularity]),
+    ///     page: Some(1), per_page: Some(10),
+    ///     ..Default::default()
+    /// };
     /// let response = client.media().fetch(&options).await?;
     /// for anime in &response.data { println!("Title: {:?}", anime.title); }
     /// # Ok(())

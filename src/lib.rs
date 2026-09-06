@@ -62,8 +62,9 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::AniListError;
+//! use macro_rules_attribute::apply;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() -> Result<(), AniListError> {
 //!     let client = AniListClient::new();
 //!
@@ -88,8 +89,9 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::AniListError;
+//! use macro_rules_attribute::apply;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() -> Result<(), AniListError> {
 //!     let client = AniListClient::new();
 //!
@@ -114,9 +116,10 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::AniListError;
+//! use macro_rules_attribute::apply;
 //! use std::env;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() -> Result<(), AniListError> {
 //!     let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set");
 //!     let client = AniListClient::with_token(token);
@@ -134,8 +137,9 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::errors::AniListError;
+//! use macro_rules_attribute::apply;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() {
 //!     let client = AniListClient::new();
 //!
