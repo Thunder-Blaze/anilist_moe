@@ -158,6 +158,10 @@ impl<'a> ReviewEndpoint<'a> {
             })
             .await?;
 
+        if response.data.len() == 0 {
+            return Err(AniListError::NotFound);
+        }
+
         Ok(response.data.swap_remove(0))
     }
 
