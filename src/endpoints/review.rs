@@ -155,11 +155,13 @@ impl ReviewEndpoint {
                 id: Some(id),
                 ..Default::default()
             })
-            .await;
-        match response {
-            Ok(res) => Ok(res.data[0].clone()),
-            Err(err) => Err(err),
+            .await?;
+
+        if response.data.len() == 0 {
+            return Err(AniListError::NotFound);
         }
+
+        Ok(response.data.swap_remove(0))
     }
 
     /// Create a new review
