@@ -1,4 +1,4 @@
-//! Data models for AniList API entities.
+//! Data models for `AniList` API entities.
 //!
 //! This module contains all the struct definitions for data returned by the API,
 //! including anime, manga, characters, users, and more.
@@ -7,7 +7,7 @@
 pub mod activity;
 /// Airing schedule data models
 pub mod airing;
-/// AniChart data models
+/// `AniChart` data models
 pub mod anichart;
 /// Character data models
 pub mod character;
@@ -20,7 +20,7 @@ pub mod media;
 /// Media list data models
 pub mod media_list;
 /// Moderator-related data models
-pub mod mods;
+pub mod moderators;
 /// Notification data models
 pub mod notification;
 /// Recommendation data models

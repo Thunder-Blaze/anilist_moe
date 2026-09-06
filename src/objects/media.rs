@@ -26,11 +26,11 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Media {
-    pub id: Option<i32>,
-    pub id_mal: Option<i32>,
+    pub id: u32,
+    pub id_mal: Option<u32>,
     pub title: Option<MediaTitle>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
@@ -90,7 +90,7 @@ pub struct Media {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaCharacter {
     pub id: Option<i32>,
@@ -103,7 +103,7 @@ pub struct MediaCharacter {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaConnection {
     pub edges: Option<Vec<MediaEdge>>,
@@ -112,7 +112,7 @@ pub struct MediaConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaCoverImage {
     pub extra_large: Option<String>,
@@ -122,7 +122,7 @@ pub struct MediaCoverImage {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaEdge {
     pub node: Option<Media>,
@@ -141,7 +141,7 @@ pub struct MediaEdge {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaExternalLink {
     pub id: i32,
@@ -158,7 +158,7 @@ pub struct MediaExternalLink {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaRank {
     pub id: i32,
@@ -173,7 +173,7 @@ pub struct MediaRank {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaStreamingEpisode {
     pub title: Option<String>,
@@ -183,7 +183,7 @@ pub struct MediaStreamingEpisode {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaSubmission {
     pub id: i32,
@@ -206,7 +206,7 @@ pub struct MediaSubmission {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaSubmissionComparison {
     pub submission: Option<MediaSubmissionEdge>,
@@ -217,7 +217,7 @@ pub struct MediaSubmissionComparison {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaSubmissionEdge {
     pub id: i32,
@@ -239,7 +239,7 @@ pub struct MediaSubmissionEdge {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTag {
     pub id: i32,
@@ -254,7 +254,7 @@ pub struct MediaTag {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTitle {
     pub romaji: Option<String>,
@@ -264,7 +264,7 @@ pub struct MediaTitle {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTrailer {
     pub id: Option<String>,
@@ -273,7 +273,7 @@ pub struct MediaTrailer {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTrend {
     pub media_id: Option<i32>,
@@ -288,7 +288,7 @@ pub struct MediaTrend {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTrendConnection {
     pub edges: Option<Vec<MediaTrendEdge>>,
@@ -297,7 +297,7 @@ pub struct MediaTrendConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTrendEdge {
     pub node: Option<MediaTrend>,

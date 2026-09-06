@@ -1,13 +1,14 @@
 //! Tests for Forum endpoint
 
-use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::forum::*;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_forum_threads() {
     let h = harness();
     let client = h.client();
@@ -33,7 +34,7 @@ async fn test_fetch_forum_threads() {
     assert!(!threads.is_empty(), "Should return at least one thread");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_one_forum_thread() {
     delay_between_tests().await;
     let h = harness();
@@ -82,7 +83,7 @@ async fn test_fetch_one_forum_thread() {
     );
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_forum_comments() {
     delay_between_tests().await;
     let h = harness();
@@ -125,7 +126,7 @@ async fn test_fetch_forum_comments() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_forum_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -159,7 +160,7 @@ async fn test_forum_data_types() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_comment_one() {
     delay_between_tests().await;
     let h = harness();
@@ -202,20 +203,20 @@ async fn test_fetch_comment_one() {
 }
 
 // Authentication required tests - these gracefully handle missing auth
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_save_forum_thread() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_save_forum_thread: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
             let options = SaveThreadOptions {
-                title: Some("Test Thread from anilist_moe".to_string()),
-                body: Some("This is a test thread body.".to_string()),
-                categories: Some(vec![1]),
+                title: Some("Test Thread from anilist_moe"),
+                body: Some("This is a test thread body."),
+                categories: Some(&[1]),
                 id: None,
                 media_categories: None,
                 sticky: None,
@@ -244,13 +245,13 @@ async fn test_save_forum_thread() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_toggle_thread_subscription() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_toggle_thread_subscription: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     // First fetch a thread to subscribe to
     let list_result = h

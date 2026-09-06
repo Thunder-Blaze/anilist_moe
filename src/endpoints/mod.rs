@@ -1,7 +1,7 @@
-//! AniList API endpoint modules.
+//! `AniList` API endpoint modules.
 //!
 //! Each module provides a specialized endpoint for interacting with different
-//! parts of the AniList API, such as anime, manga, characters, users, etc.
+//! parts of the `AniList` API, such as anime, manga, characters, users, etc.
 
 /// Activity feed operations (text posts, list updates, replies)
 pub mod activity;

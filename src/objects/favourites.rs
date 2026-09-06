@@ -7,7 +7,7 @@ use crate::objects::{
 };
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Favourites {
     pub anime: Option<MediaConnection>,

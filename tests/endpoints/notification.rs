@@ -2,14 +2,15 @@
 
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::notification::*;
+use macro_rules_attribute::apply;
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_notifications() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_fetch_notifications: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -36,13 +37,13 @@ async fn test_fetch_notifications() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_notification_data_types() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_notification_data_types: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     delay_between_tests().await;
 

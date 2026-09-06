@@ -2,16 +2,17 @@
 
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
 use anilist_moe::{endpoints::common::*, enums::likable::LikeableType};
+use macro_rules_attribute::apply;
 
 // All common endpoint functions require authentication
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_toggle_like() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_toggle_like: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -34,13 +35,13 @@ async fn test_toggle_like() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_toggle_follow() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_toggle_follow: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     delay_between_tests().await;
 
@@ -66,13 +67,13 @@ async fn test_toggle_follow() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_toggle_favourite() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_toggle_favourite: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     delay_between_tests().await;
 

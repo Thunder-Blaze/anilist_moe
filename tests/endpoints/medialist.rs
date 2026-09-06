@@ -1,14 +1,15 @@
 //! Tests for MediaList endpoint
 
-use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::medialist::*;
 use anilist_moe::enums::media_list::MediaListStatus;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_media_list() {
     let h = harness();
     let client = h.client();
@@ -38,13 +39,13 @@ async fn test_fetch_media_list() {
     );
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_media_list_by_media() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_fetch_media_list_by_media: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -75,7 +76,7 @@ async fn test_fetch_media_list_by_media() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_media_list_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -109,13 +110,13 @@ async fn test_media_list_data_types() {
 }
 
 // Authentication required tests
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_save_media_list() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_save_media_list: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     let result = h
         .run(|| async {
@@ -141,13 +142,13 @@ async fn test_save_media_list() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_delete_media_list() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_delete_media_list: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     // First create a media list entry to delete
     let save_result = h

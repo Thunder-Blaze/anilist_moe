@@ -1,13 +1,14 @@
 //! Tests for Airing endpoint
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::endpoints::airing::*;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_airing_schedules() {
     let h = harness();
     let client = h.client();
@@ -47,7 +48,7 @@ async fn test_fetch_airing_schedules() {
     );
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_airing_pagination() {
     delay_between_tests().await;
     let h = harness();
@@ -107,7 +108,7 @@ async fn test_fetch_airing_pagination() {
     assert_ne!(ids1, ids2, "Different pages should have different results");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_airing_data_types() {
     delay_between_tests().await;
     let h = harness();

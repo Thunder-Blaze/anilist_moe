@@ -5,13 +5,13 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchActivityOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchActivityOptions<'a> {
     // # Pagination
     #[serde(rename = "page")]
     pub page: Option<i32>,
@@ -40,33 +40,33 @@ pub struct FetchActivityOptions {
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Vec<i32>>,
+    pub id_in: Option<&'a [i32]>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Vec<i32>>,
+    pub id_not_in: Option<&'a [i32]>,
     #[serde(rename = "userId_not")]
     pub user_id_not: Option<i32>,
     #[serde(rename = "userId_in")]
-    pub user_id_in: Option<Vec<i32>>,
+    pub user_id_in: Option<&'a [i32]>,
     #[serde(rename = "userId_not_in")]
-    pub user_id_not_in: Option<Vec<i32>>,
+    pub user_id_not_in: Option<&'a [i32]>,
     #[serde(rename = "messengerId_not")]
     pub messenger_id_not: Option<i32>,
     #[serde(rename = "messengerId_in")]
-    pub messenger_id_in: Option<Vec<i32>>,
+    pub messenger_id_in: Option<&'a [i32]>,
     #[serde(rename = "messengerId_not_in")]
-    pub messenger_id_not_in: Option<Vec<i32>>,
+    pub messenger_id_not_in: Option<&'a [i32]>,
     #[serde(rename = "mediaId_not")]
     pub media_id_not: Option<i32>,
     #[serde(rename = "mediaId_in")]
-    pub media_id_in: Option<Vec<i32>>,
+    pub media_id_in: Option<&'a [i32]>,
     #[serde(rename = "mediaId_not_in")]
-    pub media_id_not_in: Option<Vec<i32>>,
+    pub media_id_not_in: Option<&'a [i32]>,
     #[serde(rename = "type_not")]
     pub type_not: Option<ActivityType>,
     #[serde(rename = "type_in")]
-    pub type_in: Option<Vec<ActivityType>>,
+    pub type_in: Option<&'a [ActivityType]>,
     #[serde(rename = "type_not_in")]
-    pub type_not_in: Option<Vec<ActivityType>>,
+    pub type_not_in: Option<&'a [ActivityType]>,
     #[serde(rename = "createdAt_greater")]
     pub created_at_greater: Option<i32>,
     #[serde(rename = "createdAt_lesser")]
@@ -74,7 +74,7 @@ pub struct FetchActivityOptions {
 
     // # Sort
     #[serde(rename = "sort")]
-    pub sort: Option<Vec<ActivitySort>>,
+    pub sort: Option<&'a [ActivitySort]>,
 
     // # HTML rendering options
     #[serde(rename = "text_as_html")]
@@ -85,7 +85,7 @@ pub struct FetchActivityOptions {
 
 /// Options for fetching a single activity by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchActivityOneOptions {
     pub id: i32,
     // # HTML rendering options
@@ -97,7 +97,7 @@ pub struct FetchActivityOneOptions {
 
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
     #[serde(rename = "page")]
@@ -117,26 +117,26 @@ pub struct FetchActivityRepliesOptions {
 }
 
 /// Options for deleting an activity.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteActivityOptions {
     pub id: i32,
 }
 
 /// Options for deleting an activity reply.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteActivityReplyOptions {
     pub id: i32,
 }
 
 /// Options for pinning or unpinning an activity.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct PinActivityOptions {
     pub id: i32,
     pub pinned: bool,
 }
 
 /// Options for subscribing or unsubscribing to an activity.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct SubscribeActivityOptions {
     pub id: i32,
     pub subscribe: bool,
@@ -144,10 +144,10 @@ pub struct SubscribeActivityOptions {
 
 /// Options for saving a message activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct SaveMessageActivityOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct SaveMessageActivityOptions<'a> {
     pub id: Option<i32>,
-    pub message: String,
+    pub message: &'a str,
     #[serde(rename = "recipientId")]
     pub recipient_id: i32,
     pub private: Option<bool>,
@@ -157,39 +157,40 @@ pub struct SaveMessageActivityOptions {
 
 /// Options for saving a text activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct SaveTextActivityOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct SaveTextActivityOptions<'a> {
     pub id: Option<i32>,
-    pub text: String,
+    pub text: &'a str,
     pub locked: Option<bool>,
 }
 
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct SaveActivityReplyOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct SaveActivityReplyOptions<'a> {
     pub id: Option<i32>,
-    pub text: String,
+    pub text: &'a str,
     #[serde(rename = "activityId")]
     pub activity_id: i32,
 }
 
 /// Endpoint for activity feed operations.
-pub struct ActivityEndpoint {
-    pub client: AniListClient,
+pub struct ActivityEndpoint<'a> {
+    pub client: &'a AniListClient,
 }
 
-impl ActivityEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> ActivityEndpoint<'a> {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
     pub async fn fetch(
         &self,
-        options: &FetchActivityOptions,
+        options: &FetchActivityOptions<'_>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
         let query = activity::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn fetch_one(
@@ -197,7 +198,7 @@ impl ActivityEndpoint {
         options: &FetchActivityOneOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::FETCH_ONE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn fetch_replies(
@@ -205,12 +206,13 @@ impl ActivityEndpoint {
         options: &FetchActivityRepliesOptions,
     ) -> Result<Page<Vec<ActivityReply>>, AniListError> {
         let query = activity::FETCH_REPLIES;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn delete(&self, options: &DeleteActivityOptions) -> Result<bool, AniListError> {
         let query = activity::DELETE;
-        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -222,7 +224,8 @@ impl ActivityEndpoint {
         options: &DeleteActivityReplyOptions,
     ) -> Result<bool, AniListError> {
         let query = activity::DELETE_REPLY;
-        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -231,7 +234,7 @@ impl ActivityEndpoint {
 
     pub async fn pin(&self, options: &PinActivityOptions) -> Result<ActivityUnion, AniListError> {
         let query = activity::PIN;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn subscribe(
@@ -239,16 +242,16 @@ impl ActivityEndpoint {
         options: &SubscribeActivityOptions,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SUBSCRIBE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn save_message_activity(
         &self,
-        options: &SaveMessageActivityOptions,
+        options: &SaveMessageActivityOptions<'_>,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_MESSAGE_ACTIVITY;
         let response: Result<MessageActivity, AniListError> =
-            self.client.fetch(query, Some(options)).await;
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(ActivityUnion::MessageActivity(res)),
             Err(err) => Err(err),
@@ -257,11 +260,11 @@ impl ActivityEndpoint {
 
     pub async fn save_text_activity(
         &self,
-        options: &SaveTextActivityOptions,
+        options: &SaveTextActivityOptions<'_>,
     ) -> Result<ActivityUnion, AniListError> {
         let query = activity::SAVE_TEXT_ACTIVITY;
         let response: Result<TextActivity, AniListError> =
-            self.client.fetch(query, Some(options)).await;
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(ActivityUnion::TextActivity(res)),
             Err(err) => Err(err),
@@ -270,10 +273,10 @@ impl ActivityEndpoint {
 
     pub async fn save_reply(
         &self,
-        options: &SaveActivityReplyOptions,
+        options: &SaveActivityReplyOptions<'_>,
     ) -> Result<ActivityReply, AniListError> {
         let query = activity::SAVE_REPLY;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions
@@ -287,7 +290,7 @@ impl ActivityEndpoint {
         self.fetch(&FetchActivityOptions {
             page,
             per_page,
-            sort: Some(vec![ActivitySort::IdDesc]),
+            sort: Some(&[ActivitySort::IdDesc]),
             ..Default::default()
         })
         .await
@@ -303,7 +306,7 @@ impl ActivityEndpoint {
             is_following: Some(true),
             page,
             per_page,
-            sort: Some(vec![ActivitySort::IdDesc]),
+            sort: Some(&[ActivitySort::IdDesc]),
             ..Default::default()
         })
         .await
@@ -322,7 +325,7 @@ impl ActivityEndpoint {
     pub async fn create_text_activity(&self, text: &str) -> Result<ActivityUnion, AniListError> {
         self.save_text_activity(&SaveTextActivityOptions {
             id: None,
-            text: text.to_string(),
+            text,
             locked: None,
         })
         .await
@@ -337,7 +340,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivityUnion, AniListError> {
         self.save_message_activity(&SaveMessageActivityOptions {
             id: None,
-            message: message.to_string(),
+            message,
             recipient_id,
             private,
             locked: None,
@@ -354,7 +357,7 @@ impl ActivityEndpoint {
     ) -> Result<ActivityReply, AniListError> {
         self.save_reply(&SaveActivityReplyOptions {
             id: None,
-            text: text.to_string(),
+            text,
             activity_id,
         })
         .await

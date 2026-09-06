@@ -4,7 +4,7 @@ use serde_with::skip_serializing_none;
 use crate::objects::{common::Json, media::Media, user::User};
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Thread {
     pub id: i32,
@@ -32,7 +32,7 @@ pub struct Thread {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadCategory {
     pub id: i32,
@@ -40,7 +40,7 @@ pub struct ThreadCategory {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadComment {
     pub id: i32,

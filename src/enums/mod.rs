@@ -1,4 +1,4 @@
-//! Enumeration types for AniList API.
+//! Enumeration types for `AniList` API.
 //!
 //! This module contains all enum definitions used throughout the API,
 //! including media types, status values, sorting options, and more.
@@ -18,7 +18,7 @@ pub mod media;
 /// Media list enums
 pub mod media_list;
 /// Moderator-related enums
-pub mod mods;
+pub mod moderators;
 /// Notification enums
 pub mod notification;
 /// Recommendation enums

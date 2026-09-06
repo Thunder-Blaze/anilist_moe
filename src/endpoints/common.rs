@@ -4,7 +4,7 @@ use crate::objects::favourites::Favourites;
 use crate::objects::user::User;
 use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for toggling a like on various entities.
@@ -16,7 +16,7 @@ pub struct ToggleLikeOptions {
 }
 
 /// Options for toggling follow status of a user.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct ToggleFollowOptions {
     #[serde(rename = "userId")]
     pub user_id: i32,
@@ -24,7 +24,7 @@ pub struct ToggleFollowOptions {
 
 /// Options for adding or removing favourites.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct ToggleFavouriteOptions {
     #[serde(rename = "animeId")]
     pub anime_id: Option<i32>,
@@ -39,12 +39,13 @@ pub struct ToggleFavouriteOptions {
 }
 
 /// Endpoint for common and general-purpose operations.
-pub struct CommonEndpoint {
-    pub client: AniListClient,
+pub struct CommonEndpoint<'a> {
+    pub client: &'a AniListClient,
 }
 
-impl CommonEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> CommonEndpoint<'a> {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
@@ -53,12 +54,12 @@ impl CommonEndpoint {
         options: &ToggleLikeOptions,
     ) -> Result<LikeableUnion, AniListError> {
         let query = common::TOGGLE_LIKE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn toggle_follow(&self, options: &ToggleFollowOptions) -> Result<User, AniListError> {
         let query = common::TOGGLE_FOLLOW;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     pub async fn toggle_favourite(
@@ -66,7 +67,7 @@ impl CommonEndpoint {
         options: &ToggleFavouriteOptions,
     ) -> Result<Favourites, AniListError> {
         let query = common::TOGGLE_FAVOURITE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions

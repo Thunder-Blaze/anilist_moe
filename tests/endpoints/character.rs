@@ -1,13 +1,14 @@
 //! Tests for Character endpoint
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::endpoints::character::*;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_character_by_search() {
     let h = harness();
     let client = h.client();
@@ -15,7 +16,7 @@ async fn test_fetch_character_by_search() {
     let result = h
         .run(|| async {
             let options = FetchCharacterOptions {
-                search: Some("Spike".to_string()),
+                search: Some("Spike"),
                 per_page: Some(5),
                 ..Default::default()
             };
@@ -58,7 +59,7 @@ async fn test_fetch_character_by_search() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_character_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -86,7 +87,7 @@ async fn test_fetch_character_by_id() {
     assert_eq!(characters[0].id, 1, "Should return correct character ID");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_one_character() {
     delay_between_tests().await;
     let h = harness();
@@ -113,7 +114,7 @@ async fn test_fetch_one_character() {
     assert!(character.name.is_some(), "Character should have a name");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_character_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -154,7 +155,7 @@ async fn test_character_data_types() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_character_search_pagination() {
     delay_between_tests().await;
     let h = harness();
@@ -164,7 +165,7 @@ async fn test_character_search_pagination() {
     let result1 = h
         .run(|| async {
             let options = FetchCharacterOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 page: Some(1),
                 per_page: Some(5),
                 ..Default::default()
@@ -181,7 +182,7 @@ async fn test_character_search_pagination() {
     let result2 = h
         .run(|| async {
             let options = FetchCharacterOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 page: Some(2),
                 per_page: Some(5),
                 ..Default::default()

@@ -2,7 +2,7 @@ use crate::objects::activity::{ActivityReply, ListActivity, MessageActivity, Tex
 use crate::objects::thread::{Thread, ThreadComment};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "__typename")]
 pub enum LikeableUnion {
     ListActivity(ListActivity),

@@ -12,7 +12,7 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FormatStats {
     pub format: Option<MediaFormat>,
@@ -20,7 +20,7 @@ pub struct FormatStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GenreStats {
     pub genre: Option<String>,
@@ -30,7 +30,7 @@ pub struct GenreStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ListScoreStats {
     pub mean_score: Option<i32>,
@@ -38,7 +38,7 @@ pub struct ListScoreStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaStats {
     pub score_distribution: Option<Vec<ScoreDistribution>>,
@@ -46,7 +46,7 @@ pub struct MediaStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScoreDistribution {
     pub score: Option<i32>,
@@ -54,7 +54,7 @@ pub struct ScoreDistribution {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StatusDistribution {
     pub status: Option<MediaListStatus>,
@@ -62,7 +62,7 @@ pub struct StatusDistribution {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SiteStatistics {
     pub users: Option<SiteTrendConnection>,
@@ -75,7 +75,7 @@ pub struct SiteStatistics {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SiteTrend {
     pub date: i32,
@@ -84,7 +84,7 @@ pub struct SiteTrend {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SiteTrendConnection {
     pub edges: Option<Vec<SiteTrendEdge>>,
@@ -93,14 +93,14 @@ pub struct SiteTrendConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SiteTrendEdge {
     pub node: Option<SiteTrend>,
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffStats {
     pub staff: Option<Staff>,
@@ -110,7 +110,7 @@ pub struct StaffStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StudioStats {
     pub studio: Option<Studio>,
@@ -120,7 +120,7 @@ pub struct StudioStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TagStats {
     pub tag: Option<MediaTag>,
@@ -130,7 +130,7 @@ pub struct TagStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserCountryStatistic {
     pub count: Option<i32>,
@@ -142,7 +142,7 @@ pub struct UserCountryStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserFormatStatistic {
     pub count: Option<i32>,
@@ -154,7 +154,7 @@ pub struct UserFormatStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserGenreStatistic {
     pub count: Option<i32>,
@@ -166,7 +166,7 @@ pub struct UserGenreStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLengthStatistic {
     pub count: Option<i32>,
@@ -178,7 +178,7 @@ pub struct UserLengthStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserReleaseYearStatistic {
     pub count: Option<i32>,
@@ -190,7 +190,7 @@ pub struct UserReleaseYearStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserScoreStatistic {
     pub count: Option<i32>,
@@ -202,7 +202,7 @@ pub struct UserScoreStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStaffStatistic {
     pub count: Option<i32>,
@@ -214,7 +214,7 @@ pub struct UserStaffStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStartYearStatistic {
     pub count: Option<i32>,
@@ -226,7 +226,7 @@ pub struct UserStartYearStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStatisticTypes {
     pub anime: Option<UserStatistics>,
@@ -234,7 +234,7 @@ pub struct UserStatisticTypes {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStatistics {
     pub count: Option<i32>,
@@ -259,7 +259,7 @@ pub struct UserStatistics {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStats {
     pub watched_time: Option<i32>,
@@ -282,7 +282,7 @@ pub struct UserStats {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStatusStatistic {
     pub count: Option<i32>,
@@ -294,7 +294,7 @@ pub struct UserStatusStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserStudioStatistic {
     pub count: Option<i32>,
@@ -306,7 +306,7 @@ pub struct UserStudioStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserTagStatistic {
     pub count: Option<i32>,
@@ -318,7 +318,7 @@ pub struct UserTagStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserVoiceActorStatistic {
     pub count: Option<i32>,
@@ -331,7 +331,7 @@ pub struct UserVoiceActorStatistic {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct YearStats {
     pub year: Option<i32>,

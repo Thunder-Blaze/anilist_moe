@@ -1,16 +1,16 @@
-//! Error types for the AniList API client.
+//! Error types for the `AniList` API client.
 //!
 //! This module defines all possible errors that can occur when using the API,
 //! including network errors, rate limiting, authentication failures, and more.
 
 use thiserror::Error;
 
-/// Errors that can occur when interacting with the AniList API.
+/// Errors that can occur when interacting with the `AniList` API.
 #[derive(Error, Debug)]
 pub enum AniListError {
     /// Network-level error (connection failed, timeout, etc.)
     #[error("Network error: {0}")]
-    Network(#[from] reqwest::Error),
+    Network(#[from] ureq::Error),
 
     /// JSON deserialization error
     #[error("JSON parsing error: {0}")]

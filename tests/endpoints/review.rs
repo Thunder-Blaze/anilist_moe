@@ -1,14 +1,15 @@
 //! Tests for Review endpoint
 
-use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::review::*;
 use anilist_moe::enums::review::ReviewRating;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_reviews() {
     let h = harness();
     let client = h.client();
@@ -34,7 +35,7 @@ async fn test_fetch_reviews() {
     assert!(!reviews.is_empty(), "Should return at least one review");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_reviews_by_media() {
     delay_between_tests().await;
     let h = harness();
@@ -65,7 +66,7 @@ async fn test_fetch_reviews_by_media() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_review_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -95,13 +96,13 @@ async fn test_review_data_types() {
 }
 
 // Authentication required tests
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_rate_review() {
     let Some(h) = get_authenticated_harness() else {
         eprintln!("Skipping test_rate_review: ANILIST_TOKEN not set");
         return;
     };
-    let client = h.client().clone();
+    let client = h.client();
 
     // First fetch a review to rate
     let fetch_result = h

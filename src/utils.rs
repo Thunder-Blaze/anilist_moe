@@ -1,8 +1,8 @@
 //! Utility helpers for rate limits, retries, and JSON.
 
 use crate::errors::AniListError;
+use smol::Timer;
 use std::time::Duration;
-use tokio::time::sleep;
 
 /// Retry configuration.
 ///
@@ -13,7 +13,7 @@ use tokio::time::sleep;
 /// use anilist_moe::utils::RetryConfig;
 /// let config = RetryConfig { max_retries: 5, base_delay_ms: 2000, exponential_backoff: true, max_delay_ms: 60000 };
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct RetryConfig {
     /// Maximum number of retry attempts before giving up
     pub max_retries: u32,
@@ -39,18 +39,18 @@ impl Default for RetryConfig {
 impl RetryConfig {
     /// Configuration tuned for API rate limits.
     #[must_use]
-    pub fn for_rate_limits() -> Self {
+    pub const fn for_rate_limits() -> Self {
         Self {
             max_retries: 5,
             base_delay_ms: 60000,       // 1 minute base delay for rate limits
             exponential_backoff: false, // Fixed delay for rate limits
-            max_delay_ms: 120000,       // 2 minute max
+            max_delay_ms: 120_000,      // 2 minute max
         }
     }
 
     /// Configuration for aggressive retries (transient errors).
     #[must_use]
-    pub fn aggressive() -> Self {
+    pub const fn aggressive() -> Self {
         Self {
             max_retries: 5,
             base_delay_ms: 500,
@@ -74,7 +74,7 @@ impl RetryConfig {
 /// Retry an operation with backoff on rate limits.
 pub async fn retry_with_backoff<F, Fut, T>(
     mut operation: F,
-    config: RetryConfig,
+    config: &RetryConfig,
 ) -> Result<T, AniListError>
 where
     F: FnMut() -> Fut,
@@ -93,7 +93,7 @@ where
                         }
                         // Use the Retry-After header if available and reasonable
                         let duration = if *retry_after > 0 && *retry_after <= 300 {
-                            Duration::from_secs(*retry_after as u64)
+                            Duration::from_secs(u64::from(*retry_after))
                         } else {
                             config.calculate_delay(attempts)
                         };
@@ -124,7 +124,7 @@ where
                         attempts + 1,
                         config.max_retries
                     );
-                    sleep(sleep_duration).await;
+                    Timer::after(sleep_duration).await;
                     attempts += 1;
                 }
             }
@@ -135,16 +135,17 @@ where
 /// Sleeps for the specified duration in milliseconds.
 #[inline]
 pub async fn rate_limit_delay(delay_ms: u64) {
-    sleep(Duration::from_millis(delay_ms)).await;
+    Timer::after(Duration::from_millis(delay_ms)).await;
 }
 
 /// Calculates an appropriate delay based on remaining rate limit quota.
 #[inline]
-pub fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
+#[must_use]
+pub const fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
     match remaining {
         0 => Duration::from_secs(reset_in_seconds),
-        1..=9 => Duration::from_millis(2000), // 2 seconds when getting low
-        10..=29 => Duration::from_millis(1000), // 1 second when moderate
-        _ => Duration::from_millis(500),      // 500ms when plenty remaining
+        1..=9 => Duration::from_secs(2), // 2 seconds when getting low
+        10..=29 => Duration::from_secs(1), // 1 second when moderate
+        _ => Duration::from_millis(500), // 500ms when plenty remaining
     }
 }

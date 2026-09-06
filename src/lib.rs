@@ -1,17 +1,17 @@
 //! # AniList.moe
 //!
-//! A comprehensive, type-safe Rust wrapper for the AniList GraphQL API that provides
-//! complete coverage of AniList's features including anime, manga, characters, staff, users,
+//! A comprehensive, type-safe Rust wrapper for the `AniList` GraphQL API that provides
+//! complete coverage of `AniList`'s features including anime, manga, characters, staff, users,
 //! social features, forums, activities, reviews, recommendations, and more.
 //!
-//! This crate provides a fully typed, async interface to interact with the AniList API,
+//! This crate provides a fully typed, async interface to interact with the `AniList` API,
 //! supporting both authenticated and unauthenticated requests with comprehensive error
 //! management and proper type safety throughout.
 //!
 //! ## Features
 //!
 //! - **Type Safety**: Fully typed responses - no more `serde_json::Value`
-//! - **Complete API Coverage**: All major AniList endpoints including social features
+//! - **Complete API Coverage**: All major `AniList` endpoints including social features
 //! - **Async/Await Support**: Built with tokio for high-performance async operations
 //! - **Modular Design**: Separate endpoint modules for clean code organization
 //! - **Authentication**: Full support for authenticated requests with Bearer tokens
@@ -52,7 +52,7 @@
 //!
 //! ## Rate Limiting
 //!
-//! AniList enforces a rate limit of 90 requests per minute. Be respectful of the API
+//! `AniList` enforces a rate limit of 90 requests per minute. Be respectful of the API
 //! and implement appropriate delays between requests in production applications.
 //!
 //! ## Examples
@@ -62,8 +62,9 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::AniListError;
+//! use macro_rules_attribute::apply;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() -> Result<(), AniListError> {
 //!     let client = AniListClient::new();
 //!
@@ -88,8 +89,9 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::AniListError;
+//! use macro_rules_attribute::apply;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() -> Result<(), AniListError> {
 //!     let client = AniListClient::new();
 //!
@@ -98,7 +100,7 @@
 //!
 //!     if let Some(first) = search.data.first() {
 //!         // Get detailed information
-//!         let details = client.media().get_anime_by_id(first.id.unwrap()).await?;
+//!         let details = client.media().get_anime_by_id(first.id).await?;
 //!         let anime = &details;
 //!
 //!         println!("Score: {}/100", anime.average_score.unwrap_or(0));
@@ -114,9 +116,10 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::AniListError;
+//! use macro_rules_attribute::apply;
 //! use std::env;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() -> Result<(), AniListError> {
 //!     let token = env::var("ANILIST_TOKEN").expect("ANILIST_TOKEN must be set");
 //!     let client = AniListClient::with_token(token);
@@ -134,8 +137,9 @@
 //! ```rust,no_run
 //! use anilist_moe::client::AniListClient;
 //! use anilist_moe::errors::AniListError;
+//! use macro_rules_attribute::apply;
 //!
-//! #[tokio::main]
+//! #[apply(smol_macros::main!)]
 //! async fn main() {
 //!     let client = AniListClient::new();
 //!

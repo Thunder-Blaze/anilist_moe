@@ -4,15 +4,15 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::thread::{Thread, ThreadComment};
 use crate::{client::AniListClient, queries::forum};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching forum threads.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchThreadOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchThreadOptions<'a> {
     pub id: Option<i32>,
-    pub search: Option<String>,
+    pub search: Option<&'a str>,
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
     #[serde(rename = "replyUserId")]
@@ -23,7 +23,7 @@ pub struct FetchThreadOptions {
     pub category_id: Option<i32>,
     #[serde(rename = "mediaCategoryId")]
     pub media_category_id: Option<i32>,
-    pub sort: Option<Vec<ThreadSort>>,
+    pub sort: Option<&'a [ThreadSort]>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -45,15 +45,15 @@ pub struct FetchThreadOptions {
 
 /// Options for fetching a single forum thread by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchThreadOneOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchThreadOneOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "commentsPage")]
     pub comments_page: Option<i32>,
     #[serde(rename = "commentsPerPage")]
     pub comments_per_page: Option<i32>,
     #[serde(rename = "commentsSort")]
-    pub comments_sort: Option<Vec<ThreadCommentSort>>,
+    pub comments_sort: Option<&'a [ThreadCommentSort]>,
     // HTML rendering options
     #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
@@ -61,14 +61,14 @@ pub struct FetchThreadOneOptions {
 
 /// Options for fetching thread comments.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchThreadCommentOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchThreadCommentOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "threadId")]
     pub thread_id: Option<i32>,
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    pub sort: Option<Vec<ThreadCommentSort>>,
+    pub sort: Option<&'a [ThreadCommentSort]>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -79,7 +79,7 @@ pub struct FetchThreadCommentOptions {
 
 /// Options for fetching a single thread comment by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct FetchThreadCommentOneOptions {
     pub id: Option<i32>,
     // HTML rendering options
@@ -89,14 +89,14 @@ pub struct FetchThreadCommentOneOptions {
 
 /// Options for creating or updating a forum thread.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct SaveThreadOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct SaveThreadOptions<'a> {
     pub id: Option<i32>,
-    pub title: Option<String>,
-    pub body: Option<String>,
-    pub categories: Option<Vec<i32>>,
+    pub title: Option<&'a str>,
+    pub body: Option<&'a str>,
+    pub categories: Option<&'a [i32]>,
     #[serde(rename = "mediaCategories")]
-    pub media_categories: Option<Vec<i32>>,
+    pub media_categories: Option<&'a [i32]>,
     pub sticky: Option<bool>,
     pub locked: Option<bool>,
     // HTML rendering options
@@ -105,21 +105,21 @@ pub struct SaveThreadOptions {
 }
 
 /// Options for deleting a forum thread.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteThreadOptions {
     pub id: i32,
 }
 
 /// Options for creating or updating a thread comment.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct SaveThreadCommentOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct SaveThreadCommentOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "threadId")]
     pub thread_id: Option<i32>,
     #[serde(rename = "parentCommentId")]
     pub parent_comment_id: Option<i32>,
-    pub comment: Option<String>,
+    pub comment: Option<&'a str>,
     pub locked: Option<bool>,
     // HTML rendering options
     #[serde(rename = "comment_as_html")]
@@ -127,14 +127,14 @@ pub struct SaveThreadCommentOptions {
 }
 
 /// Options for deleting a thread comment.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct DeleteThreadCommentOptions {
     pub id: i32,
 }
 
 /// Options for subscribing or unsubscribing to a thread.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize)]
 pub struct ToggleThreadSubscriptionOptions {
     #[serde(rename = "threadId")]
     pub thread_id: i32,
@@ -142,37 +142,41 @@ pub struct ToggleThreadSubscriptionOptions {
 }
 
 /// Endpoint for forum thread and comment operations.
-pub struct ForumEndpoint {
-    client: AniListClient,
+pub struct ForumEndpoint<'a> {
+    client: &'a AniListClient,
 }
 
-impl ForumEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> ForumEndpoint<'a> {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
     /// Fetch multiple threads with pagination
     pub async fn fetch(
         &self,
-        options: &FetchThreadOptions,
+        options: &FetchThreadOptions<'_>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         let query = forum::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch a single thread with full details
-    pub async fn fetch_one(&self, options: &FetchThreadOneOptions) -> Result<Thread, AniListError> {
+    pub async fn fetch_one(
+        &self,
+        options: &FetchThreadOneOptions<'_>,
+    ) -> Result<Thread, AniListError> {
         let query: &str = forum::FETCH_ONE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch multiple thread comments with pagination
     pub async fn fetch_comments(
         &self,
-        options: &FetchThreadCommentOptions,
+        options: &FetchThreadCommentOptions<'_>,
     ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
         let query = forum::FETCH_COMMENT;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Fetch a single thread comment
@@ -181,19 +185,20 @@ impl ForumEndpoint {
         options: &FetchThreadCommentOneOptions,
     ) -> Result<ThreadComment, AniListError> {
         let query = forum::FETCH_COMMENT_ONE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Create or update a thread
-    pub async fn save(&self, options: &SaveThreadOptions) -> Result<Thread, AniListError> {
+    pub async fn save(&self, options: &SaveThreadOptions<'_>) -> Result<Thread, AniListError> {
         let query = forum::SAVE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Delete a thread
     pub async fn delete(&self, options: &DeleteThreadOptions) -> Result<bool, AniListError> {
         let query = forum::DELETE;
-        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -203,10 +208,10 @@ impl ForumEndpoint {
     /// Create or update a thread comment
     pub async fn save_comment(
         &self,
-        options: &SaveThreadCommentOptions,
+        options: &SaveThreadCommentOptions<'_>,
     ) -> Result<ThreadComment, AniListError> {
         let query = forum::SAVE_COMMENT;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     /// Delete a thread comment
@@ -215,7 +220,8 @@ impl ForumEndpoint {
         options: &DeleteThreadCommentOptions,
     ) -> Result<bool, AniListError> {
         let query = forum::DELETE_COMMENT;
-        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
+        let response: Result<Deleted, AniListError> =
+            self.client.fetch(query, Some(&options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),
@@ -228,7 +234,7 @@ impl ForumEndpoint {
         options: &ToggleThreadSubscriptionOptions,
     ) -> Result<Thread, AniListError> {
         let query = forum::SUBSCRIPTION;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions
@@ -240,7 +246,7 @@ impl ForumEndpoint {
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&FetchThreadOptions {
-            sort: Some(vec![ThreadSort::CreatedAtDesc]),
+            sort: Some(&[ThreadSort::CreatedAtDesc]),
             page,
             per_page,
             ..Default::default()
@@ -255,7 +261,7 @@ impl ForumEndpoint {
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&FetchThreadOptions {
-            sort: Some(vec![ThreadSort::RepliedAtDesc]),
+            sort: Some(&[ThreadSort::RepliedAtDesc]),
             page,
             per_page,
             ..Default::default()
@@ -271,8 +277,8 @@ impl ForumEndpoint {
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&FetchThreadOptions {
-            search: Some(query.to_string()),
-            sort: Some(vec![ThreadSort::SearchMatch]),
+            search: Some(query),
+            sort: Some(&[ThreadSort::SearchMatch]),
             page,
             per_page,
             ..Default::default()
@@ -289,7 +295,7 @@ impl ForumEndpoint {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&FetchThreadOptions {
             category_id: Some(category_id),
-            sort: Some(vec![ThreadSort::RepliedAtDesc]),
+            sort: Some(&[ThreadSort::RepliedAtDesc]),
             page,
             per_page,
             ..Default::default()
@@ -306,7 +312,7 @@ impl ForumEndpoint {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&FetchThreadOptions {
             user_id: Some(user_id),
-            sort: Some(vec![ThreadSort::CreatedAtDesc]),
+            sort: Some(&[ThreadSort::CreatedAtDesc]),
             page,
             per_page,
             ..Default::default()
@@ -322,7 +328,7 @@ impl ForumEndpoint {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&FetchThreadOptions {
             subscribed: Some(true),
-            sort: Some(vec![ThreadSort::RepliedAtDesc]),
+            sort: Some(&[ThreadSort::RepliedAtDesc]),
             page,
             per_page,
             ..Default::default()
@@ -348,9 +354,9 @@ impl ForumEndpoint {
     ) -> Result<Thread, AniListError> {
         self.save(&SaveThreadOptions {
             id: None,
-            title: Some(title.to_string()),
-            body: Some(body.to_string()),
-            categories: Some(categories),
+            title: Some(title),
+            body: Some(body),
+            categories: Some(categories.as_slice()),
             ..Default::default()
         })
         .await
@@ -365,8 +371,8 @@ impl ForumEndpoint {
     ) -> Result<Thread, AniListError> {
         self.save(&SaveThreadOptions {
             id: Some(id),
-            title: title.map(|s| s.to_string()),
-            body: body.map(|s| s.to_string()),
+            title,
+            body,
             ..Default::default()
         })
         .await
@@ -386,7 +392,7 @@ impl ForumEndpoint {
     ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
         self.fetch_comments(&FetchThreadCommentOptions {
             thread_id: Some(thread_id),
-            sort: Some(vec![ThreadCommentSort::Id]),
+            sort: Some(&[ThreadCommentSort::Id]),
             page,
             per_page,
             ..Default::default()
@@ -412,7 +418,7 @@ impl ForumEndpoint {
         self.save_comment(&SaveThreadCommentOptions {
             id: None,
             thread_id: Some(thread_id),
-            comment: Some(comment.to_string()),
+            comment: Some(comment),
             ..Default::default()
         })
         .await
@@ -429,7 +435,7 @@ impl ForumEndpoint {
             id: None,
             thread_id: Some(thread_id),
             parent_comment_id: Some(parent_comment_id),
-            comment: Some(comment.to_string()),
+            comment: Some(comment),
             ..Default::default()
         })
         .await
@@ -443,7 +449,7 @@ impl ForumEndpoint {
     ) -> Result<ThreadComment, AniListError> {
         self.save_comment(&SaveThreadCommentOptions {
             id: Some(id),
-            comment: Some(comment.to_string()),
+            comment: Some(comment),
             ..Default::default()
         })
         .await

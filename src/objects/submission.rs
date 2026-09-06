@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterSubmission {
     pub id: i32,
@@ -23,7 +23,7 @@ pub struct CharacterSubmission {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterSubmissionConnection {
     pub edges: Option<Vec<CharacterSubmissionEdge>>,
@@ -32,7 +32,7 @@ pub struct CharacterSubmissionConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterSubmissionEdge {
     pub node: Option<CharacterSubmission>,
@@ -42,7 +42,7 @@ pub struct CharacterSubmissionEdge {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffSubmission {
     pub id: i32,

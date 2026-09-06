@@ -4,7 +4,7 @@ use serde_with::skip_serializing_none;
 use crate::objects::{common::PageInfo, media::MediaConnection};
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Studio {
     pub id: Option<i32>,
@@ -17,7 +17,7 @@ pub struct Studio {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StudioConnection {
     pub edges: Option<Vec<StudioEdge>>,
@@ -26,7 +26,7 @@ pub struct StudioConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StudioEdge {
     pub node: Option<Studio>,

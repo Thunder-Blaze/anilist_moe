@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Character {
     pub id: i32,
@@ -31,7 +31,7 @@ pub struct Character {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterConnection {
     pub edges: Option<Vec<CharacterEdge>>,
@@ -40,7 +40,7 @@ pub struct CharacterConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterEdge {
     pub node: Option<Character>,
@@ -54,7 +54,7 @@ pub struct CharacterEdge {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterImage {
     pub large: Option<String>,
@@ -62,7 +62,7 @@ pub struct CharacterImage {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterName {
     pub first: Option<String>,

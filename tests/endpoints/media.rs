@@ -3,16 +3,17 @@
 //! These tests verify that the media endpoint correctly fetches, parses,
 //! and returns data with proper types from the AniList API.
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::enums::media::{MediaSort, MediaType};
-use anilist_moe::{endpoints::media::*, AniListError};
+use anilist_moe::{AniListError, endpoints::media::*};
+use macro_rules_attribute::apply;
 
 /// Helper to create a test harness
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_media_with_search() {
     let h = harness();
     let client = h.client();
@@ -20,7 +21,7 @@ async fn test_fetch_media_with_search() {
     let result = h
         .run(|| async {
             let options = FetchMediaOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 ..Default::default()
@@ -53,10 +54,7 @@ async fn test_fetch_media_with_search() {
     assert!(media_list.len() <= 5, "Should respect perPage limit");
 
     let first_media = &media_list[0];
-    assert!(
-        first_media.id.unwrap_or(0) > 0,
-        "Media should have a positive ID"
-    );
+    assert!(first_media.id > 0, "Media should have a positive ID");
     assert!(first_media.title.is_some(), "Media should have a title");
 
     // Verify search relevance
@@ -75,7 +73,7 @@ async fn test_fetch_media_with_search() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_media_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -102,7 +100,7 @@ async fn test_fetch_media_by_id() {
     assert_eq!(media_list.len(), 1, "Should return exactly one media");
 
     let media = &media_list[0];
-    assert_eq!(media.id, Some(1), "Should return correct media ID");
+    assert_eq!(media.id, 1, "Should return correct media ID");
     assert!(media.title.is_some(), "Media should have a title");
 
     // Verify it's Cowboy Bebop
@@ -118,7 +116,7 @@ async fn test_fetch_media_by_id() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_one_media() {
     delay_between_tests().await;
     let h = harness();
@@ -141,11 +139,11 @@ async fn test_fetch_one_media() {
     );
 
     let media = result.unwrap();
-    assert_eq!(media.id, Some(1), "Should return media with ID 1");
+    assert_eq!(media.id, 1, "Should return media with ID 1");
     assert!(media.title.is_some(), "Media should have a title");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_media_data_types() {
     delay_between_tests().await;
     let h = harness();
@@ -167,7 +165,7 @@ async fn test_media_data_types() {
     let media = &response.data[0];
 
     // Verify ID is required and positive
-    assert!(media.id.unwrap_or(0) > 0, "ID should be positive");
+    assert!(media.id > 0, "ID should be positive");
 
     // Verify optional numeric fields have valid ranges
     if let Some(popularity) = media.popularity {
@@ -197,7 +195,7 @@ async fn test_media_data_types() {
     assert!(media.media_type.is_some(), "Media type should be present");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_fetch_media_pagination() {
     delay_between_tests().await;
     let h = harness();
@@ -210,7 +208,7 @@ async fn test_fetch_media_pagination() {
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(1),
-                sort: Some(vec![MediaSort::IdDesc]),
+                sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
             client.media().fetch(&options).await
@@ -228,7 +226,7 @@ async fn test_fetch_media_pagination() {
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(2),
-                sort: Some(vec![MediaSort::IdDesc]),
+                sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
             client.media().fetch(&options).await
@@ -268,19 +266,18 @@ async fn test_fetch_media_pagination() {
     }
 
     // Verify different pages have different results
-    let ids1: Vec<Option<i32>> = media_list1.iter().map(|m| m.id).collect();
-    let ids2: Vec<Option<i32>> = media_list2.iter().map(|m| m.id).collect();
+    let ids1: Vec<u32> = media_list1.iter().map(|m| m.id).collect();
+    let ids2: Vec<u32> = media_list2.iter().map(|m| m.id).collect();
     assert_ne!(ids1, ids2, "Different pages should have different results");
 
     // Verify IDs are in descending order within each page
     for window in ids1.windows(2) {
-        if let (Some(a), Some(b)) = (window[0], window[1]) {
-            assert!(a > b, "IDs should be in descending order");
-        }
+        let (a, b) = (window[0], window[1]);
+        assert!(a > b, "IDs should be in descending order");
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_get_trending_anime() {
     delay_between_tests().await;
     let h = harness();
@@ -297,7 +294,7 @@ async fn test_get_trending_anime() {
     assert!(response.data.len() <= 10, "Should respect per_page limit");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_get_popular_anime() {
     delay_between_tests().await;
     let h = harness();
@@ -323,7 +320,7 @@ async fn test_get_popular_anime() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_search_anime() {
     delay_between_tests().await;
     let h = harness();
@@ -360,7 +357,7 @@ async fn test_search_anime() {
     }
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_get_anime_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -374,12 +371,12 @@ async fn test_get_anime_by_id() {
     assert!(result.is_ok(), "Should successfully fetch anime by ID");
 
     let anime = result.unwrap();
-    assert_eq!(anime.id, Some(16498), "Should return correct anime");
+    assert_eq!(anime.id, 16498, "Should return correct anime");
     assert!(anime.title.is_some(), "Should have title");
     assert!(anime.average_score.is_some(), "Should have average score");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test!)]
 async fn test_nonexistent_media() {
     delay_between_tests().await;
     let h = harness();

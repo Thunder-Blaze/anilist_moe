@@ -4,7 +4,7 @@ use serde_with::skip_serializing_none;
 use crate::objects::{common::PageInfo, media::Media};
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringProgression {
     pub episode: Option<f32>,
@@ -13,7 +13,7 @@ pub struct AiringProgression {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringSchedule {
     pub id: Option<i32>,
@@ -25,7 +25,7 @@ pub struct AiringSchedule {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringScheduleConnection {
     pub edges: Option<Vec<AiringScheduleEdge>>,
@@ -34,7 +34,7 @@ pub struct AiringScheduleConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringScheduleEdge {
     pub id: Option<i32>,

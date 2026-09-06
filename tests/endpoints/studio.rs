@@ -1,13 +1,14 @@
 //! Tests for Studio endpoint
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::endpoints::studio::*;
+use macro_rules_attribute::apply;
 
 fn harness() -> TestHarness {
     TestHarness::new()
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_studio_by_search() {
     let h = harness();
     let client = h.client();
@@ -15,7 +16,7 @@ async fn test_fetch_studio_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStudioOptions {
-                search: Some("Kyoto".to_string()),
+                search: Some("Kyoto"),
                 per_page: Some(5),
                 ..Default::default()
             };
@@ -41,7 +42,7 @@ async fn test_fetch_studio_by_search() {
     assert!(first_studio.name.is_some(), "Studio should have a name");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_studio_by_id() {
     delay_between_tests().await;
     let h = harness();
@@ -69,7 +70,7 @@ async fn test_fetch_studio_by_id() {
     assert_eq!(studios[0].id, Some(2), "Should return correct studio ID");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_fetch_one_studio() {
     delay_between_tests().await;
     let h = harness();
@@ -95,7 +96,7 @@ async fn test_fetch_one_studio() {
     assert_eq!(studio.id, Some(2), "Should return studio with ID 2");
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_studio_data_types() {
     delay_between_tests().await;
     let h = harness();

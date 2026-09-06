@@ -7,10 +7,10 @@ use std::marker::PhantomData;
 
 /// Top-level GraphQL response wrapper.
 ///
-/// Wraps AniList GraphQL responses. The generic `T` is the actual data.
+/// Wraps `AniList` GraphQL responses. The generic `T` is the actual data.
 /// Notes: handled internally; endpoints typically return the inner `T`.
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GraphQLResponse<T> {
     pub data: T,
@@ -41,7 +41,7 @@ pub struct GraphQLResponse<T> {
 /// # }
 /// ```
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Page<T> {
     /// Pagination metadata including current page, total items, and whether there are more pages

@@ -3,24 +3,24 @@ use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::staff::Staff;
 use crate::{client::AniListClient, queries::staff};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching staff members.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchStaffOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchStaffOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    pub search: Option<String>,
+    pub search: Option<&'a str>,
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Vec<i32>>,
+    pub id_in: Option<&'a [i32]>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Vec<i32>>,
-    pub sort: Option<Vec<StaffSort>>,
+    pub id_not_in: Option<&'a [i32]>,
+    pub sort: Option<&'a [StaffSort]>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -56,19 +56,19 @@ pub struct FetchStaffOptions {
 
 /// Options for fetching a single staff member by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, Deserialize)]
-pub struct FetchStaffOneOptions {
+#[derive(Default, Debug, Serialize)]
+pub struct FetchStaffOneOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    pub search: Option<String>,
+    pub search: Option<&'a str>,
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Vec<i32>>,
+    pub id_in: Option<&'a [i32]>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Vec<i32>>,
-    pub sort: Option<Vec<StaffSort>>,
+    pub id_not_in: Option<&'a [i32]>,
+    pub sort: Option<&'a [StaffSort]>,
     // Sub-pagination variables
     #[serde(rename = "staffMediaPage")]
     pub staff_media_page: Option<i32>,
@@ -85,26 +85,30 @@ pub struct FetchStaffOneOptions {
 }
 
 /// Endpoint for staff member operations.
-pub struct StaffEndpoint {
-    client: AniListClient,
+pub struct StaffEndpoint<'a> {
+    client: &'a AniListClient,
 }
 
-impl StaffEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+impl<'a> StaffEndpoint<'a> {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
     pub async fn fetch(
         &self,
-        options: &FetchStaffOptions,
+        options: &FetchStaffOptions<'a>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         let query = staff::FETCH;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
-    pub async fn fetch_one(&self, options: &FetchStaffOneOptions) -> Result<Staff, AniListError> {
+    pub async fn fetch_one(
+        &self,
+        options: &FetchStaffOneOptions<'_>,
+    ) -> Result<Staff, AniListError> {
         let query = staff::FETCH_ONE;
-        self.client.fetch(query, Some(options)).await
+        self.client.fetch(query, Some(&options)).await
     }
 
     // Convenience functions
@@ -116,7 +120,7 @@ impl StaffEndpoint {
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(&FetchStaffOptions {
-            sort: Some(vec![StaffSort::FavouritesDesc]),
+            sort: Some(&[StaffSort::FavouritesDesc]),
             page,
             per_page,
             ..Default::default()
@@ -124,7 +128,7 @@ impl StaffEndpoint {
         .await
     }
 
-    /// Get most favorited staff (alias for get_popular)
+    /// Get most favorited staff (alias for `get_popular`)
     pub async fn get_most_favorited(
         &self,
         page: Option<i32>,
@@ -141,8 +145,8 @@ impl StaffEndpoint {
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(&FetchStaffOptions {
-            search: Some(query.to_string()),
-            sort: Some(vec![StaffSort::SearchMatch]),
+            search: Some(query),
+            sort: Some(&[StaffSort::SearchMatch]),
             page,
             per_page,
             ..Default::default()
@@ -167,7 +171,7 @@ impl StaffEndpoint {
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(&FetchStaffOptions {
             is_birthday: Some(true),
-            sort: Some(vec![StaffSort::FavouritesDesc]),
+            sort: Some(&[StaffSort::FavouritesDesc]),
             page,
             per_page,
             ..Default::default()

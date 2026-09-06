@@ -2,8 +2,9 @@ use anilist_moe::client::AniListClient;
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::MediaType;
 use anilist_moe::enums::staff::StaffLanguage;
+use macro_rules_attribute::apply;
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchMediaOptions {
@@ -100,7 +101,7 @@ async fn test_conditional_fetching() {
     // println!("{:#?}", media);
 }
 
-#[tokio::test]
+#[apply(smol_macros::test)]
 async fn test_conditional_fetching_without_includes() {
     let client = AniListClient::new();
     let options = FetchMediaOptions {

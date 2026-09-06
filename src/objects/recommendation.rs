@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Recommendation {
     pub id: i32,
@@ -20,7 +20,7 @@ pub struct Recommendation {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecommendationConnection {
     pub edges: Option<Vec<RecommendationEdge>>,
@@ -29,7 +29,7 @@ pub struct RecommendationConnection {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecommendationEdge {
     pub node: Option<Recommendation>,

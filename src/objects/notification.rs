@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityMessageNotification {
     pub id: i32,
@@ -27,7 +27,7 @@ pub struct ActivityMessageNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringNotification {
     pub id: i32,
@@ -41,7 +41,7 @@ pub struct AiringNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FollowingNotification {
     pub id: i32,
@@ -54,7 +54,7 @@ pub struct FollowingNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationOption {
     #[serde(rename = "type")]
@@ -63,7 +63,7 @@ pub struct NotificationOption {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RelatedMediaAdditionNotification {
     pub id: i32,
@@ -76,7 +76,7 @@ pub struct RelatedMediaAdditionNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadLikeNotification {
     pub id: i32,
@@ -91,7 +91,7 @@ pub struct ThreadLikeNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityMentionNotification {
     pub id: i32,
@@ -106,7 +106,7 @@ pub struct ActivityMentionNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityReplyNotification {
     pub id: i32,
@@ -121,7 +121,7 @@ pub struct ActivityReplyNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityReplySubscribedNotification {
     pub id: i32,
@@ -136,7 +136,7 @@ pub struct ActivityReplySubscribedNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityLikeNotification {
     pub id: i32,
@@ -151,7 +151,7 @@ pub struct ActivityLikeNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityReplyLikeNotification {
     pub id: i32,
@@ -166,7 +166,7 @@ pub struct ActivityReplyLikeNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadCommentMentionNotification {
     pub id: i32,
@@ -182,7 +182,7 @@ pub struct ThreadCommentMentionNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadCommentReplyNotification {
     pub id: i32,
@@ -198,7 +198,7 @@ pub struct ThreadCommentReplyNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadCommentSubscribedNotification {
     pub id: i32,
@@ -214,7 +214,7 @@ pub struct ThreadCommentSubscribedNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadCommentLikeNotification {
     pub id: i32,
@@ -230,7 +230,7 @@ pub struct ThreadCommentLikeNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaDataChangeNotification {
     pub id: i32,
@@ -244,7 +244,7 @@ pub struct MediaDataChangeNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaMergeNotification {
     pub id: i32,
@@ -259,7 +259,7 @@ pub struct MediaMergeNotification {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaDeletionNotification {
     pub id: i32,
