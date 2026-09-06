@@ -141,7 +141,7 @@ pub struct MediaEdge {
 }
 
 #[skip_serializing_none]
-#[derive( Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaExternalLink {
     pub id: i32,
@@ -158,7 +158,7 @@ pub struct MediaExternalLink {
 }
 
 #[skip_serializing_none]
-#[derive( Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaRank {
     pub id: i32,
@@ -173,7 +173,7 @@ pub struct MediaRank {
 }
 
 #[skip_serializing_none]
-#[derive( Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaStreamingEpisode {
     pub title: Option<String>,

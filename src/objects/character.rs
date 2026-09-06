@@ -62,7 +62,7 @@ pub struct CharacterImage {
 }
 
 #[skip_serializing_none]
-#[derive(Debug,  Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterName {
     pub first: Option<String>,

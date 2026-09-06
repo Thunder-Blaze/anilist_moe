@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug,   Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum NotificationType {
     #[serde(rename = "ACTIVITY_MESSAGE")]
     ActivityMessage,
