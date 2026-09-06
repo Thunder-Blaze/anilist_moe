@@ -347,6 +347,8 @@ impl<'a> MediaEndpoint<'a> {
         self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             sort: Some(&[MediaSort::PopularityDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -363,6 +365,8 @@ impl<'a> MediaEndpoint<'a> {
         self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             sort: Some(&[MediaSort::TrendingDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -380,6 +384,8 @@ impl<'a> MediaEndpoint<'a> {
             media_type: Some(MediaType::Anime),
             status: Some(MediaStatus::Releasing),
             sort: Some(&[MediaSort::PopularityDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -417,6 +423,8 @@ impl<'a> MediaEndpoint<'a> {
             season: Some(season),
             season_year: Some(year),
             sort: Some(&[MediaSort::PopularityDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -435,6 +443,8 @@ impl<'a> MediaEndpoint<'a> {
             media_type: Some(MediaType::Anime),
             search: Some(query),
             sort: Some(&[MediaSort::SearchMatch]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -460,6 +470,8 @@ impl<'a> MediaEndpoint<'a> {
         self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Anime),
             sort: Some(&[MediaSort::ScoreDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -478,6 +490,8 @@ impl<'a> MediaEndpoint<'a> {
         self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             sort: Some(&[MediaSort::PopularityDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -494,6 +508,8 @@ impl<'a> MediaEndpoint<'a> {
         self.fetch(&FetchMediaOptions {
             media_type: Some(MediaType::Manga),
             sort: Some(&[MediaSort::TrendingDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -511,6 +527,8 @@ impl<'a> MediaEndpoint<'a> {
             media_type: Some(MediaType::Manga),
             status: Some(MediaStatus::Releasing),
             sort: Some(&[MediaSort::PopularityDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -528,6 +546,8 @@ impl<'a> MediaEndpoint<'a> {
             media_type: Some(MediaType::Manga),
             status: Some(MediaStatus::Finished),
             sort: Some(&[MediaSort::PopularityDesc]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
@@ -546,6 +566,8 @@ impl<'a> MediaEndpoint<'a> {
             media_type: Some(MediaType::Manga),
             search: Some(query),
             sort: Some(&[MediaSort::SearchMatch]),
+            include_start_date: Some(true),
+            include_end_date: Some(true),
             page,
             per_page,
             ..Default::default()
