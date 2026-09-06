@@ -4,8 +4,8 @@
 //! transient network failures.
 
 use anilist_moe::{AniListClient, AniListError};
-use smol::lock::Mutex;
 use smol::Timer;
+use smol::lock::Mutex;
 use std::future::Future;
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
@@ -267,13 +267,15 @@ mod tests {
     fn test_is_rate_limit_error() {
         assert!(AniListError::RateLimitSimple.is_rate_limit_error());
         assert!(AniListError::BurstLimit.is_rate_limit_error());
-        assert!(AniListError::RateLimit {
-            limit: 90,
-            remaining: 0,
-            reset_at: 0,
-            retry_after: 60,
-        }
-        .is_rate_limit_error());
+        assert!(
+            AniListError::RateLimit {
+                limit: 90,
+                remaining: 0,
+                reset_at: 0,
+                retry_after: 60,
+            }
+            .is_rate_limit_error()
+        );
         assert!(!AniListError::NotFound.is_rate_limit_error());
         assert!(!AniListError::AuthenticationRequired.is_rate_limit_error());
     }

@@ -66,7 +66,8 @@ pub struct CharacterEndpoint<'a> {
 }
 
 impl<'a> CharacterEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
@@ -103,7 +104,7 @@ impl<'a> CharacterEndpoint<'a> {
         .await
     }
 
-    /// Get most favorited characters (alias for get_popular)
+    /// Get most favorited characters (alias for `get_popular`)
     pub async fn get_most_favorited(
         &self,
         page: Option<i32>,

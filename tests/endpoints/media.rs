@@ -3,9 +3,9 @@
 //! These tests verify that the media endpoint correctly fetches, parses,
 //! and returns data with proper types from the AniList API.
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::enums::media::{MediaSort, MediaType};
-use anilist_moe::{endpoints::media::*, AniListError};
+use anilist_moe::{AniListError, endpoints::media::*};
 use macro_rules_attribute::apply;
 
 /// Helper to create a test harness

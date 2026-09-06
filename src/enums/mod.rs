@@ -1,4 +1,4 @@
-//! Enumeration types for AniList API.
+//! Enumeration types for `AniList` API.
 //!
 //! This module contains all enum definitions used throughout the API,
 //! including media types, status values, sorting options, and more.

@@ -1,6 +1,6 @@
 //! Tests for User endpoint
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::endpoints::user::*;
 use macro_rules_attribute::apply;
 

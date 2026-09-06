@@ -34,7 +34,8 @@ pub struct NotificationEndpoint<'a> {
 }
 
 impl<'a> NotificationEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 

@@ -90,7 +90,8 @@ pub struct StaffEndpoint<'a> {
 }
 
 impl<'a> StaffEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
@@ -127,7 +128,7 @@ impl<'a> StaffEndpoint<'a> {
         .await
     }
 
-    /// Get most favorited staff (alias for get_popular)
+    /// Get most favorited staff (alias for `get_popular`)
     pub async fn get_most_favorited(
         &self,
         page: Option<i32>,

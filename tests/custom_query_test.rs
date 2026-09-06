@@ -7,7 +7,7 @@ mod test_harness;
 use anilist_moe::objects::{media::Media, responses::Page};
 use macro_rules_attribute::apply;
 use std::collections::HashMap;
-use test_harness::{delay_between_tests, TestHarness};
+use test_harness::{TestHarness, delay_between_tests};
 
 /// GraphQL query: id + title for up to 5 media
 const CUSTOM_MEDIA_QUERY: &str = r#"

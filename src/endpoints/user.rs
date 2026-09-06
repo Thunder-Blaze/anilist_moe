@@ -148,7 +148,8 @@ pub struct UserEndpoint<'a> {
 }
 
 impl<'a> UserEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 

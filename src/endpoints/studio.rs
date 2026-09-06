@@ -57,7 +57,8 @@ pub struct StudioEndpoint<'a> {
 }
 
 impl<'a> StudioEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 

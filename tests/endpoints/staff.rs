@@ -1,6 +1,6 @@
 //! Tests for Staff endpoint
 
-use crate::test_harness::{delay_between_tests, TestHarness};
+use crate::test_harness::{TestHarness, delay_between_tests};
 use anilist_moe::endpoints::staff::*;
 use macro_rules_attribute::apply;
 

@@ -46,7 +46,8 @@ pub struct RecommendationEndpoint<'a> {
 }
 
 impl<'a> RecommendationEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 

@@ -31,7 +31,7 @@ pub struct Staff {
     pub staff_media: Option<MediaConnection>,
     pub characters: Option<CharacterConnection>,
     pub character_media: Option<MediaConnection>,
-    pub staff: Box<Option<Staff>>,
+    pub staff: Box<Option<Self>>,
     pub submitter: Option<User>,
     pub submission_status: Option<i32>,
     pub submission_notes: Option<String>,

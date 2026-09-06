@@ -6,7 +6,7 @@
 /// Media queries and mutations
 pub mod media;
 
-/// MediaList queries and mutations
+/// `MediaList` queries and mutations
 pub mod medialist;
 
 /// Activity queries and mutations

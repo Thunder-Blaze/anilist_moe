@@ -66,7 +66,8 @@ pub struct ReviewEndpoint<'a> {
 }
 
 impl<'a> ReviewEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
@@ -158,7 +159,7 @@ impl<'a> ReviewEndpoint<'a> {
             })
             .await?;
 
-        if response.data.len() == 0 {
+        if response.data.is_empty() {
             return Err(AniListError::NotFound);
         }
 

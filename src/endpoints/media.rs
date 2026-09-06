@@ -282,8 +282,9 @@ pub struct MediaEndpoint<'a> {
 }
 
 impl<'a> MediaEndpoint<'a> {
-    /// Creates a new MediaEndpoint instance.
-    pub fn new(client: &'a AniListClient) -> Self {
+    /// Creates a new `MediaEndpoint` instance.
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 

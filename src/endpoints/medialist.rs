@@ -118,7 +118,8 @@ pub struct MediaListEndpoint<'a> {
 }
 
 impl<'a> MediaListEndpoint<'a> {
-    pub fn new(client: &'a AniListClient) -> Self {
+    #[must_use]
+    pub const fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
@@ -127,7 +128,7 @@ impl<'a> MediaListEndpoint<'a> {
         options: &FetchMediaListOptions<'_>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         let query = medialist::FETCH;
-        self.client.fetch(query, Some(&options)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn save(
@@ -143,13 +144,12 @@ impl<'a> MediaListEndpoint<'a> {
         options: &SaveMediaListMultipleOptions<'_>,
     ) -> Result<Vec<MediaList>, AniListError> {
         let query = medialist::SAVE_MULTIPLE;
-        self.client.fetch(query, Some(&options)).await
+        self.client.fetch(query, Some(options)).await
     }
 
     pub async fn delete(&self, options: &DeleteMediaListOptions) -> Result<bool, AniListError> {
         let query = medialist::DELETE;
-        let response: Result<Deleted, AniListError> =
-            self.client.fetch(query, Some(&options)).await;
+        let response: Result<Deleted, AniListError> = self.client.fetch(query, Some(options)).await;
         match response {
             Ok(res) => Ok(res.deleted.unwrap_or_default()),
             Err(err) => Err(err),

@@ -7,7 +7,7 @@ use std::marker::PhantomData;
 
 /// Top-level GraphQL response wrapper.
 ///
-/// Wraps AniList GraphQL responses. The generic `T` is the actual data.
+/// Wraps `AniList` GraphQL responses. The generic `T` is the actual data.
 /// Notes: handled internally; endpoints typically return the inner `T`.
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
