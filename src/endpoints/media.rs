@@ -232,7 +232,7 @@ pub struct FetchMediaOptions {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FetchMediaOneOptions {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     // Characters pagination
     #[serde(rename = "fetchCharacters")]
     pub fetch_characters: Option<bool>,
@@ -448,7 +448,7 @@ impl MediaEndpoint {
     }
 
     /// Get anime by ID
-    pub async fn get_anime_by_id(&self, id: i32) -> Result<Media, AniListError> {
+    pub async fn get_anime_by_id(&self, id: u32) -> Result<Media, AniListError> {
         self.fetch_one(&FetchMediaOneOptions {
             id: Some(id),
             ..Default::default()
@@ -571,7 +571,7 @@ impl MediaEndpoint {
     }
 
     /// Get manga by ID
-    pub async fn get_manga_by_id(&self, id: i32) -> Result<Media, AniListError> {
+    pub async fn get_manga_by_id(&self, id: u32) -> Result<Media, AniListError> {
         self.fetch_one(&FetchMediaOneOptions {
             id: Some(id),
             ..Default::default()

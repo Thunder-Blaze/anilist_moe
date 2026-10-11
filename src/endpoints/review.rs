@@ -150,7 +150,7 @@ impl ReviewEndpoint {
 
     /// Get review by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Review, AniListError> {
-        let response = self
+        let mut response = self
             .fetch(&FetchReviewOptions {
                 id: Some(id),
                 ..Default::default()
