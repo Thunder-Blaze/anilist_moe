@@ -20,7 +20,7 @@ async fn test_fetch_media_with_search() {
     let result = h
         .run(|| async {
             let options = FetchMediaOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 ..Default::default()
@@ -207,7 +207,7 @@ async fn test_fetch_media_pagination() {
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(1),
-                sort: Some(vec![MediaSort::IdDesc]),
+                sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
             client.media().fetch(&options).await
@@ -225,7 +225,7 @@ async fn test_fetch_media_pagination() {
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(2),
-                sort: Some(vec![MediaSort::IdDesc]),
+                sort: Some(&[MediaSort::IdDesc]),
                 ..Default::default()
             };
             client.media().fetch(&options).await

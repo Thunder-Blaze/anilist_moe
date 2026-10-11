@@ -15,7 +15,7 @@ async fn test_fetch_studio_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStudioOptions {
-                search: Some("Kyoto".to_string()),
+                search: Some("Kyoto"),
                 per_page: Some(5),
                 ..Default::default()
             };

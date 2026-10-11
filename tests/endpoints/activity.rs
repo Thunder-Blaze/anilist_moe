@@ -104,7 +104,7 @@ async fn test_text_activity_full_lifecycle() {
     let create_result = h
         .run(|| async {
             let save_options = SaveTextActivityOptions {
-                text: "Test activity from anilist_moe library - full lifecycle test".to_string(),
+                text: "Test activity from anilist_moe library - full lifecycle test",
                 id: None,
                 locked: None,
             };
@@ -135,7 +135,7 @@ async fn test_text_activity_full_lifecycle() {
         .run(|| async {
             let modify_options = SaveTextActivityOptions {
                 id: Some(activity_id),
-                text: "Modified test activity from anilist_moe library".to_string(),
+                text: "Modified test activity from anilist_moe library",
                 locked: None,
             };
             client.activity().save_text_activity(&modify_options).await
@@ -209,7 +209,7 @@ async fn test_message_activity_full_lifecycle() {
     let create_result = h
         .run(|| async {
             let save_options = SaveMessageActivityOptions {
-                message: "Heya - test from anilist_moe".to_string(),
+                message: "Heya - test from anilist_moe",
                 recipient_id: user_id,
                 id: None,
                 private: Some(true),
@@ -243,7 +243,7 @@ async fn test_message_activity_full_lifecycle() {
         .run(|| async {
             let modify_options = SaveMessageActivityOptions {
                 id: Some(activity_id),
-                message: "Modified message from anilist_moe".to_string(),
+                message: "Modified message from anilist_moe",
                 recipient_id: user_id,
                 private: Some(true),
                 locked: None,
@@ -297,7 +297,7 @@ async fn test_activity_reply() {
     let create_result = h
         .run(|| async {
             let save_options = SaveTextActivityOptions {
-                text: "Test activity for reply test".to_string(),
+                text: "Test activity for reply test",
                 id: None,
                 locked: None,
             };
@@ -320,7 +320,7 @@ async fn test_activity_reply() {
     let reply_result = h
         .run(|| async {
             let save_reply_options = SaveActivityReplyOptions {
-                text: "Test reply from anilist_moe library".to_string(),
+                text: "Test reply from anilist_moe library",
                 activity_id,
                 id: None,
             };

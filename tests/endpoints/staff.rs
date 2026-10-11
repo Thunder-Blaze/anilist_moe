@@ -15,7 +15,7 @@ async fn test_fetch_staff_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStaffOptions {
-                search: Some("Hayao".to_string()),
+                search: Some("Hayao"),
                 ..Default::default()
             };
             client.staff().fetch(&options).await
@@ -158,7 +158,7 @@ async fn test_staff_with_popularity() {
     let result = h
         .run(|| async {
             let options = FetchStaffOptions {
-                search: Some("Kamiya".to_string()), // Common voice actor name
+                search: Some("Kamiya"), // Common voice actor name
                 per_page: Some(5),
                 ..Default::default()
             };
@@ -172,7 +172,11 @@ async fn test_staff_with_popularity() {
     assert!(!response.data.is_empty(), "Should return results");
 
     for staff in &response.data {
-        assert!(staff.id > 0, "Staff ID should be positive");
+        assert!(
+            staff.id > 0,
+            "Staff
+ ID should be positive"
+        );
         println!(
             "Staff: {:?} (ID: {})",
             staff.name.as_ref().and_then(|n| n.full.as_ref()),

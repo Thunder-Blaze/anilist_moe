@@ -8,7 +8,7 @@ async fn main() -> Result<(), AniListError> {
     let popular_anime = client
         .media()
         .fetch(&FetchMediaOptions {
-            sort: Some(vec![anilist_moe::enums::media::MediaSort::PopularityDesc]),
+            sort: Some(&[anilist_moe::enums::media::MediaSort::PopularityDesc]),
             per_page: Some(5),
             page: Some(1),
             ..Default::default()
