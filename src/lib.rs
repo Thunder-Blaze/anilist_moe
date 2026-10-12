@@ -199,6 +199,8 @@
 //! }
 //! ```
 
+#![doc = include_str!("../EXAMPLES.md")]
+
 pub mod client;
 pub mod endpoints;
 pub mod enums;
