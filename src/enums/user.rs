@@ -1,6 +1,7 @@
+use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum UserSort {
     Id,
@@ -22,7 +23,7 @@ pub enum UserStaffNameLanguage {
     Native,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum UserStatisticsSort {
     Id,
@@ -44,4 +45,16 @@ pub enum UserTitleLanguage {
     RomajiStylised,
     EnglishStylised,
     NativeStylised,
+}
+
+impl SortSpec for UserSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
+}
+
+impl SortSpec for UserStatisticsSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }

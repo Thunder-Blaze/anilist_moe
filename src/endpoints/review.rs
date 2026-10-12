@@ -5,6 +5,8 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::review::Review;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -24,6 +26,12 @@ pub struct FetchReviewOptions<'a> {
     pub user_id: Option<i32>,
     #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [ReviewSort]>>,
     // HTML rendering options
     #[serde(rename = "body_as_html")]
@@ -208,5 +216,18 @@ impl<'a> ReviewEndpoint<'a> {
             rating => rating,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchReviewOptions<'a> {
+    type Item = Review;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<Review>>, AniListError> {
+        client.review().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

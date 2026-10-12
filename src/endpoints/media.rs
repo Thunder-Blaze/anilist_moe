@@ -4,6 +4,8 @@ use crate::errors::AniListError;
 use crate::objects::media::Media;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::media};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -138,6 +140,12 @@ pub struct FetchMediaOptions<'a> {
     pub volumes_greater: Option<i32>,
     #[serde(rename = "volumes_lesser")]
     pub volumes_lesser: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [MediaSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -603,5 +611,18 @@ impl<'a> MediaEndpoint<'a> {
             per_page,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchMediaOptions<'a> {
+    type Item = Media;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<Media>>, AniListError> {
+        client.media().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

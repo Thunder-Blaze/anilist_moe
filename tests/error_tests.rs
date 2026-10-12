@@ -1,15 +1,50 @@
 //! Tests for error types and error handling
 
-use anilist_moe::errors::AniListError;
+use anilist_moe::errors::{AniListError, GraphQLError};
 
 #[test]
 fn test_error_display_graphql() {
     let error = AniListError::GraphQL {
-        message: "Field 'test' not found".to_string(),
+        errors: vec![GraphQLError::new("Field 'test' not found")],
+        data: None,
     };
     let display = format!("{}", error);
     assert!(display.contains("GraphQL error"));
     assert!(display.contains("Field 'test' not found"));
+}
+
+#[test]
+fn test_graphql_errors_expose_the_payload() {
+    let error = AniListError::GraphQL {
+        errors: vec![
+            GraphQLError {
+                message: "Cannot query field \"nope\".".to_string(),
+                path: Some(vec![serde_json::json!("Media")]),
+                locations: Some(vec![anilist_moe::errors::GraphQLLocation {
+                    line: 2,
+                    column: 3,
+                }]),
+                extensions: None,
+            },
+            GraphQLError::new("and another"),
+        ],
+        data: Some(serde_json::json!({"Media": {"id": 1}})),
+    };
+
+    let errors = error.graphql_errors().expect("structured errors");
+    assert_eq!(errors.len(), 2);
+    assert_eq!(errors[0].path.as_ref().unwrap()[0], "Media");
+    assert_eq!(errors[0].locations.as_ref().unwrap()[0].line, 2);
+    assert!(error.graphql_message_contains("cannot query"));
+    assert!(!error.graphql_message_contains("absent"));
+
+    // The display string stays readable for logging.
+    assert_eq!(
+        error.to_string(),
+        "GraphQL error: Cannot query field \"nope\"., and another"
+    );
+
+    assert!(!AniListError::NotFound.graphql_message_contains("anything"));
 }
 
 #[test]

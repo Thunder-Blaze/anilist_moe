@@ -3,6 +3,8 @@ use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::studio::Studio;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::studio};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -23,6 +25,12 @@ pub struct FetchStudioOptions<'a> {
     pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [i32]>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [StudioSort]>>,
     // Extra
     #[serde(rename = "includeMedia")]
@@ -46,6 +54,12 @@ pub struct FetchStudioOneOptions<'a> {
     pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [i32]>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [StudioSort]>>,
     // Sub-pagination variables
     #[serde(rename = "mediaPage")]
@@ -121,5 +135,18 @@ impl<'a> StudioEndpoint<'a> {
             id: Some(id),
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchStudioOptions<'a> {
+    type Item = Studio;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<Studio>>, AniListError> {
+        client.studio().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

@@ -4,6 +4,8 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::thread::{Thread, ThreadComment};
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -25,6 +27,12 @@ pub struct FetchThreadOptions<'a> {
     pub category_id: Option<i32>,
     #[serde(rename = "mediaCategoryId")]
     pub media_category_id: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [ThreadSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -70,6 +78,12 @@ pub struct FetchThreadCommentOptions<'a> {
     pub thread_id: Option<i32>,
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -493,5 +507,34 @@ impl<'a> ForumEndpoint<'a> {
             thread_id => thread_id,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchThreadOptions<'a> {
+    type Item = Thread;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<Thread>>, AniListError> {
+        client.forum().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchThreadCommentOptions<'a> {
+    type Item = ThreadComment;
+
+    async fn fetch(
+        &self,
+        client: &AniListClient,
+    ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
+        client.forum().fetch_comments(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

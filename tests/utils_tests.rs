@@ -55,10 +55,14 @@ fn test_calculate_delay_boundary_conditions() {
 #[test]
 fn test_retry_config_default() {
     let config = RetryConfig::default();
-    assert_eq!(config.max_retries, 3);
+    assert_eq!(
+        config.max_retries, 0,
+        "retries are opt-in, so the default retries nothing"
+    );
     assert_eq!(config.base_delay_ms, 1000);
     assert!(config.exponential_backoff);
     assert_eq!(config.max_delay_ms, 30000);
+    assert!(!config.retry_transient_errors);
 }
 
 #[test]
@@ -95,6 +99,8 @@ fn test_retry_config_equality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let config2 = RetryConfig {
@@ -102,6 +108,8 @@ fn test_retry_config_equality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     assert_eq!(config1, config2);
@@ -114,6 +122,8 @@ fn test_retry_config_inequality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let config2 = RetryConfig {
@@ -121,6 +131,8 @@ fn test_retry_config_inequality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     assert_ne!(config1, config2);
@@ -133,6 +145,8 @@ fn test_retry_config_copy() {
         base_delay_ms: 2000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     // Use copy semantics instead of clone

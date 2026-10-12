@@ -1,3 +1,4 @@
+use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
@@ -9,11 +10,17 @@ pub enum RecommendationRating {
     RateDown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RecommendationSort {
     Id,
     IdDesc,
     Rating,
     RatingDesc,
+}
+
+impl SortSpec for RecommendationSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }

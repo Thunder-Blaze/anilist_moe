@@ -5,6 +5,8 @@ use crate::objects::common::{Deleted, FuzzyDate};
 use crate::objects::media_list::MediaList;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::medialist};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -58,6 +60,12 @@ pub struct FetchMediaListOptions<'a> {
     pub completed_at_lesser: Option<FuzzyDate>,
     #[serde(rename = "completedAt_like")]
     pub completed_at_like: Option<Cow<'a, str>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [MediaListSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -423,5 +431,18 @@ impl<'a> MediaListEndpoint<'a> {
             id => entry_id,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchMediaListOptions<'a> {
+    type Item = MediaList;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<MediaList>>, AniListError> {
+        client.medialist().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

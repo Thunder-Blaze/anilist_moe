@@ -24,6 +24,11 @@ This directory contains **24 comprehensive integration tests** for all AniList A
 
 ## 🚀 Running Tests
 
+These are the **live tests**: they call the real AniList API, are rate limited,
+and must run one thread at a time. CI skips them on ordinary pushes and only
+runs them on a schedule, on a manual `workflow_dispatch`, or on a pull request
+labelled `run-live-tests`.
+
 ### Run All Endpoint Tests
 ```bash
 cargo test --test endpoint_tests
@@ -42,6 +47,31 @@ cargo test --test endpoint_tests character
 ```bash
 cargo test --test endpoint_tests -- --test-threads=1
 ```
+
+### Tuning the Rate Limit
+
+The harness sends at most 80 requests per 60s window by default, which stays
+under AniList's 90 requests per minute. Override any of it for a run:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `ANILIST_TEST_WINDOW_REQUESTS` | 80 | requests allowed per window |
+| `ANILIST_TEST_WINDOW_SECS` | 60 | length of the window |
+| `ANILIST_TEST_PAUSE_SECS` | 61 | pause after a 429 without `Retry-After` |
+| `ANILIST_TEST_MIN_DELAY_MS` | 700 | minimum delay between two requests |
+| `ANILIST_TEST_MAX_RETRIES` | 3 | transient network failures retried per request |
+| `ANILIST_TEST_RETRY_DELAY_MS` | 2000 | delay between those retries |
+
+```bash
+# Slower run that is kind to the API
+ANILIST_TEST_MIN_DELAY_MS=1500 cargo test --test endpoint_tests -- --test-threads=1
+
+# Quick smoke run
+ANILIST_TEST_WINDOW_REQUESTS=20 ANILIST_TEST_MIN_DELAY_MS=100 cargo test --test endpoint_tests
+```
+
+A 429 pauses every thread for the `Retry-After` the API sent, or
+`ANILIST_TEST_PAUSE_SECS` when the response carried no such header.
 
 ## 📝 What Each Test Verifies
 

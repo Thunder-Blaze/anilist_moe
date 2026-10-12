@@ -21,7 +21,94 @@ thiserror = "1.0"
 chrono = "0.4.41"
 dotenv = "0.15.0"
 log = "0.4.22"
+tracing = { version = "0.1", optional = true }
+
+# Endpoint feature flags.
+#
+# Every AniList endpoint group is gated behind its own feature, and `default`
+# enables the `full` umbrella so existing users are unaffected. To build a lean
+# client, disable default features and opt in to only what you need:
+#
+# ```toml
+# anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+# ```
+#
+# `cargo build --no-default-features` yields a client with no endpoints at all;
+# it still compiles and only loses the accessor methods for the disabled groups.
+#
+# Feature matrix (feature -> endpoints module -> `AniListClient` accessors):
+#
+# | Feature          | Endpoints module        | Client accessors                     |
+# |------------------|-------------------------|--------------------------------------|
+# | `media`          | `endpoints::media`      | `media()`, `anime()`, `manga()`      |
+# | `medialist`      | `endpoints::medialist`  | `medialist()`                        |
+# | `user`           | `endpoints::user`       | `user()`                             |
+# | `character`      | `endpoints::character`  | `character()`                        |
+# | `staff`          | `endpoints::staff`      | `staff()`                            |
+# | `studio`         | `endpoints::studio`     | `studio()`                           |
+# | `forum`          | `endpoints::forum`      | `forum()`                            |
+# | `activity`       | `endpoints::activity`   | `activity()`                         |
+# | `review`         | `endpoints::review`     | `review()`                           |
+# | `recommendation` | `endpoints::recommendation` | `recommendation()`              |
+# | `airing`         | `endpoints::airing`     | `airing()`                           |
+# | `notification`   | `endpoints::notification` | `notification()`                   |
+# | `common`         | `endpoints::common`     | `common()`                           |
+# | `full`           | all of the above        | all of the above                     |
+[features]
+# Enable everything, matching the pre-feature-flag behaviour.
+default = ["full"]
+
+# Emit `tracing` spans and events for the request lifecycle. Adds no cost when off.
+tracing = ["dep:tracing"]
+
+# Walk the pages of a list query with `Paginator` and `AniListClient::paginate`.
+pagination = []
+
+# Umbrella feature pulling in every endpoint group listed below.
+full = [
+  "media",
+  "medialist",
+  "user",
+  "character",
+  "staff",
+  "studio",
+  "forum",
+  "activity",
+  "review",
+  "recommendation",
+  "airing",
+  "notification",
+  "common",
+]
+
+# Anime and manga operations (search, trending, details).
+media = []
+# User anime/manga list operations.
+medialist = []
+# User profiles, statistics, favourites, and following.
+user = []
+# Character operations (search, popular, birthdays).
+character = []
+# Staff member operations (search, popular, birthdays).
+staff = []
+# Studio operations (search, productions).
+studio = []
+# Forum threads, comments, and categories.
+forum = []
+# Activity feed operations (text posts, list updates, replies).
+activity = []
+# Review operations (create, read, update, delete).
+review = []
+# Recommendation operations (browse, manage).
+recommendation = []
+# Airing schedule operations (upcoming, recently aired).
+airing = []
+# Notification operations (read, manage).
+notification = []
+# Common operations (likes, follows, favourites).
+common = []
 
 [dev-dependencies]
 husky-rs = "0.1.5"
+parking_lot = "0.12"
 tokio-test = "0.4"

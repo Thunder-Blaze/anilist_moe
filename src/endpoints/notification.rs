@@ -2,6 +2,8 @@ use crate::enums::notification::NotificationType;
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::unions::notification::NotificationUnion;
 use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
@@ -89,5 +91,21 @@ impl<'a> NotificationEndpoint<'a> {
             per_page,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for NotificationSearchOptions<'a> {
+    type Item = NotificationUnion;
+
+    async fn fetch(
+        &self,
+        client: &AniListClient,
+    ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
+        client.notification().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

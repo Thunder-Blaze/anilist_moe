@@ -20,6 +20,51 @@
 //! - **Pagination**: Built-in support for paginated results across all endpoints
 //! - **Convenience Functions**: 80+ helper functions for common queries
 //!
+//! ## Feature Flags
+//!
+//! Each endpoint group is behind its own Cargo feature. The `default` feature
+//! enables `full`, which turns on every group, so existing users are unaffected.
+//! Building with `--no-default-features` produces a client with no endpoints
+//! (it still compiles; only the disabled accessor methods disappear).
+//!
+//! ```toml
+//! # Lean client: only the media and user endpoints.
+//! anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+//! ```
+//!
+//! | Feature          | Endpoint module             | Client accessor                      |
+//! |------------------|-----------------------------|--------------------------------------|
+//! | `media`          | `endpoints::media`          | `media()`, `anime()`, `manga()`      |
+//! | `medialist`      | `endpoints::medialist`      | `medialist()`                        |
+//! | `user`           | `endpoints::user`           | `user()`                             |
+//! | `character`      | `endpoints::character`      | `character()`                        |
+//! | `staff`          | `endpoints::staff`          | `staff()`                            |
+//! | `studio`         | `endpoints::studio`         | `studio()`                           |
+//! | `forum`          | `endpoints::forum`          | `forum()`                            |
+//! | `activity`       | `endpoints::activity`       | `activity()`                         |
+//! | `review`         | `endpoints::review`         | `review()`                           |
+//! | `recommendation` | `endpoints::recommendation` | `recommendation()`                   |
+//! | `airing`         | `endpoints::airing`         | `airing()`                           |
+//! | `notification`   | `endpoints::notification`   | `notification()`                     |
+//! | `common`         | `endpoints::common`         | `common()`                           |
+//! | `full`           | all of the above            | all of the above                     |
+//!
+//! `tracing` is separate and off by default: it instruments the request
+//! lifecycle with spans and events (operation, attempt, status, elapsed time)
+//! and compiles to nothing when disabled. The token is never logged.
+//!
+//! ```toml
+//! anilist_moe = { version = "0.3", features = ["tracing"] }
+//! ```
+//!
+//! `pagination` adds the page walk: `AniListClient::paginate(options)` gives a
+//! cursor that asks for one page at a time and yields pages or entries. It pulls
+//! in no dependency and is off by default.
+//!
+//! ```toml
+//! anilist_moe = { version = "0.3", features = ["pagination"] }
+//! ```
+//!
 //! ## Supported Endpoints
 //!
 //! ### Core Content
@@ -142,7 +187,9 @@
 //!     match client.media().get_anime_by_id(999999).await {
 //!         Ok(anime) => println!("Found: {:?}", anime),
 //!         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
-//!         Err(AniListError::GraphQL { message, .. }) => eprintln!("API error: {}", message),
+//!         Err(AniListError::GraphQL { errors, .. }) => {
+//!             eprintln!("API error: {}", errors[0].message())
+//!         }
 //!         Err(AniListError::NotFound) => eprintln!("Not found"),
 //!         Err(AniListError::RateLimit { .. }) => eprintln!("Rate limited"),
 //!         Err(AniListError::RateLimitSimple) => eprintln!("Rate limited"),
@@ -158,7 +205,10 @@ pub mod enums;
 pub mod errors;
 pub mod objects;
 pub mod options;
+#[cfg(feature = "pagination")]
+pub mod pagination;
 pub mod queries;
+pub mod transport;
 pub mod unions;
 pub mod utils;
 

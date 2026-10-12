@@ -3,6 +3,8 @@ use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::airing};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -46,6 +48,12 @@ pub struct FetchAiringOptions<'a> {
     pub airing_at_greater: Option<i32>,
     #[serde(rename = "airingAt_lesser")]
     pub airing_at_lesser: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset keeps the order the query document asks for.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub sort: Option<Cow<'a, [AiringSort]>>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -132,5 +140,21 @@ impl<'a> AiringEndpoint<'a> {
             per_page,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchAiringOptions<'a> {
+    type Item = AiringSchedule;
+
+    async fn fetch(
+        &self,
+        client: &AniListClient,
+    ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
+        client.airing().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

@@ -3,6 +3,10 @@
 //! Coordinates pauses across threads on 429 responses and retries
 //! transient network failures.
 
+// This module is shared by several test binaries and each uses a different part
+// of it, so the unused helpers are expected rather than dead code.
+#![allow(dead_code)]
+
 use anilist_moe::{AniListClient, AniListError};
 use std::future::Future;
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
@@ -10,12 +14,76 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tokio::sync::Mutex;
 use tokio::time::sleep;
 
-/// Rate limit configuration for tests
-const RATE_LIMIT_PAUSE_SECS: u64 = 61; // Pause duration after 429
-const MIN_DELAY_BETWEEN_REQUESTS_MS: u64 = 700; // Per-request delay
-const RATE_LIMIT_WINDOW_REQUESTS: u32 = 80; // Soft cap (< 90/min)
-const MAX_NETWORK_RETRIES: u32 = 3; // Retry budget
-const NETWORK_RETRY_DELAY_MS: u64 = 2000; // Backoff between retries
+/// Runtime configuration for the harness.
+///
+/// Read once from the environment, so a test run can be tuned without a rebuild.
+/// AniList allows 90 requests per minute per IP; the defaults stay a little under
+/// that so a full run does not trip the limit.
+///
+/// | Variable | Default | Meaning |
+/// |---|---|---|
+/// | `ANILIST_TEST_WINDOW_REQUESTS` | 80 | requests the harness lets through per window |
+/// | `ANILIST_TEST_WINDOW_SECS` | 60 | length of that window |
+/// | `ANILIST_TEST_PAUSE_SECS` | 61 | pause after a 429 that carries no `Retry-After` |
+/// | `ANILIST_TEST_MIN_DELAY_MS` | 700 | minimum delay between two requests |
+/// | `ANILIST_TEST_MAX_RETRIES` | 3 | transient network failures retried per request |
+/// | `ANILIST_TEST_RETRY_DELAY_MS` | 2000 | delay between those retries |
+#[derive(Debug, Clone, Copy)]
+pub struct TestConfig {
+    /// Requests allowed inside `window_secs` before the harness waits.
+    pub window_requests: u32,
+    /// Length of the rate limit window, in seconds.
+    pub window_secs: u64,
+    /// Pause applied after a 429 that carries no `Retry-After` header.
+    pub pause_secs: u64,
+    /// Minimum delay between two requests, in milliseconds.
+    pub min_delay_ms: u64,
+    /// Transient network failures retried per request.
+    pub max_network_retries: u32,
+    /// Delay between those retries, in milliseconds.
+    pub retry_delay_ms: u64,
+}
+
+impl TestConfig {
+    /// Reads the configuration from the environment, falling back to the defaults.
+    #[must_use]
+    pub fn from_env() -> Self {
+        Self::from_lookup(|key| std::env::var(key).ok())
+    }
+
+    /// Builds a configuration from `lookup`, falling back to the documented defaults.
+    fn from_lookup(mut lookup: impl FnMut(&str) -> Option<String>) -> Self {
+        fn parse<T: std::str::FromStr>(value: Option<String>, default: T) -> T {
+            value
+                .and_then(|value| value.trim().parse().ok())
+                .unwrap_or(default)
+        }
+
+        Self {
+            window_requests: parse(lookup("ANILIST_TEST_WINDOW_REQUESTS"), 80),
+            window_secs: parse(lookup("ANILIST_TEST_WINDOW_SECS"), 60),
+            pause_secs: parse(lookup("ANILIST_TEST_PAUSE_SECS"), 61),
+            min_delay_ms: parse(lookup("ANILIST_TEST_MIN_DELAY_MS"), 700),
+            max_network_retries: parse(lookup("ANILIST_TEST_MAX_RETRIES"), 3),
+            retry_delay_ms: parse(lookup("ANILIST_TEST_RETRY_DELAY_MS"), 2000),
+        }
+    }
+
+    /// The configuration for this test process.
+    pub fn get() -> &'static Self {
+        &CONFIG
+    }
+}
+
+/// Parsed once per test process; the initializer is declared with the cell.
+static CONFIG: std::sync::LazyLock<TestConfig> = std::sync::LazyLock::new(|| {
+    let config = TestConfig::from_env();
+    eprintln!(
+        "Test harness: {} requests / {}s window, {}s pause on 429, {}ms between requests",
+        config.window_requests, config.window_secs, config.pause_secs, config.min_delay_ms
+    );
+    config
+});
 
 /// Global rate limiter shared across tests
 static GLOBAL_RATE_LIMITER: GlobalRateLimiter = GlobalRateLimiter::new();
@@ -50,12 +118,12 @@ impl GlobalRateLimiter {
             .as_secs()
     }
 
-    /// Start a global pause
-    pub fn trigger_pause(&self) {
-        let pause_end = Self::now_secs() + RATE_LIMIT_PAUSE_SECS;
+    /// Start a global pause for `secs` seconds.
+    pub fn trigger_pause(&self, secs: u64) {
+        let pause_end = Self::now_secs() + secs;
         self.pause_until.store(pause_end, Ordering::SeqCst);
         self.is_paused.store(true, Ordering::SeqCst);
-        eprintln!("Rate limit hit. Pausing {}s", RATE_LIMIT_PAUSE_SECS);
+        eprintln!("Rate limit hit. Pausing {secs}s");
     }
 
     /// Wait while a pause is active
@@ -79,24 +147,25 @@ impl GlobalRateLimiter {
     pub async fn pre_request(&self) {
         self.wait_if_paused().await;
 
+        let config = TestConfig::get();
         let now = Self::now_secs();
         let window_start = self.window_start.load(Ordering::SeqCst);
 
-        if now - window_start >= 60 {
+        if now - window_start >= config.window_secs {
             self.window_start.store(now, Ordering::SeqCst);
             self.request_count.store(0, Ordering::SeqCst);
         }
 
         let count = self.request_count.fetch_add(1, Ordering::SeqCst);
-        if count >= RATE_LIMIT_WINDOW_REQUESTS {
+        if count >= config.window_requests {
             let window_start = self.window_start.load(Ordering::SeqCst);
             let elapsed = now - window_start;
 
-            if elapsed < 60 {
-                let wait_secs = 60 - elapsed;
+            if elapsed < config.window_secs {
+                let wait_secs = config.window_secs - elapsed;
                 eprintln!(
                     "⚠️  Approaching rate limit ({}/{} requests). Waiting {} seconds...",
-                    count, RATE_LIMIT_WINDOW_REQUESTS, wait_secs
+                    count, config.window_requests, wait_secs
                 );
                 sleep(Duration::from_secs(wait_secs + 1)).await;
                 self.window_start.store(Self::now_secs(), Ordering::SeqCst);
@@ -104,12 +173,15 @@ impl GlobalRateLimiter {
             }
         }
 
-        sleep(Duration::from_millis(MIN_DELAY_BETWEEN_REQUESTS_MS)).await;
+        sleep(Duration::from_millis(config.min_delay_ms)).await;
     }
 
-    /// Handle a rate limit error (global pause)
-    pub async fn handle_rate_limit(&self) {
-        self.trigger_pause();
+    /// Handle a rate limit error (global pause).
+    ///
+    /// `server_retry_after` is the `Retry-After` the API sent, in seconds; the
+    /// configured pause is used when it is missing.
+    pub async fn handle_rate_limit(&self, server_retry_after: Option<u64>) {
+        self.trigger_pause(server_retry_after.unwrap_or(TestConfig::get().pause_secs));
         self.wait_if_paused().await;
         self.window_start.store(Self::now_secs(), Ordering::SeqCst);
         self.request_count.store(0, Ordering::SeqCst);
@@ -150,8 +222,9 @@ impl TestHarness {
     /// 1. Waits if there's a global pause in effect
     /// 2. Enforces a minimum delay between requests
     /// 3. Tracks request counts within a window
-    /// 4. Retries on transient network errors (up to MAX_NETWORK_RETRIES times)
-    /// 5. Triggers a GLOBAL pause (all threads) when rate limited
+    /// 4. Retries on transient network errors (up to `max_network_retries` times)
+    /// 5. Triggers a GLOBAL pause (all threads) when rate limited, for as long as
+    ///    the API asked for
     /// 6. Retries the operation after the pause
     pub async fn run<F, Fut, T, E>(&self, operation: F) -> Result<T, E>
     where
@@ -159,6 +232,7 @@ impl TestHarness {
         Fut: Future<Output = Result<T, E>>,
         E: std::fmt::Debug + IsRetryableError,
     {
+        let config = TestConfig::get();
         let mut network_retries = 0u32;
 
         loop {
@@ -180,24 +254,26 @@ impl TestHarness {
                     return Ok(result);
                 }
                 Err(e) if e.is_rate_limit_error() => {
-                    // Trigger global pause for ALL threads
-                    GLOBAL_RATE_LIMITER.handle_rate_limit().await;
+                    // Trigger global pause for ALL threads, honouring Retry-After
+                    GLOBAL_RATE_LIMITER
+                        .handle_rate_limit(e.retry_after_secs())
+                        .await;
                     // Loop will retry after pause
                 }
-                Err(e) if e.is_network_error() && network_retries < MAX_NETWORK_RETRIES => {
+                Err(e) if e.is_network_error() && network_retries < config.max_network_retries => {
                     network_retries += 1;
                     eprintln!(
                         "🔄 Network error, retrying ({}/{})...: {:?}",
-                        network_retries, MAX_NETWORK_RETRIES, e
+                        network_retries, config.max_network_retries, e
                     );
-                    sleep(Duration::from_millis(NETWORK_RETRY_DELAY_MS)).await;
+                    sleep(Duration::from_millis(config.retry_delay_ms)).await;
                     // Loop will retry
                 }
                 Err(e) => {
                     if network_retries > 0 {
                         eprintln!(
                             "❌ Max network retries ({}) reached. Failing test.",
-                            MAX_NETWORK_RETRIES
+                            config.max_network_retries
                         );
                     }
                     return Err(e);
@@ -217,6 +293,11 @@ impl Default for TestHarness {
 pub trait IsRetryableError {
     fn is_rate_limit_error(&self) -> bool;
     fn is_network_error(&self) -> bool;
+
+    /// The `Retry-After` the API sent for a rate limit error, when it did.
+    fn retry_after_secs(&self) -> Option<u64> {
+        None
+    }
 }
 
 impl IsRetryableError for AniListError {
@@ -232,6 +313,13 @@ impl IsRetryableError for AniListError {
     fn is_network_error(&self) -> bool {
         matches!(self, AniListError::Network(_))
     }
+
+    fn retry_after_secs(&self) -> Option<u64> {
+        match self {
+            AniListError::RateLimit { retry_after, .. } => Some(u64::from(*retry_after)),
+            _ => None,
+        }
+    }
 }
 
 /// Gets an authenticated test harness
@@ -245,9 +333,9 @@ pub fn get_authenticated_harness() -> Option<TestHarness> {
         .map(|token| TestHarness::with_token(&token))
 }
 
-/// Pauses for the rate limit window reset period (triggers global pause)
+/// Pauses for the configured rate limit window reset period (triggers global pause)
 pub async fn pause_for_rate_limit() {
-    GLOBAL_RATE_LIMITER.handle_rate_limit().await;
+    GLOBAL_RATE_LIMITER.handle_rate_limit(None).await;
 }
 
 /// A simple delay between tests to avoid rate limiting
@@ -296,5 +384,65 @@ mod tests {
     fn test_global_rate_limiter_now() {
         let now = GlobalRateLimiter::now_secs();
         assert!(now > 0);
+    }
+
+    #[test]
+    fn test_config_defaults() {
+        // No environment input: every field falls back to the documented default.
+        let config = TestConfig::from_lookup(|_| None);
+        assert_eq!(config.window_requests, 80);
+        assert_eq!(config.window_secs, 60);
+        assert_eq!(config.pause_secs, 61);
+        assert_eq!(config.min_delay_ms, 700);
+        assert_eq!(config.max_network_retries, 3);
+        assert_eq!(config.retry_delay_ms, 2000);
+        assert!(
+            config.window_requests < 90,
+            "the default must stay under the API limit"
+        );
+    }
+
+    #[test]
+    fn test_config_overrides_and_bad_values() {
+        let config = TestConfig::from_lookup(|key| match key {
+            "ANILIST_TEST_WINDOW_REQUESTS" => Some("7".to_string()),
+            "ANILIST_TEST_WINDOW_SECS" => Some("not a number".to_string()),
+            "ANILIST_TEST_MAX_RETRIES" => Some(" 5 ".to_string()),
+            _ => None,
+        });
+        assert_eq!(config.window_requests, 7, "override applies");
+        assert_eq!(config.window_secs, 60, "unparsable values keep the default");
+        assert_eq!(
+            config.max_network_retries, 5,
+            "surrounding space is trimmed"
+        );
+        assert_eq!(config.pause_secs, 61, "unset values keep the default");
+    }
+
+    #[test]
+    fn test_retry_after_comes_from_the_error() {
+        let error = AniListError::RateLimit {
+            limit: 90,
+            remaining: 0,
+            reset_at: 0,
+            retry_after: 42,
+        };
+        assert_eq!(error.retry_after_secs(), Some(42));
+        assert_eq!(AniListError::RateLimitSimple.retry_after_secs(), None);
+        assert_eq!(AniListError::BurstLimit.retry_after_secs(), None);
+        assert_eq!(AniListError::NotFound.retry_after_secs(), None);
+    }
+
+    #[test]
+    fn test_pause_uses_the_requested_duration() {
+        let limiter = GlobalRateLimiter::new();
+        limiter.trigger_pause(5);
+        let now = GlobalRateLimiter::now_secs();
+        let deadline = limiter.pause_until.load(Ordering::SeqCst);
+        assert!(limiter.is_paused.load(Ordering::SeqCst));
+        assert!(
+            deadline > now && deadline <= now + 6,
+            "the pause must last the requested 5s, got {deadline} against {now}"
+        );
     }
 }

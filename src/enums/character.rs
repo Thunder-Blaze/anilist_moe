@@ -1,3 +1,4 @@
+use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -8,7 +9,7 @@ pub enum CharacterRole {
     Background,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum CharacterSort {
     Id,
@@ -19,4 +20,10 @@ pub enum CharacterSort {
     Favourites,
     FavouritesDesc,
     Relevance,
+}
+
+impl SortSpec for CharacterSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }

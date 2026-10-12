@@ -55,6 +55,24 @@ anilist_moe = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
+### Feature Flags
+
+Every endpoint group is a cargo feature, and `default` enables `full`, so the
+default build has everything. A leaner build opts out of the groups it does not
+need, or adds `tracing` for request spans:
+
+```toml
+# Only the media and user endpoints.
+anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+
+# Everything, plus tracing.
+anilist_moe = { version = "0.3", features = ["tracing"] }
+```
+
+The available groups are `media`, `medialist`, `user`, `character`, `staff`,
+`studio`, `forum`, `activity`, `review`, `recommendation`, `airing`,
+`notification` and `common`; `tracing` and `pagination` are off by default.
+
 ## Quick Start
 
 ### Example 1: Get Trending Anime
@@ -160,13 +178,64 @@ async fn main() -> Result<(), AniListError> {
 
     let page: Page<Vec<Media>> = client.fetch(query, Some(&variables)).await?;
     for media in page.data {
-        if let (Some(id), Some(title)) = (media.id, media.title.as_ref()) {
-            println!("{} - {:?}", id, title.romaji);
+        if let Some(title) = media.title.as_ref() {
+            println!("{} - {:?}", media.id, title.romaji);
         }
     }
 
     Ok(())
 }
+```
+
+### Client Configuration
+
+`AniListClient::new()` and `with_token(..)` cover the common cases. Anything else
+goes through the builder:
+
+```rust
+use anilist_moe::{AniListClient, AniListError};
+use anilist_moe::utils::RetryConfig;
+use std::time::Duration;
+
+#[tokio::main]
+async fn main() -> Result<(), AniListError> {
+    let client = AniListClient::builder()
+        .token("your_access_token")
+        .timeout(Duration::from_secs(60))
+        .user_agent("my-app/1.0")
+        .retry_config(RetryConfig {
+            max_retries: 5,
+            jitter: true,
+            ..RetryConfig::default()
+        })
+        .build()?;
+
+    Ok(())
+}
+```
+
+Requests go through a `Transport`. The default one uses `reqwest`; supply your own
+to route them through another HTTP stack, or to answer them from memory in tests:
+
+```rust
+use anilist_moe::transport::{HttpRequest, HttpResponse, Transport};
+use anilist_moe::{AniListClient, AniListError};
+use std::future::Future;
+use std::pin::Pin;
+
+#[derive(Debug)]
+struct Scripted;
+
+impl Transport for Scripted {
+    fn execute(
+        &self,
+        _request: HttpRequest,
+    ) -> Pin<Box<dyn Future<Output = Result<HttpResponse, AniListError>> + Send + '_>> {
+        Box::pin(async { Ok(HttpResponse::new(200, r#"{"data":{"Page":{"media":[],"pageInfo":{}}}}"#)) })
+    }
+}
+
+let client = AniListClient::builder().transport(Scripted).build().unwrap();
 ```
 
 ### Conditional Fetching Controls
@@ -384,7 +453,12 @@ async fn main() {
     match client.media().get_anime_by_id(999999).await {
         Ok(anime) => println!("Found anime: {:?}", anime),
         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
-        Err(AniListError::GraphQL { message }) => eprintln!("GraphQL error: {}", message),
+        Err(AniListError::GraphQL { errors, data }) => {
+            eprintln!("GraphQL error: {}", errors[0].message());
+            if let Some(partial) = data {
+                eprintln!("Partial data: {:?}", partial);
+            }
+        }
         Err(AniListError::Json(e)) => eprintln!("JSON parsing error: {}", e),
         Err(AniListError::RateLimit { limit, remaining, reset_at, retry_after }) => {
             eprintln!("Rate limited - retry after {} seconds", retry_after);
@@ -395,6 +469,32 @@ async fn main() {
         Err(AniListError::AuthenticationRequired) => eprintln!("Authentication required"),
         Err(AniListError::AccessDenied) => eprintln!("Access denied"),
         Err(e) => eprintln!("Error: {:?}", e),
+    }
+}
+```
+
+Each GraphQL error keeps the details the server sent, so callers can branch on a
+field path or an extension code instead of matching on a string:
+
+```rust
+use anilist_moe::{AniListClient, errors::AniListError};
+
+#[tokio::main]
+async fn main() {
+    let client = AniListClient::new();
+
+    if let Err(error) = client.media().fetch_one(&anilist_moe::options!(
+        anilist_moe::endpoints::media::FetchMediaOneOptions,
+        id: 999_999_999,
+    )).await {
+        if let Some(errors) = error.graphql_errors() {
+            for entry in errors {
+                eprintln!("{} at {:?}", entry.message(), entry.path);
+            }
+        }
+        if error.graphql_message_contains("cannot query field") {
+            eprintln!("the query asked for a field that does not exist");
+        }
     }
 }
 ```
@@ -448,6 +548,11 @@ Run specific endpoint tests:
 cargo test --test endpoint_tests
 ```
 
+The offline tests (formatting, clippy, unit tests, scripted transport tests, and
+doctests) run on every push and pull request. The live endpoint tests call the
+real AniList API and are rate limited, so CI only runs them on a schedule, on a
+manual `workflow_dispatch`, or on a pull request labelled `run-live-tests`.
+
 The library includes comprehensive tests for:
 - All endpoint methods
 - Error handling scenarios
@@ -456,7 +561,11 @@ The library includes comprehensive tests for:
 
 ## Rate Limiting
 
-The AniList API has rate limiting (90 requests per minute). The client handles basic error responses, but you should implement your own rate limiting logic for production applications:
+The AniList API has rate limiting (90 requests per minute). The client does not
+retry by default: a `429`, a `5xx` or a dropped connection comes back to you as an
+error, and your application decides what to do with it. That keeps the client's
+policy out of the request path, where it cannot know your budget or your
+cancellation story.
 
 ```rust
 use anilist_moe::{AniListClient, errors::AniListError};
@@ -491,6 +600,18 @@ async fn main() -> Result<(), AniListError> {
 
     Ok(())
 }
+```
+
+If you would rather have the client retry for you, opt in with a `RetryConfig`:
+
+```rust
+use anilist_moe::{AniListClient, utils::RetryConfig};
+
+// Retries rate limits with a one minute base delay.
+let client = AniListClient::new().with_retry_config(RetryConfig::for_rate_limits());
+
+// Retries rate limits, 5xx responses and transport errors, up to 5 times.
+let client = AniListClient::new().with_retry_config(RetryConfig::aggressive());
 ```
 
 ## Pagination
@@ -530,6 +651,74 @@ async fn main() -> Result<(), AniListError> {
     Ok(())
 }
 ```
+
+### Stable paging
+
+AniList sorts on its database columns as they are, so two rows that share the
+sorted value have no defined order between them — and an order that changes
+between requests makes a walk repeat some rows and miss others. The client
+therefore appends the row's unique key to every sort:
+
+| You pass | Sent to AniList |
+|---|---|
+| nothing | `[ID]` |
+| `&[MediaSort::ScoreDesc]` | `[SCORE_DESC, ID]` |
+| `&[MediaSort::ScoreDesc, MediaSort::StartDateDesc]` | `[SCORE_DESC, START_DATE_DESC, ID]` |
+| `&[MediaSort::ScoreDesc, MediaSort::Id]` | `[SCORE_DESC, ID]` (no duplicate) |
+
+Media list entries have no `ID` of their own, so they are tied by `MEDIA_ID`. Two
+queries declare their own sort default and keep it, because it is already total:
+the activity feed (`[ID_DESC]`, newest first) and the airing schedule
+(`[TIME, ID]`). `import anilist_moe::options::SortSpec` if you need the tiebreaker
+key for a sort type of your own.
+
+### Walking every page
+
+With the `pagination` feature, `AniListClient::paginate` walks a list for you. It
+asks for one page at a time — nothing is prefetched — and stops when the server
+says there is no next page, when a page comes back empty, or at a cap of 1000
+pages:
+
+```rust
+use anilist_moe::{options, AniListClient, AniListError};
+use anilist_moe::endpoints::media::FetchMediaOptions;
+use anilist_moe::enums::media::MediaType;
+
+#[tokio::main]
+async fn main() -> Result<(), AniListError> {
+    let client = AniListClient::new();
+
+    // Entry by entry.
+    let mut items = client.paginate(options!(
+        FetchMediaOptions,
+        media_type: MediaType::Anime,
+        per_page: 50,
+    ));
+
+    while let Some(anime) = items.next_item().await {
+        let anime = anime?;
+        println!("{:?}", anime.title);
+    }
+
+    // Or page by page, which keeps the page number next to the entries.
+    let mut pages = client.paginate(options!(
+        FetchMediaOptions,
+        media_type: MediaType::Anime,
+        per_page: 50,
+    ));
+
+    while let Some(page) = pages.next_page().await {
+        let page = page?;
+        println!("page of {} entries", page.data.len());
+    }
+
+    Ok(())
+}
+```
+
+Nothing is retried and nothing sleeps between pages, as everywhere else in the
+crate: if a `429` is worth waiting out, that is your loop's decision. The walk is
+cancel-safe — dropping the cursor stops the requests.
 
 ## Contributing
 

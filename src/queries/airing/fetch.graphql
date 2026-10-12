@@ -17,7 +17,7 @@ query AiringSchedule(
     $episode_lesser: Int
     $airingAt_greater: Int
     $airingAt_lesser: Int
-    $sort: [AiringSort] = [TIME]
+    $sort: [AiringSort] = [TIME, ID]
     $page: Int = 1
     $perPage: Int = 20
 

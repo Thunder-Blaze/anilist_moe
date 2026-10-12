@@ -1,6 +1,7 @@
+use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ActivitySort {
     Id,
@@ -16,4 +17,10 @@ pub enum ActivityType {
     MangaList,
     Message,
     MediaList,
+}
+
+impl SortSpec for ActivitySort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }
