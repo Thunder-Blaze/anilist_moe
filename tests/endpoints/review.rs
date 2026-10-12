@@ -4,7 +4,6 @@ use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::review::*;
 use anilist_moe::enums::review::ReviewRating;
-use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -17,10 +16,7 @@ async fn test_fetch_reviews() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchReviewOptions,
-                per_page: Some(5),
-            );
+            let options = FetchReviewOptions::builder().per_page(Some(5)).build();
             client.review().fetch(&options).await
         })
         .await;
@@ -44,11 +40,10 @@ async fn test_fetch_reviews_by_media() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchReviewOptions,
-                media_id: Some(1), // Cowboy Bebop
-                per_page: Some(5),
-            );
+            let options = FetchReviewOptions::builder()
+                .media_id(Some(1)) // Cowboy Bebop
+                .per_page(Some(5))
+                .build();
             client.review().fetch(&options).await
         })
         .await;
@@ -75,10 +70,7 @@ async fn test_review_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchReviewOptions,
-                per_page: Some(1),
-            );
+            let options = FetchReviewOptions::builder().per_page(Some(1)).build();
             client.review().fetch(&options).await
         })
         .await;
@@ -108,10 +100,7 @@ async fn test_rate_review() {
     // First fetch a review to rate
     let fetch_result = h
         .run(|| async {
-            let options = options!(
-                FetchReviewOptions,
-                per_page: Some(1),
-            );
+            let options = FetchReviewOptions::builder().per_page(Some(1)).build();
             client.review().fetch(&options).await
         })
         .await;
@@ -125,11 +114,10 @@ async fn test_rate_review() {
 
             let result = h
                 .run(|| async {
-                    let rate_options = options!(
-                        RateReviewOptions,
-                        review_id => review_id,
-                        rating => ReviewRating::UpVote, // upvote
-                    );
+                    let rate_options = RateReviewOptions::builder()
+                        .review_id(review_id)
+                        .rating(ReviewRating::UpVote)
+                        .build();
                     client.review().rate(&rate_options).await
                 })
                 .await;
@@ -141,11 +129,10 @@ async fn test_rate_review() {
                     delay_between_tests().await;
                     let _ = h
                         .run(|| async {
-                            let reset_options = options!(
-                                RateReviewOptions,
-                                review_id => review_id,
-                                rating => ReviewRating::NoVote,
-                            );
+                            let reset_options = RateReviewOptions::builder()
+                                .review_id(review_id)
+                                .rating(ReviewRating::NoVote)
+                                .build();
                             client.review().rate(&reset_options).await
                         })
                         .await;

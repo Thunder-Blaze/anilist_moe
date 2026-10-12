@@ -7,161 +7,168 @@ use crate::enums::user::{UserSort, UserStatisticsSort};
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::user::User;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching users.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserOptions<'a> {
-    pub id: Option<u32>,
-    pub name: Option<Cow<'a, str>>,
-    pub search: Option<Cow<'a, str>>,
+    id: Option<u32>,
+    name: Option<Cow<'a, str>>,
+    search: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [UserSort]>>,
-    pub is_moderator: Option<bool>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    sort: Option<Cow<'a, [UserSort]>>,
+    is_moderator: Option<bool>,
+    page: Option<i32>,
+    per_page: Option<i32>,
     // Extra
-    pub include_favourites: Option<bool>,
-    pub include_statistics: Option<bool>,
+    include_favourites: Option<bool>,
+    include_statistics: Option<bool>,
     // HTML rendering options
-    pub about_as_html: Option<bool>,
+    about_as_html: Option<bool>,
 }
 
 /// Options for fetching a single user by ID or name.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserOneOptions<'a> {
-    pub id: Option<u32>,
-    pub name: Option<Cow<'a, str>>,
-    pub search: Option<Cow<'a, str>>,
-    pub is_moderator: Option<bool>,
-    pub sort: Option<Cow<'a, [UserSort]>>,
+    id: Option<u32>,
+    name: Option<Cow<'a, str>>,
+    search: Option<Cow<'a, str>>,
+    is_moderator: Option<bool>,
+    sort: Option<Cow<'a, [UserSort]>>,
     // HTML rendering options
-    pub about_as_html: Option<bool>,
+    about_as_html: Option<bool>,
 }
 
 /// Options for fetching a user's followers.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserFollowersOptions<'a> {
-    pub user_id: u32,
-    pub sort: Option<Cow<'a, [UserSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    user_id: u32,
+    sort: Option<Cow<'a, [UserSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 }
 
 /// Options for fetching users a user is following.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserFollowingOptions<'a> {
-    pub user_id: u32,
-    pub sort: Option<Cow<'a, [UserSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    user_id: u32,
+    sort: Option<Cow<'a, [UserSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 }
 
 /// Options for fetching a user's favorites.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserFavoritesOptions<'a> {
-    pub user_id: u32,
+    user_id: u32,
     // Toggle what to fetch
-    pub fetch_anime: Option<bool>,
-    pub fetch_manga: Option<bool>,
-    pub fetch_characters: Option<bool>,
-    pub fetch_staff: Option<bool>,
-    pub fetch_studios: Option<bool>,
+    fetch_anime: Option<bool>,
+    fetch_manga: Option<bool>,
+    fetch_characters: Option<bool>,
+    fetch_staff: Option<bool>,
+    fetch_studios: Option<bool>,
     // Anime pagination
-    pub anime_page: Option<i32>,
-    pub anime_per_page: Option<i32>,
-    pub anime_sort: Option<Cow<'a, [MediaSort]>>,
+    anime_page: Option<i32>,
+    anime_per_page: Option<i32>,
+    anime_sort: Option<Cow<'a, [MediaSort]>>,
     // Manga pagination
-    pub manga_page: Option<i32>,
-    pub manga_per_page: Option<i32>,
-    pub manga_sort: Option<Cow<'a, [MediaSort]>>,
+    manga_page: Option<i32>,
+    manga_per_page: Option<i32>,
+    manga_sort: Option<Cow<'a, [MediaSort]>>,
     // Characters pagination
-    pub characters_page: Option<i32>,
-    pub characters_per_page: Option<i32>,
+    characters_page: Option<i32>,
+    characters_per_page: Option<i32>,
     // Staff pagination
-    pub staff_page: Option<i32>,
-    pub staff_per_page: Option<i32>,
+    staff_page: Option<i32>,
+    staff_per_page: Option<i32>,
     // Studios pagination
-    pub studios_page: Option<i32>,
-    pub studios_per_page: Option<i32>,
-    pub characters_sort: Option<Cow<'a, [CharacterSort]>>,
-    pub staff_sort: Option<Cow<'a, [StaffSort]>>,
-    pub studios_sort: Option<Cow<'a, [StudioSort]>>,
+    studios_page: Option<i32>,
+    studios_per_page: Option<i32>,
+    characters_sort: Option<Cow<'a, [CharacterSort]>>,
+    staff_sort: Option<Cow<'a, [StaffSort]>>,
+    studios_sort: Option<Cow<'a, [StudioSort]>>,
 }
 
 /// Options for fetching a user's media list.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserMediaListOptions<'a> {
-    pub id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub username: Option<Cow<'a, str>>,
-    pub media_type: Option<MediaType>,
-    pub status: Option<MediaListStatus>,
-    pub status_in: Option<Cow<'a, [MediaListStatus]>>,
-    pub status_not: Option<MediaListStatus>,
-    pub status_not_in: Option<Cow<'a, [MediaListStatus]>>,
-    pub media_id: Option<u32>,
-    pub media_id_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not_in: Option<Cow<'a, [u32]>>,
-    pub user_id_in: Option<Cow<'a, [u32]>>,
-    pub is_following: Option<bool>,
-    pub compare_with_auth_list: Option<bool>,
-    pub started_at_exact: Option<i32>,
-    pub started_at_greater: Option<i32>,
-    pub started_at_lesser: Option<i32>,
-    pub completed_at_exact: Option<i32>,
-    pub completed_at_greater: Option<i32>,
-    pub completed_at_lesser: Option<i32>,
-    pub notes: Option<Cow<'a, str>>,
-    pub started_at: Option<Cow<'a, str>>,
-    pub completed_at: Option<Cow<'a, str>>,
+    id: Option<u32>,
+    user_id: Option<u32>,
+    username: Option<Cow<'a, str>>,
+    media_type: Option<MediaType>,
+    status: Option<MediaListStatus>,
+    status_in: Option<Cow<'a, [MediaListStatus]>>,
+    status_not: Option<MediaListStatus>,
+    status_not_in: Option<Cow<'a, [MediaListStatus]>>,
+    media_id: Option<u32>,
+    media_id_in: Option<Cow<'a, [u32]>>,
+    media_id_not_in: Option<Cow<'a, [u32]>>,
+    user_id_in: Option<Cow<'a, [u32]>>,
+    is_following: Option<bool>,
+    compare_with_auth_list: Option<bool>,
+    started_at_exact: Option<i32>,
+    started_at_greater: Option<i32>,
+    started_at_lesser: Option<i32>,
+    completed_at_exact: Option<i32>,
+    completed_at_greater: Option<i32>,
+    completed_at_lesser: Option<i32>,
+    notes: Option<Cow<'a, str>>,
+    started_at: Option<Cow<'a, str>>,
+    completed_at: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [MediaSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    sort: Option<Cow<'a, [MediaSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 }
 
 /// Options for fetching user statistics.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchUserStatsOptions<'a> {
-    pub user_id: u32,
+    user_id: u32,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [UserStatisticsSort]>>,
+    sort: Option<Cow<'a, [UserStatisticsSort]>>,
 }
 
 /// Endpoint for user profile and statistics operations.
@@ -243,28 +250,23 @@ impl<'a> UserEndpoint<'a> {
     pub async fn get_current_user(&self) -> Result<User, AniListError> {
         let response = self.client.user().fetch_basic().await?;
         let id = response.id;
-        self.fetch_one(&options!(
-            FetchUserOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_one(&FetchUserOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Get user by ID
     pub async fn get_by_id(&self, id: u32) -> Result<User, AniListError> {
-        self.fetch_one(&options!(
-            FetchUserOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_one(&FetchUserOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Get user by username
     pub async fn get_by_name(&self, name: &str) -> Result<User, AniListError> {
-        self.fetch_one(&options!(
-            FetchUserOneOptions,
-            name: Some(name),
-        ))
+        self.fetch_one(
+            &FetchUserOneOptions::builder()
+                .name(Some(Cow::Borrowed(name)))
+                .build(),
+        )
         .await
     }
 
@@ -275,13 +277,14 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(&options!(
-            FetchUserOptions,
-            search: Some(query),
-            page,
-            per_page,
-            sort: Some(&[UserSort::SearchMatch]),
-        ))
+        self.fetch(
+            &FetchUserOptions::builder()
+                .search(Some(Cow::Borrowed(query)))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[UserSort::SearchMatch])))
+                .build(),
+        )
         .await
     }
 
@@ -291,12 +294,13 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(&options!(
-            FetchUserOptions,
-            page,
-            per_page,
-            sort: Some(&[UserSort::WatchedTimeDesc]),
-        ))
+        self.fetch(
+            &FetchUserOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[UserSort::WatchedTimeDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -306,12 +310,13 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(&options!(
-            FetchUserOptions,
-            page,
-            per_page,
-            sort: Some(&[UserSort::ChaptersReadDesc]),
-        ))
+        self.fetch(
+            &FetchUserOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[UserSort::ChaptersReadDesc])))
+                .build(),
+        )
         .await
     }
 }

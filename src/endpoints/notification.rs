@@ -1,7 +1,6 @@
 use crate::enums::notification::NotificationType;
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::unions::notification::NotificationUnion;
@@ -9,21 +8,23 @@ use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for searching and filtering notifications.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationSearchOptions<'a> {
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
-    pub notification_type: Option<NotificationType>,
-    pub type_in: Option<Cow<'a, [NotificationType]>>,
-    pub reset_notification_count: Option<bool>,
+    page: Option<i32>,
+    per_page: Option<i32>,
+    notification_type: Option<NotificationType>,
+    type_in: Option<Cow<'a, [NotificationType]>>,
+    reset_notification_count: Option<bool>,
     // HTML rendering options
-    pub message_as_html: Option<bool>,
-    pub text_as_html: Option<bool>,
-    pub comment_as_html: Option<bool>,
+    message_as_html: Option<bool>,
+    text_as_html: Option<bool>,
+    comment_as_html: Option<bool>,
 }
 
 /// Endpoint for notification operations.
@@ -52,8 +53,13 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(&options!(NotificationSearchOptions, page, per_page,))
-            .await
+        self.fetch(
+            &NotificationSearchOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
+        .await
     }
 
     /// Get unread notifications and mark them as read
@@ -62,12 +68,13 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(&options!(
-            NotificationSearchOptions,
-            page,
-            per_page,
-            reset_notification_count: Some(true),
-        ))
+        self.fetch(
+            &NotificationSearchOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .reset_notification_count(Some(true))
+                .build(),
+        )
         .await
     }
 
@@ -78,12 +85,13 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(&options!(
-            NotificationSearchOptions,
-            notification_type: Some(notification_type),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &NotificationSearchOptions::builder()
+                .notification_type(Some(notification_type))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 }

@@ -22,7 +22,6 @@ use anilist_moe::enums::media::{MediaFormat, MediaStatus, MediaType};
 use anilist_moe::enums::media_list::MediaListStatus;
 use anilist_moe::enums::moderators::ModRole;
 use anilist_moe::enums::recommendation::RecommendationRating;
-use anilist_moe::options;
 use anilist_moe::transport::{HttpRequest, HttpResponse, Transport};
 use anilist_moe::unions::activity::ActivityUnion;
 use anilist_moe::unions::notification::NotificationUnion;
@@ -87,12 +86,13 @@ async fn media_page_parses_the_requested_fields() {
 
     let page = client
         .media()
-        .fetch(&options!(
-            FetchMediaOptions,
-            media_type: MediaType::Anime,
-            page: 1,
-            per_page: 2,
-        ))
+        .fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .page(Some(1))
+                .per_page(Some(2))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -135,11 +135,12 @@ async fn media_list_page_parses_the_requested_fields() {
 
     let page = client
         .medialist()
-        .fetch(&options!(
-            FetchMediaListOptions,
-            user_name: "someone",
-            status: MediaListStatus::Completed,
-        ))
+        .fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(Some(std::borrow::Cow::Borrowed("someone")))
+                .status(Some(MediaListStatus::Completed))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -183,7 +184,11 @@ async fn user_page_parses_the_requested_fields() {
 
     let page = client
         .user()
-        .fetch(&options!(FetchUserOptions, search: "someone"))
+        .fetch(
+            &FetchUserOptions::builder()
+                .search(Some(std::borrow::Cow::Borrowed("someone")))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -227,11 +232,12 @@ async fn character_page_parses_the_requested_fields() {
 
     let page = client
         .character()
-        .fetch(&options!(
-            FetchCharacterOptions,
-            search: "spike",
-            include_media: true,
-        ))
+        .fetch(
+            &FetchCharacterOptions::builder()
+                .search(Some(std::borrow::Cow::Borrowed("spike")))
+                .include_media(Some(true))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -284,11 +290,12 @@ async fn staff_page_parses_the_requested_fields() {
 
     let page = client
         .staff()
-        .fetch(&options!(
-            FetchStaffOptions,
-            search: "watanabe",
-            include_staff_media: true,
-        ))
+        .fetch(
+            &FetchStaffOptions::builder()
+                .search(Some(std::borrow::Cow::Borrowed("watanabe")))
+                .include_staff_media(Some(true))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -335,11 +342,12 @@ async fn studio_page_parses_the_requested_fields() {
 
     let page = client
         .studio()
-        .fetch(&options!(
-            FetchStudioOptions,
-            search: "bones",
-            include_media: true,
-        ))
+        .fetch(
+            &FetchStudioOptions::builder()
+                .search(Some(std::borrow::Cow::Borrowed("bones")))
+                .include_media(Some(true))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -381,12 +389,13 @@ async fn forum_thread_page_parses_the_requested_fields() {
 
     let page = client
         .forum()
-        .fetch(&options!(
-            FetchThreadOptions,
-            search: "discussion",
-            include_body: true,
-            include_user: true,
-        ))
+        .fetch(
+            &FetchThreadOptions::builder()
+                .search(Some(std::borrow::Cow::Borrowed("discussion")))
+                .include_body(Some(true))
+                .include_user(Some(true))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -422,7 +431,11 @@ async fn forum_comment_page_parses_the_requested_fields() {
 
     let page = client
         .forum()
-        .fetch_comments(&options!(FetchThreadCommentOptions, thread_id: 50))
+        .fetch_comments(
+            &FetchThreadCommentOptions::builder()
+                .thread_id(Some(50))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -457,7 +470,12 @@ async fn activity_page_parses_the_requested_fields() {
 
     let page = client
         .activity()
-        .fetch(&options!(FetchActivityOptions, page: 1, per_page: 2))
+        .fetch(
+            &FetchActivityOptions::builder()
+                .page(Some(1))
+                .per_page(Some(2))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -506,7 +524,7 @@ async fn airing_page_parses_the_requested_fields() {
 
     let page = client
         .airing()
-        .fetch(&options!(FetchAiringOptions, media_id: 101))
+        .fetch(&FetchAiringOptions::builder().media_id(Some(101)).build())
         .await
         .expect("the scripted response parses");
 
@@ -547,7 +565,7 @@ async fn review_page_parses_the_requested_fields() {
 
     let page = client
         .review()
-        .fetch(&options!(FetchReviewOptions, media_id: 101))
+        .fetch(&FetchReviewOptions::builder().media_id(Some(101)).build())
         .await
         .expect("the scripted response parses");
 
@@ -590,7 +608,11 @@ async fn recommendation_page_parses_the_requested_fields() {
 
     let page = client
         .recommendation()
-        .fetch(&options!(FetchRecommendationOptions, media_id: 101))
+        .fetch(
+            &FetchRecommendationOptions::builder()
+                .media_id(Some(101))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 
@@ -639,7 +661,12 @@ async fn notification_page_parses_the_requested_fields() {
 
     let page = client
         .notification()
-        .fetch(&options!(NotificationSearchOptions, page: 1, per_page: 2))
+        .fetch(
+            &NotificationSearchOptions::builder()
+                .page(Some(1))
+                .per_page(Some(2))
+                .build(),
+        )
         .await
         .expect("the scripted response parses");
 

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use anilist_moe::client::AniListClient;
 use anilist_moe::endpoints::character::FetchCharacterOptions;
 use anilist_moe::endpoints::forum::FetchThreadOptions;
@@ -5,7 +7,6 @@ use anilist_moe::endpoints::staff::FetchStaffOptions;
 use anilist_moe::endpoints::studio::FetchStudioOptions;
 use anilist_moe::endpoints::user::FetchUserOptions;
 use anilist_moe::enums::media::MediaSort;
-use anilist_moe::options;
 
 mod support;
 
@@ -14,14 +15,13 @@ use support::allow_environmental_failure;
 #[tokio::test]
 async fn test_character_conditional_fetching() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchCharacterOptions,
-        id: Some(1), // Spike Spiegel
-        include_media: Some(true),
-        media_per_page: Some(5),
-        media_sort: Some(&[MediaSort::PopularityDesc]),
-        include_mod_notes: Some(false),
-    );
+    let options = FetchCharacterOptions::builder()
+        .id(Some(1))
+        .include_media(Some(true))
+        .media_per_page(Some(5))
+        .media_sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+        .include_mod_notes(Some(false))
+        .build();
 
     let result = client.character().fetch(&options).await;
     match result {
@@ -48,14 +48,13 @@ async fn test_character_conditional_fetching() {
 #[tokio::test]
 async fn test_staff_conditional_fetching() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchStaffOptions,
-        id: Some(95263), // Akira Toriyama
-        include_staff_media: Some(true),
-        staff_media_per_page: Some(5),
-        include_characters: Some(true),
-        characters_per_page: Some(5),
-    );
+    let options = FetchStaffOptions::builder()
+        .id(Some(95263)) // Akira Toriyama
+        .include_staff_media(Some(true))
+        .staff_media_per_page(Some(5))
+        .include_characters(Some(true))
+        .characters_per_page(Some(5))
+        .build();
 
     let result = client.staff().fetch(&options).await;
     match result {
@@ -74,12 +73,11 @@ async fn test_staff_conditional_fetching() {
 #[tokio::test]
 async fn test_studio_conditional_fetching() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchStudioOptions,
-        id: Some(1), // Studio Pierrot (or generic ID)
-        include_media: Some(true),
-        media_per_page: Some(5),
-    );
+    let options = FetchStudioOptions::builder()
+        .id(Some(1))
+        .include_media(Some(true))
+        .media_per_page(Some(5))
+        .build();
 
     let result = client.studio().fetch(&options).await;
     match result {
@@ -96,12 +94,11 @@ async fn test_studio_conditional_fetching() {
 #[tokio::test]
 async fn test_user_conditional_fetching() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchUserOptions,
-        name: Some("Josh"), // A popular user or generic
-        include_statistics: Some(true),
-        include_favourites: Some(true),
-    );
+    let options = FetchUserOptions::builder()
+        .name(Some(Cow::Borrowed("Josh")))
+        .include_statistics(Some(true))
+        .include_favourites(Some(true))
+        .build();
 
     let result = client.user().fetch(&options).await;
     match result {
@@ -126,13 +123,12 @@ async fn test_user_conditional_fetching() {
 async fn test_forum_conditional_fetching() {
     let client = AniListClient::new();
     // Search for a random popular thread or just by generic search
-    let options = options!(
-        FetchThreadOptions,
-        search: Some("Anime"),
-        per_page: Some(1),
-        include_body: Some(true),
-        include_user: Some(true),
-    );
+    let options = FetchThreadOptions::builder()
+        .search(Some(Cow::Borrowed("Anime")))
+        .per_page(Some(1))
+        .include_body(Some(true))
+        .include_user(Some(true))
+        .build();
 
     let result = client.forum().fetch(&options).await;
     match result {
@@ -150,12 +146,11 @@ async fn test_forum_conditional_fetching() {
 #[tokio::test]
 async fn test_user_conditional_fetching_negative() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchUserOptions,
-        name: Some("Josh"),
-        include_statistics: Some(false),
-        include_favourites: Some(false),
-    );
+    let options = FetchUserOptions::builder()
+        .name(Some(Cow::Borrowed("Josh")))
+        .include_favourites(Some(true))
+        .include_statistics(Some(true))
+        .build();
 
     let result = client.user().fetch(&options).await;
     match result {

@@ -2,7 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::studio::*;
-use anilist_moe::options;
+use std::borrow::Cow;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -15,11 +15,10 @@ async fn test_fetch_studio_by_search() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStudioOptions,
-                search: Some("Kyoto"),
-                per_page: Some(5),
-            );
+            let options = FetchStudioOptions::builder()
+                .search(Some(Cow::Borrowed("Kyoto")))
+                .per_page(Some(5))
+                .build();
             client.studio().fetch(&options).await
         })
         .await;
@@ -50,10 +49,7 @@ async fn test_fetch_studio_by_id() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStudioOptions,
-                id: Some(2), // Kyoto Animation
-            );
+            let options = FetchStudioOptions::builder().id(Some(2)).build();
             client.studio().fetch(&options).await
         })
         .await;
@@ -78,10 +74,7 @@ async fn test_fetch_one_studio() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStudioOneOptions,
-                id: Some(2),
-            );
+            let options = FetchStudioOneOptions::builder().id(Some(2)).build();
             client.studio().fetch_one(&options).await
         })
         .await;
@@ -104,10 +97,7 @@ async fn test_studio_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStudioOptions,
-                id: Some(2),
-            );
+            let options = FetchStudioOptions::builder().id(Some(2)).build();
             client.studio().fetch(&options).await
         })
         .await;

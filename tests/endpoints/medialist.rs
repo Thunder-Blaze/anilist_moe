@@ -5,7 +5,6 @@ use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHa
 use anilist_moe::endpoints::medialist::*;
 use anilist_moe::enums::media::MediaType;
 use anilist_moe::enums::media_list::MediaListStatus;
-use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -18,11 +17,10 @@ async fn test_fetch_media_list() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaListOptions,
-                user_id: Some(3225),
-                per_page: Some(5),
-            );
+            let options = FetchMediaListOptions::builder()
+                .user_id(Some(3225))
+                .per_page(Some(5))
+                .build();
             client.medialist().fetch(&options).await
         })
         .await;
@@ -51,12 +49,11 @@ async fn test_fetch_media_list_by_media() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaListOptions,
-                media_id: Some(1), // Cowboy Bebop
-                per_page: Some(5),
-                is_following: Some(true),
-            );
+            let options = FetchMediaListOptions::builder()
+                .media_id(Some(1)) // Cowboy Bebop
+                .per_page(Some(5))
+                .is_following(Some(true))
+                .build();
             client.medialist().fetch(&options).await
         })
         .await;
@@ -86,11 +83,10 @@ async fn test_media_list_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaListOptions,
-                user_id: Some(3225),
-                per_page: Some(1),
-            );
+            let options = FetchMediaListOptions::builder()
+                .user_id(Some(3225))
+                .per_page(Some(1))
+                .build();
             client.medialist().fetch(&options).await
         })
         .await;
@@ -122,11 +118,10 @@ async fn test_save_media_list() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                SaveMediaListOptions,
-                media_id: Some(1), // Cowboy Bebop
-                status: Some(MediaListStatus::Planning),
-            );
+            let options = SaveMediaListOptions::builder()
+                .media_id(Some(1))
+                .status(Some(MediaListStatus::Planning))
+                .build();
             client.medialist().save(&options).await
         })
         .await;
@@ -155,11 +150,10 @@ async fn test_delete_media_list() {
     // First create a media list entry to delete
     let save_result = h
         .run(|| async {
-            let options = options!(
-                SaveMediaListOptions,
-                media_id: Some(20),
-                status: Some(MediaListStatus::Planning),
-            );
+            let options = SaveMediaListOptions::builder()
+                .media_id(Some(20))
+                .status(Some(MediaListStatus::Planning))
+                .build();
             client.medialist().save(&options).await
         })
         .await;
@@ -171,10 +165,7 @@ async fn test_delete_media_list() {
 
         let delete_result = h
             .run(|| async {
-                let options = options!(
-                    DeleteMediaListOptions,
-                    id => entry_id,
-                );
+                let options = DeleteMediaListOptions::builder().id(entry_id).build();
                 client.medialist().delete(&options).await
             })
             .await;
@@ -193,7 +184,6 @@ async fn test_delete_media_list() {
         }
     }
 }
-
 #[tokio::test]
 async fn test_fetch_collection() {
     let h = TestHarness::new();
@@ -201,11 +191,10 @@ async fn test_fetch_collection() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaListCollectionOptions,
-                user_id: Some(3225),
-                media_type: MediaType::Anime,
-            );
+            let options = FetchMediaListCollectionOptions::builder()
+                .user_id(Some(3225))
+                .media_type(Some(MediaType::Anime))
+                .build();
             client.medialist().fetch_collection(&options).await
         })
         .await;
@@ -243,10 +232,7 @@ async fn test_fetch_one_media_list_entry() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaListOptions,
-                user_id: Some(3225),
-            );
+            let options = FetchMediaListOptions::builder().user_id(Some(3225)).build();
             client.medialist().fetch_one(&options).await
         })
         .await;

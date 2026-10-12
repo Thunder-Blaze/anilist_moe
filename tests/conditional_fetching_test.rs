@@ -2,53 +2,51 @@ use anilist_moe::client::AniListClient;
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::MediaType;
 use anilist_moe::enums::staff::StaffLanguage;
-use anilist_moe::options;
 
 #[tokio::test]
 async fn test_conditional_fetching() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchMediaOptions,
-        media_type: Some(MediaType::Anime),
-        page: Some(1),
-        per_page: Some(1),
-        include_tags: Some(true),
-        include_characters: Some(true),
-        include_staff: Some(true),
-        include_studios: Some(true),
-        include_reviews: Some(true),
-        include_recommendations: Some(true),
-        include_external_links: Some(true),
-        include_streaming_episodes: Some(true),
-        include_rankings: Some(true),
-        include_stats: Some(true),
-        include_next_airing_episode: Some(true),
-        include_media_list_entry_details: Some(true),
-        include_start_date: Some(true),
-        include_end_date: Some(true),
-        include_duration: Some(true),
-        include_volumes: Some(true),
-        include_country_of_origin: Some(true),
-        include_is_licensed: Some(true),
-        include_source: Some(true),
-        include_hashtag: Some(true),
-        include_trailer: Some(true),
-        include_updated_at: Some(true),
-        include_cover_image_extra_large: Some(true),
-        include_mean_score: Some(true),
-        include_is_locked: Some(true),
-        include_trending: Some(true),
-        include_auto_create_forum_thread: Some(true),
-        include_is_recommendation_blocked: Some(true),
-        include_is_review_blocked: Some(true),
-        include_mod_notes: Some(true),
-        include_relations: Some(true),
-        characters_per_page: Some(5),
-        staff_per_page: Some(5),
-        reviews_per_page: Some(5),
-        recommendations_per_page: Some(5),
-        voice_actor_language: Some(StaffLanguage::Japanese),
-    );
+    let options = FetchMediaOptions::builder()
+        .media_type(Some(MediaType::Anime))
+        .page(Some(1))
+        .per_page(Some(1))
+        .include_tags(Some(true))
+        .include_characters(Some(true))
+        .include_staff(Some(true))
+        .include_studios(Some(true))
+        .include_reviews(Some(true))
+        .include_recommendations(Some(true))
+        .include_external_links(Some(true))
+        .include_streaming_episodes(Some(true))
+        .include_rankings(Some(true))
+        .include_stats(Some(true))
+        .include_next_airing_episode(Some(true))
+        .include_media_list_entry_details(Some(true))
+        .include_start_date(Some(true))
+        .include_end_date(Some(true))
+        .include_duration(Some(true))
+        .include_volumes(Some(true))
+        .include_country_of_origin(Some(true))
+        .include_is_licensed(Some(true))
+        .include_source(Some(true))
+        .include_hashtag(Some(true))
+        .include_trailer(Some(true))
+        .include_updated_at(Some(true))
+        .include_cover_image_extra_large(Some(true))
+        .include_mean_score(Some(true))
+        .include_is_locked(Some(true))
+        .include_trending(Some(true))
+        .include_auto_create_forum_thread(Some(true))
+        .include_is_recommendation_blocked(Some(true))
+        .include_is_review_blocked(Some(true))
+        .include_mod_notes(Some(true))
+        .include_relations(Some(true))
+        .characters_per_page(Some(5))
+        .staff_per_page(Some(5))
+        .reviews_per_page(Some(5))
+        .recommendations_per_page(Some(5))
+        .voice_actor_language(Some(StaffLanguage::Japanese))
+        .build();
 
     let result = client.anime().fetch(&options).await;
     assert!(result.is_ok());
@@ -101,14 +99,13 @@ async fn test_conditional_fetching() {
 #[tokio::test]
 async fn test_conditional_fetching_without_includes() {
     let client = AniListClient::new();
-    let options = options!(
-        FetchMediaOptions,
-        media_type: Some(MediaType::Anime),
-        page: Some(1),
-        per_page: Some(1),
-        include_tags: Some(false),
-        include_characters: Some(false),
-    );
+    let options = FetchMediaOptions::builder()
+        .media_type(Some(MediaType::Anime))
+        .page(Some(1))
+        .per_page(Some(1))
+        .include_tags(Some(false))
+        .include_characters(Some(false))
+        .build();
 
     let result = client.anime().fetch(&options).await;
     assert!(result.is_ok());

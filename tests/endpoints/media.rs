@@ -3,9 +3,10 @@
 //! These tests verify that the media endpoint correctly fetches, parses,
 //! and returns data with proper types from the AniList API.
 
+use std::borrow::Cow;
+
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::enums::media::{MediaSort, MediaType};
-use anilist_moe::options;
 use anilist_moe::{endpoints::media::*, AniListError};
 
 /// Helper to create a test harness
@@ -20,12 +21,11 @@ async fn test_fetch_media_with_search() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOptions,
-                search: Some("Naruto"),
-                media_type: Some(MediaType::Anime),
-                per_page: Some(5),
-            );
+            let options = FetchMediaOptions::builder()
+                .search(Some("Naruto".into()))
+                .media_type(Some(MediaType::Anime))
+                .per_page(Some(5))
+                .build();
             client.media().fetch(&options).await
         })
         .await;
@@ -81,10 +81,7 @@ async fn test_fetch_media_by_id() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOptions,
-                id: Some(1), // Cowboy Bebop
-            );
+            let options = FetchMediaOptions::builder().id(Some(1)).build();
             client.media().fetch(&options).await
         })
         .await;
@@ -124,10 +121,7 @@ async fn test_fetch_one_media() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOneOptions,
-                id: Some(1),
-            );
+            let options = FetchMediaOneOptions::builder().id(Some(1)).build();
             client.media().fetch_one(&options).await
         })
         .await;
@@ -151,10 +145,7 @@ async fn test_media_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOptions,
-                id: Some(1),
-            );
+            let options = FetchMediaOptions::builder().id(Some(1)).build();
             client.media().fetch(&options).await
         })
         .await;
@@ -204,13 +195,12 @@ async fn test_fetch_media_pagination() {
     // Fetch page 1
     let result1 = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOptions,
-                media_type: Some(MediaType::Anime),
-                per_page: Some(5),
-                page: Some(1),
-                sort: Some(&[MediaSort::IdDesc]),
-            );
+            let options = FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .per_page(Some(5))
+                .page(Some(1))
+                .sort(Some(Cow::Borrowed(&[MediaSort::IdDesc])))
+                .build();
             client.media().fetch(&options).await
         })
         .await;
@@ -222,13 +212,12 @@ async fn test_fetch_media_pagination() {
     // Fetch page 2
     let result2 = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOptions,
-                media_type: Some(MediaType::Anime),
-                per_page: Some(5),
-                page: Some(2),
-                sort: Some(&[MediaSort::IdDesc]),
-            );
+            let options = FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .per_page(Some(5))
+                .page(Some(2))
+                .sort(Some(Cow::Borrowed(&[MediaSort::IdDesc])))
+                .build();
             client.media().fetch(&options).await
         })
         .await;
@@ -384,10 +373,7 @@ async fn test_nonexistent_media() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaOptions,
-                id: Some(999999999), // Very unlikely to exist
-            );
+            let options = FetchMediaOptions::builder().id(Some(999999999)).build();
             client.media().fetch(&options).await
         })
         .await;
@@ -417,11 +403,10 @@ async fn test_fetch_media_trends() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaTrendOptions,
-                media_id: Some(16498),
-                per_page: Some(5),
-            );
+            let options = FetchMediaTrendOptions::builder()
+                .media_id(Some(16498))
+                .per_page(Some(5))
+                .build();
             client.media().fetch_trends(&options).await
         })
         .await;
@@ -447,10 +432,9 @@ async fn test_fetch_one_media_trend() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchMediaTrendOptions,
-                media_id: Some(16498),
-            );
+            let options = FetchMediaTrendOptions::builder()
+                .media_id(Some(16498))
+                .build();
             client.media().fetch_trend_one(&options).await
         })
         .await;

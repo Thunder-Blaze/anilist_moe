@@ -6,6 +6,7 @@
 use anilist_moe::options;
 #[cfg(feature = "media")]
 use anilist_moe::{endpoints::media::FetchMediaOptions, AniListClient, AniListError};
+use std::borrow::Cow;
 
 #[cfg(feature = "media")]
 #[tokio::main]
@@ -15,12 +16,15 @@ async fn main() -> Result<(), AniListError> {
     // Example usage
     let popular_anime = client
         .media()
-        .fetch(&options!(
-            FetchMediaOptions,
-            sort: Some(&[anilist_moe::enums::media::MediaSort::PopularityDesc]),
-            per_page: Some(5),
-            page: Some(1),
-        ))
+        .fetch(
+            &FetchMediaOptions::builder()
+                .sort(Some(Cow::Borrowed(&[
+                    anilist_moe::enums::media::MediaSort::PopularityDesc,
+                ])))
+                .per_page(Some(5))
+                .page(Some(1))
+                .build(),
+        )
         .await?;
     println!("Popular anime: {:#?}", popular_anime);
 

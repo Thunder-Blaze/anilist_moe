@@ -4,65 +4,69 @@ use crate::errors::AniListError;
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::review::Review;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching reviews.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchReviewOptions<'a> {
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
-    pub id: Option<u32>,
-    pub media_id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub media_type: Option<MediaType>,
+    page: Option<i32>,
+    per_page: Option<i32>,
+    id: Option<u32>,
+    media_id: Option<u32>,
+    user_id: Option<u32>,
+    media_type: Option<MediaType>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [ReviewSort]>>,
+    sort: Option<Cow<'a, [ReviewSort]>>,
     // HTML rendering options
-    pub body_as_html: Option<bool>,
-    pub description_as_html: Option<bool>,
+    body_as_html: Option<bool>,
+    description_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a review.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveReviewOptions<'a> {
-    pub id: Option<u32>,
-    pub media_id: u32,
-    pub score: Option<i32>,
-    pub summary: Option<Cow<'a, str>>,
-    pub body: Option<Cow<'a, str>>,
-    pub private: Option<bool>,
+    id: Option<u32>,
+    media_id: u32,
+    score: Option<i32>,
+    summary: Option<Cow<'a, str>>,
+    body: Option<Cow<'a, str>>,
+    private: Option<bool>,
     // HTML rendering options
-    pub body_as_html: Option<bool>,
+    body_as_html: Option<bool>,
 }
 
 /// Options for deleting a review.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteReviewOptions {
-    pub id: u32,
+    id: u32,
 }
 
 /// Options for rating a review.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct RateReviewOptions {
-    pub review_id: u32,
-    pub rating: ReviewRating,
+    review_id: u32,
+    rating: ReviewRating,
 }
 
 /// Endpoint for review operations.
@@ -112,13 +116,14 @@ impl<'a> ReviewEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(&options!(
-            FetchReviewOptions,
-            media_id: Some(media_id),
-            page,
-            per_page,
-            sort: Some(&[ReviewSort::RatingDesc]),
-        ))
+        self.fetch(
+            &FetchReviewOptions::builder()
+                .media_id(Some(media_id))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[ReviewSort::RatingDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -129,13 +134,14 @@ impl<'a> ReviewEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(&options!(
-            FetchReviewOptions,
-            user_id: Some(user_id),
-            page,
-            per_page,
-            sort: Some(&[ReviewSort::IdDesc]),
-        ))
+        self.fetch(
+            &FetchReviewOptions::builder()
+                .user_id(Some(user_id))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[ReviewSort::IdDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -145,22 +151,20 @@ impl<'a> ReviewEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
-        self.fetch(&options!(
-            FetchReviewOptions,
-            page,
-            per_page,
-            sort: Some(&[ReviewSort::IdDesc]),
-        ))
+        self.fetch(
+            &FetchReviewOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[ReviewSort::IdDesc])))
+                .build(),
+        )
         .await
     }
 
     /// Get review by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Review, AniListError> {
         let mut response = self
-            .fetch(&options!(
-                FetchReviewOptions,
-                id: Some(id),
-            ))
+            .fetch(&FetchReviewOptions::builder().id(Some(id)).build())
             .await?;
 
         if response.data.is_empty() {
@@ -179,24 +183,22 @@ impl<'a> ReviewEndpoint<'a> {
         body: &str,
         private: Option<bool>,
     ) -> Result<Review, AniListError> {
-        self.save(&options!(
-            SaveReviewOptions,
-            media_id => media_id,
-            score: Some(score),
-            summary: Some(summary),
-            body: Some(body),
-            private,
-        ))
+        self.save(
+            &SaveReviewOptions::builder()
+                .media_id(media_id)
+                .score(Some(score))
+                .summary(Some(Cow::Borrowed(summary)))
+                .body(Some(Cow::Borrowed(body)))
+                .private(private)
+                .build(),
+        )
         .await
     }
 
     /// Delete a review
     pub async fn delete_review(&self, id: u32) -> Result<bool, AniListError> {
-        self.delete(&options!(
-            DeleteReviewOptions,
-            id => id,
-        ))
-        .await
+        self.delete(&DeleteReviewOptions::builder().id(id).build())
+            .await
     }
 
     /// Rate a review
@@ -205,11 +207,12 @@ impl<'a> ReviewEndpoint<'a> {
         review_id: u32,
         rating: ReviewRating,
     ) -> Result<Review, AniListError> {
-        self.rate(&options!(
-            RateReviewOptions,
-            review_id => review_id,
-            rating => rating,
-        ))
+        self.rate(
+            &RateReviewOptions::builder()
+                .review_id(review_id)
+                .rating(rating)
+                .build(),
+        )
         .await
     }
 }

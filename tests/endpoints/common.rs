@@ -2,7 +2,6 @@
 
 use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
-use anilist_moe::options;
 use anilist_moe::{
     endpoints::common::*,
     enums::{
@@ -23,10 +22,10 @@ async fn test_toggle_like() {
 
     let result = h
         .run(|| async {
-            let options = ToggleLikeOptions {
-                id: 870493538,
-                like_type: LikeableType::Activity,
-            };
+            let options = ToggleLikeOptions::builder()
+                .id(870493538)
+                .like_type(LikeableType::Activity)
+                .build();
             client.common().toggle_like(&options).await
         })
         .await;
@@ -54,10 +53,7 @@ async fn test_toggle_follow() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                ToggleFollowOptions,
-                user_id => 5429396,
-            );
+            let options = ToggleFollowOptions::builder().user_id(5429396).build();
             client.common().toggle_follow(&options).await
         })
         .await;
@@ -89,10 +85,7 @@ async fn test_toggle_favourite() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                ToggleFavouriteOptions,
-                anime_id: Some(1), // Cowboy Bebop
-            );
+            let options = ToggleFavouriteOptions::builder().anime_id(Some(1)).build();
             client.common().toggle_favourite(&options).await
         })
         .await;
@@ -158,12 +151,12 @@ async fn test_likes() {
 
     let result = h
         .run(|| async {
-            let options = LikesOptions {
-                likeable_id: 870493538,
-                like_type: LikeableType::Activity,
-                page: Some(1),
-                per_page: Some(5),
-            };
+            let options = LikesOptions::builder()
+                .likeable_id(870493538)
+                .like_type(LikeableType::Activity)
+                .page(Some(1))
+                .per_page(Some(5))
+                .build();
             client.common().likes(&options).await
         })
         .await;
@@ -202,11 +195,11 @@ async fn test_external_link_sources() {
 
     let result = h
         .run(|| async {
-            let options = ExternalLinkSourceOptions {
-                id: None,
-                link_type: Some(ExternalLinkType::Streaming),
-                media_type: Some(ExternalLinkMediaType::Anime),
-            };
+            let options = ExternalLinkSourceOptions::builder()
+                .id(None)
+                .link_type(Some(ExternalLinkType::Streaming))
+                .media_type(Some(ExternalLinkMediaType::Anime))
+                .build();
             client.common().external_link_sources(&options).await
         })
         .await;

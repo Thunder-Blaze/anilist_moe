@@ -2,7 +2,6 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::airing::*;
-use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -15,10 +14,7 @@ async fn test_fetch_airing_schedules() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchAiringOptions,
-                per_page: Some(10),
-            );
+            let options = FetchAiringOptions::builder().per_page(Some(10)).build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -57,11 +53,10 @@ async fn test_fetch_airing_pagination() {
     // Fetch page 1
     let result1 = h
         .run(|| async {
-            let options = options!(
-                FetchAiringOptions,
-                per_page: Some(5),
-                page: Some(1),
-            );
+            let options = FetchAiringOptions::builder()
+                .per_page(Some(5))
+                .page(Some(1))
+                .build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -77,11 +72,10 @@ async fn test_fetch_airing_pagination() {
     // Fetch page 2
     let result2 = h
         .run(|| async {
-            let options = options!(
-                FetchAiringOptions,
-                per_page: Some(5),
-                page: Some(2),
-            );
+            let options = FetchAiringOptions::builder()
+                .per_page(Some(5))
+                .page(Some(2))
+                .build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -116,10 +110,7 @@ async fn test_airing_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchAiringOptions,
-                per_page: Some(1),
-            );
+            let options = FetchAiringOptions::builder().per_page(Some(1)).build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -162,17 +153,18 @@ async fn test_fetch_one_airing_schedule() {
         .run(|| async {
             let page = client
                 .airing()
-                .fetch(&options!(
-                    FetchAiringOptions,
-                    not_yet_aired: Some(true),
-                    per_page: Some(1),
-                ))
+                .fetch(
+                    &FetchAiringOptions::builder()
+                        .not_yet_aired(Some(true))
+                        .per_page(Some(1))
+                        .build(),
+                )
                 .await?;
             let listed = page.data.first().expect("an upcoming schedule");
             let id = listed.id.expect("a schedule id");
             let one = client
                 .airing()
-                .fetch_one(&options!(FetchAiringOptions, id: Some(id)))
+                .fetch_one(&FetchAiringOptions::builder().id(Some(id)).build())
                 .await?;
             Ok::<_, anilist_moe::AniListError>((id, listed.media_id, one))
         })

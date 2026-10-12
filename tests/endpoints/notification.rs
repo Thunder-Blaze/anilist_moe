@@ -3,7 +3,6 @@
 use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
 use anilist_moe::endpoints::notification::*;
-use anilist_moe::options;
 
 #[tokio::test]
 async fn test_fetch_notifications() {
@@ -15,10 +14,9 @@ async fn test_fetch_notifications() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                NotificationSearchOptions,
-                per_page: Some(5),
-            );
+            let options = NotificationSearchOptions::builder()
+                .per_page(Some(5))
+                .build();
             client.notification().fetch(&options).await
         })
         .await;
@@ -47,10 +45,9 @@ async fn test_notification_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                NotificationSearchOptions,
-                per_page: Some(1),
-            );
+            let options = NotificationSearchOptions::builder()
+                .per_page(Some(1))
+                .build();
             client.notification().fetch(&options).await
         })
         .await;

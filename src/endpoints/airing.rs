@@ -2,48 +2,49 @@ use crate::enums::airing::AiringSort;
 use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::airing};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching airing schedule information.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchAiringOptions<'a> {
-    pub id: Option<u32>,
-    pub media_id: Option<u32>,
-    pub episode: Option<i32>,
-    pub airing_at: Option<i32>,
-    pub not_yet_aired: Option<bool>,
-    pub id_not: Option<u32>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub id_not_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not: Option<u32>,
-    pub media_id_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not_in: Option<Cow<'a, [u32]>>,
-    pub episode_not: Option<i32>,
-    pub episode_in: Option<Cow<'a, [i32]>>,
-    pub episode_not_in: Option<Cow<'a, [i32]>>,
-    pub episode_greater: Option<i32>,
-    pub episode_lesser: Option<i32>,
-    pub airing_at_greater: Option<i32>,
-    pub airing_at_lesser: Option<i32>,
+    id: Option<u32>,
+    media_id: Option<u32>,
+    episode: Option<i32>,
+    airing_at: Option<i32>,
+    not_yet_aired: Option<bool>,
+    id_not: Option<u32>,
+    id_in: Option<Cow<'a, [u32]>>,
+    id_not_in: Option<Cow<'a, [u32]>>,
+    media_id_not: Option<u32>,
+    media_id_in: Option<Cow<'a, [u32]>>,
+    media_id_not_in: Option<Cow<'a, [u32]>>,
+    episode_not: Option<i32>,
+    episode_in: Option<Cow<'a, [i32]>>,
+    episode_not_in: Option<Cow<'a, [i32]>>,
+    episode_greater: Option<i32>,
+    episode_lesser: Option<i32>,
+    airing_at_greater: Option<i32>,
+    airing_at_lesser: Option<i32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset keeps the order the query document asks for.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "Option::is_none"
     )]
-    pub sort: Option<Cow<'a, [AiringSort]>>,
-    pub per_page: Option<i32>,
-    pub page: Option<i32>,
+    sort: Option<Cow<'a, [AiringSort]>>,
+    per_page: Option<i32>,
+    page: Option<i32>,
     // HTML rendering options
-    pub description_as_html: Option<bool>,
+    description_as_html: Option<bool>,
 }
 
 /// Endpoint for airing schedule operations.
@@ -90,13 +91,14 @@ impl<'a> AiringEndpoint<'a> {
             .map(|since_epoch| since_epoch.as_secs() as i32)
             .unwrap_or(0);
 
-        self.fetch(&options!(
-            FetchAiringOptions,
-            airing_at_greater: Some(now),
-            sort: Some(&[AiringSort::Time]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchAiringOptions::builder()
+                .airing_at_greater(Some(now))
+                .sort(Some(Cow::Borrowed(&[AiringSort::Time])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -112,13 +114,14 @@ impl<'a> AiringEndpoint<'a> {
             .map(|since_epoch| since_epoch.as_secs() as i32)
             .unwrap_or(0);
 
-        self.fetch(&options!(
-            FetchAiringOptions,
-            airing_at_lesser: Some(now),
-            sort: Some(&[AiringSort::TimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchAiringOptions::builder()
+                .airing_at_lesser(Some(now))
+                .sort(Some(Cow::Borrowed(&[AiringSort::TimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -129,13 +132,14 @@ impl<'a> AiringEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
-        self.fetch(&options!(
-            FetchAiringOptions,
-            media_id: Some(media_id),
-            sort: Some(&[AiringSort::Time]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchAiringOptions::builder()
+                .media_id(Some(media_id))
+                .sort(Some(Cow::Borrowed(&[AiringSort::Time])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 }

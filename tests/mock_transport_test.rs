@@ -5,7 +5,6 @@
 
 use anilist_moe::endpoints::media::{FetchMediaOneOptions, FetchMediaOptions};
 use anilist_moe::enums::media::{MediaSort, MediaType};
-use anilist_moe::options;
 use anilist_moe::transport::{HttpRequest, HttpResponse, Transport};
 use anilist_moe::utils::RetryConfig;
 use anilist_moe::{AniListClient, AniListError};
@@ -171,15 +170,16 @@ async fn media_options_carry_the_include_flags() {
     let transport = ScriptedTransport::new(vec![ScriptedTransport::json(MEDIA_PAGE)]);
     let client = client(&transport);
 
-    let options = options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        sort: &[MediaSort::PopularityDesc],
-        include_characters: true,
-        include_staff: true,
-        page: 1,
-        per_page: 5,
-    );
+    let options = FetchMediaOptions::builder()
+        .media_type(Some(MediaType::Anime))
+        .sort(Some(std::borrow::Cow::Borrowed(&[
+            MediaSort::PopularityDesc,
+        ])))
+        .include_characters(Some(true))
+        .include_staff(Some(true))
+        .page(Some(1))
+        .per_page(Some(5))
+        .build();
     let page = client.media().fetch(&options).await.expect("parses");
 
     assert_eq!(page.data.len(), 1);
@@ -231,7 +231,9 @@ async fn a_not_found_response_surfaces_as_not_found() {
     let transport = ScriptedTransport::new(vec![HttpResponse::new(404, "missing")]);
     let client = client(&transport);
 
-    let options = options!(FetchMediaOneOptions, id: 999_999_999);
+    let options = FetchMediaOneOptions::builder()
+        .id(Some(999_999_999))
+        .build();
     let error = client
         .media()
         .fetch_one(&options)

@@ -4,7 +4,6 @@ use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::recommendation::*;
 use anilist_moe::enums::recommendation::RecommendationRating;
-use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -17,10 +16,9 @@ async fn test_fetch_recommendations() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchRecommendationOptions,
-                per_page: Some(5),
-            );
+            let options = FetchRecommendationOptions::builder()
+                .per_page(Some(5))
+                .build();
             client.recommendation().fetch(&options).await
         })
         .await;
@@ -47,11 +45,10 @@ async fn test_fetch_recommendations_by_media() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchRecommendationOptions,
-                media_id: Some(1), // Cowboy Bebop
-                per_page: Some(5),
-            );
+            let options = FetchRecommendationOptions::builder()
+                .media_id(Some(1))
+                .per_page(Some(5))
+                .build();
             client.recommendation().fetch(&options).await
         })
         .await;
@@ -78,10 +75,9 @@ async fn test_recommendation_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchRecommendationOptions,
-                per_page: Some(1),
-            );
+            let options = FetchRecommendationOptions::builder()
+                .per_page(Some(1))
+                .build();
             client.recommendation().fetch(&options).await
         })
         .await;
@@ -114,12 +110,11 @@ async fn test_save_recommendation() {
     let result = h
         .run(|| async {
             // Recommending Cowboy Bebop (1) -> Samurai Champloo (205)
-            let options = options!(
-                SaveRecommendationOptions,
-                media_id => 1,
-                media_recommendation_id => 205,
-                rating => RecommendationRating::RateUp,
-            );
+            let options = SaveRecommendationOptions::builder()
+                .media_id(1)
+                .media_recommendation_id(205)
+                .rating(RecommendationRating::RateUp)
+                .build();
             client.recommendation().save(&options).await
         })
         .await;

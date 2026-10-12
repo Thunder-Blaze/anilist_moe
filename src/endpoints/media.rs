@@ -5,13 +5,13 @@ use crate::enums::staff::StaffLanguage;
 use crate::errors::AniListError;
 use crate::objects::media::{Media, MediaTrend};
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::media};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Fetch media (anime/manga) with filters and pagination.
 ///
@@ -19,172 +19,173 @@ use std::borrow::Cow;
 /// ```rust
 /// # use anilist_moe::endpoints::media::FetchMediaOptions;
 /// # use anilist_moe::enums::media::{MediaType, MediaSeason, MediaSort};
-/// # use anilist_moe::options;
-/// let options = options!(
-///     FetchMediaOptions,
-///     media_type: MediaType::Anime,
-///     season: MediaSeason::Fall,
-///     season_year: 2024,
-///     sort: &[MediaSort::Popularity],
-///     page: 1,
-///     per_page: 20,
-/// );
+/// # use std::borrow::Cow;
+/// let options = FetchMediaOptions::builder()
+///     .media_type(Some(MediaType::Anime))
+///     .season(Some(MediaSeason::Fall))
+///     .season_year(Some(2024))
+///     .sort(Some(Cow::Borrowed(&[MediaSort::Popularity])))
+///     .page(Some(1))
+///     .per_page(Some(20))
+///     .build();
 /// ```
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaOptions<'a> {
-    pub id: Option<u32>,
-    pub id_mal: Option<u32>,
-    pub search: Option<Cow<'a, str>>,
-    pub media_type: Option<MediaType>,
-    pub format: Option<MediaFormat>,
-    pub status: Option<MediaStatus>,
-    pub season: Option<MediaSeason>,
-    pub season_year: Option<i32>,
-    pub genre: Option<Cow<'a, str>>,
-    pub tag: Option<Cow<'a, str>>,
-    pub tag_category: Option<Cow<'a, str>>,
-    pub minimum_tag_rank: Option<i32>,
-    pub source: Option<Cow<'a, str>>,
-    pub country_of_origin: Option<Cow<'a, str>>,
-    pub country_of_origin_in: Option<Cow<'a, [CountryCode]>>,
-    pub country_of_origin_not_in: Option<Cow<'a, [CountryCode]>>,
-    pub is_licensed: Option<bool>,
-    pub is_adult: Option<bool>,
-    pub on_list: Option<bool>,
-    pub licensed_by: Option<Cow<'a, str>>,
-    pub licensed_by_id: Option<u32>,
-    pub id_not: Option<u32>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub id_not_in: Option<Cow<'a, [u32]>>,
-    pub id_mal_not: Option<u32>,
-    pub id_mal_in: Option<Cow<'a, [u32]>>,
-    pub id_mal_not_in: Option<Cow<'a, [u32]>>,
-    pub format_not: Option<MediaFormat>,
-    pub format_in: Option<Cow<'a, [MediaFormat]>>,
-    pub format_not_in: Option<Cow<'a, [MediaFormat]>>,
-    pub status_not: Option<MediaStatus>,
-    pub status_in: Option<Cow<'a, [MediaStatus]>>,
-    pub status_not_in: Option<Cow<'a, [MediaStatus]>>,
-    pub genre_in: Option<Cow<'a, [&'a str]>>,
-    pub genre_not_in: Option<Cow<'a, [&'a str]>>,
-    pub tag_in: Option<Cow<'a, [&'a str]>>,
-    pub tag_not_in: Option<Cow<'a, [&'a str]>>,
-    pub tag_category_in: Option<Cow<'a, [&'a str]>>,
-    pub tag_category_not_in: Option<Cow<'a, [&'a str]>>,
-    pub licensed_by_in: Option<Cow<'a, [&'a str]>>,
-    pub licensed_by_id_in: Option<Cow<'a, [u32]>>,
-    pub source_in: Option<Cow<'a, [&'a str]>>,
-    pub start_date: Option<i32>,
-    pub end_date: Option<i32>,
-    pub start_date_greater: Option<i32>,
-    pub start_date_lesser: Option<i32>,
-    pub start_date_like: Option<Cow<'a, str>>,
-    pub end_date_greater: Option<i32>,
-    pub end_date_lesser: Option<i32>,
-    pub end_date_like: Option<Cow<'a, str>>,
-    pub average_score: Option<i32>,
-    pub average_score_not: Option<i32>,
-    pub average_score_greater: Option<i32>,
-    pub average_score_lesser: Option<i32>,
-    pub popularity: Option<i32>,
-    pub popularity_not: Option<i32>,
-    pub popularity_greater: Option<i32>,
-    pub popularity_lesser: Option<i32>,
-    pub episodes: Option<i32>,
-    pub episodes_greater: Option<i32>,
-    pub episodes_lesser: Option<i32>,
-    pub duration: Option<i32>,
-    pub duration_greater: Option<i32>,
-    pub duration_lesser: Option<i32>,
-    pub chapters: Option<i32>,
-    pub chapters_greater: Option<i32>,
-    pub chapters_lesser: Option<i32>,
-    pub volumes: Option<i32>,
-    pub volumes_greater: Option<i32>,
-    pub volumes_lesser: Option<i32>,
+    id: Option<u32>,
+    id_mal: Option<u32>,
+    search: Option<Cow<'a, str>>,
+    media_type: Option<MediaType>,
+    format: Option<MediaFormat>,
+    status: Option<MediaStatus>,
+    season: Option<MediaSeason>,
+    season_year: Option<i32>,
+    genre: Option<Cow<'a, str>>,
+    tag: Option<Cow<'a, str>>,
+    tag_category: Option<Cow<'a, str>>,
+    minimum_tag_rank: Option<i32>,
+    source: Option<Cow<'a, str>>,
+    country_of_origin: Option<Cow<'a, str>>,
+    country_of_origin_in: Option<Cow<'a, [CountryCode]>>,
+    country_of_origin_not_in: Option<Cow<'a, [CountryCode]>>,
+    is_licensed: Option<bool>,
+    is_adult: Option<bool>,
+    on_list: Option<bool>,
+    licensed_by: Option<Cow<'a, str>>,
+    licensed_by_id: Option<u32>,
+    id_not: Option<u32>,
+    id_in: Option<Cow<'a, [u32]>>,
+    id_not_in: Option<Cow<'a, [u32]>>,
+    id_mal_not: Option<u32>,
+    id_mal_in: Option<Cow<'a, [u32]>>,
+    id_mal_not_in: Option<Cow<'a, [u32]>>,
+    format_not: Option<MediaFormat>,
+    format_in: Option<Cow<'a, [MediaFormat]>>,
+    format_not_in: Option<Cow<'a, [MediaFormat]>>,
+    status_not: Option<MediaStatus>,
+    status_in: Option<Cow<'a, [MediaStatus]>>,
+    status_not_in: Option<Cow<'a, [MediaStatus]>>,
+    genre_in: Option<Cow<'a, [&'a str]>>,
+    genre_not_in: Option<Cow<'a, [&'a str]>>,
+    tag_in: Option<Cow<'a, [&'a str]>>,
+    tag_not_in: Option<Cow<'a, [&'a str]>>,
+    tag_category_in: Option<Cow<'a, [&'a str]>>,
+    tag_category_not_in: Option<Cow<'a, [&'a str]>>,
+    licensed_by_in: Option<Cow<'a, [&'a str]>>,
+    licensed_by_id_in: Option<Cow<'a, [u32]>>,
+    source_in: Option<Cow<'a, [&'a str]>>,
+    start_date: Option<i32>,
+    end_date: Option<i32>,
+    start_date_greater: Option<i32>,
+    start_date_lesser: Option<i32>,
+    start_date_like: Option<Cow<'a, str>>,
+    end_date_greater: Option<i32>,
+    end_date_lesser: Option<i32>,
+    end_date_like: Option<Cow<'a, str>>,
+    average_score: Option<i32>,
+    average_score_not: Option<i32>,
+    average_score_greater: Option<i32>,
+    average_score_lesser: Option<i32>,
+    popularity: Option<i32>,
+    popularity_not: Option<i32>,
+    popularity_greater: Option<i32>,
+    popularity_lesser: Option<i32>,
+    episodes: Option<i32>,
+    episodes_greater: Option<i32>,
+    episodes_lesser: Option<i32>,
+    duration: Option<i32>,
+    duration_greater: Option<i32>,
+    duration_lesser: Option<i32>,
+    chapters: Option<i32>,
+    chapters_greater: Option<i32>,
+    chapters_lesser: Option<i32>,
+    volumes: Option<i32>,
+    volumes_greater: Option<i32>,
+    volumes_lesser: Option<i32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [MediaSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
-    pub include_start_date: Option<bool>,
-    pub include_end_date: Option<bool>,
-    pub include_duration: Option<bool>,
-    pub include_volumes: Option<bool>,
-    pub include_country_of_origin: Option<bool>,
-    pub include_is_licensed: Option<bool>,
-    pub include_source: Option<bool>,
-    pub include_hashtag: Option<bool>,
-    pub include_trailer: Option<bool>,
-    pub include_updated_at: Option<bool>,
-    pub include_cover_image_extra_large: Option<bool>,
-    pub include_mean_score: Option<bool>,
-    pub include_is_locked: Option<bool>,
-    pub include_trending: Option<bool>,
-    pub include_tags: Option<bool>,
-    pub include_next_airing_episode: Option<bool>,
-    pub include_relations: Option<bool>,
-    pub include_characters: Option<bool>,
-    pub include_staff: Option<bool>,
-    pub include_studios: Option<bool>,
-    pub include_media_list_entry_details: Option<bool>,
-    pub include_reviews: Option<bool>,
-    pub include_recommendations: Option<bool>,
-    pub include_external_links: Option<bool>,
-    pub include_streaming_episodes: Option<bool>,
-    pub include_rankings: Option<bool>,
-    pub include_stats: Option<bool>,
-    pub include_auto_create_forum_thread: Option<bool>,
-    pub include_is_recommendation_blocked: Option<bool>,
-    pub include_is_review_blocked: Option<bool>,
-    pub include_mod_notes: Option<bool>,
+    sort: Option<Cow<'a, [MediaSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
+    include_start_date: Option<bool>,
+    include_end_date: Option<bool>,
+    include_duration: Option<bool>,
+    include_volumes: Option<bool>,
+    include_country_of_origin: Option<bool>,
+    include_is_licensed: Option<bool>,
+    include_source: Option<bool>,
+    include_hashtag: Option<bool>,
+    include_trailer: Option<bool>,
+    include_updated_at: Option<bool>,
+    include_cover_image_extra_large: Option<bool>,
+    include_mean_score: Option<bool>,
+    include_is_locked: Option<bool>,
+    include_trending: Option<bool>,
+    include_tags: Option<bool>,
+    include_next_airing_episode: Option<bool>,
+    include_relations: Option<bool>,
+    include_characters: Option<bool>,
+    include_staff: Option<bool>,
+    include_studios: Option<bool>,
+    include_media_list_entry_details: Option<bool>,
+    include_reviews: Option<bool>,
+    include_recommendations: Option<bool>,
+    include_external_links: Option<bool>,
+    include_streaming_episodes: Option<bool>,
+    include_rankings: Option<bool>,
+    include_stats: Option<bool>,
+    include_auto_create_forum_thread: Option<bool>,
+    include_is_recommendation_blocked: Option<bool>,
+    include_is_review_blocked: Option<bool>,
+    include_mod_notes: Option<bool>,
     // Pagination fields
-    pub characters_page: Option<i32>,
-    pub characters_per_page: Option<i32>,
-    pub staff_page: Option<i32>,
-    pub staff_per_page: Option<i32>,
-    pub reviews_page: Option<i32>,
-    pub reviews_per_page: Option<i32>,
-    pub recommendations_page: Option<i32>,
-    pub recommendations_per_page: Option<i32>,
+    characters_page: Option<i32>,
+    characters_per_page: Option<i32>,
+    staff_page: Option<i32>,
+    staff_per_page: Option<i32>,
+    reviews_page: Option<i32>,
+    reviews_per_page: Option<i32>,
+    recommendations_page: Option<i32>,
+    recommendations_per_page: Option<i32>,
     // Filter fields for included connections
-    pub voice_actor_language: Option<StaffLanguage>,
+    voice_actor_language: Option<StaffLanguage>,
     // HTML rendering options
-    pub description_as_html: Option<bool>,
+    description_as_html: Option<bool>,
 }
 
 /// Fetch detailed info for a single media item.
 ///
 /// Supports optional pagination for related data (characters, staff, reviews, recommendations).
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaOneOptions<'a> {
-    pub id: Option<u32>,
-    pub id_mal: Option<u32>,
-    pub search: Option<Cow<'a, str>>,
+    id: Option<u32>,
+    id_mal: Option<u32>,
+    search: Option<Cow<'a, str>>,
     // Characters pagination
-    pub fetch_characters: Option<bool>,
-    pub characters_page: Option<i32>,
-    pub characters_per_page: Option<i32>,
+    fetch_characters: Option<bool>,
+    characters_page: Option<i32>,
+    characters_per_page: Option<i32>,
     // Staff pagination
-    pub fetch_staff: Option<bool>,
-    pub staff_page: Option<i32>,
-    pub staff_per_page: Option<i32>,
+    fetch_staff: Option<bool>,
+    staff_page: Option<i32>,
+    staff_per_page: Option<i32>,
     // Reviews pagination
-    pub fetch_reviews: Option<bool>,
-    pub reviews_page: Option<i32>,
-    pub reviews_per_page: Option<i32>,
+    fetch_reviews: Option<bool>,
+    reviews_page: Option<i32>,
+    reviews_per_page: Option<i32>,
     // Recommendations pagination
-    pub fetch_recommendations: Option<bool>,
-    pub recommendations_page: Option<i32>,
-    pub recommendations_per_page: Option<i32>,
+    fetch_recommendations: Option<bool>,
+    recommendations_page: Option<i32>,
+    recommendations_per_page: Option<i32>,
 }
 
 /// Anime and manga endpoint.
@@ -206,42 +207,43 @@ pub struct FetchMediaOneOptions<'a> {
 /// This is the daily record AniList keeps for a media: its trending score,
 /// average score, popularity and episode count, one row per day.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaTrendOptions<'a> {
-    pub media_id: Option<u32>,
-    pub date: Option<i32>,
-    pub trending: Option<i32>,
-    pub average_score: Option<i32>,
-    pub popularity: Option<i32>,
-    pub episode: Option<i32>,
-    pub releasing: Option<bool>,
-    pub media_id_not: Option<u32>,
-    pub media_id_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not_in: Option<Cow<'a, [u32]>>,
-    pub date_greater: Option<i32>,
-    pub date_lesser: Option<i32>,
-    pub trending_greater: Option<i32>,
-    pub trending_lesser: Option<i32>,
-    pub trending_not: Option<i32>,
-    pub average_score_greater: Option<i32>,
-    pub average_score_lesser: Option<i32>,
-    pub average_score_not: Option<i32>,
-    pub popularity_greater: Option<i32>,
-    pub popularity_lesser: Option<i32>,
-    pub popularity_not: Option<i32>,
-    pub episode_greater: Option<i32>,
-    pub episode_lesser: Option<i32>,
-    pub episode_not: Option<i32>,
+    media_id: Option<u32>,
+    date: Option<i32>,
+    trending: Option<i32>,
+    average_score: Option<i32>,
+    popularity: Option<i32>,
+    episode: Option<i32>,
+    releasing: Option<bool>,
+    media_id_not: Option<u32>,
+    media_id_in: Option<Cow<'a, [u32]>>,
+    media_id_not_in: Option<Cow<'a, [u32]>>,
+    date_greater: Option<i32>,
+    date_lesser: Option<i32>,
+    trending_greater: Option<i32>,
+    trending_lesser: Option<i32>,
+    trending_not: Option<i32>,
+    average_score_greater: Option<i32>,
+    average_score_lesser: Option<i32>,
+    average_score_not: Option<i32>,
+    popularity_greater: Option<i32>,
+    popularity_lesser: Option<i32>,
+    popularity_not: Option<i32>,
+    episode_greater: Option<i32>,
+    episode_lesser: Option<i32>,
+    episode_not: Option<i32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset keeps the order the query document asks for.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "Option::is_none"
     )]
-    pub sort: Option<Cow<'a, [MediaTrendSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    sort: Option<Cow<'a, [MediaTrendSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 }
 
 pub struct MediaEndpoint<'a> {
@@ -262,16 +264,17 @@ impl<'a> MediaEndpoint<'a> {
     /// # use anilist_moe::AniListError;
     /// # use anilist_moe::endpoints::media::FetchMediaOptions;
     /// # use anilist_moe::enums::media::{MediaType, MediaSort};
-    /// # use anilist_moe::options;
+    /// # use std::borrow::Cow;
+    ///
     /// # async fn example() -> Result<(), AniListError> {
     /// let client = AniListClient::new();
-    /// let options = options!(
-    ///     FetchMediaOptions,
-    ///     media_type: MediaType::Anime,
-    ///     sort: &[MediaSort::Popularity],
-    ///     page: 1,
-    ///     per_page: 10,
-    /// );
+    /// let options = FetchMediaOptions::builder()
+    ///     .media_type(Some(MediaType::Anime))
+    ///     .sort(Some(Cow::Borrowed(&[MediaSort::Popularity])))
+    ///     .page(Some(1))
+    ///     .per_page(Some(10))
+    ///     .build();
+    ///
     /// let response = client.media().fetch(&options).await?;
     /// for anime in &response.data { println!("Title: {:?}", anime.title); }
     /// # Ok(())
@@ -294,7 +297,7 @@ impl<'a> MediaEndpoint<'a> {
     /// # use anilist_moe::endpoints::media::FetchMediaOneOptions;
     /// # async fn example() -> Result<(), AniListError> {
     /// let client = AniListClient::new();
-    /// let options = FetchMediaOneOptions { id: Some(16498), ..Default::default() };
+    /// let options = FetchMediaOneOptions::builder().id(Some(16498)).build();
     /// let anime = client.media().fetch_one(&options).await?;
     /// println!("Title: {:?}", anime.title);
     /// # Ok(())
@@ -338,15 +341,16 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -356,15 +360,16 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            sort: Some(&[MediaSort::TrendingDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .sort(Some(Cow::Borrowed(&[MediaSort::TrendingDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -374,16 +379,17 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            status: Some(MediaStatus::Releasing),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .status(Some(MediaStatus::Releasing))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -393,14 +399,15 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            status: Some(MediaStatus::NotYetReleased),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .status(Some(MediaStatus::NotYetReleased))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -412,17 +419,18 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            season: Some(season),
-            season_year: Some(year),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .season(Some(season))
+                .season_year(Some(year))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -433,26 +441,24 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            search: Some(query),
-            sort: Some(&[MediaSort::SearchMatch]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .search(Some(Cow::Borrowed(query)))
+                .sort(Some(Cow::Borrowed(&[MediaSort::SearchMatch])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
     /// Get anime by ID
     pub async fn get_anime_by_id(&self, id: u32) -> Result<Media, AniListError> {
-        self.fetch_one(&options!(
-            FetchMediaOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_one(&FetchMediaOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Get top rated anime
@@ -461,15 +467,16 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Anime),
-            sort: Some(&[MediaSort::ScoreDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .sort(Some(Cow::Borrowed(&[MediaSort::ScoreDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -481,15 +488,16 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Manga),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -499,15 +507,16 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Manga),
-            sort: Some(&[MediaSort::TrendingDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .sort(Some(Cow::Borrowed(&[MediaSort::TrendingDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -517,16 +526,17 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Manga),
-            status: Some(MediaStatus::Releasing),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .status(Some(MediaStatus::Releasing))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -536,16 +546,17 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Manga),
-            status: Some(MediaStatus::Finished),
-            sort: Some(&[MediaSort::PopularityDesc]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .status(Some(MediaStatus::Finished))
+                .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -556,26 +567,24 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Manga),
-            search: Some(query),
-            sort: Some(&[MediaSort::SearchMatch]),
-            include_start_date: Some(true),
-            include_end_date: Some(true),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .search(Some(Cow::Borrowed(query)))
+                .sort(Some(Cow::Borrowed(&[MediaSort::SearchMatch])))
+                .include_start_date(Some(true))
+                .include_end_date(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
     /// Get manga by ID
     pub async fn get_manga_by_id(&self, id: u32) -> Result<Media, AniListError> {
-        self.fetch_one(&options!(
-            FetchMediaOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_one(&FetchMediaOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Get top rated manga
@@ -584,13 +593,14 @@ impl<'a> MediaEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Media>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaOptions,
-            media_type: Some(MediaType::Manga),
-            sort: Some(&[MediaSort::ScoreDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .sort(Some(Cow::Borrowed(&[MediaSort::ScoreDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 }

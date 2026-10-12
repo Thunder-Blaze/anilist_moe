@@ -2,45 +2,48 @@ use crate::enums::recommendation::{RecommendationRating, RecommendationSort};
 use crate::errors::AniListError;
 use crate::objects::recommendation::Recommendation;
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
-use crate::{client::AniListClient, queries::recommendation};
+use crate::queries::recommendation;
+use crate::AniListClient;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching media recommendations.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchRecommendationOptions<'a> {
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
-    pub id: Option<u32>,
-    pub media_id: Option<u32>,
-    pub media_recommendation_id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub rating: Option<i32>,
-    pub rating_greater: Option<i32>,
-    pub rating_lesser: Option<i32>,
-    pub on_list: Option<bool>,
+    page: Option<i32>,
+    per_page: Option<i32>,
+    id: Option<u32>,
+    media_id: Option<u32>,
+    media_recommendation_id: Option<u32>,
+    user_id: Option<u32>,
+    rating: Option<i32>,
+    rating_greater: Option<i32>,
+    rating_lesser: Option<i32>,
+    on_list: Option<bool>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [RecommendationSort]>>,
+    sort: Option<Cow<'a, [RecommendationSort]>>,
 }
 
 /// Options for saving a recommendation rating.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveRecommendationOptions {
-    pub media_id: u32,
-    pub media_recommendation_id: u32,
-    pub rating: RecommendationRating,
+    media_id: u32,
+    media_recommendation_id: u32,
+    rating: RecommendationRating,
 }
 
 /// Endpoint for media recommendation operations.
@@ -78,13 +81,14 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&options!(
-            FetchRecommendationOptions,
-            media_id: Some(media_id),
-            page,
-            per_page,
-            sort: Some(&[RecommendationSort::RatingDesc]),
-        ))
+        self.fetch(
+            &FetchRecommendationOptions::builder()
+                .media_id(Some(media_id))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[RecommendationSort::RatingDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -95,13 +99,14 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&options!(
-            FetchRecommendationOptions,
-            user_id: Some(user_id),
-            page,
-            per_page,
-            sort: Some(&[RecommendationSort::IdDesc]),
-        ))
+        self.fetch(
+            &FetchRecommendationOptions::builder()
+                .user_id(Some(user_id))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[RecommendationSort::IdDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -111,12 +116,13 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&options!(
-            FetchRecommendationOptions,
-            page,
-            per_page,
-            sort: Some(&[RecommendationSort::IdDesc]),
-        ))
+        self.fetch(
+            &FetchRecommendationOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[RecommendationSort::IdDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -127,12 +133,13 @@ impl<'a> RecommendationEndpoint<'a> {
         media_recommendation_id: u32,
         rating: RecommendationRating,
     ) -> Result<Recommendation, AniListError> {
-        self.save(&options!(
-            SaveRecommendationOptions,
-            media_id => media_id,
-            media_recommendation_id => media_recommendation_id,
-            rating => rating,
-        ))
+        self.save(
+            &SaveRecommendationOptions::builder()
+                .media_id(media_id)
+                .media_recommendation_id(media_recommendation_id)
+                .rating(rating)
+                .build(),
+        )
         .await
     }
 }

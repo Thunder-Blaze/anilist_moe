@@ -30,6 +30,7 @@ tokio = { version = "1.53.2", features = ["time"] }
 thiserror = "2.0.21"
 log = "0.4.34"
 tracing = { version = "0.1.44", optional = true }
+typed-builder = "0.23.2"
 
 # Endpoint feature flags.
 #

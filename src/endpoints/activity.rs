@@ -3,7 +3,6 @@ use crate::errors::AniListError;
 use crate::objects::activity::{ActivityReply, ListActivity, MessageActivity, TextActivity};
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::unions::activity::ActivityUnion;
@@ -11,15 +10,17 @@ use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching one activity reply.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityReplyOptions {
-    pub id: Option<u32>,
-    pub activity_id: Option<u32>,
-    pub text_as_html: Option<bool>,
+    id: Option<u32>,
+    activity_id: Option<u32>,
+    text_as_html: Option<bool>,
 }
 
 /// Options for updating a list activity.
@@ -27,49 +28,51 @@ pub struct FetchActivityReplyOptions {
 /// This is a moderator mutation: the API refuses it for an ordinary token. The
 /// activity's `id` is required, and `locked` decides whether it ends up locked.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveListActivityOptions {
-    pub id: u32,
-    pub locked: Option<bool>,
+    id: u32,
+    locked: Option<bool>,
 }
 
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityOptions<'a> {
     // # Pagination
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 
     // # Filters
-    pub id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub messenger_id: Option<u32>,
-    pub media_id: Option<u32>,
-    pub type_: Option<ActivityType>,
-    pub is_following: Option<bool>,
-    pub has_replies: Option<bool>,
-    pub has_replies_or_type_text: Option<bool>,
-    pub created_at: Option<i32>,
-    pub id_not: Option<u32>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub id_not_in: Option<Cow<'a, [u32]>>,
-    pub user_id_not: Option<u32>,
-    pub user_id_in: Option<Cow<'a, [u32]>>,
-    pub user_id_not_in: Option<Cow<'a, [u32]>>,
-    pub messenger_id_not: Option<u32>,
-    pub messenger_id_in: Option<Cow<'a, [u32]>>,
-    pub messenger_id_not_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not: Option<u32>,
-    pub media_id_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not_in: Option<Cow<'a, [u32]>>,
-    pub type_not: Option<ActivityType>,
-    pub type_in: Option<Cow<'a, [ActivityType]>>,
-    pub type_not_in: Option<Cow<'a, [ActivityType]>>,
-    pub created_at_greater: Option<i32>,
-    pub created_at_lesser: Option<i32>,
+    id: Option<u32>,
+    user_id: Option<u32>,
+    messenger_id: Option<u32>,
+    media_id: Option<u32>,
+    type_: Option<ActivityType>,
+    is_following: Option<bool>,
+    has_replies: Option<bool>,
+    has_replies_or_type_text: Option<bool>,
+    created_at: Option<i32>,
+    id_not: Option<u32>,
+    id_in: Option<Cow<'a, [u32]>>,
+    id_not_in: Option<Cow<'a, [u32]>>,
+    user_id_not: Option<u32>,
+    user_id_in: Option<Cow<'a, [u32]>>,
+    user_id_not_in: Option<Cow<'a, [u32]>>,
+    messenger_id_not: Option<u32>,
+    messenger_id_in: Option<Cow<'a, [u32]>>,
+    messenger_id_not_in: Option<Cow<'a, [u32]>>,
+    media_id_not: Option<u32>,
+    media_id_in: Option<Cow<'a, [u32]>>,
+    media_id_not_in: Option<Cow<'a, [u32]>>,
+    type_not: Option<ActivityType>,
+    type_in: Option<Cow<'a, [ActivityType]>>,
+    type_not_in: Option<Cow<'a, [ActivityType]>>,
+    created_at_greater: Option<i32>,
+    created_at_lesser: Option<i32>,
 
     // # Sort
     /// Sort order. The unique key (id) is appended, so paging stays stable;
@@ -78,103 +81,112 @@ pub struct FetchActivityOptions<'a> {
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "Option::is_none"
     )]
-    pub sort: Option<Cow<'a, [ActivitySort]>>,
+    sort: Option<Cow<'a, [ActivitySort]>>,
 
     // # HTML rendering options
-    pub text_as_html: Option<bool>,
-    pub message_as_html: Option<bool>,
+    text_as_html: Option<bool>,
+    message_as_html: Option<bool>,
 }
 
 /// Options for fetching a single activity by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityOneOptions {
-    pub id: u32,
+    id: u32,
     // # HTML rendering options
-    pub text_as_html: Option<bool>,
-    pub message_as_html: Option<bool>,
+    text_as_html: Option<bool>,
+    message_as_html: Option<bool>,
 }
 
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 
     // # Filters
-    pub id: Option<u32>,
-    pub activity_id: u32,
+    id: Option<u32>,
+    activity_id: u32,
 
     // # HTML rendering options
-    pub text_as_html: Option<bool>,
+    text_as_html: Option<bool>,
 }
 
 /// Options for deleting an activity.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteActivityOptions {
-    pub id: u32,
+    id: u32,
 }
 
 /// Options for deleting an activity reply.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteActivityReplyOptions {
-    pub id: u32,
+    id: u32,
 }
 
 /// Options for pinning or unpinning an activity.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct PinActivityOptions {
-    pub id: u32,
-    pub pinned: bool,
+    id: u32,
+    pinned: bool,
 }
 
 /// Options for subscribing or unsubscribing to an activity.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeActivityOptions {
     /// The activity to subscribe to or unsubscribe from.
-    pub activity_id: u32,
-    pub subscribe: bool,
+    activity_id: u32,
+    subscribe: bool,
 }
 
 /// Options for saving a message activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMessageActivityOptions<'a> {
-    pub id: Option<u32>,
-    pub message: Cow<'a, str>,
-    pub recipient_id: u32,
-    pub private: Option<bool>,
-    pub locked: Option<bool>,
-    pub as_mod: Option<bool>,
+    id: Option<u32>,
+    message: Cow<'a, str>,
+    recipient_id: u32,
+    private: Option<bool>,
+    locked: Option<bool>,
+    as_mod: Option<bool>,
 }
 
 /// Options for saving a text activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveTextActivityOptions<'a> {
-    pub id: Option<u32>,
-    pub text: Cow<'a, str>,
-    pub locked: Option<bool>,
+    id: Option<u32>,
+    text: Cow<'a, str>,
+    locked: Option<bool>,
 }
 
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveActivityReplyOptions<'a> {
-    pub id: Option<u32>,
-    pub text: Cow<'a, str>,
-    pub activity_id: u32,
+    id: Option<u32>,
+    text: Cow<'a, str>,
+    activity_id: u32,
 }
 
 /// Endpoint for activity feed operations.
@@ -308,12 +320,12 @@ impl<'a> ActivityEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
-        self.fetch(&options!(
-            FetchActivityOptions,
-            page,
-            per_page,
-            sort: Some(&[ActivitySort::IdDesc]),
-        ))
+        self.fetch(
+            &FetchActivityOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -323,31 +335,30 @@ impl<'a> ActivityEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
-        self.fetch(&options!(
-            FetchActivityOptions,
-            is_following: Some(true),
-            page,
-            per_page,
-            sort: Some(&[ActivitySort::IdDesc]),
-        ))
+        self.fetch(
+            &FetchActivityOptions::builder()
+                .is_following(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[ActivitySort::IdDesc])))
+                .build(),
+        )
         .await
     }
 
     /// Get activity by ID
     pub async fn get_by_id(&self, id: u32) -> Result<ActivityUnion, AniListError> {
-        self.fetch_one(&options!(
-            FetchActivityOneOptions,
-            id => id,
-        ))
-        .await
+        self.fetch_one(&FetchActivityOneOptions::builder().id(id).build())
+            .await
     }
 
     /// Create a text activity
     pub async fn create_text_activity(&self, text: &str) -> Result<ActivityUnion, AniListError> {
-        self.save_text_activity(&options!(
-            SaveTextActivityOptions,
-            text => text,
-        ))
+        self.save_text_activity(
+            &SaveTextActivityOptions::builder()
+                .text(Cow::Borrowed(text))
+                .build(),
+        )
         .await
     }
 
@@ -358,12 +369,13 @@ impl<'a> ActivityEndpoint<'a> {
         message: &str,
         private: Option<bool>,
     ) -> Result<ActivityUnion, AniListError> {
-        self.save_message_activity(&options!(
-            SaveMessageActivityOptions,
-            message => message,
-            recipient_id => recipient_id,
-            private,
-        ))
+        self.save_message_activity(
+            &SaveMessageActivityOptions::builder()
+                .recipient_id(recipient_id)
+                .message(Cow::Borrowed(message))
+                .private(private)
+                .build(),
+        )
         .await
     }
 
@@ -373,30 +385,25 @@ impl<'a> ActivityEndpoint<'a> {
         activity_id: u32,
         text: &str,
     ) -> Result<ActivityReply, AniListError> {
-        self.save_reply(&options!(
-            SaveActivityReplyOptions,
-            text => text,
-            activity_id => activity_id,
-        ))
+        self.save_reply(
+            &SaveActivityReplyOptions::builder()
+                .activity_id(activity_id)
+                .text(Cow::Borrowed(text))
+                .build(),
+        )
         .await
     }
 
     /// Delete an activity
     pub async fn delete_activity(&self, id: u32) -> Result<bool, AniListError> {
-        self.delete(&options!(
-            DeleteActivityOptions,
-            id => id,
-        ))
-        .await
+        self.delete(&DeleteActivityOptions::builder().id(id).build())
+            .await
     }
 
     /// Delete an activity reply
     pub async fn delete_activity_reply(&self, id: u32) -> Result<bool, AniListError> {
-        self.delete_reply(&options!(
-            DeleteActivityReplyOptions,
-            id => id,
-        ))
-        .await
+        self.delete_reply(&DeleteActivityReplyOptions::builder().id(id).build())
+            .await
     }
 
     /// Toggle activity subscription
@@ -405,22 +412,19 @@ impl<'a> ActivityEndpoint<'a> {
         id: u32,
         subscribe: bool,
     ) -> Result<ActivityUnion, AniListError> {
-        self.subscribe(&options!(
-            SubscribeActivityOptions,
-            activity_id => id,
-            subscribe => subscribe,
-        ))
+        self.subscribe(
+            &SubscribeActivityOptions::builder()
+                .activity_id(id)
+                .subscribe(subscribe)
+                .build(),
+        )
         .await
     }
 
     /// Toggle activity pin status
     pub async fn toggle_pin(&self, id: u32, pinned: bool) -> Result<ActivityUnion, AniListError> {
-        self.pin(&options!(
-            PinActivityOptions,
-            id => id,
-            pinned => pinned,
-        ))
-        .await
+        self.pin(&PinActivityOptions::builder().id(id).pinned(pinned).build())
+            .await
     }
 }
 

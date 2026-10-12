@@ -4,52 +4,53 @@ use crate::errors::AniListError;
 use crate::objects::common::{Deleted, FuzzyDate};
 use crate::objects::media_list::{MediaList, MediaListCollection};
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::medialist};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching media list entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaListOptions<'a> {
-    pub id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub user_name: Option<Cow<'a, str>>,
-    pub media_type: Option<MediaType>,
-    pub status: Option<MediaListStatus>,
-    pub media_id: Option<u32>,
-    pub is_following: Option<bool>,
-    pub notes: Option<Cow<'a, str>>,
-    pub started_at: Option<i32>,
-    pub completed_at: Option<i32>,
-    pub compare_with_auth_list: Option<bool>,
-    pub user_id_in: Option<Cow<'a, [u32]>>,
-    pub status_in: Option<Cow<'a, [MediaListStatus]>>,
-    pub status_not_in: Option<Cow<'a, [MediaListStatus]>>,
-    pub status_not: Option<MediaListStatus>,
-    pub media_id_in: Option<Cow<'a, [u32]>>,
-    pub media_id_not_in: Option<Cow<'a, [u32]>>,
-    pub notes_like: Option<Cow<'a, str>>,
-    pub started_at_greater: Option<i32>,
-    pub started_at_lesser: Option<i32>,
-    pub started_at_like: Option<Cow<'a, str>>,
-    pub completed_at_greater: Option<i32>,
-    pub completed_at_lesser: Option<i32>,
-    pub completed_at_like: Option<Cow<'a, str>>,
+    id: Option<u32>,
+    user_id: Option<u32>,
+    user_name: Option<Cow<'a, str>>,
+    media_type: Option<MediaType>,
+    status: Option<MediaListStatus>,
+    media_id: Option<u32>,
+    is_following: Option<bool>,
+    notes: Option<Cow<'a, str>>,
+    started_at: Option<i32>,
+    completed_at: Option<i32>,
+    compare_with_auth_list: Option<bool>,
+    user_id_in: Option<Cow<'a, [u32]>>,
+    status_in: Option<Cow<'a, [MediaListStatus]>>,
+    status_not_in: Option<Cow<'a, [MediaListStatus]>>,
+    status_not: Option<MediaListStatus>,
+    media_id_in: Option<Cow<'a, [u32]>>,
+    media_id_not_in: Option<Cow<'a, [u32]>>,
+    notes_like: Option<Cow<'a, str>>,
+    started_at_greater: Option<i32>,
+    started_at_lesser: Option<i32>,
+    started_at_like: Option<Cow<'a, str>>,
+    completed_at_greater: Option<i32>,
+    completed_at_lesser: Option<i32>,
+    completed_at_like: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [MediaListSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    sort: Option<Cow<'a, [MediaListSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
 }
 
 /// Options for fetching a whole list at once, grouped by status.
@@ -62,30 +63,31 @@ pub struct FetchMediaListOptions<'a> {
 /// The API insists on a user (id or name) and a [`media_type`](Self::media_type),
 /// even though the schema marks both as optional.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaListCollectionOptions<'a> {
-    pub user_id: Option<u32>,
-    pub user_name: Option<Cow<'a, str>>,
-    pub media_type: Option<MediaType>,
-    pub status: Option<MediaListStatus>,
-    pub status_in: Option<Cow<'a, [MediaListStatus]>>,
-    pub status_not: Option<MediaListStatus>,
-    pub status_not_in: Option<Cow<'a, [MediaListStatus]>>,
-    pub notes: Option<Cow<'a, str>>,
-    pub notes_like: Option<Cow<'a, str>>,
-    pub started_at: Option<i32>,
-    pub started_at_greater: Option<i32>,
-    pub started_at_lesser: Option<i32>,
-    pub started_at_like: Option<Cow<'a, str>>,
-    pub completed_at: Option<i32>,
-    pub completed_at_greater: Option<i32>,
-    pub completed_at_lesser: Option<i32>,
-    pub completed_at_like: Option<Cow<'a, str>>,
-    pub force_single_completed_list: Option<bool>,
-    pub chunk: Option<i32>,
-    pub per_chunk: Option<i32>,
-    pub sort: Option<Cow<'a, [MediaListSort]>>,
+    user_id: Option<u32>,
+    user_name: Option<Cow<'a, str>>,
+    media_type: Option<MediaType>,
+    status: Option<MediaListStatus>,
+    status_in: Option<Cow<'a, [MediaListStatus]>>,
+    status_not: Option<MediaListStatus>,
+    status_not_in: Option<Cow<'a, [MediaListStatus]>>,
+    notes: Option<Cow<'a, str>>,
+    notes_like: Option<Cow<'a, str>>,
+    started_at: Option<i32>,
+    started_at_greater: Option<i32>,
+    started_at_lesser: Option<i32>,
+    started_at_like: Option<Cow<'a, str>>,
+    completed_at: Option<i32>,
+    completed_at_greater: Option<i32>,
+    completed_at_lesser: Option<i32>,
+    completed_at_like: Option<Cow<'a, str>>,
+    force_single_completed_list: Option<bool>,
+    chunk: Option<i32>,
+    per_chunk: Option<i32>,
+    sort: Option<Cow<'a, [MediaListSort]>>,
 }
 
 /// Options for deleting one of your custom lists.
@@ -93,59 +95,63 @@ pub struct FetchMediaListCollectionOptions<'a> {
 /// Both fields are required: the API rejects a delete without the list's name and
 /// the media type it belongs to.
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteCustomListOptions<'a> {
-    pub custom_list: Cow<'a, str>,
-    pub media_type: MediaType,
+    #[builder(default)]
+    custom_list: Cow<'a, str>,
+    media_type: MediaType,
 }
 
 /// Options for creating or updating a media list entry.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListOptions<'a> {
-    pub id: Option<u32>,
-    pub media_id: Option<u32>,
-    pub status: Option<MediaListStatus>,
-    pub score: Option<f64>,
-    pub score_raw: Option<i32>,
-    pub progress: Option<i32>,
-    pub progress_volumes: Option<i32>,
-    pub repeat: Option<i32>,
-    pub priority: Option<i32>,
-    pub private: Option<bool>,
-    pub notes: Option<Cow<'a, str>>,
-    pub hidden_from_status_lists: Option<bool>,
-    pub custom_lists: Option<Cow<'a, [&'a str]>>,
-    pub advanced_scores: Option<Cow<'a, [f64]>>,
-    pub started_at: Option<FuzzyDate>,
-    pub completed_at: Option<FuzzyDate>,
+    id: Option<u32>,
+    media_id: Option<u32>,
+    status: Option<MediaListStatus>,
+    score: Option<f64>,
+    score_raw: Option<i32>,
+    progress: Option<i32>,
+    progress_volumes: Option<i32>,
+    repeat: Option<i32>,
+    priority: Option<i32>,
+    private: Option<bool>,
+    notes: Option<Cow<'a, str>>,
+    hidden_from_status_lists: Option<bool>,
+    custom_lists: Option<Cow<'a, [&'a str]>>,
+    advanced_scores: Option<Cow<'a, [f64]>>,
+    started_at: Option<FuzzyDate>,
+    completed_at: Option<FuzzyDate>,
 }
 
 /// Options for bulk updating multiple media list entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListMultipleOptions<'a> {
-    pub status: Option<MediaListStatus>,
-    pub score: Option<f64>,
-    pub score_raw: Option<i32>,
-    pub progress: Option<i32>,
-    pub progress_volumes: Option<i32>,
-    pub repeat: Option<i32>,
-    pub priority: Option<i32>,
-    pub private: Option<bool>,
-    pub notes: Option<Cow<'a, str>>,
-    pub hidden_from_status_lists: Option<bool>,
-    pub advanced_scores: Option<Cow<'a, [f64]>>,
-    pub started_at: Option<FuzzyDate>,
-    pub completed_at: Option<FuzzyDate>,
-    pub ids: Cow<'a, [u32]>,
+    status: Option<MediaListStatus>,
+    score: Option<f64>,
+    score_raw: Option<i32>,
+    progress: Option<i32>,
+    progress_volumes: Option<i32>,
+    repeat: Option<i32>,
+    priority: Option<i32>,
+    private: Option<bool>,
+    notes: Option<Cow<'a, str>>,
+    hidden_from_status_lists: Option<bool>,
+    advanced_scores: Option<Cow<'a, [f64]>>,
+    started_at: Option<FuzzyDate>,
+    completed_at: Option<FuzzyDate>,
+    ids: Cow<'a, [u32]>,
 }
 
 /// Options for deleting a media list entry.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMediaListOptions {
     pub id: u32,
@@ -235,15 +241,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name: Some(username),
-            media_type: Some(MediaType::Anime),
-            status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(Some(Cow::Borrowed(username)))
+                .media_type(Some(MediaType::Anime))
+                .status(status)
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -255,15 +262,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name: Some(username),
-            media_type: Some(MediaType::Manga),
-            status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(Some(Cow::Borrowed(username)))
+                .media_type(Some(MediaType::Manga))
+                .status(status)
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -274,14 +282,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            media_type: Some(MediaType::Anime),
-            status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .media_type(Some(MediaType::Anime))
+                .status(status)
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -292,14 +301,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            media_type: Some(MediaType::Manga),
-            status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .media_type(Some(MediaType::Manga))
+                .status(status)
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -310,15 +320,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name,
-            media_type: Some(MediaType::Anime),
-            status: Some(MediaListStatus::Current),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(user_name.map(Cow::Borrowed))
+                .media_type(Some(MediaType::Anime))
+                .status(Some(MediaListStatus::Current))
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -329,15 +340,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name,
-            media_type: Some(MediaType::Manga),
-            status: Some(MediaListStatus::Current),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(user_name.map(Cow::Borrowed))
+                .media_type(Some(MediaType::Manga))
+                .status(Some(MediaListStatus::Current))
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -348,15 +360,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name,
-            media_type: Some(MediaType::Anime),
-            status: Some(MediaListStatus::Completed),
-            sort: Some(&[MediaListSort::ScoreDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(user_name.map(Cow::Borrowed))
+                .media_type(Some(MediaType::Anime))
+                .status(Some(MediaListStatus::Completed))
+                .sort(Some(Cow::Borrowed(&[MediaListSort::ScoreDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -367,15 +380,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name,
-            media_type: Some(MediaType::Manga),
-            status: Some(MediaListStatus::Completed),
-            sort: Some(&[MediaListSort::ScoreDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(user_name.map(Cow::Borrowed))
+                .media_type(Some(MediaType::Manga))
+                .status(Some(MediaListStatus::Completed))
+                .sort(Some(Cow::Borrowed(&[MediaListSort::ScoreDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -386,15 +400,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name,
-            media_type: Some(MediaType::Anime),
-            status: Some(MediaListStatus::Planning),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(user_name.map(Cow::Borrowed))
+                .media_type(Some(MediaType::Anime))
+                .status(Some(MediaListStatus::Planning))
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -405,15 +420,16 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&options!(
-            FetchMediaListOptions,
-            user_name,
-            media_type: Some(MediaType::Manga),
-            status: Some(MediaListStatus::Planning),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchMediaListOptions::builder()
+                .user_name(user_name.map(Cow::Borrowed))
+                .media_type(Some(MediaType::Manga))
+                .status(Some(MediaListStatus::Planning))
+                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -423,11 +439,12 @@ impl<'a> MediaListEndpoint<'a> {
         media_id: u32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
-        self.save(&options!(
-            SaveMediaListOptions,
-            media_id: Some(media_id),
-            status: Some(status),
-        ))
+        self.save(
+            &SaveMediaListOptions::builder()
+                .media_id(Some(media_id))
+                .status(Some(status))
+                .build(),
+        )
         .await
     }
 
@@ -437,11 +454,12 @@ impl<'a> MediaListEndpoint<'a> {
         media_id: u32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
-        self.save(&options!(
-            SaveMediaListOptions,
-            media_id: Some(media_id),
-            status: Some(status),
-        ))
+        self.save(
+            &SaveMediaListOptions::builder()
+                .media_id(Some(media_id))
+                .status(Some(status))
+                .build(),
+        )
         .await
     }
 
@@ -451,21 +469,23 @@ impl<'a> MediaListEndpoint<'a> {
         entry_id: u32,
         progress: i32,
     ) -> Result<MediaList, AniListError> {
-        self.save(&options!(
-            SaveMediaListOptions,
-            id: Some(entry_id),
-            progress: Some(progress),
-        ))
+        self.save(
+            &SaveMediaListOptions::builder()
+                .id(Some(entry_id))
+                .progress(Some(progress))
+                .build(),
+        )
         .await
     }
 
     /// Update score for an entry
     pub async fn update_score(&self, entry_id: u32, score: f64) -> Result<MediaList, AniListError> {
-        self.save(&options!(
-            SaveMediaListOptions,
-            id: Some(entry_id),
-            score: Some(score),
-        ))
+        self.save(
+            &SaveMediaListOptions::builder()
+                .id(Some(entry_id))
+                .score(Some(score))
+                .build(),
+        )
         .await
     }
 
@@ -475,21 +495,19 @@ impl<'a> MediaListEndpoint<'a> {
         entry_id: u32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
-        self.save(&options!(
-            SaveMediaListOptions,
-            id: Some(entry_id),
-            status: Some(status),
-        ))
+        self.save(
+            &SaveMediaListOptions::builder()
+                .id(Some(entry_id))
+                .status(Some(status))
+                .build(),
+        )
         .await
     }
 
     /// Delete a media list entry
     pub async fn delete_entry(&self, entry_id: u32) -> Result<bool, AniListError> {
-        self.delete(&options!(
-            DeleteMediaListOptions,
-            id => entry_id,
-        ))
-        .await
+        self.delete(&DeleteMediaListOptions::builder().id(entry_id).build())
+            .await
     }
 }
 

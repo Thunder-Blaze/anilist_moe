@@ -2,7 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::staff::*;
-use anilist_moe::options;
+use std::borrow::Cow;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -15,10 +15,9 @@ async fn test_fetch_staff_by_search() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStaffOptions,
-                search: Some("Hayao"),
-            );
+            let options = FetchStaffOptions::builder()
+                .search(Some(Cow::Borrowed("Hayao")))
+                .build();
             client.staff().fetch(&options).await
         })
         .await;
@@ -54,10 +53,7 @@ async fn test_fetch_staff_by_id() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStaffOptions,
-                id: Some(95269), // Hayao Miyazaki
-            );
+            let options = FetchStaffOptions::builder().id(Some(95269)).build(); // Hayao Miyazaki
             client.staff().fetch(&options).await
         })
         .await;
@@ -86,10 +82,7 @@ async fn test_fetch_one_staff() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStaffOneOptions,
-                id: Some(95269),
-            );
+            let options = FetchStaffOneOptions::builder().id(Some(95269)).build();
             client.staff().fetch_one(&options).await
         })
         .await;
@@ -113,10 +106,7 @@ async fn test_staff_data_types() {
 
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStaffOptions,
-                id: Some(95269),
-            );
+            let options = FetchStaffOptions::builder().id(Some(95269)).build();
             client.staff().fetch(&options).await
         })
         .await;
@@ -158,11 +148,10 @@ async fn test_staff_with_popularity() {
     // Fetch popular staff (voice actors are often popular)
     let result = h
         .run(|| async {
-            let options = options!(
-                FetchStaffOptions,
-                search: Some("Kamiya"), // Common voice actor name
-                per_page: Some(5),
-            );
+            let options = FetchStaffOptions::builder()
+                .search(Some(Cow::Borrowed("Kamiya")))
+                .per_page(Some(5))
+                .build();
             client.staff().fetch(&options).await
         })
         .await;

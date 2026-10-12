@@ -3,65 +3,67 @@ use crate::enums::media::MediaSort;
 use crate::errors::AniListError;
 use crate::objects::character::Character;
 use crate::objects::responses::Page;
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::character};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching multiple characters with pagination and filters.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchCharacterOptions<'a> {
-    pub page: Option<i32>,
-    pub id: Option<u32>,
-    pub per_page: Option<i32>,
-    pub search: Option<Cow<'a, str>>,
+    page: Option<i32>,
+    id: Option<u32>,
+    per_page: Option<i32>,
+    search: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [CharacterSort]>>,
-    pub is_birthday: Option<bool>,
-    pub id_not: Option<u32>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub id_not_in: Option<Cow<'a, [u32]>>,
+    sort: Option<Cow<'a, [CharacterSort]>>,
+    is_birthday: Option<bool>,
+    id_not: Option<u32>,
+    id_in: Option<Cow<'a, [u32]>>,
+    id_not_in: Option<Cow<'a, [u32]>>,
     // Extra
-    pub include_media: Option<bool>,
-    pub include_mod_notes: Option<bool>,
+    include_media: Option<bool>,
+    include_mod_notes: Option<bool>,
     // Sub-pagination variables
-    pub media_sort: Option<Cow<'a, [MediaSort]>>,
-    pub media_page: Option<i32>,
-    pub media_per_page: Option<i32>,
+    media_sort: Option<Cow<'a, [MediaSort]>>,
+    media_page: Option<i32>,
+    media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single character.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchCharacterOneOptions<'a> {
-    pub id: Option<u32>,
-    pub is_birthday: Option<bool>,
-    pub search: Option<Cow<'a, str>>,
-    pub id_not: Option<u32>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub id_not_in: Option<Cow<'a, [u32]>>,
+    id: Option<u32>,
+    is_birthday: Option<bool>,
+    search: Option<Cow<'a, str>>,
+    id_not: Option<u32>,
+    id_in: Option<Cow<'a, [u32]>>,
+    id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [CharacterSort]>>,
+    sort: Option<Cow<'a, [CharacterSort]>>,
     // Sub-pagination variables
-    pub media_sort: Option<Cow<'a, [MediaSort]>>,
-    pub media_page: Option<i32>,
-    pub media_per_page: Option<i32>,
+    media_sort: Option<Cow<'a, [MediaSort]>>,
+    media_page: Option<i32>,
+    media_per_page: Option<i32>,
 }
 
 /// Endpoint for character operations.
@@ -98,12 +100,13 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(&options!(
-            FetchCharacterOptions,
-            page,
-            per_page,
-            sort: Some(&[CharacterSort::FavouritesDesc]),
-        ))
+        self.fetch(
+            &FetchCharacterOptions::builder()
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[CharacterSort::FavouritesDesc])))
+                .build(),
+        )
         .await
     }
 
@@ -123,23 +126,21 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(&options!(
-            FetchCharacterOptions,
-            search: Some(query),
-            page,
-            per_page,
-            sort: Some(&[CharacterSort::SearchMatch]),
-        ))
+        self.fetch(
+            &FetchCharacterOptions::builder()
+                .search(Some(Cow::Borrowed(query)))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[CharacterSort::SearchMatch])))
+                .build(),
+        )
         .await
     }
 
     /// Get character by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Character, AniListError> {
-        self.fetch_one(&options!(
-            FetchCharacterOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_one(&FetchCharacterOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Get characters with birthday today
@@ -148,13 +149,14 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(&options!(
-            FetchCharacterOptions,
-            is_birthday: Some(true),
-            page,
-            per_page,
-            sort: Some(&[CharacterSort::FavouritesDesc]),
-        ))
+        self.fetch(
+            &FetchCharacterOptions::builder()
+                .is_birthday(Some(true))
+                .page(page)
+                .per_page(per_page)
+                .sort(Some(Cow::Borrowed(&[CharacterSort::FavouritesDesc])))
+                .build(),
+        )
         .await
     }
 }

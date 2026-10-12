@@ -3,149 +3,158 @@ use crate::errors::AniListError;
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::thread::{Thread, ThreadComment};
-use crate::options;
 #[cfg(feature = "pagination")]
 use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for fetching forum threads.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchThreadOptions<'a> {
-    pub id: Option<u32>,
-    pub search: Option<Cow<'a, str>>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub user_id: Option<u32>,
-    pub reply_user_id: Option<u32>,
-    pub subscribed: Option<bool>,
-    pub category_id: Option<u32>,
-    pub media_category_id: Option<u32>,
+    id: Option<u32>,
+    search: Option<Cow<'a, str>>,
+    id_in: Option<Cow<'a, [u32]>>,
+    user_id: Option<u32>,
+    reply_user_id: Option<u32>,
+    subscribed: Option<bool>,
+    category_id: Option<u32>,
+    media_category_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [ThreadSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    sort: Option<Cow<'a, [ThreadSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
     // Extra
-    pub include_body: Option<bool>,
-    pub include_user: Option<bool>,
-    pub include_reply_user: Option<bool>,
-    pub include_categories: Option<bool>,
-    pub include_media_categories: Option<bool>,
+    include_body: Option<bool>,
+    include_user: Option<bool>,
+    include_reply_user: Option<bool>,
+    include_categories: Option<bool>,
+    include_media_categories: Option<bool>,
     // HTML rendering options
-    pub body_as_html: Option<bool>,
+    body_as_html: Option<bool>,
 }
 
 /// Options for fetching a single forum thread by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchThreadOneOptions<'a> {
-    pub id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub reply_user_id: Option<u32>,
-    pub subscribed: Option<bool>,
-    pub category_id: Option<u32>,
-    pub media_category_id: Option<u32>,
-    pub search: Option<Cow<'a, str>>,
-    pub id_in: Option<Cow<'a, [u32]>>,
-    pub sort: Option<Cow<'a, [ThreadSort]>>,
+    id: Option<u32>,
+    user_id: Option<u32>,
+    reply_user_id: Option<u32>,
+    subscribed: Option<bool>,
+    category_id: Option<u32>,
+    media_category_id: Option<u32>,
+    search: Option<Cow<'a, str>>,
+    id_in: Option<Cow<'a, [u32]>>,
+    sort: Option<Cow<'a, [ThreadSort]>>,
     // HTML rendering options
-    pub body_as_html: Option<bool>,
+    body_as_html: Option<bool>,
 }
 
 /// Options for fetching thread comments.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchThreadCommentOptions<'a> {
-    pub id: Option<u32>,
-    pub thread_id: Option<u32>,
-    pub user_id: Option<u32>,
+    id: Option<u32>,
+    thread_id: Option<u32>,
+    user_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    sort: Option<Cow<'a, [ThreadCommentSort]>>,
+    page: Option<i32>,
+    per_page: Option<i32>,
     // HTML rendering options
-    pub comment_as_html: Option<bool>,
+    comment_as_html: Option<bool>,
 }
 
 /// Options for fetching a single thread comment by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchThreadCommentOneOptions<'a> {
-    pub id: Option<u32>,
-    pub thread_id: Option<u32>,
-    pub user_id: Option<u32>,
-    pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
+    id: Option<u32>,
+    thread_id: Option<u32>,
+    user_id: Option<u32>,
+    sort: Option<Cow<'a, [ThreadCommentSort]>>,
     // HTML rendering options
-    pub comment_as_html: Option<bool>,
+    comment_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a forum thread.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveThreadOptions<'a> {
-    pub id: Option<u32>,
-    pub title: Option<Cow<'a, str>>,
-    pub body: Option<Cow<'a, str>>,
-    pub categories: Option<Cow<'a, [u32]>>,
-    pub media_categories: Option<Cow<'a, [u32]>>,
-    pub sticky: Option<bool>,
-    pub locked: Option<bool>,
+    id: Option<u32>,
+    title: Option<Cow<'a, str>>,
+    body: Option<Cow<'a, str>>,
+    categories: Option<Cow<'a, [u32]>>,
+    media_categories: Option<Cow<'a, [u32]>>,
+    sticky: Option<bool>,
+    locked: Option<bool>,
     // HTML rendering options
-    pub body_as_html: Option<bool>,
+    body_as_html: Option<bool>,
 }
 
 /// Options for deleting a forum thread.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteThreadOptions {
-    pub id: u32,
+    id: u32,
 }
 
 /// Options for creating or updating a thread comment.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveThreadCommentOptions<'a> {
-    pub id: Option<u32>,
-    pub thread_id: Option<u32>,
-    pub parent_comment_id: Option<u32>,
-    pub comment: Option<Cow<'a, str>>,
-    pub locked: Option<bool>,
+    id: Option<u32>,
+    thread_id: Option<u32>,
+    parent_comment_id: Option<u32>,
+    comment: Option<Cow<'a, str>>,
+    locked: Option<bool>,
     // HTML rendering options
-    pub comment_as_html: Option<bool>,
+    comment_as_html: Option<bool>,
 }
 
 /// Options for deleting a thread comment.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteThreadCommentOptions {
-    pub id: u32,
+    id: u32,
 }
 
 /// Options for subscribing or unsubscribing to a thread.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleThreadSubscriptionOptions {
-    pub thread_id: u32,
-    pub subscribe: Option<bool>,
+    thread_id: u32,
+    subscribe: Option<bool>,
 }
 
 /// Endpoint for forum thread and comment operations.
@@ -251,12 +260,13 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&options!(
-            FetchThreadOptions,
-            sort: Some(&[ThreadSort::IdDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchThreadOptions::builder()
+                .sort(Some(Cow::Borrowed(&[ThreadSort::IdDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -266,12 +276,13 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&options!(
-            FetchThreadOptions,
-            sort: Some(&[ThreadSort::RepliedAtDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchThreadOptions::builder()
+                .sort(Some(Cow::Borrowed(&[ThreadSort::RepliedAtDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -282,13 +293,14 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&options!(
-            FetchThreadOptions,
-            search: Some(query),
-            sort: Some(&[ThreadSort::SearchMatch]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchThreadOptions::builder()
+                .sort(Some(Cow::Borrowed(&[ThreadSort::SearchMatch])))
+                .search(Some(Cow::Borrowed(query)))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -299,13 +311,13 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&options!(
-            FetchThreadOptions,
-            category_id: Some(category_id),
-            sort: Some(&[ThreadSort::RepliedAtDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchThreadOptions::builder()
+                .category_id(Some(category_id))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -316,13 +328,14 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&options!(
-            FetchThreadOptions,
-            user_id: Some(user_id),
-            sort: Some(&[ThreadSort::IdDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchThreadOptions::builder()
+                .sort(Some(Cow::Borrowed(&[ThreadSort::IdDesc])))
+                .user_id(Some(user_id))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
@@ -332,23 +345,21 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&options!(
-            FetchThreadOptions,
-            subscribed: Some(true),
-            sort: Some(&[ThreadSort::RepliedAtDesc]),
-            page,
-            per_page,
-        ))
+        self.fetch(
+            &FetchThreadOptions::builder()
+                .subscribed(Some(true))
+                .sort(Some(Cow::Borrowed(&[ThreadSort::RepliedAtDesc])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
     /// Get thread by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Thread, AniListError> {
-        self.fetch_one(&options!(
-            FetchThreadOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_one(&FetchThreadOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Create a new thread
@@ -358,12 +369,13 @@ impl<'a> ForumEndpoint<'a> {
         body: &str,
         categories: Vec<u32>,
     ) -> Result<Thread, AniListError> {
-        self.save(&options!(
-            SaveThreadOptions,
-            title: Some(title),
-            body: Some(body),
-            categories: Some(categories.as_slice()),
-        ))
+        self.save(
+            &SaveThreadOptions::builder()
+                .title(Some(Cow::Borrowed(title)))
+                .body(Some(Cow::Borrowed(body)))
+                .categories(Some(Cow::Owned(categories)))
+                .build(),
+        )
         .await
     }
 
@@ -374,22 +386,20 @@ impl<'a> ForumEndpoint<'a> {
         title: Option<&str>,
         body: Option<&str>,
     ) -> Result<Thread, AniListError> {
-        self.save(&options!(
-            SaveThreadOptions,
-            id: Some(id),
-            title,
-            body,
-        ))
+        self.save(
+            &SaveThreadOptions::builder()
+                .id(Some(id))
+                .title(title.map(Cow::Borrowed))
+                .body(body.map(Cow::Borrowed))
+                .build(),
+        )
         .await
     }
 
     /// Delete a thread
     pub async fn delete_thread(&self, id: u32) -> Result<bool, AniListError> {
-        self.delete(&options!(
-            DeleteThreadOptions,
-            id => id,
-        ))
-        .await
+        self.delete(&DeleteThreadOptions::builder().id(id).build())
+            .await
     }
 
     /// Get comments for a thread
@@ -399,23 +409,21 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
-        self.fetch_comments(&options!(
-            FetchThreadCommentOptions,
-            thread_id: Some(thread_id),
-            sort: Some(&[ThreadCommentSort::Id]),
-            page,
-            per_page,
-        ))
+        self.fetch_comments(
+            &FetchThreadCommentOptions::builder()
+                .thread_id(Some(thread_id))
+                .sort(Some(Cow::Borrowed(&[ThreadCommentSort::Id])))
+                .page(page)
+                .per_page(per_page)
+                .build(),
+        )
         .await
     }
 
     /// Get comment by ID
     pub async fn get_comment_by_id(&self, id: u32) -> Result<ThreadComment, AniListError> {
-        self.fetch_comment_one(&options!(
-            FetchThreadCommentOneOptions,
-            id: Some(id),
-        ))
-        .await
+        self.fetch_comment_one(&FetchThreadCommentOneOptions::builder().id(Some(id)).build())
+            .await
     }
 
     /// Create a thread comment (reply)
@@ -424,11 +432,12 @@ impl<'a> ForumEndpoint<'a> {
         thread_id: u32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
-        self.save_comment(&options!(
-            SaveThreadCommentOptions,
-            thread_id: Some(thread_id),
-            comment: Some(comment),
-        ))
+        self.save_comment(
+            &SaveThreadCommentOptions::builder()
+                .thread_id(Some(thread_id))
+                .comment(Some(Cow::Borrowed(comment)))
+                .build(),
+        )
         .await
     }
 
@@ -439,12 +448,13 @@ impl<'a> ForumEndpoint<'a> {
         parent_comment_id: u32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
-        self.save_comment(&options!(
-            SaveThreadCommentOptions,
-            thread_id: Some(thread_id),
-            parent_comment_id: Some(parent_comment_id),
-            comment: Some(comment),
-        ))
+        self.save_comment(
+            &SaveThreadCommentOptions::builder()
+                .thread_id(Some(thread_id))
+                .parent_comment_id(Some(parent_comment_id))
+                .comment(Some(Cow::Borrowed(comment)))
+                .build(),
+        )
         .await
     }
 
@@ -454,49 +464,50 @@ impl<'a> ForumEndpoint<'a> {
         id: u32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
-        self.save_comment(&options!(
-            SaveThreadCommentOptions,
-            id: Some(id),
-            comment: Some(comment),
-        ))
+        self.save_comment(
+            &SaveThreadCommentOptions::builder()
+                .id(Some(id))
+                .comment(Some(Cow::Borrowed(comment)))
+                .build(),
+        )
         .await
     }
 
     /// Delete a comment
     pub async fn delete_thread_comment(&self, id: u32) -> Result<bool, AniListError> {
-        self.delete_comment(&options!(
-            DeleteThreadCommentOptions,
-            id => id,
-        ))
-        .await
+        self.delete_comment(&DeleteThreadCommentOptions::builder().id(id).build())
+            .await
     }
 
     /// Subscribe to a thread
     pub async fn subscribe_to_thread(&self, thread_id: u32) -> Result<Thread, AniListError> {
-        self.subscription(&options!(
-            ToggleThreadSubscriptionOptions,
-            thread_id => thread_id,
-            subscribe: Some(true),
-        ))
+        self.subscription(
+            &ToggleThreadSubscriptionOptions::builder()
+                .thread_id(thread_id)
+                .subscribe(Some(true))
+                .build(),
+        )
         .await
     }
 
     /// Unsubscribe from a thread
     pub async fn unsubscribe_from_thread(&self, thread_id: u32) -> Result<Thread, AniListError> {
-        self.subscription(&options!(
-            ToggleThreadSubscriptionOptions,
-            thread_id => thread_id,
-            subscribe: Some(false),
-        ))
+        self.subscription(
+            &ToggleThreadSubscriptionOptions::builder()
+                .thread_id(thread_id)
+                .subscribe(Some(false))
+                .build(),
+        )
         .await
     }
 
     /// Toggle thread subscription
     pub async fn toggle_thread_subscription(&self, thread_id: u32) -> Result<Thread, AniListError> {
-        self.subscription(&options!(
-            ToggleThreadSubscriptionOptions,
-            thread_id => thread_id,
-        ))
+        self.subscription(
+            &ToggleThreadSubscriptionOptions::builder()
+                .thread_id(thread_id)
+                .build(),
+        )
         .await
     }
 }

@@ -8,93 +8,104 @@ use crate::objects::media::{MediaExternalLink, MediaTag};
 use crate::objects::responses::Page;
 use crate::objects::stats::SiteStatistics;
 use crate::objects::user::User;
-use crate::options;
 use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
 /// Options for toggling a like on various entities.
-#[derive(Serialize)]
+#[derive(Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleLikeOptions {
-    pub id: u32,
-    pub like_type: LikeableType,
+    #[builder(default)]
+    id: u32,
+    like_type: LikeableType,
 }
 
 /// Options for toggling follow status of a user.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleFollowOptions {
-    pub user_id: u32,
+    user_id: u32,
 }
 
 /// Options for adding or removing favourites.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleFavouriteOptions {
-    pub anime_id: Option<u32>,
-    pub manga_id: Option<u32>,
-    pub character_id: Option<u32>,
-    pub staff_id: Option<u32>,
-    pub studio_id: Option<u32>,
+    anime_id: Option<u32>,
+    manga_id: Option<u32>,
+    character_id: Option<u32>,
+    staff_id: Option<u32>,
+    studio_id: Option<u32>,
 }
 
 /// Options for rendering markdown the way AniList renders it.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct MarkdownOptions<'a> {
-    pub markdown: Cow<'a, str>,
+    markdown: Cow<'a, str>,
 }
 
 /// Options for the external link source list.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalLinkSourceOptions {
-    pub id: Option<u32>,
+    id: Option<u32>,
     #[serde(rename = "type")]
-    pub link_type: Option<ExternalLinkType>,
-    pub media_type: Option<ExternalLinkMediaType>,
+    link_type: Option<ExternalLinkType>,
+    media_type: Option<ExternalLinkMediaType>,
 }
 
 /// Options for the AniChart settings.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAniChartSettingsOptions<'a> {
-    pub title_language: Option<Cow<'a, str>>,
-    pub outgoing_link_provider: Option<Cow<'a, str>>,
-    pub theme: Option<Cow<'a, str>>,
-    pub sort: Option<Cow<'a, str>>,
+    title_language: Option<Cow<'a, str>>,
+    outgoing_link_provider: Option<Cow<'a, str>>,
+    theme: Option<Cow<'a, str>>,
+    sort: Option<Cow<'a, str>>,
 }
 
 /// Options for the AniChart highlights.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAniChartHighlightsOptions<'a> {
-    pub highlights: Option<Cow<'a, [AniChartHighlight]>>,
+    highlights: Option<Cow<'a, [AniChartHighlight]>>,
 }
 
 /// Options for the media tag list. `status` asks for tags above a rank.
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTagsOptions {
-    pub status: Option<i32>,
+    status: Option<i32>,
 }
 
 /// Options for listing the users who liked something.
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
 pub struct LikesOptions {
-    pub likeable_id: u32,
-    pub like_type: LikeableType,
-    pub page: Option<i32>,
-    pub per_page: Option<i32>,
+    #[builder(default)]
+    likeable_id: u32,
+    like_type: LikeableType,
+    #[builder(default)]
+    page: Option<i32>,
+    #[builder(default)]
+    per_page: Option<i32>,
 }
 
 /// Options for reordering the entries of a favourites list.
@@ -103,19 +114,20 @@ pub struct LikesOptions {
 /// give the order, as the API describes it: "list of integers which the anime
 /// should be ordered by (ascending)".
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateFavouriteOrderOptions<'a> {
-    pub anime_ids: Option<Cow<'a, [u32]>>,
-    pub manga_ids: Option<Cow<'a, [u32]>>,
-    pub character_ids: Option<Cow<'a, [u32]>>,
-    pub staff_ids: Option<Cow<'a, [u32]>>,
-    pub studio_ids: Option<Cow<'a, [u32]>>,
-    pub anime_order: Option<Cow<'a, [u32]>>,
-    pub manga_order: Option<Cow<'a, [u32]>>,
-    pub character_order: Option<Cow<'a, [u32]>>,
-    pub staff_order: Option<Cow<'a, [u32]>>,
-    pub studio_order: Option<Cow<'a, [u32]>>,
+    anime_ids: Option<Cow<'a, [u32]>>,
+    manga_ids: Option<Cow<'a, [u32]>>,
+    character_ids: Option<Cow<'a, [u32]>>,
+    staff_ids: Option<Cow<'a, [u32]>>,
+    studio_ids: Option<Cow<'a, [u32]>>,
+    anime_order: Option<Cow<'a, [u32]>>,
+    manga_order: Option<Cow<'a, [u32]>>,
+    character_order: Option<Cow<'a, [u32]>>,
+    staff_order: Option<Cow<'a, [u32]>>,
+    studio_order: Option<Cow<'a, [u32]>>,
 }
 
 /// Endpoint for common and general-purpose operations.
@@ -274,55 +286,57 @@ impl<'a> CommonEndpoint<'a> {
 
     /// Follow or unfollow a user
     pub async fn follow_user(&self, user_id: u32) -> Result<User, AniListError> {
-        self.toggle_follow(&options!(
-            ToggleFollowOptions,
-            user_id => user_id,
-        ))
-        .await
+        self.toggle_follow(&ToggleFollowOptions::builder().user_id(user_id).build())
+            .await
     }
 
     /// Add or remove anime from favorites
     pub async fn favourite_anime(&self, anime_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&options!(
-            ToggleFavouriteOptions,
-            anime_id: Some(anime_id),
-        ))
+        self.toggle_favourite(
+            &ToggleFavouriteOptions::builder()
+                .anime_id(Some(anime_id))
+                .build(),
+        )
         .await
     }
 
     /// Add or remove manga from favorites
     pub async fn favourite_manga(&self, manga_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&options!(
-            ToggleFavouriteOptions,
-            manga_id: Some(manga_id),
-        ))
+        self.toggle_favourite(
+            &ToggleFavouriteOptions::builder()
+                .manga_id(Some(manga_id))
+                .build(),
+        )
         .await
     }
 
     /// Add or remove character from favorites
     pub async fn favourite_character(&self, character_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&options!(
-            ToggleFavouriteOptions,
-            character_id: Some(character_id),
-        ))
+        self.toggle_favourite(
+            &ToggleFavouriteOptions::builder()
+                .character_id(Some(character_id))
+                .build(),
+        )
         .await
     }
 
     /// Add or remove staff from favorites
     pub async fn favourite_staff(&self, staff_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&options!(
-            ToggleFavouriteOptions,
-            staff_id: Some(staff_id),
-        ))
+        self.toggle_favourite(
+            &ToggleFavouriteOptions::builder()
+                .staff_id(Some(staff_id))
+                .build(),
+        )
         .await
     }
 
     /// Add or remove studio from favorites
     pub async fn favourite_studio(&self, studio_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&options!(
-            ToggleFavouriteOptions,
-            studio_id: Some(studio_id),
-        ))
+        self.toggle_favourite(
+            &ToggleFavouriteOptions::builder()
+                .studio_id(Some(studio_id))
+                .build(),
+        )
         .await
     }
 }
