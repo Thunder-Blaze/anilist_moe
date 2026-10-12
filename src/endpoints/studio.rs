@@ -17,14 +17,14 @@ pub struct FetchStudioOptions<'a> {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
-    pub id_not: Option<i32>,
+    pub id_not: Option<u32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -46,14 +46,14 @@ pub struct FetchStudioOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchStudioOneOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
-    pub id_not: Option<i32>,
+    pub id_not: Option<u32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -129,7 +129,7 @@ impl<'a> StudioEndpoint<'a> {
     }
 
     /// Get studio by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<Studio, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<Studio, AniListError> {
         self.fetch_one(&options!(
             FetchStudioOneOptions,
             id: Some(id),

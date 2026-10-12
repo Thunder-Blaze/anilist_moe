@@ -9,9 +9,9 @@ use serde_with::skip_serializing_none;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityReply {
-    pub id: i32,
-    pub user_id: Option<i32>,
-    pub activity_id: Option<i32>,
+    pub id: u32,
+    pub user_id: Option<u32>,
+    pub activity_id: Option<u32>,
     pub text: Option<String>,
     pub like_count: Option<i32>,
     pub is_liked: Option<bool>,
@@ -24,8 +24,8 @@ pub struct ActivityReply {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TextActivity {
-    pub id: i32,
-    pub user_id: Option<i32>,
+    pub id: u32,
+    pub user_id: Option<u32>,
     #[serde(rename = "type")]
     pub activity_type: Option<ActivityType>,
     pub reply_count: Option<i32>,
@@ -46,8 +46,8 @@ pub struct TextActivity {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ListActivity {
-    pub id: i32,
-    pub user_id: Option<i32>,
+    pub id: u32,
+    pub user_id: Option<u32>,
     #[serde(rename = "type")]
     pub activity_type: Option<ActivityType>,
     pub reply_count: Option<i32>,
@@ -70,9 +70,9 @@ pub struct ListActivity {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageActivity {
-    pub id: i32,
-    pub recipient_id: Option<i32>,
-    pub messenger_id: Option<i32>,
+    pub id: u32,
+    pub recipient_id: Option<u32>,
+    pub messenger_id: Option<u32>,
     #[serde(rename = "type")]
     pub activity_type: Option<ActivityType>,
     pub reply_count: Option<i32>,

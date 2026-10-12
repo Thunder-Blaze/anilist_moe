@@ -7,12 +7,12 @@ use crate::{enums::mods::ModActionType, objects::user::User};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ModAction {
-    pub id: i32,
+    pub id: u32,
     pub user: Option<User>,
     pub mod_: Option<User>,
     #[serde(rename = "type")]
     pub action_type: Option<ModActionType>,
-    pub object_id: Option<i32>,
+    pub object_id: Option<u32>,
     pub object_type: Option<String>,
     pub data: Option<String>,
     pub created_at: Option<i32>,

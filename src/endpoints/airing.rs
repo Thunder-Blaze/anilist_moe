@@ -14,22 +14,22 @@ use std::borrow::Cow;
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchAiringOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "mediaId")]
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     pub episode: Option<i32>,
     #[serde(rename = "airingAt")]
     pub airing_at: Option<i32>,
     #[serde(rename = "notYetAired")]
     pub not_yet_aired: Option<bool>,
     #[serde(rename = "id_not")]
-    pub id_not: Option<i32>,
+    pub id_not: Option<u32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "mediaId_not")]
-    pub media_id_not: Option<i32>,
+    pub media_id_not: Option<u32>,
     #[serde(rename = "mediaId_in")]
     pub media_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not_in")]
@@ -130,7 +130,7 @@ impl<'a> AiringEndpoint<'a> {
     /// Get airing schedule for a specific media ID
     pub async fn get_by_media_id(
         &self,
-        media_id: i32,
+        media_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {

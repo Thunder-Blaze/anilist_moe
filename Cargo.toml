@@ -2,6 +2,8 @@
 name = "anilist_moe"
 version = "0.5.0"
 description = "Anilist_Moe is a Rust Wrapper for the Anilist API. This library allows you to seamlessly interact with Anilist's Public API with and without authentication. This currently supports Anime, Manga, Users, Staff, Forum, Threads, Recommendations, Reviews and User Activities"
+# Edition 2021 on purpose: edition 2024 requires Rust 1.85, which would raise the
+# MSRV above the 1.82 this crate supports.
 edition = "2021"
 rust-version = "1.82"
 license = "MIT"
@@ -21,10 +23,11 @@ serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 # 3.18 and later need Rust 1.88; 3.17 is the newest that keeps the MSRV.
 serde_with = "3.17.0"
-tokio = { version = "1.53.2", features = ["full"] }
+# Only `time` is needed: the crate sleeps for retry backoff and nothing else. The
+# runtime belongs to the caller, and `full` would make every consumer compile io,
+# net, fs, process and signal support this crate never touches.
+tokio = { version = "1.53.2", features = ["time"] }
 thiserror = "2.0.21"
-chrono = "0.4.45"
-dotenv = "0.15.0"
 log = "0.4.34"
 tracing = { version = "0.1.44", optional = true }
 
@@ -114,6 +117,9 @@ notification = []
 common = []
 
 [dev-dependencies]
+# Tests and examples drive a runtime of their own, and load tokens from `.env`.
+tokio = { version = "1.53.2", features = ["macros", "rt-multi-thread"] }
+dotenv = "0.15.0"
 parking_lot = "0.12.5"
 tokio-test = "0.4.6"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }

@@ -1,5 +1,6 @@
 //! Tests for Review endpoint
 
+use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::review::*;
 use anilist_moe::enums::review::ReviewRating;
@@ -150,7 +151,7 @@ async fn test_rate_review() {
                         .await;
                 }
                 Err(e) => {
-                    println!("Expected authentication error or permission issue: {:?}", e);
+                    allow_auth_rejection("test_rate_review", &e);
                 }
             }
         }

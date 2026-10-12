@@ -10,7 +10,7 @@ use crate::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterSubmission {
-    pub id: i32,
+    pub id: u32,
     pub character: Option<Character>,
     pub submission: Option<Character>,
     pub submitter: Option<User>,
@@ -45,7 +45,7 @@ pub struct CharacterSubmissionEdge {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StaffSubmission {
-    pub id: i32,
+    pub id: u32,
     pub staff: Option<Staff>,
     pub submission: Option<Staff>,
     pub submitter: Option<User>,

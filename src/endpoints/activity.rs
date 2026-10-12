@@ -24,13 +24,13 @@ pub struct FetchActivityOptions<'a> {
 
     // # Filters
     #[serde(rename = "id")]
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     #[serde(rename = "messengerId")]
-    pub messenger_id: Option<i32>,
+    pub messenger_id: Option<u32>,
     #[serde(rename = "mediaId")]
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     #[serde(rename = "type")]
     pub type_: Option<ActivityType>,
     #[serde(rename = "isFollowing")]
@@ -42,25 +42,25 @@ pub struct FetchActivityOptions<'a> {
     #[serde(rename = "createdAt")]
     pub created_at: Option<i32>,
     #[serde(rename = "id_not")]
-    pub id_not: Option<i32>,
+    pub id_not: Option<u32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "userId_not")]
-    pub user_id_not: Option<i32>,
+    pub user_id_not: Option<u32>,
     #[serde(rename = "userId_in")]
     pub user_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "userId_not_in")]
     pub user_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "messengerId_not")]
-    pub messenger_id_not: Option<i32>,
+    pub messenger_id_not: Option<u32>,
     #[serde(rename = "messengerId_in")]
     pub messenger_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "messengerId_not_in")]
     pub messenger_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not")]
-    pub media_id_not: Option<i32>,
+    pub media_id_not: Option<u32>,
     #[serde(rename = "mediaId_in")]
     pub media_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not_in")]
@@ -97,7 +97,7 @@ pub struct FetchActivityOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchActivityOneOptions {
-    pub id: i32,
+    pub id: u32,
     // # HTML rendering options
     #[serde(rename = "text_as_html")]
     pub text_as_html: Option<bool>,
@@ -117,9 +117,9 @@ pub struct FetchActivityRepliesOptions {
 
     // # Filters
     #[serde(rename = "id")]
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "activityId")]
-    pub activity_id: i32,
+    pub activity_id: u32,
 
     // # HTML rendering options
     #[serde(rename = "text_as_html")]
@@ -129,26 +129,26 @@ pub struct FetchActivityRepliesOptions {
 /// Options for deleting an activity.
 #[derive(Default, Debug, Serialize)]
 pub struct DeleteActivityOptions {
-    pub id: i32,
+    pub id: u32,
 }
 
 /// Options for deleting an activity reply.
 #[derive(Default, Debug, Serialize)]
 pub struct DeleteActivityReplyOptions {
-    pub id: i32,
+    pub id: u32,
 }
 
 /// Options for pinning or unpinning an activity.
 #[derive(Default, Debug, Serialize)]
 pub struct PinActivityOptions {
-    pub id: i32,
+    pub id: u32,
     pub pinned: bool,
 }
 
 /// Options for subscribing or unsubscribing to an activity.
 #[derive(Default, Debug, Serialize)]
 pub struct SubscribeActivityOptions {
-    pub id: i32,
+    pub id: u32,
     pub subscribe: bool,
 }
 
@@ -156,10 +156,10 @@ pub struct SubscribeActivityOptions {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct SaveMessageActivityOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub message: Cow<'a, str>,
     #[serde(rename = "recipientId")]
-    pub recipient_id: i32,
+    pub recipient_id: u32,
     pub private: Option<bool>,
     pub locked: Option<bool>,
     pub as_mod: Option<bool>,
@@ -169,7 +169,7 @@ pub struct SaveMessageActivityOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct SaveTextActivityOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub text: Cow<'a, str>,
     pub locked: Option<bool>,
 }
@@ -178,10 +178,10 @@ pub struct SaveTextActivityOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct SaveActivityReplyOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub text: Cow<'a, str>,
     #[serde(rename = "activityId")]
-    pub activity_id: i32,
+    pub activity_id: u32,
 }
 
 /// Endpoint for activity feed operations.
@@ -322,7 +322,7 @@ impl<'a> ActivityEndpoint<'a> {
     }
 
     /// Get activity by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<ActivityUnion, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<ActivityUnion, AniListError> {
         self.fetch_one(&options!(
             FetchActivityOneOptions,
             id => id,
@@ -342,7 +342,7 @@ impl<'a> ActivityEndpoint<'a> {
     /// Create a message activity
     pub async fn create_message(
         &self,
-        recipient_id: i32,
+        recipient_id: u32,
         message: &str,
         private: Option<bool>,
     ) -> Result<ActivityUnion, AniListError> {
@@ -358,7 +358,7 @@ impl<'a> ActivityEndpoint<'a> {
     /// Reply to an activity
     pub async fn reply_to(
         &self,
-        activity_id: i32,
+        activity_id: u32,
         text: &str,
     ) -> Result<ActivityReply, AniListError> {
         self.save_reply(&options!(
@@ -370,7 +370,7 @@ impl<'a> ActivityEndpoint<'a> {
     }
 
     /// Delete an activity
-    pub async fn delete_activity(&self, id: i32) -> Result<bool, AniListError> {
+    pub async fn delete_activity(&self, id: u32) -> Result<bool, AniListError> {
         self.delete(&options!(
             DeleteActivityOptions,
             id => id,
@@ -379,7 +379,7 @@ impl<'a> ActivityEndpoint<'a> {
     }
 
     /// Delete an activity reply
-    pub async fn delete_activity_reply(&self, id: i32) -> Result<bool, AniListError> {
+    pub async fn delete_activity_reply(&self, id: u32) -> Result<bool, AniListError> {
         self.delete_reply(&options!(
             DeleteActivityReplyOptions,
             id => id,
@@ -390,7 +390,7 @@ impl<'a> ActivityEndpoint<'a> {
     /// Toggle activity subscription
     pub async fn toggle_subscription(
         &self,
-        id: i32,
+        id: u32,
         subscribe: bool,
     ) -> Result<ActivityUnion, AniListError> {
         self.subscribe(&options!(
@@ -402,7 +402,7 @@ impl<'a> ActivityEndpoint<'a> {
     }
 
     /// Toggle activity pin status
-    pub async fn toggle_pin(&self, id: i32, pinned: bool) -> Result<ActivityUnion, AniListError> {
+    pub async fn toggle_pin(&self, id: u32, pinned: bool) -> Result<ActivityUnion, AniListError> {
         self.pin(&options!(
             PinActivityOptions,
             id => id,

@@ -137,7 +137,7 @@ pub struct UserCountryStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub country: Option<CountryCode>,
 }
 
@@ -149,7 +149,7 @@ pub struct UserFormatStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub format: Option<MediaFormat>,
 }
 
@@ -161,7 +161,7 @@ pub struct UserGenreStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub genre: Option<String>,
 }
 
@@ -173,7 +173,7 @@ pub struct UserLengthStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub length: Option<String>,
 }
 
@@ -185,7 +185,7 @@ pub struct UserReleaseYearStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub release_year: Option<i32>,
 }
 
@@ -197,7 +197,7 @@ pub struct UserScoreStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub score: Option<i32>,
 }
 
@@ -209,7 +209,7 @@ pub struct UserStaffStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub staff: Option<Staff>,
 }
 
@@ -221,7 +221,7 @@ pub struct UserStartYearStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub start_year: Option<i32>,
 }
 
@@ -289,7 +289,7 @@ pub struct UserStatusStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub status: Option<MediaListStatus>,
 }
 
@@ -301,7 +301,7 @@ pub struct UserStudioStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub studio: Option<Studio>,
 }
 
@@ -313,7 +313,7 @@ pub struct UserTagStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub tag: Option<MediaTag>,
 }
 
@@ -325,9 +325,9 @@ pub struct UserVoiceActorStatistic {
     pub mean_score: Option<f32>,
     pub minutes_watched: Option<i32>,
     pub chapters_read: Option<i32>,
-    pub media_ids: Option<Vec<i32>>,
+    pub media_ids: Option<Vec<u32>>,
     pub voice_actor: Option<Staff>,
-    pub character_ids: Option<Vec<i32>>,
+    pub character_ids: Option<Vec<u32>>,
 }
 
 #[skip_serializing_none]

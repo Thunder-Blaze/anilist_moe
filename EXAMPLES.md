@@ -467,6 +467,10 @@ async fn main() -> Result<(), AniListError> {
                     println!("List Activity by {}", user.name.as_deref().unwrap_or("Unknown"));
                 }
             }
+            // The unions are `#[non_exhaustive]`: AniList can add an activity type
+            // before this crate knows about it, and a `_` arm is what keeps that
+            // from being a breaking change.
+            other => println!("Other activity: {other:?}"),
         }
     }
 

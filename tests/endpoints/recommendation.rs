@@ -1,5 +1,6 @@
 //! Tests for Recommendation endpoint
 
+use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::recommendation::*;
 use anilist_moe::enums::recommendation::RecommendationRating;
@@ -128,7 +129,7 @@ async fn test_save_recommendation() {
             println!("Successfully saved recommendation with ID: {}", response.id);
         }
         Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
+            allow_auth_rejection("test_save_recommendation", &e);
         }
     }
 }

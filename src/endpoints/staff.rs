@@ -14,16 +14,16 @@ use std::borrow::Cow;
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchStaffOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
-    pub id_not: Option<i32>,
+    pub id_not: Option<u32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -68,16 +68,16 @@ pub struct FetchStaffOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchStaffOneOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
-    pub id_not: Option<i32>,
+    pub id_not: Option<u32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -170,7 +170,7 @@ impl<'a> StaffEndpoint<'a> {
     }
 
     /// Get staff by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<Staff, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<Staff, AniListError> {
         self.fetch_one(&options!(
             FetchStaffOneOptions,
             id: Some(id),

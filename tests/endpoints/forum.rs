@@ -1,5 +1,6 @@
 //! Tests for Forum endpoint
 
+use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::forum::*;
 use anilist_moe::options;
@@ -236,7 +237,7 @@ async fn test_save_forum_thread() {
                 .await;
         }
         Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
+            allow_auth_rejection("test_save_forum_thread", &e);
         }
     }
 }
@@ -295,7 +296,7 @@ async fn test_toggle_thread_subscription() {
                         .await;
                 }
                 Err(e) => {
-                    println!("Expected authentication error or permission issue: {:?}", e);
+                    allow_auth_rejection("test_toggle_thread_subscription", &e);
                 }
             }
         }

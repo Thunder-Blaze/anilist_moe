@@ -1,8 +1,9 @@
 use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaFormat {
     Tv,
     TvShort,
@@ -14,17 +15,29 @@ pub enum MediaFormat {
     Manga,
     Novel,
     OneShot,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaRankType {
     Rated,
     Popular,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaRelation {
     Adaptation,
     Prequel,
@@ -39,19 +52,31 @@ pub enum MediaRelation {
     Source,
     Compilation,
     Contains,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaSeason {
     Winter,
     Spring,
     Summer,
     Fall,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaSort {
     Id,
     IdDesc,
@@ -92,8 +117,9 @@ pub enum MediaSort {
     FavouritesDesc,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaSource {
     Original,
     Manga,
@@ -110,20 +136,32 @@ pub enum MediaSource {
     Comic,
     MultimediaProject,
     PictureBook,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaStatus {
     Finished,
     Releasing,
     NotYetReleased,
     Cancelled,
     Hiatus,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaTrendSort {
     Id,
     IdDesc,
@@ -143,13 +181,20 @@ pub enum MediaTrendSort {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaType {
     Anime,
     Manga,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum CountryCode {
     #[serde(rename = "CN")]
     China,
@@ -159,6 +204,11 @@ pub enum CountryCode {
     Japan,
     #[serde(rename = "KR")]
     SouthKorea,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
 impl SortSpec for MediaSort {

@@ -14,7 +14,7 @@ use crate::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Character {
-    pub id: i32,
+    pub id: u32,
     pub name: Option<CharacterName>,
     pub image: Option<CharacterImage>,
     pub description: Option<String>,
@@ -44,7 +44,7 @@ pub struct CharacterConnection {
 #[serde(rename_all = "camelCase")]
 pub struct CharacterEdge {
     pub node: Option<Character>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub role: Option<CharacterRole>,
     pub name: Option<String>,
     pub voice_actors: Option<Vec<Staff>>,

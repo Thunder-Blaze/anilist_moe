@@ -17,13 +17,13 @@ pub struct FetchRecommendationOptions<'a> {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "mediaId")]
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     #[serde(rename = "mediaRecommendationId")]
-    pub media_recommendation_id: Option<i32>,
+    pub media_recommendation_id: Option<u32>,
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     pub rating: Option<i32>,
     #[serde(rename = "rating_greater")]
     pub rating_greater: Option<i32>,
@@ -44,9 +44,9 @@ pub struct FetchRecommendationOptions<'a> {
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct SaveRecommendationOptions {
     #[serde(rename = "mediaId")]
-    pub media_id: i32,
+    pub media_id: u32,
     #[serde(rename = "mediaRecommendationId")]
-    pub media_recommendation_id: i32,
+    pub media_recommendation_id: u32,
     pub rating: RecommendationRating,
 }
 
@@ -81,7 +81,7 @@ impl<'a> RecommendationEndpoint<'a> {
     /// Get recommendations for a specific media
     pub async fn get_by_media_id(
         &self,
-        media_id: i32,
+        media_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
@@ -98,7 +98,7 @@ impl<'a> RecommendationEndpoint<'a> {
     /// Get recommendations by a specific user
     pub async fn get_by_user_id(
         &self,
-        user_id: i32,
+        user_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
@@ -130,8 +130,8 @@ impl<'a> RecommendationEndpoint<'a> {
     /// Create or update a recommendation rating
     pub async fn rate_recommendation(
         &self,
-        media_id: i32,
-        media_recommendation_id: i32,
+        media_id: u32,
+        media_recommendation_id: u32,
         rating: RecommendationRating,
     ) -> Result<Recommendation, AniListError> {
         self.save(&options!(

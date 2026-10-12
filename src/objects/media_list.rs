@@ -11,9 +11,9 @@ use crate::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaList {
-    pub id: i32,
-    pub user_id: Option<i32>,
-    pub media_id: Option<i32>,
+    pub id: u32,
+    pub user_id: Option<u32>,
+    pub media_id: Option<u32>,
     pub status: Option<MediaListStatus>,
     pub score: Option<f32>,
     pub progress: Option<i32>,

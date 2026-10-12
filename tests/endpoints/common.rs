@@ -1,5 +1,6 @@
 //! Tests for Common endpoint (likes, follows, favourites)
 
+use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
 use anilist_moe::options;
 use anilist_moe::{endpoints::common::*, enums::likable::LikeableType};
@@ -30,7 +31,7 @@ async fn test_toggle_like() {
             println!("Response data: {:?}", response);
         }
         Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
+            allow_auth_rejection("test_toggle_like", &e);
         }
     }
 }
@@ -65,7 +66,7 @@ async fn test_toggle_follow() {
             );
         }
         Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
+            allow_auth_rejection("test_toggle_follow", &e);
         }
     }
 }
@@ -96,7 +97,7 @@ async fn test_toggle_favourite() {
             println!("Favourites data: {:?}", response);
         }
         Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
+            allow_auth_rejection("test_toggle_favourite", &e);
         }
     }
 }

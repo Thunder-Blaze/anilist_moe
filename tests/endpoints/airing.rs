@@ -103,8 +103,8 @@ async fn test_fetch_airing_pagination() {
     assert!(!schedules2.is_empty(), "Page 2 should have results");
 
     // Verify different pages have different results
-    let ids1: Vec<Option<i32>> = schedules1.iter().map(|s| s.id).collect();
-    let ids2: Vec<Option<i32>> = schedules2.iter().map(|s| s.id).collect();
+    let ids1: Vec<Option<u32>> = schedules1.iter().map(|s| s.id).collect();
+    let ids2: Vec<Option<u32>> = schedules2.iter().map(|s| s.id).collect();
     assert_ne!(ids1, ids2, "Different pages should have different results");
 }
 

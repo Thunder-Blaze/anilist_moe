@@ -8,6 +8,7 @@
 //! ```
 
 mod endpoints;
+mod support;
 mod test_harness;
 
 pub use test_harness::*;

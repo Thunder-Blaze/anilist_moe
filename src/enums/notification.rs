@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[non_exhaustive]
 pub enum NotificationType {
     #[serde(rename = "ACTIVITY_MESSAGE")]
     ActivityMessage,
@@ -42,4 +43,9 @@ pub enum NotificationType {
     StaffSubmissionUpdate,
     #[serde(rename = "CHARACTER_SUBMISSION_UPDATE")]
     CharacterSubmissionUpdate,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }

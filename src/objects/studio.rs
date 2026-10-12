@@ -7,7 +7,7 @@ use crate::objects::{common::PageInfo, media::MediaConnection};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Studio {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub name: Option<String>,
     pub is_animation_studio: Option<bool>,
     pub media: Option<MediaConnection>,
@@ -30,7 +30,7 @@ pub struct StudioConnection {
 #[serde(rename_all = "camelCase")]
 pub struct StudioEdge {
     pub node: Option<Studio>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub is_main: Option<bool>,
     pub favourite_order: Option<i32>,
 }

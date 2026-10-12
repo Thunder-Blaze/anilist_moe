@@ -54,6 +54,8 @@ Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
 anilist_moe = "0.5"
+# This crate asks tokio only for its `time` feature (retry backoff); the runtime
+# is yours to choose, and `full` is what a typical application wants.
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -541,6 +543,26 @@ The library includes comprehensive data models for all AniList entities:
 - **Activity**: User activities including text posts, list updates, and replies
 - **Review**: User reviews with ratings and detailed content
 - **Recommendation**: Anime/manga recommendations with ratings
+
+### Forward compatibility
+
+AniList grows. Every enum is `#[non_exhaustive]` and carries an `Unknown`
+catch-all that deserialization falls back to, so a `MediaFormat`, `MediaStatus` or
+`__typename` this crate has not heard of yet is a value you can see rather than a
+response that fails to parse:
+
+```rust
+match media.format {
+    Some(MediaFormat::Movie) => println!("a film"),
+    Some(MediaFormat::Unknown) => println!("a format this version does not know"),
+    Some(other) => println!("{other:?}"),
+    None => println!("no format"),
+}
+```
+
+`Unknown` is only ever produced by deserialization — never send it as input. The
+same holds for the response unions: match `ActivityUnion`, `LikeableUnion` or
+`NotificationUnion` with a trailing `_` arm.
 
 ## Testing
 

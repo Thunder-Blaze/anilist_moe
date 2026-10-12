@@ -16,7 +16,7 @@ use std::borrow::Cow;
 #[derive(Default, Debug, Serialize)]
 pub struct FetchCharacterOptions<'a> {
     pub page: Option<i32>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub search: Option<Cow<'a, str>>,
@@ -29,9 +29,9 @@ pub struct FetchCharacterOptions<'a> {
     pub sort: Option<Cow<'a, [CharacterSort]>>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    pub id_not: Option<i32>,
-    pub id_in: Option<Cow<'a, [i32]>>,
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not: Option<u32>,
+    pub id_in: Option<Cow<'a, [u32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     // Extra
     #[serde(rename = "includeMedia")]
     pub include_media: Option<bool>,
@@ -50,13 +50,13 @@ pub struct FetchCharacterOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchCharacterOneOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub search: Option<Cow<'a, str>>,
-    pub id_not: Option<i32>,
-    pub id_in: Option<Cow<'a, [i32]>>,
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub id_not: Option<u32>,
+    pub id_in: Option<Cow<'a, [u32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -146,7 +146,7 @@ impl<'a> CharacterEndpoint<'a> {
     }
 
     /// Get character by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<Character, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<Character, AniListError> {
         self.fetch_one(&options!(
             FetchCharacterOneOptions,
             id: Some(id),

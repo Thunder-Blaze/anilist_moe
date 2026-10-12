@@ -16,7 +16,7 @@ use std::borrow::Cow;
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub name: Option<Cow<'a, str>>,
     pub search: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
@@ -45,7 +45,7 @@ pub struct FetchUserOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserOneOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub name: Option<Cow<'a, str>>,
     // HTML rendering options
     #[serde(rename = "about_as_html")]
@@ -57,7 +57,7 @@ pub struct FetchUserOneOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserFollowersOptions {
     #[serde(rename = "userId")]
-    pub user_id: i32,
+    pub user_id: u32,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -68,7 +68,7 @@ pub struct FetchUserFollowersOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserFollowingOptions {
     #[serde(rename = "userId")]
-    pub user_id: i32,
+    pub user_id: u32,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -79,7 +79,7 @@ pub struct FetchUserFollowingOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserFavoritesOptions<'a> {
     #[serde(rename = "userId")]
-    pub user_id: i32,
+    pub user_id: u32,
     // Toggle what to fetch
     #[serde(rename = "fetchAnime")]
     pub fetch_anime: Option<bool>,
@@ -127,7 +127,7 @@ pub struct FetchUserFavoritesOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserMediaListOptions<'a> {
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     pub username: Option<Cow<'a, str>>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
@@ -154,7 +154,7 @@ pub struct FetchUserMediaListOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserStatsOptions<'a> {
     #[serde(rename = "userId")]
-    pub user_id: i32,
+    pub user_id: u32,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -251,7 +251,7 @@ impl<'a> UserEndpoint<'a> {
     }
 
     /// Get user by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<User, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<User, AniListError> {
         self.fetch_one(&options!(
             FetchUserOneOptions,
             id: Some(id),
