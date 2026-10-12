@@ -159,6 +159,7 @@ pub mod errors;
 pub mod objects;
 pub mod options;
 pub mod queries;
+pub mod transport;
 pub mod unions;
 pub mod utils;
 

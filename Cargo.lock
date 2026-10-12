@@ -34,6 +34,7 @@ dependencies = [
  "dotenv",
  "husky-rs",
  "log",
+ "parking_lot",
  "reqwest",
  "serde",
  "serde_json",

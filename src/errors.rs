@@ -12,6 +12,10 @@ pub enum AniListError {
     #[error("Network error: {0}")]
     Network(#[from] reqwest::Error),
 
+    /// The transport failed before an HTTP response was produced.
+    #[error("Transport error: {message}")]
+    Transport { message: String },
+
     /// JSON deserialization error
     #[error("JSON parsing error: {0}")]
     Json(#[from] serde_json::Error),
