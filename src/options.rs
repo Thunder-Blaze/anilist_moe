@@ -1,12 +1,12 @@
 //! Helpers for building endpoint options without boilerplate.
 //!
 //! Every `*Options` struct takes its string and list fields through
-//! [`Cow`](std::borrow::Cow), so a call can pass borrowed literals (`"Naruto"`,
+//! [`Cow`], so a call can pass borrowed literals (`"Naruto"`,
 //! `&[MediaSort::IdDesc]`) without allocating, or owned data (`String`, `Vec<T>`)
 //! when the options value has to outlive the borrow, as it does when it is moved
 //! into a spawned task.
 //!
-//! [`options!`](crate::options) fills in the `Some(..)` wrappers, so a call site
+//! [`options!`](macro@crate::options) fills in the `Some(..)` wrappers, so a call site
 //! only names the fields it sets:
 //!
 //! ```
@@ -32,7 +32,7 @@
 //! # Fields
 //!
 //! * `field: value` wraps the value in `Some(..)`, converting strings and slices
-//!   into the [`Cow`](std::borrow::Cow) the field expects.
+//!   into the [`Cow`] the field expects.
 //! * `field` alone uses the local variable of the same name.
 //! * `field => value` assigns the value as it is, for the few fields that are not
 //!   optional (`SaveTextActivityOptions::text`, `FetchActivityOneOptions::id`, …).
@@ -53,7 +53,7 @@ use std::borrow::Cow;
 
 /// Converts a value into the `Option<T>` that an options field expects.
 ///
-/// This is what [`options!`](crate::options) calls for every field written as
+/// This is what [`options!`](macro@crate::options) calls for every field written as
 /// `field: value` or as a lone `field`. It is implemented for:
 ///
 /// * every `T`, producing `Some(value)`
@@ -94,7 +94,7 @@ impl<T> IntoOption<T> for Option<T> {
 
 /// Converts a value into the type of a field that is not optional.
 ///
-/// Used by [`options!`](crate::options) for `field => value` entries. The
+/// Used by [`options!`](macro@crate::options) for `field => value` entries. The
 /// reflexive implementation covers plain fields (`i32`, `bool`, enums) and the
 /// string/slice implementations build a [`Cow`] from borrowed or owned data.
 ///
@@ -242,7 +242,7 @@ impl<'a, T: Clone, const N: usize> IntoOption<Cow<'a, [T]>> for Option<[T; N]> {
 ///
 /// `field: value` wraps the value in `Some(..)`, a lone `field` uses the local
 /// variable of the same name, and `field => value` assigns the value unchanged
-/// for the fields that are not optional. See the [module docs](crate::options)
+/// for the fields that are not optional. See the [module docs](mod@crate::options)
 /// for the accepted value types.
 #[macro_export]
 macro_rules! options {

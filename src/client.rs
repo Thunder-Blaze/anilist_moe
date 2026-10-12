@@ -673,14 +673,15 @@ impl AniListClient {
         );
 
         // A span covering the whole request, including its retries. The
-        // declared operation is carried in the `operation` field, so a
-        // subscriber sees one span per logical query. `operation_name` borrows
-        // from `query` and never allocates.
+        // declared operation and the type of the variables are carried as
+        // fields, so a subscriber sees one span per logical query and names the
+        // options struct that was sent. Neither helper allocates.
         #[cfg(feature = "tracing")]
         let request = request.instrument(tracing::debug_span!(
             target: "anilist_moe::client",
             "query",
             operation = operation_name(query),
+            variables = variables_type::<V>(),
             url = %self.inner.base_url,
         ));
 
@@ -863,6 +864,19 @@ impl AniListClient {
             data,
         })
     }
+}
+
+/// The name of the options struct the variables were built from, for tracing.
+///
+/// `std::any::type_name` renders the full path with its parameters, so
+/// `anilist_moe::endpoints::media::FetchMediaOptions<'_>` is reported as
+/// `FetchMediaOptions`. It borrows a compile-time constant and allocates
+/// nothing.
+#[cfg(feature = "tracing")]
+fn variables_type<V>() -> &'static str {
+    let full = std::any::type_name::<V>();
+    let short = full.rsplit("::").next().unwrap_or(full);
+    short.split('<').next().unwrap_or(short)
 }
 
 /// The operation name a GraphQL document declares, for tracing.
@@ -1436,6 +1450,18 @@ mod tests {
         let debug = format!("{builder:?}");
         assert!(!debug.contains("super-secret"), "token leaked: {debug}");
         assert!(debug.contains("has_token: true"));
+    }
+
+    #[cfg(feature = "tracing")]
+    #[test]
+    fn the_variables_type_is_reported_by_its_short_name() {
+        use crate::endpoints::media::FetchMediaOptions;
+
+        assert_eq!(
+            variables_type::<FetchMediaOptions<'_>>(),
+            "FetchMediaOptions"
+        );
+        assert_eq!(variables_type::<()>(), "()");
     }
 
     #[cfg(feature = "tracing")]

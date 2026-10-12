@@ -50,8 +50,26 @@
 //! | `full`           | all of the above            | all of the above                     |
 //!
 //! `tracing` is separate and off by default: it instruments the request
-//! lifecycle with spans and events (operation, attempt, status, elapsed time)
-//! and compiles to nothing when disabled. The token is never logged.
+//! lifecycle with spans and events and compiles to nothing when disabled. The
+//! token and the `Authorization` header are never logged.
+//!
+//! A `debug` span names the query, so one span covers a request and its retries:
+//!
+//! ```text
+//! query{operation=GetMedia variables=FetchMediaOptions url=https://graphql.anilist.co}
+//!   attempt{attempt=1}
+//!     sending request{url=… authenticated=false body_bytes=812}
+//!     received response{status=200 elapsed_ms=143}
+//! ```
+//!
+//! To see the request body — the query and its variables — turn the level up:
+//!
+//! ```bash
+//! RUST_LOG=anilist_moe=trace cargo run
+//! ```
+//!
+//! Retries are reported through `log` as well, so an application that only wires
+//! a `log` subscriber still sees them.
 //!
 //! ```toml
 //! anilist_moe = { version = "0.5", features = ["tracing"] }

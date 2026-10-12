@@ -36,6 +36,9 @@ asked for.
   cursor that walks the pages of a list query, yielding pages or single entries,
   capped so a query that never says "no more" cannot spin
 - `AniListError::kind`, a stable label for logs and spans
+- The `tracing` query span names the operation and the options struct it sent
+  (`operation=GetMedia variables=FetchMediaOptions`), and `RUST_LOG=anilist_moe=trace`
+  shows the request body
 - `AniListClientBuilder::header` / `headers`, for extra headers on every request,
   handed to whichever transport is in use
 - `AniListClient::try_new` and `try_with_token`, so a client can be built without
