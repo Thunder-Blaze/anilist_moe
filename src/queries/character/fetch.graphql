@@ -6,9 +6,9 @@ query FetchCharacters(
   $sort: [CharacterSort]
   $isBirthday: Boolean
   # NOT filters
-  $id_not: Int
-  $id_in: [Int]
-  $id_not_in: [Int]
+  $idNot: Int
+  $idIn: [Int]
+  $idNotIn: [Int]
   # Extra
   $includeMedia: Boolean = false
   $includeModNotes: Boolean = false
@@ -25,7 +25,7 @@ query FetchCharacters(
       lastPage
       hasNextPage
     }
-    characters(id: $id, search: $search, sort: $sort, isBirthday: $isBirthday, id_not: $id_not, id_in: $id_in, id_not_in: $id_not_in) {
+    characters(id: $id, search: $search, sort: $sort, isBirthday: $isBirthday, id_not: $idNot, id_in: $idIn, id_not_in: $idNotIn) {
       id
       name {
         full

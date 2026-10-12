@@ -5,6 +5,5 @@ use serde::{Deserialize, Serialize};
 #[non_exhaustive]
 pub enum RevisionHistoryAction {
     Create,
-    #[serde(rename = "Edit")]
     Edit,
 }

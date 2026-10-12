@@ -1,6 +1,6 @@
 use crate::enums::activity::{ActivitySort, ActivityType};
 use crate::errors::AniListError;
-use crate::objects::activity::{ActivityReply, MessageActivity, TextActivity};
+use crate::objects::activity::{ActivityReply, ListActivity, MessageActivity, TextActivity};
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::options;
@@ -12,74 +12,68 @@ use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
 
+/// Options for fetching one activity reply.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchActivityReplyOptions {
+    pub id: Option<u32>,
+    pub activity_id: Option<u32>,
+    pub text_as_html: Option<bool>,
+}
+
+/// Options for updating a list activity.
+///
+/// This is a moderator mutation: the API refuses it for an ordinary token. The
+/// activity's `id` is required, and `locked` decides whether it ends up locked.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveListActivityOptions {
+    pub id: u32,
+    pub locked: Option<bool>,
+}
+
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchActivityOptions<'a> {
     // # Pagination
-    #[serde(rename = "page")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 
     // # Filters
-    #[serde(rename = "id")]
     pub id: Option<u32>,
-    #[serde(rename = "userId")]
     pub user_id: Option<u32>,
-    #[serde(rename = "messengerId")]
     pub messenger_id: Option<u32>,
-    #[serde(rename = "mediaId")]
     pub media_id: Option<u32>,
-    #[serde(rename = "type")]
     pub type_: Option<ActivityType>,
-    #[serde(rename = "isFollowing")]
     pub is_following: Option<bool>,
-    #[serde(rename = "hasReplies")]
     pub has_replies: Option<bool>,
-    #[serde(rename = "hasRepliesOrTypeText")]
     pub has_replies_or_type_text: Option<bool>,
-    #[serde(rename = "createdAt")]
     pub created_at: Option<i32>,
-    #[serde(rename = "id_not")]
     pub id_not: Option<u32>,
-    #[serde(rename = "id_in")]
     pub id_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "userId_not")]
     pub user_id_not: Option<u32>,
-    #[serde(rename = "userId_in")]
-    pub user_id_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "userId_not_in")]
-    pub user_id_not_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "messengerId_not")]
+    pub user_id_in: Option<Cow<'a, [u32]>>,
+    pub user_id_not_in: Option<Cow<'a, [u32]>>,
     pub messenger_id_not: Option<u32>,
-    #[serde(rename = "messengerId_in")]
-    pub messenger_id_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "messengerId_not_in")]
-    pub messenger_id_not_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "mediaId_not")]
+    pub messenger_id_in: Option<Cow<'a, [u32]>>,
+    pub messenger_id_not_in: Option<Cow<'a, [u32]>>,
     pub media_id_not: Option<u32>,
-    #[serde(rename = "mediaId_in")]
-    pub media_id_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "mediaId_not_in")]
-    pub media_id_not_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "type_not")]
+    pub media_id_in: Option<Cow<'a, [u32]>>,
+    pub media_id_not_in: Option<Cow<'a, [u32]>>,
     pub type_not: Option<ActivityType>,
-    #[serde(rename = "type_in")]
     pub type_in: Option<Cow<'a, [ActivityType]>>,
-    #[serde(rename = "type_not_in")]
     pub type_not_in: Option<Cow<'a, [ActivityType]>>,
-    #[serde(rename = "createdAt_greater")]
     pub created_at_greater: Option<i32>,
-    #[serde(rename = "createdAt_lesser")]
     pub created_at_lesser: Option<i32>,
 
     // # Sort
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset keeps the order the query document asks for.
-    #[serde(rename = "sort")]
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "Option::is_none"
@@ -87,59 +81,55 @@ pub struct FetchActivityOptions<'a> {
     pub sort: Option<Cow<'a, [ActivitySort]>>,
 
     // # HTML rendering options
-    #[serde(rename = "text_as_html")]
     pub text_as_html: Option<bool>,
-    #[serde(rename = "message_as_html")]
     pub message_as_html: Option<bool>,
 }
 
 /// Options for fetching a single activity by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchActivityOneOptions {
     pub id: u32,
     // # HTML rendering options
-    #[serde(rename = "text_as_html")]
     pub text_as_html: Option<bool>,
-    #[serde(rename = "message_as_html")]
     pub message_as_html: Option<bool>,
 }
 
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
-    #[serde(rename = "page")]
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
 
     // # Filters
-    #[serde(rename = "id")]
     pub id: Option<u32>,
-    #[serde(rename = "activityId")]
     pub activity_id: u32,
 
     // # HTML rendering options
-    #[serde(rename = "text_as_html")]
     pub text_as_html: Option<bool>,
 }
 
 /// Options for deleting an activity.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteActivityOptions {
     pub id: u32,
 }
 
 /// Options for deleting an activity reply.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteActivityReplyOptions {
     pub id: u32,
 }
 
 /// Options for pinning or unpinning an activity.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PinActivityOptions {
     pub id: u32,
     pub pinned: bool,
@@ -147,18 +137,20 @@ pub struct PinActivityOptions {
 
 /// Options for subscribing or unsubscribing to an activity.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubscribeActivityOptions {
-    pub id: u32,
+    /// The activity to subscribe to or unsubscribe from.
+    pub activity_id: u32,
     pub subscribe: bool,
 }
 
 /// Options for saving a message activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveMessageActivityOptions<'a> {
     pub id: Option<u32>,
     pub message: Cow<'a, str>,
-    #[serde(rename = "recipientId")]
     pub recipient_id: u32,
     pub private: Option<bool>,
     pub locked: Option<bool>,
@@ -168,6 +160,7 @@ pub struct SaveMessageActivityOptions<'a> {
 /// Options for saving a text activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveTextActivityOptions<'a> {
     pub id: Option<u32>,
     pub text: Cow<'a, str>,
@@ -177,10 +170,10 @@ pub struct SaveTextActivityOptions<'a> {
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveActivityReplyOptions<'a> {
     pub id: Option<u32>,
     pub text: Cow<'a, str>,
-    #[serde(rename = "activityId")]
     pub activity_id: u32,
 }
 
@@ -285,6 +278,25 @@ impl<'a> ActivityEndpoint<'a> {
         options: &SaveActivityReplyOptions<'_>,
     ) -> Result<ActivityReply, AniListError> {
         let query = activity::SAVE_REPLY;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Fetch one activity reply by id, or by the activity it belongs to.
+    pub async fn fetch_reply(
+        &self,
+        options: &FetchActivityReplyOptions,
+    ) -> Result<ActivityReply, AniListError> {
+        let query = activity::FETCH_REPLY;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Update a list activity, or lock it. Moderators only: the API refuses it
+    /// for an ordinary token.
+    pub async fn save_list_activity(
+        &self,
+        options: &SaveListActivityOptions,
+    ) -> Result<ListActivity, AniListError> {
+        let query = activity::SAVE_LIST_ACTIVITY;
         self.client.fetch(query, Some(&options)).await
     }
 
@@ -395,7 +407,7 @@ impl<'a> ActivityEndpoint<'a> {
     ) -> Result<ActivityUnion, AniListError> {
         self.subscribe(&options!(
             SubscribeActivityOptions,
-            id => id,
+            activity_id => id,
             subscribe => subscribe,
         ))
         .await

@@ -1,0 +1,25 @@
+query Likes(
+    $likeableId: Int
+    $likeType: LikeableType
+    $page: Int
+    $perPage: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+            hasNextPage
+        }
+        likes(likeableId: $likeableId, type: $likeType) {
+            id
+            name
+            siteUrl
+            avatar {
+                large
+                medium
+            }
+        }
+    }
+}

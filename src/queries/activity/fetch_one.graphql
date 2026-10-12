@@ -18,8 +18,8 @@ fragment MediaFields on Media {
 
 query FetchActivity(
     $id: Int
-    $text_as_html: Boolean = false
-    $message_as_html: Boolean = false
+    $textAsHtml: Boolean = false
+    $messageAsHtml: Boolean = false
 ) {
     Activity(id: $id) {
         __typename
@@ -49,7 +49,7 @@ query FetchActivity(
         ... on TextActivity {
             id
             type
-            text(asHtml: $text_as_html)
+            text(asHtml: $textAsHtml)
             createdAt
             replyCount
             likeCount
@@ -68,7 +68,7 @@ query FetchActivity(
         ... on MessageActivity {
             id
             type
-            message(asHtml: $message_as_html)
+            message(asHtml: $messageAsHtml)
             createdAt
             replyCount
             likeCount

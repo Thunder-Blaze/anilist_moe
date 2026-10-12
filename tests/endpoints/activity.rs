@@ -357,7 +357,32 @@ async fn test_activity_reply() {
 
     delay_between_tests().await;
 
-    // Step 2: Fetch replies to verify
+    // Step 2: Fetch the reply on its own, by id
+    println!("Step 2: Fetching the reply by id...");
+    let single = h
+        .run(|| async {
+            let options = options!(
+                FetchActivityReplyOptions,
+                id: reply_id,
+            );
+            client.activity().fetch_reply(&options).await
+        })
+        .await;
+
+    assert!(
+        single.is_ok(),
+        "Should fetch the reply by id: {:?}",
+        single.err()
+    );
+    assert_eq!(
+        single.unwrap().id,
+        reply_id,
+        "the reply fetched by id should be the one just created"
+    );
+
+    delay_between_tests().await;
+
+    // Step 3: Fetch replies to verify
     println!("Step 2: Fetching replies...");
     let fetch_result = h
         .run(|| async {
@@ -383,7 +408,7 @@ async fn test_activity_reply() {
     delay_between_tests().await;
 
     // Step 3: Delete the reply
-    println!("Step 3: Deleting reply...");
+    println!("Step 4: Deleting reply...");
     let delete_reply_result = h
         .run(|| async {
             let delete_options = options!(

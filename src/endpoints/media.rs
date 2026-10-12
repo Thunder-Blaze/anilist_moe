@@ -1,4 +1,6 @@
-use crate::enums::media::{MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType};
+use crate::enums::media::{
+    CountryCode, MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType,
+};
 use crate::enums::staff::StaffLanguage;
 use crate::errors::AniListError;
 use crate::objects::media::Media;
@@ -30,46 +32,35 @@ use std::borrow::Cow;
 /// ```
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchMediaOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "idMal")]
     pub id_mal: Option<u32>,
     pub search: Option<Cow<'a, str>>,
-    #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
     pub format: Option<MediaFormat>,
     pub status: Option<MediaStatus>,
     pub season: Option<MediaSeason>,
-    #[serde(rename = "seasonYear")]
     pub season_year: Option<i32>,
     pub genre: Option<Cow<'a, str>>,
     pub tag: Option<Cow<'a, str>>,
-    #[serde(rename = "tagCategory")]
     pub tag_category: Option<Cow<'a, str>>,
-    #[serde(rename = "minimumTagRank")]
     pub minimum_tag_rank: Option<i32>,
     pub source: Option<Cow<'a, str>>,
-    #[serde(rename = "countryOfOrigin")]
     pub country_of_origin: Option<Cow<'a, str>>,
-    #[serde(rename = "isLicensed")]
+    pub country_of_origin_in: Option<Cow<'a, [CountryCode]>>,
+    pub country_of_origin_not_in: Option<Cow<'a, [CountryCode]>>,
     pub is_licensed: Option<bool>,
-    #[serde(rename = "isAdult")]
     pub is_adult: Option<bool>,
-    #[serde(rename = "onList")]
     pub on_list: Option<bool>,
-    #[serde(rename = "licensedBy")]
     pub licensed_by: Option<Cow<'a, str>>,
-    #[serde(rename = "licensedById")]
     pub licensed_by_id: Option<u32>,
     pub id_not: Option<u32>,
     pub id_in: Option<Cow<'a, [u32]>>,
     pub id_not_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "idMal_not")]
     pub id_mal_not: Option<u32>,
-    #[serde(rename = "idMal_in")]
-    pub id_mal_in: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "idMal_not_in")]
-    pub id_mal_not_in: Option<Cow<'a, [i32]>>,
+    pub id_mal_in: Option<Cow<'a, [u32]>>,
+    pub id_mal_not_in: Option<Cow<'a, [u32]>>,
     pub format_not: Option<MediaFormat>,
     pub format_in: Option<Cow<'a, [MediaFormat]>>,
     pub format_not_in: Option<Cow<'a, [MediaFormat]>>,
@@ -80,65 +71,38 @@ pub struct FetchMediaOptions<'a> {
     pub genre_not_in: Option<Cow<'a, [&'a str]>>,
     pub tag_in: Option<Cow<'a, [&'a str]>>,
     pub tag_not_in: Option<Cow<'a, [&'a str]>>,
-    #[serde(rename = "tagCategory_in")]
     pub tag_category_in: Option<Cow<'a, [&'a str]>>,
-    #[serde(rename = "tagCategory_not_in")]
     pub tag_category_not_in: Option<Cow<'a, [&'a str]>>,
-    #[serde(rename = "licensedBy_in")]
     pub licensed_by_in: Option<Cow<'a, [&'a str]>>,
-    #[serde(rename = "licensedById_in")]
-    pub licensed_by_id_in: Option<Cow<'a, [i32]>>,
+    pub licensed_by_id_in: Option<Cow<'a, [u32]>>,
     pub source_in: Option<Cow<'a, [&'a str]>>,
-    #[serde(rename = "startDate")]
     pub start_date: Option<i32>,
-    #[serde(rename = "endDate")]
     pub end_date: Option<i32>,
-    #[serde(rename = "startDate_greater")]
     pub start_date_greater: Option<i32>,
-    #[serde(rename = "startDate_lesser")]
     pub start_date_lesser: Option<i32>,
-    #[serde(rename = "startDate_like")]
     pub start_date_like: Option<Cow<'a, str>>,
-    #[serde(rename = "endDate_greater")]
     pub end_date_greater: Option<i32>,
-    #[serde(rename = "endDate_lesser")]
     pub end_date_lesser: Option<i32>,
-    #[serde(rename = "endDate_like")]
     pub end_date_like: Option<Cow<'a, str>>,
-    #[serde(rename = "averageScore")]
     pub average_score: Option<i32>,
-    #[serde(rename = "averageScore_not")]
     pub average_score_not: Option<i32>,
-    #[serde(rename = "averageScore_greater")]
     pub average_score_greater: Option<i32>,
-    #[serde(rename = "averageScore_lesser")]
     pub average_score_lesser: Option<i32>,
     pub popularity: Option<i32>,
-    #[serde(rename = "popularity_not")]
     pub popularity_not: Option<i32>,
-    #[serde(rename = "popularity_greater")]
     pub popularity_greater: Option<i32>,
-    #[serde(rename = "popularity_lesser")]
     pub popularity_lesser: Option<i32>,
     pub episodes: Option<i32>,
-    #[serde(rename = "episodes_greater")]
     pub episodes_greater: Option<i32>,
-    #[serde(rename = "episodes_lesser")]
     pub episodes_lesser: Option<i32>,
     pub duration: Option<i32>,
-    #[serde(rename = "duration_greater")]
     pub duration_greater: Option<i32>,
-    #[serde(rename = "duration_lesser")]
     pub duration_lesser: Option<i32>,
     pub chapters: Option<i32>,
-    #[serde(rename = "chapters_greater")]
     pub chapters_greater: Option<i32>,
-    #[serde(rename = "chapters_lesser")]
     pub chapters_lesser: Option<i32>,
     pub volumes: Option<i32>,
-    #[serde(rename = "volumes_greater")]
     pub volumes_greater: Option<i32>,
-    #[serde(rename = "volumes_lesser")]
     pub volumes_lesser: Option<i32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -148,92 +112,50 @@ pub struct FetchMediaOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [MediaSort]>>,
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(rename = "includeStartDate")]
     pub include_start_date: Option<bool>,
-    #[serde(rename = "includeEndDate")]
     pub include_end_date: Option<bool>,
-    #[serde(rename = "includeDuration")]
     pub include_duration: Option<bool>,
-    #[serde(rename = "includeVolumes")]
     pub include_volumes: Option<bool>,
-    #[serde(rename = "includeCountryOfOrigin")]
     pub include_country_of_origin: Option<bool>,
-    #[serde(rename = "includeIsLicensed")]
     pub include_is_licensed: Option<bool>,
-    #[serde(rename = "includeSource")]
     pub include_source: Option<bool>,
-    #[serde(rename = "includeHashtag")]
     pub include_hashtag: Option<bool>,
-    #[serde(rename = "includeTrailer")]
     pub include_trailer: Option<bool>,
-    #[serde(rename = "includeUpdatedAt")]
     pub include_updated_at: Option<bool>,
-    #[serde(rename = "includeCoverImageExtraLarge")]
     pub include_cover_image_extra_large: Option<bool>,
-    #[serde(rename = "includeMeanScore")]
     pub include_mean_score: Option<bool>,
-    #[serde(rename = "includeIsLocked")]
     pub include_is_locked: Option<bool>,
-    #[serde(rename = "includeTrending")]
     pub include_trending: Option<bool>,
-    #[serde(rename = "includeTags")]
     pub include_tags: Option<bool>,
-    #[serde(rename = "includeNextAiringEpisode")]
     pub include_next_airing_episode: Option<bool>,
-    #[serde(rename = "includeRelations")]
     pub include_relations: Option<bool>,
-    #[serde(rename = "includeCharacters")]
     pub include_characters: Option<bool>,
-    #[serde(rename = "includeStaff")]
     pub include_staff: Option<bool>,
-    #[serde(rename = "includeStudios")]
     pub include_studios: Option<bool>,
-    #[serde(rename = "includeMediaListEntryDetails")]
     pub include_media_list_entry_details: Option<bool>,
-    #[serde(rename = "includeReviews")]
     pub include_reviews: Option<bool>,
-    #[serde(rename = "includeRecommendations")]
     pub include_recommendations: Option<bool>,
-    #[serde(rename = "includeExternalLinks")]
     pub include_external_links: Option<bool>,
-    #[serde(rename = "includeStreamingEpisodes")]
     pub include_streaming_episodes: Option<bool>,
-    #[serde(rename = "includeRankings")]
     pub include_rankings: Option<bool>,
-    #[serde(rename = "includeStats")]
     pub include_stats: Option<bool>,
-    #[serde(rename = "includeAutoCreateForumThread")]
     pub include_auto_create_forum_thread: Option<bool>,
-    #[serde(rename = "includeIsRecommendationBlocked")]
     pub include_is_recommendation_blocked: Option<bool>,
-    #[serde(rename = "includeIsReviewBlocked")]
     pub include_is_review_blocked: Option<bool>,
-    #[serde(rename = "includeModNotes")]
     pub include_mod_notes: Option<bool>,
     // Pagination fields
-    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
-    #[serde(rename = "staffPage")]
     pub staff_page: Option<i32>,
-    #[serde(rename = "staffPerPage")]
     pub staff_per_page: Option<i32>,
-    #[serde(rename = "reviewsPage")]
     pub reviews_page: Option<i32>,
-    #[serde(rename = "reviewsPerPage")]
     pub reviews_per_page: Option<i32>,
-    #[serde(rename = "recommendationsPage")]
     pub recommendations_page: Option<i32>,
-    #[serde(rename = "recommendationsPerPage")]
     pub recommendations_per_page: Option<i32>,
     // Filter fields for included connections
-    #[serde(rename = "voiceActorLanguage")]
     pub voice_actor_language: Option<StaffLanguage>,
     // HTML rendering options
-    #[serde(rename = "description_as_html")]
     pub description_as_html: Option<bool>,
 }
 
@@ -242,35 +164,26 @@ pub struct FetchMediaOptions<'a> {
 /// Supports optional pagination for related data (characters, staff, reviews, recommendations).
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
-pub struct FetchMediaOneOptions {
+#[serde(rename_all = "camelCase")]
+pub struct FetchMediaOneOptions<'a> {
     pub id: Option<u32>,
+    pub id_mal: Option<u32>,
+    pub search: Option<Cow<'a, str>>,
     // Characters pagination
-    #[serde(rename = "fetchCharacters")]
     pub fetch_characters: Option<bool>,
-    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
     // Staff pagination
-    #[serde(rename = "fetchStaff")]
     pub fetch_staff: Option<bool>,
-    #[serde(rename = "staffPage")]
     pub staff_page: Option<i32>,
-    #[serde(rename = "staffPerPage")]
     pub staff_per_page: Option<i32>,
     // Reviews pagination
-    #[serde(rename = "fetchReviews")]
     pub fetch_reviews: Option<bool>,
-    #[serde(rename = "reviewsPage")]
     pub reviews_page: Option<i32>,
-    #[serde(rename = "reviewsPerPage")]
     pub reviews_per_page: Option<i32>,
     // Recommendations pagination
-    #[serde(rename = "fetchRecommendations")]
     pub fetch_recommendations: Option<bool>,
-    #[serde(rename = "recommendationsPage")]
     pub recommendations_page: Option<i32>,
-    #[serde(rename = "recommendationsPerPage")]
     pub recommendations_per_page: Option<i32>,
 }
 
@@ -344,7 +257,10 @@ impl<'a> MediaEndpoint<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn fetch_one(&self, options: &FetchMediaOneOptions) -> Result<Media, AniListError> {
+    pub async fn fetch_one(
+        &self,
+        options: &FetchMediaOneOptions<'_>,
+    ) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
         self.client.fetch(query, Some(&options)).await
     }

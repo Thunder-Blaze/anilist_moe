@@ -1,10 +1,12 @@
 use crate::objects::notification::{
     ActivityLikeNotification, ActivityMentionNotification, ActivityMessageNotification,
     ActivityReplyLikeNotification, ActivityReplyNotification, ActivityReplySubscribedNotification,
-    AiringNotification, FollowingNotification, MediaDataChangeNotification,
-    MediaDeletionNotification, MediaMergeNotification, RelatedMediaAdditionNotification,
-    ThreadCommentLikeNotification, ThreadCommentMentionNotification,
-    ThreadCommentReplyNotification, ThreadCommentSubscribedNotification, ThreadLikeNotification,
+    AiringNotification, CharacterSubmissionUpdateNotification, FollowingNotification,
+    MediaDataChangeNotification, MediaDeletionNotification, MediaMergeNotification,
+    MediaSubmissionUpdateNotification, RelatedMediaAdditionNotification,
+    StaffSubmissionUpdateNotification, ThreadCommentLikeNotification,
+    ThreadCommentMentionNotification, ThreadCommentReplyNotification,
+    ThreadCommentSubscribedNotification, ThreadLikeNotification,
 };
 use serde::{Deserialize, Serialize};
 
@@ -30,6 +32,9 @@ pub enum NotificationUnion {
     MediaDataChange(MediaDataChangeNotification),
     MediaMerge(MediaMergeNotification),
     MediaDeletion(MediaDeletionNotification),
+    MediaSubmissionUpdate(MediaSubmissionUpdateNotification),
+    StaffSubmissionUpdate(StaffSubmissionUpdateNotification),
+    CharacterSubmissionUpdate(CharacterSubmissionUpdateNotification),
     /// A `__typename` this version of the crate does not know yet.
     ///
     /// Only ever produced by deserialization.

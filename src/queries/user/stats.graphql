@@ -1,5 +1,5 @@
-query GetUserStats($id: Int!) {
-    User(id: $id) {
+query GetUserStats($userId: Int!, $sort: [UserStatisticsSort]) {
+    User(id: $userId) {
         id
         name
         statistics {
@@ -11,37 +11,37 @@ query GetUserStats($id: Int!) {
                 episodesWatched
                 chaptersRead
                 volumesRead
-                formats {
+                formats(sort: $sort) {
                     format
                     count
                 }
-                statuses {
+                statuses(sort: $sort) {
                     status
                     count
                 }
-                scores {
+                scores(sort: $sort) {
                     score
                     count
                 }
-                lengths {
+                lengths(sort: $sort) {
                     length
                     count
                 }
-                releaseYears {
+                releaseYears(sort: $sort) {
                     releaseYear
                     count
                 }
-                startYears {
+                startYears(sort: $sort) {
                     startYear
                     count
                 }
-                genres {
+                genres(sort: $sort) {
                     genre
                     count
                     meanScore
                     minutesWatched
                 }
-                tags {
+                tags(sort: $sort) {
                     tag {
                         id
                         name
@@ -50,13 +50,13 @@ query GetUserStats($id: Int!) {
                     meanScore
                     minutesWatched
                 }
-                countries {
+                countries(sort: $sort) {
                     country
                     count
                     meanScore
                     minutesWatched
                 }
-                voiceActors {
+                voiceActors(sort: $sort) {
                     voiceActor {
                         id
                         name {
@@ -71,7 +71,7 @@ query GetUserStats($id: Int!) {
                     meanScore
                     minutesWatched
                 }
-                staff {
+                staff(sort: $sort) {
                     staff {
                         id
                         name {
@@ -86,7 +86,7 @@ query GetUserStats($id: Int!) {
                     meanScore
                     minutesWatched
                 }
-                studios {
+                studios(sort: $sort) {
                     studio {
                         id
                         name
@@ -102,37 +102,37 @@ query GetUserStats($id: Int!) {
                 standardDeviation
                 chaptersRead
                 volumesRead
-                formats {
+                formats(sort: $sort) {
                     format
                     count
                 }
-                statuses {
+                statuses(sort: $sort) {
                     status
                     count
                 }
-                scores {
+                scores(sort: $sort) {
                     score
                     count
                 }
-                lengths {
+                lengths(sort: $sort) {
                     length
                     count
                 }
-                releaseYears {
+                releaseYears(sort: $sort) {
                     releaseYear
                     count
                 }
-                startYears {
+                startYears(sort: $sort) {
                     startYear
                     count
                 }
-                genres {
+                genres(sort: $sort) {
                     genre
                     count
                     meanScore
                     chaptersRead
                 }
-                tags {
+                tags(sort: $sort) {
                     tag {
                         id
                         name
@@ -141,13 +141,13 @@ query GetUserStats($id: Int!) {
                     meanScore
                     chaptersRead
                 }
-                countries {
+                countries(sort: $sort) {
                     country
                     count
                     meanScore
                     chaptersRead
                 }
-                staff {
+                staff(sort: $sort) {
                     staff {
                         id
                         name {

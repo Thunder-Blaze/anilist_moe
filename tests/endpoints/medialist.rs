@@ -3,6 +3,7 @@
 use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::medialist::*;
+use anilist_moe::enums::media::MediaType;
 use anilist_moe::enums::media_list::MediaListStatus;
 use anilist_moe::options;
 
@@ -191,4 +192,76 @@ async fn test_delete_media_list() {
             }
         }
     }
+}
+
+#[tokio::test]
+async fn test_fetch_collection() {
+    let h = TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = options!(
+                FetchMediaListCollectionOptions,
+                user_id: Some(3225),
+                media_type: MediaType::Anime,
+            );
+            client.medialist().fetch_collection(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should fetch a grouped media list: {:?}",
+        result.err()
+    );
+
+    let collection = result.unwrap();
+    let lists = collection.lists.expect("a collection has lists");
+    assert!(!lists.is_empty(), "the user should have lists");
+    assert!(
+        lists
+            .iter()
+            .any(|list| list.name.as_deref() == Some("Completed")),
+        "the completed list should be among them: {:?}",
+        lists
+            .iter()
+            .map(|list| list.name.clone())
+            .collect::<Vec<_>>()
+    );
+    let entries = lists
+        .iter()
+        .flat_map(|list| list.entries.clone().unwrap_or_default())
+        .count();
+    assert!(entries > 0, "the lists should carry entries");
+}
+
+#[tokio::test]
+async fn test_fetch_one_media_list_entry() {
+    let h = TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = options!(
+                FetchMediaListOptions,
+                user_id: Some(3225),
+            );
+            client.medialist().fetch_one(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should fetch a single media list entry: {:?}",
+        result.err()
+    );
+
+    let entry = result.unwrap();
+    assert!(entry.id > 0, "the entry should have an id");
+    assert_eq!(
+        entry.user_id,
+        Some(3225),
+        "and belong to the user asked for"
+    );
 }

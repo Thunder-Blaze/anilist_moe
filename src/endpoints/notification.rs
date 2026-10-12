@@ -13,22 +13,16 @@ use std::borrow::Cow;
 /// Options for searching and filtering notifications.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NotificationSearchOptions<'a> {
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    #[serde(rename = "type")]
     pub notification_type: Option<NotificationType>,
-    #[serde(rename = "type_in")]
     pub type_in: Option<Cow<'a, [NotificationType]>>,
-    #[serde(rename = "resetNotificationCount")]
     pub reset_notification_count: Option<bool>,
     // HTML rendering options
-    #[serde(rename = "message_as_html")]
     pub message_as_html: Option<bool>,
-    #[serde(rename = "text_as_html")]
     pub text_as_html: Option<bool>,
-    #[serde(rename = "comment_as_html")]
     pub comment_as_html: Option<bool>,
 }
 

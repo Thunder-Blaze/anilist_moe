@@ -14,18 +14,15 @@ use std::borrow::Cow;
 /// Options for fetching forum threads.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchThreadOptions<'a> {
     pub id: Option<u32>,
     pub search: Option<Cow<'a, str>>,
-    #[serde(rename = "userId")]
+    pub id_in: Option<Cow<'a, [u32]>>,
     pub user_id: Option<u32>,
-    #[serde(rename = "replyUserId")]
     pub reply_user_id: Option<u32>,
-    #[serde(rename = "subscribed")]
     pub subscribed: Option<bool>,
-    #[serde(rename = "categoryId")]
     pub category_id: Option<u32>,
-    #[serde(rename = "mediaCategoryId")]
     pub media_category_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -35,48 +32,42 @@ pub struct FetchThreadOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [ThreadSort]>>,
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     // Extra
-    #[serde(rename = "includeBody")]
     pub include_body: Option<bool>,
-    #[serde(rename = "includeUser")]
     pub include_user: Option<bool>,
-    #[serde(rename = "includeReplyUser")]
     pub include_reply_user: Option<bool>,
-    #[serde(rename = "includeCategories")]
     pub include_categories: Option<bool>,
-    #[serde(rename = "includeMediaCategories")]
     pub include_media_categories: Option<bool>,
     // HTML rendering options
-    #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
 }
 
 /// Options for fetching a single forum thread by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchThreadOneOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "commentsPage")]
-    pub comments_page: Option<i32>,
-    #[serde(rename = "commentsPerPage")]
-    pub comments_per_page: Option<i32>,
-    #[serde(rename = "commentsSort")]
-    pub comments_sort: Option<Cow<'a, [ThreadCommentSort]>>,
+    pub user_id: Option<u32>,
+    pub reply_user_id: Option<u32>,
+    pub subscribed: Option<bool>,
+    pub category_id: Option<u32>,
+    pub media_category_id: Option<u32>,
+    pub search: Option<Cow<'a, str>>,
+    pub id_in: Option<Cow<'a, [u32]>>,
+    pub sort: Option<Cow<'a, [ThreadSort]>>,
     // HTML rendering options
-    #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
 }
 
 /// Options for fetching thread comments.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchThreadCommentOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "threadId")]
     pub thread_id: Option<u32>,
-    #[serde(rename = "userId")]
     pub user_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -86,42 +77,43 @@ pub struct FetchThreadCommentOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     // HTML rendering options
-    #[serde(rename = "comment_as_html")]
     pub comment_as_html: Option<bool>,
 }
 
 /// Options for fetching a single thread comment by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
-pub struct FetchThreadCommentOneOptions {
+#[serde(rename_all = "camelCase")]
+pub struct FetchThreadCommentOneOptions<'a> {
     pub id: Option<u32>,
+    pub thread_id: Option<u32>,
+    pub user_id: Option<u32>,
+    pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
     // HTML rendering options
-    #[serde(rename = "comment_as_html")]
     pub comment_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a forum thread.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveThreadOptions<'a> {
     pub id: Option<u32>,
     pub title: Option<Cow<'a, str>>,
     pub body: Option<Cow<'a, str>>,
-    pub categories: Option<Cow<'a, [i32]>>,
-    #[serde(rename = "mediaCategories")]
-    pub media_categories: Option<Cow<'a, [i32]>>,
+    pub categories: Option<Cow<'a, [u32]>>,
+    pub media_categories: Option<Cow<'a, [u32]>>,
     pub sticky: Option<bool>,
     pub locked: Option<bool>,
     // HTML rendering options
-    #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
 }
 
 /// Options for deleting a forum thread.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteThreadOptions {
     pub id: u32,
 }
@@ -129,21 +121,20 @@ pub struct DeleteThreadOptions {
 /// Options for creating or updating a thread comment.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveThreadCommentOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "threadId")]
     pub thread_id: Option<u32>,
-    #[serde(rename = "parentCommentId")]
     pub parent_comment_id: Option<u32>,
     pub comment: Option<Cow<'a, str>>,
     pub locked: Option<bool>,
     // HTML rendering options
-    #[serde(rename = "comment_as_html")]
     pub comment_as_html: Option<bool>,
 }
 
 /// Options for deleting a thread comment.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteThreadCommentOptions {
     pub id: u32,
 }
@@ -151,8 +142,8 @@ pub struct DeleteThreadCommentOptions {
 /// Options for subscribing or unsubscribing to a thread.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToggleThreadSubscriptionOptions {
-    #[serde(rename = "threadId")]
     pub thread_id: u32,
     pub subscribe: Option<bool>,
 }
@@ -197,7 +188,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Fetch a single thread comment
     pub async fn fetch_comment_one(
         &self,
-        options: &FetchThreadCommentOneOptions,
+        options: &FetchThreadCommentOneOptions<'_>,
     ) -> Result<ThreadComment, AniListError> {
         let query = forum::FETCH_COMMENT_ONE;
         self.client.fetch(query, Some(&options)).await
@@ -262,7 +253,7 @@ impl<'a> ForumEndpoint<'a> {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(&options!(
             FetchThreadOptions,
-            sort: Some(&[ThreadSort::CreatedAtDesc]),
+            sort: Some(&[ThreadSort::IdDesc]),
             page,
             per_page,
         ))
@@ -328,7 +319,7 @@ impl<'a> ForumEndpoint<'a> {
         self.fetch(&options!(
             FetchThreadOptions,
             user_id: Some(user_id),
-            sort: Some(&[ThreadSort::CreatedAtDesc]),
+            sort: Some(&[ThreadSort::IdDesc]),
             page,
             per_page,
         ))
@@ -365,7 +356,7 @@ impl<'a> ForumEndpoint<'a> {
         &self,
         title: &str,
         body: &str,
-        categories: Vec<i32>,
+        categories: Vec<u32>,
     ) -> Result<Thread, AniListError> {
         self.save(&options!(
             SaveThreadOptions,

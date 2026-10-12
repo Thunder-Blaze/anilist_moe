@@ -8,7 +8,7 @@ mutation SaveThread(
     $sticky: Boolean
 
     # HTML rendering options
-    $body_as_html: Boolean = false
+    $bodyAsHtml: Boolean = false
 ) {
     SaveThread(
         id: $id
@@ -21,7 +21,7 @@ mutation SaveThread(
     ) {
         id
         title
-        body(asHtml: $body_as_html)
+        body(asHtml: $bodyAsHtml)
         userId
         replyCount
         viewCount

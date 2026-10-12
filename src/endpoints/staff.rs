@@ -13,16 +13,13 @@ use std::borrow::Cow;
 /// Options for fetching staff members.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchStaffOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub search: Option<Cow<'a, str>>,
-    #[serde(rename = "id_not")]
     pub id_not: Option<u32>,
-    #[serde(rename = "id_in")]
     pub id_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -32,51 +29,34 @@ pub struct FetchStaffOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [StaffSort]>>,
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     // Extra
-    #[serde(rename = "includeStaffMedia")]
     pub include_staff_media: Option<bool>,
-    #[serde(rename = "includeCharacters")]
     pub include_characters: Option<bool>,
-    #[serde(rename = "includeCharacterMedia")]
     pub include_character_media: Option<bool>,
-    #[serde(rename = "includeSubmitter")]
     pub include_submitter: Option<bool>,
-    #[serde(rename = "includeSubmissionStatus")]
     pub include_submission_status: Option<bool>,
-    #[serde(rename = "includeSubmissionNotes")]
     pub include_submission_notes: Option<bool>,
-    #[serde(rename = "includeModNotes")]
     pub include_mod_notes: Option<bool>,
     // Sub-pagination variables
-    #[serde(rename = "staffMediaPage")]
     pub staff_media_page: Option<i32>,
-    #[serde(rename = "staffMediaPerPage")]
     pub staff_media_per_page: Option<i32>,
-    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
-    #[serde(rename = "characterMediaPage")]
     pub character_media_page: Option<i32>,
-    #[serde(rename = "characterMediaPerPage")]
     pub character_media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single staff member by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchStaffOneOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub search: Option<Cow<'a, str>>,
-    #[serde(rename = "id_not")]
     pub id_not: Option<u32>,
-    #[serde(rename = "id_in")]
     pub id_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -86,17 +66,11 @@ pub struct FetchStaffOneOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [StaffSort]>>,
     // Sub-pagination variables
-    #[serde(rename = "staffMediaPage")]
     pub staff_media_page: Option<i32>,
-    #[serde(rename = "staffMediaPerPage")]
     pub staff_media_per_page: Option<i32>,
-    #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
-    #[serde(rename = "charactersPerPage")]
     pub characters_per_page: Option<i32>,
-    #[serde(rename = "characterMediaPage")]
     pub character_media_page: Option<i32>,
-    #[serde(rename = "characterMediaPerPage")]
     pub character_media_per_page: Option<i32>,
 }
 

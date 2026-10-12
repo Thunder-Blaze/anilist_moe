@@ -150,3 +150,48 @@ async fn test_airing_data_types() {
         );
     }
 }
+
+#[tokio::test]
+async fn test_fetch_one_airing_schedule() {
+    let h = harness();
+    let client = h.client();
+
+    // Which media has a schedule is the API's business, so ask it for one and
+    // then fetch that single schedule by id.
+    let result = h
+        .run(|| async {
+            let page = client
+                .airing()
+                .fetch(&options!(
+                    FetchAiringOptions,
+                    not_yet_aired: Some(true),
+                    per_page: Some(1),
+                ))
+                .await?;
+            let listed = page.data.first().expect("an upcoming schedule");
+            let id = listed.id.expect("a schedule id");
+            let one = client
+                .airing()
+                .fetch_one(&options!(FetchAiringOptions, id: Some(id)))
+                .await?;
+            Ok::<_, anilist_moe::AniListError>((id, listed.media_id, one))
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should fetch one airing schedule: {:?}",
+        result.err()
+    );
+
+    let (id, media_id, one) = result.unwrap();
+    assert_eq!(
+        one.id,
+        Some(id),
+        "the single fetch should answer with the id asked for"
+    );
+    assert_eq!(
+        one.media_id, media_id,
+        "and for the same media the list gave"
+    );
+}

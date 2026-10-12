@@ -8,7 +8,8 @@ use crate::objects::{common::PageInfo, media::Media};
 #[serde(rename_all = "camelCase")]
 pub struct AiringProgression {
     pub episode: Option<f32>,
-    pub progress: Option<f32>,
+    /// The average score at this episode.
+    pub score: Option<f32>,
     pub watching: Option<i32>,
 }
 

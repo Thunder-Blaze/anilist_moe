@@ -10,7 +10,7 @@ query SearchThreads(
     $page: Int = 1
     $perPage: Int = 20
     # Additional filters
-    $id_in: [Int]
+    $idIn: [Int]
     # Extra
     $includeBody: Boolean = false
     $includeUser: Boolean = false
@@ -19,7 +19,7 @@ query SearchThreads(
     $includeMediaCategories: Boolean = false
 
     # HTML rendering options
-    $body_as_html: Boolean = false
+    $bodyAsHtml: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -38,11 +38,11 @@ query SearchThreads(
             mediaCategoryId: $mediaCategoryId
             search: $search
             sort: $sort
-            id_in: $id_in
+            id_in: $idIn
         ) {
             id
             title
-            body(asHtml: $body_as_html) @include(if: $includeBody)
+            body(asHtml: $bodyAsHtml) @include(if: $includeBody)
             userId
             replyUserId
             replyCount

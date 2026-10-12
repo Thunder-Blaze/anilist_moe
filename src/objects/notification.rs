@@ -2,7 +2,9 @@ use crate::{
     enums::notification::NotificationType,
     objects::{
         activity::MessageActivity,
+        character::Character,
         media::Media,
+        staff::Staff,
         thread::{Thread, ThreadComment},
         user::User,
     },
@@ -87,6 +89,8 @@ pub struct ThreadLikeNotification {
     pub context: Option<String>,
     pub created_at: Option<i32>,
     pub thread: Option<Thread>,
+    /// The comment that was liked, when the notification is about one.
+    pub comment: Option<ThreadComment>,
     pub user: Option<User>,
 }
 
@@ -269,4 +273,51 @@ pub struct MediaDeletionNotification {
     pub context: Option<String>,
     pub reason: Option<String>,
     pub created_at: Option<i32>,
+}
+
+/// A submission update about a media entry (AniList sends these under
+/// [`NotificationType::MediaSubmissionUpdate`](crate::enums::notification::NotificationType::MediaSubmissionUpdate)).
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaSubmissionUpdateNotification {
+    pub id: u32,
+    #[serde(rename = "type")]
+    pub activity_type: Option<NotificationType>,
+    pub contexts: Option<Vec<String>>,
+    pub status: Option<String>,
+    pub notes: Option<String>,
+    pub created_at: Option<i32>,
+    pub media: Option<Media>,
+    pub submitted_title: Option<String>,
+}
+
+/// A submission update about a staff entry.
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StaffSubmissionUpdateNotification {
+    pub id: u32,
+    #[serde(rename = "type")]
+    pub activity_type: Option<NotificationType>,
+    pub contexts: Option<Vec<String>>,
+    pub status: Option<String>,
+    pub notes: Option<String>,
+    pub created_at: Option<i32>,
+    pub staff: Option<Staff>,
+}
+
+/// A submission update about a character entry.
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CharacterSubmissionUpdateNotification {
+    pub id: u32,
+    #[serde(rename = "type")]
+    pub activity_type: Option<NotificationType>,
+    pub contexts: Option<Vec<String>>,
+    pub status: Option<String>,
+    pub notes: Option<String>,
+    pub created_at: Option<i32>,
+    pub character: Option<Character>,
 }

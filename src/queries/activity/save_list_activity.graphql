@@ -1,0 +1,31 @@
+mutation SaveListActivity($id: Int, $locked: Boolean) {
+    SaveListActivity(id: $id, locked: $locked) {
+        __typename
+        id
+        type
+        status
+        progress
+        isLocked
+        isSubscribed
+        isLiked
+        likeCount
+        siteUrl
+        createdAt
+        userId
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+        media {
+            id
+            title {
+                romaji
+                english
+            }
+        }
+    }
+}

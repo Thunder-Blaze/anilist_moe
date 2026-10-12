@@ -15,7 +15,7 @@ pub enum SubmissionStatus {
     Pending,
     Rejected,
     PartiallyAccepted,
-    Approved,
+    Accepted,
     /// A value the API returned that this version of the crate does not know yet.
     ///
     /// Only ever produced by deserialization; never send it as input.

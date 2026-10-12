@@ -1,19 +1,59 @@
 query GetUserMangaList(
+    $id: Int
     $userId: Int!
+    $username: String
     $page: Int = 1
     $perPage: Int = 25
     $status: MediaListStatus
+    $statusIn: [MediaListStatus]
+    $statusNot: MediaListStatus
+    $statusNotIn: [MediaListStatus]
+    $mediaId: Int
+    $mediaIdIn: [Int]
+    $mediaIdNotIn: [Int]
+    $userIdIn: [Int]
+    $isFollowing: Boolean
+    $compareWithAuthList: Boolean
+    $notes: String
+    $startedAtExact: FuzzyDateInt
+    $startedAtGreater: FuzzyDateInt
+    $startedAtLesser: FuzzyDateInt
+    $startedAt: String
+    $completedAtExact: FuzzyDateInt
+    $completedAtGreater: FuzzyDateInt
+    $completedAtLesser: FuzzyDateInt
+    $completedAt: String
     $sort: [MediaListSort]
-    $type: MediaType
+    $mediaType: MediaType
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
             hasNextPage
         }
         mediaList(
+            id: $id
             userId: $userId
-            type: $type
+            userName: $username
+            type: $mediaType
             status: $status
+            status_in: $statusIn
+            status_not: $statusNot
+            status_not_in: $statusNotIn
+            mediaId: $mediaId
+            mediaId_in: $mediaIdIn
+            mediaId_not_in: $mediaIdNotIn
+            userId_in: $userIdIn
+            isFollowing: $isFollowing
+            compareWithAuthList: $compareWithAuthList
+            notes_like: $notes
+            startedAt: $startedAtExact
+            startedAt_greater: $startedAtGreater
+            startedAt_lesser: $startedAtLesser
+            startedAt_like: $startedAt
+            completedAt: $completedAtExact
+            completedAt_greater: $completedAtGreater
+            completedAt_lesser: $completedAtLesser
+            completedAt_like: $completedAt
             sort: $sort
         ) {
             id

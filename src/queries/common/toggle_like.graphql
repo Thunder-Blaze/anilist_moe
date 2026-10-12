@@ -1,10 +1,10 @@
 mutation ToggleLike(
     $id: Int
-    $type: LikeableType
+    $likeType: LikeableType
 ) {
     ToggleLikeV2(
         id: $id
-        type: $type
+        type: $likeType
     ) {
         ... on ListActivity {
             __typename

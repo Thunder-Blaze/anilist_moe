@@ -38,12 +38,14 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 - **Recommendations**: Browse and manage anime/manga recommendations
 
 ### Scheduling & Discovery
-- **Airing Schedules**: Upcoming episodes, recently aired, date ranges
+- **Airing Schedules**: Upcoming episodes, recently aired, date ranges, or a single schedule by id
 - **Notifications**: Read, manage, and mark notifications as read
-- **Media Lists**: User anime/manga lists with status tracking
+- **Media Lists**: User anime/manga lists with status tracking, a whole list grouped the way the
+  site shows it (`fetch_collection`), a single entry, and custom list management
 
 ### Interactions
-- **Common**: Toggle likes, toggle follows, toggle favorites on various content types
+- **Common**: Toggle likes, toggle follows, toggle favourites on various content types, the users
+  who liked something, the genre and tag lists, and favourite ordering
 
 ## Installation
 

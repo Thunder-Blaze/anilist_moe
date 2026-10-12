@@ -31,30 +31,30 @@ query FetchActivity(
     $hasReplies: Boolean,
     $hasRepliesOrTypeText: Boolean,
     $createdAt: Int,
-    $id_not: Int,
-    $id_in: [Int],
-    $id_not_in: [Int],
-    $userId_not: Int,
-    $userId_in: [Int],
-    $userId_not_in: [Int],
-    $messengerId_not: Int,
-    $messengerId_in: [Int],
-    $messengerId_not_in: [Int],
-    $mediaId_not: Int,
-    $mediaId_in: [Int],
-    $mediaId_not_in: [Int],
-    $type_not: ActivityType,
-    $type_in: [ActivityType],
-    $type_not_in: [ActivityType],
-    $createdAt_greater: Int,
-    $createdAt_lesser: Int,
+    $idNot: Int,
+    $idIn: [Int],
+    $idNotIn: [Int],
+    $userIdNot: Int,
+    $userIdIn: [Int],
+    $userIdNotIn: [Int],
+    $messengerIdNot: Int,
+    $messengerIdIn: [Int],
+    $messengerIdNotIn: [Int],
+    $mediaIdNot: Int,
+    $mediaIdIn: [Int],
+    $mediaIdNotIn: [Int],
+    $typeNot: ActivityType,
+    $typeIn: [ActivityType],
+    $typeNotIn: [ActivityType],
+    $createdAtGreater: Int,
+    $createdAtLesser: Int,
 
     # Sort
     $sort: [ActivitySort] = [ID_DESC]
 
     # HTML rendering options
-    $text_as_html: Boolean = false
-    $message_as_html: Boolean = false
+    $textAsHtml: Boolean = false
+    $messageAsHtml: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -70,23 +70,23 @@ query FetchActivity(
             hasReplies: $hasReplies,
             hasRepliesOrTypeText: $hasRepliesOrTypeText,
             createdAt: $createdAt,
-            id_not: $id_not,
-            id_in: $id_in,
-            id_not_in: $id_not_in,
-            userId_not: $userId_not,
-            userId_in: $userId_in,
-            userId_not_in: $userId_not_in,
-            messengerId_not: $messengerId_not,
-            messengerId_in: $messengerId_in,
-            messengerId_not_in: $messengerId_not_in,
-            mediaId_not: $mediaId_not,
-            mediaId_in: $mediaId_in,
-            mediaId_not_in: $mediaId_not_in,
-            type_not: $type_not,
-            type_in: $type_in,
-            type_not_in: $type_not_in,
-            createdAt_greater: $createdAt_greater,
-            createdAt_lesser: $createdAt_lesser,
+            id_not: $idNot,
+            id_in: $idIn,
+            id_not_in: $idNotIn,
+            userId_not: $userIdNot,
+            userId_in: $userIdIn,
+            userId_not_in: $userIdNotIn,
+            messengerId_not: $messengerIdNot,
+            messengerId_in: $messengerIdIn,
+            messengerId_not_in: $messengerIdNotIn,
+            mediaId_not: $mediaIdNot,
+            mediaId_in: $mediaIdIn,
+            mediaId_not_in: $mediaIdNotIn,
+            type_not: $typeNot,
+            type_in: $typeIn,
+            type_not_in: $typeNotIn,
+            createdAt_greater: $createdAtGreater,
+            createdAt_lesser: $createdAtLesser,
             sort: $sort
         ) {
             __typename
@@ -118,7 +118,7 @@ query FetchActivity(
                 likeCount
                 replyCount
                 isSubscribed
-                text(asHtml: $text_as_html)
+                text(asHtml: $textAsHtml)
                 user {
                     ...UserFields
                 }
@@ -134,7 +134,7 @@ query FetchActivity(
                 likeCount
                 replyCount
                 isSubscribed
-                message(asHtml: $message_as_html)
+                message(asHtml: $messageAsHtml)
                 messenger {
                     ...UserFields
                 }

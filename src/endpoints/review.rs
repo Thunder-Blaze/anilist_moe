@@ -15,16 +15,13 @@ use std::borrow::Cow;
 /// Options for fetching reviews.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchReviewOptions<'a> {
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub id: Option<u32>,
-    #[serde(rename = "mediaId")]
     pub media_id: Option<u32>,
-    #[serde(rename = "userId")]
     pub user_id: Option<u32>,
-    #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -34,38 +31,36 @@ pub struct FetchReviewOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [ReviewSort]>>,
     // HTML rendering options
-    #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
-    #[serde(rename = "description_as_html")]
     pub description_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a review.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveReviewOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "mediaId")]
     pub media_id: u32,
     pub score: Option<i32>,
     pub summary: Option<Cow<'a, str>>,
     pub body: Option<Cow<'a, str>>,
     pub private: Option<bool>,
     // HTML rendering options
-    #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
 }
 
 /// Options for deleting a review.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteReviewOptions {
     pub id: u32,
 }
 
 /// Options for rating a review.
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RateReviewOptions {
-    #[serde(rename = "reviewId")]
     pub review_id: u32,
     pub rating: ReviewRating,
 }
@@ -139,7 +134,7 @@ impl<'a> ReviewEndpoint<'a> {
             user_id: Some(user_id),
             page,
             per_page,
-            sort: Some(&[ReviewSort::CreatedAtDesc]),
+            sort: Some(&[ReviewSort::IdDesc]),
         ))
         .await
     }
@@ -154,7 +149,7 @@ impl<'a> ReviewEndpoint<'a> {
             FetchReviewOptions,
             page,
             per_page,
-            sort: Some(&[ReviewSort::CreatedAtDesc]),
+            sort: Some(&[ReviewSort::IdDesc]),
         ))
         .await
     }

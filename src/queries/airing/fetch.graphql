@@ -4,25 +4,25 @@ query AiringSchedule(
     $episode: Int
     $airingAt: Int
     $notYetAired: Boolean = true
-    $id_not: Int
-    $id_in: [Int]
-    $id_not_in: [Int]
-    $mediaId_not: Int
-    $mediaId_in: [Int]
-    $mediaId_not_in: [Int]
-    $episode_not: Int
-    $episode_in: [Int]
-    $episode_not_in: [Int]
-    $episode_greater: Int
-    $episode_lesser: Int
-    $airingAt_greater: Int
-    $airingAt_lesser: Int
+    $idNot: Int
+    $idIn: [Int]
+    $idNotIn: [Int]
+    $mediaIdNot: Int
+    $mediaIdIn: [Int]
+    $mediaIdNotIn: [Int]
+    $episodeNot: Int
+    $episodeIn: [Int]
+    $episodeNotIn: [Int]
+    $episodeGreater: Int
+    $episodeLesser: Int
+    $airingAtGreater: Int
+    $airingAtLesser: Int
     $sort: [AiringSort] = [TIME, ID]
     $page: Int = 1
     $perPage: Int = 20
 
     # HTML rendering options
-    $description_as_html: Boolean = false
+    $descriptionAsHtml: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -34,19 +34,19 @@ query AiringSchedule(
             episode: $episode
             airingAt: $airingAt
             notYetAired: $notYetAired
-            id_not: $id_not
-            id_in: $id_in
-            id_not_in: $id_not_in
-            mediaId_not: $mediaId_not
-            mediaId_in: $mediaId_in
-            mediaId_not_in: $mediaId_not_in
-            episode_not: $episode_not
-            episode_in: $episode_in
-            episode_not_in: $episode_not_in
-            episode_greater: $episode_greater
-            episode_lesser: $episode_lesser
-            airingAt_greater: $airingAt_greater
-            airingAt_lesser: $airingAt_lesser
+            id_not: $idNot
+            id_in: $idIn
+            id_not_in: $idNotIn
+            mediaId_not: $mediaIdNot
+            mediaId_in: $mediaIdIn
+            mediaId_not_in: $mediaIdNotIn
+            episode_not: $episodeNot
+            episode_in: $episodeIn
+            episode_not_in: $episodeNotIn
+            episode_greater: $episodeGreater
+            episode_lesser: $episodeLesser
+            airingAt_greater: $airingAtGreater
+            airingAt_lesser: $airingAtLesser
             sort: $sort
         ) {
             id
@@ -66,7 +66,7 @@ query AiringSchedule(
                 type
                 format
                 status
-                description(asHtml: $description_as_html)
+                description(asHtml: $descriptionAsHtml)
                 season
                 seasonYear
                 episodes

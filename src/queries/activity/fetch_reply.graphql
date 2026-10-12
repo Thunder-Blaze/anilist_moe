@@ -1,0 +1,31 @@
+fragment ReplyLikesFields on User {
+    id
+    name
+    avatar {
+        large
+    }
+}
+
+query FetchActivityReply(
+    $id: Int
+    $activityId: Int
+    $textAsHtml: Boolean = false
+) {
+    ActivityReply(id: $id, activityId: $activityId) {
+        id
+        text(asHtml: $textAsHtml)
+        createdAt
+        likeCount
+        isLiked
+        user {
+            id
+            name
+            avatar {
+                large
+            }
+        }
+        likes {
+            ...ReplyLikesFields
+        }
+    }
+}

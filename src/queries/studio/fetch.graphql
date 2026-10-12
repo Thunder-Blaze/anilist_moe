@@ -5,9 +5,9 @@ query (
   $search: String
   $sort: [StudioSort]
   # NOT filters
-  $id_not: Int
-  $id_in: [Int]
-  $id_not_in: [Int]
+  $idNot: Int
+  $idIn: [Int]
+  $idNotIn: [Int]
   # Extra
   $includeMedia: Boolean = false
   # Sub-pagination variables
@@ -18,7 +18,7 @@ query (
     pageInfo {
       hasNextPage
     }
-    studios(id: $id, search: $search, sort: $sort, id_not: $id_not, id_in: $id_in, id_not_in: $id_not_in) {
+    studios(id: $id, search: $search, sort: $sort, id_not: $idNot, id_in: $idIn, id_not_in: $idNotIn) {
       id
       name
       isAnimationStudio

@@ -17,7 +17,9 @@ pub enum ThreadSort {
     IdDesc,
     Title,
     TitleDesc,
+    #[deprecated(note = "the API deprecated it: use `Id` instead")]
     CreatedAt,
+    #[deprecated(note = "the API deprecated it: use `IdDesc` instead")]
     CreatedAtDesc,
     UpdatedAt,
     UpdatedAtDesc,

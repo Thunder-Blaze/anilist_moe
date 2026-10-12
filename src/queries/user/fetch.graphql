@@ -11,7 +11,7 @@ query SearchUsers(
     $includeStatistics: Boolean = false
 
     # HTML rendering options
-    $about_as_html: Boolean = false
+    $aboutAsHtml: Boolean = false
 ) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
@@ -30,7 +30,7 @@ query SearchUsers(
         ) {
             id
             name
-            about(asHtml: $about_as_html)
+            about(asHtml: $aboutAsHtml)
             avatar {
                 large
                 medium

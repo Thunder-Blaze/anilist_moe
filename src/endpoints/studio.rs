@@ -13,17 +13,14 @@ use std::borrow::Cow;
 /// Options for fetching studios.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchStudioOptions<'a> {
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub id: Option<u32>,
     pub search: Option<Cow<'a, str>>,
-    #[serde(rename = "id_not")]
     pub id_not: Option<u32>,
-    #[serde(rename = "id_in")]
     pub id_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -33,26 +30,21 @@ pub struct FetchStudioOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [StudioSort]>>,
     // Extra
-    #[serde(rename = "includeMedia")]
     pub include_media: Option<bool>,
     // Sub-pagination variables
-    #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage")]
     pub media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single studio by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchStudioOneOptions<'a> {
     pub id: Option<u32>,
     pub search: Option<Cow<'a, str>>,
-    #[serde(rename = "id_not")]
     pub id_not: Option<u32>,
-    #[serde(rename = "id_in")]
     pub id_in: Option<Cow<'a, [u32]>>,
-    #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -62,9 +54,7 @@ pub struct FetchStudioOneOptions<'a> {
     )]
     pub sort: Option<Cow<'a, [StudioSort]>>,
     // Sub-pagination variables
-    #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage")]
     pub media_per_page: Option<i32>,
 }
 

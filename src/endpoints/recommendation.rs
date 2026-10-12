@@ -13,23 +13,17 @@ use std::borrow::Cow;
 /// Options for fetching media recommendations.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchRecommendationOptions<'a> {
     pub page: Option<i32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub id: Option<u32>,
-    #[serde(rename = "mediaId")]
     pub media_id: Option<u32>,
-    #[serde(rename = "mediaRecommendationId")]
     pub media_recommendation_id: Option<u32>,
-    #[serde(rename = "userId")]
     pub user_id: Option<u32>,
     pub rating: Option<i32>,
-    #[serde(rename = "rating_greater")]
     pub rating_greater: Option<i32>,
-    #[serde(rename = "rating_lesser")]
     pub rating_lesser: Option<i32>,
-    #[serde(rename = "onList")]
     pub on_list: Option<bool>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
@@ -42,10 +36,9 @@ pub struct FetchRecommendationOptions<'a> {
 
 /// Options for saving a recommendation rating.
 #[derive(Default, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SaveRecommendationOptions {
-    #[serde(rename = "mediaId")]
     pub media_id: u32,
-    #[serde(rename = "mediaRecommendationId")]
     pub media_recommendation_id: u32,
     pub rating: RecommendationRating,
 }

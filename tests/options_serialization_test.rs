@@ -96,3 +96,155 @@ fn every_endpoint_that_sorts_on_its_own_is_total() {
     let searched = wire(&options!(FetchCharacterOptions, search: "Spike"));
     assert_eq!(searched["sort"], serde_json::json!(["ID"]));
 }
+
+// ---------------------------------------------------------------- the contract
+//
+// AniList validates the *argument* names in a query, not the variable names, so
+// a field whose serialised name does not match the variable the query declares
+// is dropped without a word. That is exactly what happened to the filter
+// suffixes (`id_not`, `status_not_in`, ...), so each group is pinned here.
+
+use anilist_moe::endpoints::activity::{FetchActivityReplyOptions, SubscribeActivityOptions};
+use anilist_moe::endpoints::common::LikesOptions;
+use anilist_moe::endpoints::forum::FetchThreadOptions;
+use anilist_moe::endpoints::medialist::FetchMediaListOptions;
+use anilist_moe::endpoints::user::{FetchUserMediaListOptions, FetchUserStatsOptions};
+use anilist_moe::enums::likable::LikeableType;
+use anilist_moe::enums::media::{CountryCode, MediaStatus};
+use anilist_moe::enums::media_list::MediaListStatus;
+use std::borrow::Cow;
+
+/// The field's value reaches the API only if the query declares the variable.
+fn assert_wired(options: &impl serde::Serialize, keys: &[&str], query: &str) {
+    let wire = wire(options);
+    for key in keys {
+        assert!(
+            wire.get(key).is_some(),
+            "{key} is missing from the variables"
+        );
+        assert!(
+            query.contains(&format!("${key}")),
+            "the query does not declare ${key}"
+        );
+    }
+}
+
+#[test]
+fn the_media_filter_suffixes_reach_the_query() {
+    let options = FetchMediaOptions {
+        id_not: Some(1),
+        id_in: Some(Cow::Borrowed(&[1, 2])),
+        format_not_in: Some(Cow::Borrowed(&[anilist_moe::enums::media::MediaFormat::Tv])),
+        status_not_in: Some(Cow::Borrowed(&[MediaStatus::Finished])),
+        genre_in: Some(Cow::Borrowed(&["Action"])),
+        country_of_origin_in: Some(Cow::Borrowed(&[CountryCode::Japan])),
+        ..Default::default()
+    };
+    assert_wired(
+        &options,
+        &[
+            "idNot",
+            "idIn",
+            "formatNotIn",
+            "statusNotIn",
+            "genreIn",
+            "countryOfOriginIn",
+        ],
+        anilist_moe::queries::media::FETCH,
+    );
+}
+
+#[test]
+fn the_other_filter_suffixes_reach_their_queries() {
+    assert_wired(
+        &FetchCharacterOptions {
+            id_in: Some(Cow::Borrowed(&[1])),
+            ..Default::default()
+        },
+        &["idIn"],
+        anilist_moe::queries::character::FETCH,
+    );
+    assert_wired(
+        &FetchThreadOptions {
+            id_in: Some(Cow::Borrowed(&[1])),
+            ..Default::default()
+        },
+        &["idIn"],
+        anilist_moe::queries::forum::FETCH,
+    );
+    assert_wired(
+        &FetchUserMediaListOptions {
+            username: Some(Cow::Borrowed("a")),
+            notes: Some(Cow::Borrowed("b")),
+            started_at: Some(Cow::Borrowed("c")),
+            completed_at: Some(Cow::Borrowed("d")),
+            media_id_in: Some(Cow::Borrowed(&[1])),
+            status_in: Some(Cow::Borrowed(&[MediaListStatus::Current])),
+            ..Default::default()
+        },
+        &[
+            "username",
+            "notes",
+            "startedAt",
+            "completedAt",
+            "mediaIdIn",
+            "statusIn",
+        ],
+        anilist_moe::queries::user::MEDIA_LIST,
+    );
+    assert_wired(
+        &SubscribeActivityOptions {
+            activity_id: 1,
+            subscribe: true,
+        },
+        &["activityId"],
+        anilist_moe::queries::activity::SUBSCRIBE,
+    );
+}
+
+#[test]
+fn a_date_filter_is_the_int_the_api_asks_for() {
+    // `startedAt` on a media list is a `FuzzyDateInt` — `YYYYMMDD` — not the
+    // `FuzzyDate` object the media objects carry.
+    let options = FetchMediaListOptions {
+        started_at: Some(20200101),
+        ..Default::default()
+    };
+    assert_eq!(wire(&options)["startedAt"], serde_json::json!(20200101));
+    assert!(anilist_moe::queries::medialist::FETCH.contains("$startedAt"));
+}
+
+#[test]
+fn the_user_lookup_variables_reach_the_query() {
+    assert_wired(
+        &FetchUserStatsOptions {
+            user_id: 1,
+            sort: Some(Cow::Borrowed(&[
+                anilist_moe::enums::user::UserStatisticsSort::CountDesc,
+            ])),
+        },
+        &["userId", "sort"],
+        anilist_moe::queries::user::STATS,
+    );
+}
+
+#[test]
+fn the_new_endpoint_options_serialise() {
+    assert_eq!(
+        wire(&LikesOptions {
+            likeable_id: 7,
+            like_type: LikeableType::Activity,
+            page: None,
+            per_page: Some(5),
+        })["likeableId"],
+        serde_json::json!(7)
+    );
+    assert_eq!(
+        wire(&FetchActivityReplyOptions {
+            id: Some(3),
+            activity_id: Some(4),
+            text_as_html: Some(true),
+        })["activityId"],
+        serde_json::json!(4)
+    );
+}

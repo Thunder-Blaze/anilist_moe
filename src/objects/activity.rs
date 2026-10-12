@@ -1,5 +1,5 @@
 use crate::{
-    enums::activity::ActivityType,
+    enums::{activity::ActivityType, media_list::MediaListStatus},
     objects::{media::Media, user::User},
 };
 use serde::{Deserialize, Serialize};
@@ -82,6 +82,7 @@ pub struct MessageActivity {
     pub like_count: Option<i32>,
     pub is_liked: Option<bool>,
     pub is_private: Option<bool>,
+    pub is_pinned: Option<bool>,
     pub site_url: Option<String>,
     pub created_at: Option<i32>,
     pub recipient: Option<User>,
@@ -95,5 +96,7 @@ pub struct MessageActivity {
 #[serde(rename_all = "camelCase")]
 pub struct ListActivityOption {
     pub disabled: Option<bool>,
-    pub activity_type: Option<ActivityType>,
+    /// Which list section the option is about.
+    #[serde(rename = "type")]
+    pub list_type: Option<MediaListStatus>,
 }

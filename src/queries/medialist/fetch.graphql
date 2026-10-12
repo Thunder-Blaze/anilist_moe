@@ -1,7 +1,8 @@
 query FetchMedialist(
+    $id: Int,
     $userId: Int,
     $userName: String,
-    $type: MediaType,
+    $mediaType: MediaType,
     $status: MediaListStatus,
     $mediaId: Int,
     $isFollowing: Boolean,
@@ -9,19 +10,19 @@ query FetchMedialist(
     $startedAt: FuzzyDateInt,
     $completedAt: FuzzyDateInt,
     $compareWithAuthList: Boolean,
-    $userId_in: [Int],
-    $status_in: [MediaListStatus],
-    $status_not_in: [MediaListStatus],
-    $status_not: MediaListStatus,
-    $mediaId_in: [Int],
-    $mediaId_not_in: [Int],
-    $notes_like: String,
-    $startedAt_greater: FuzzyDateInt,
-    $startedAt_lesser: FuzzyDateInt,
-    $startedAt_like: String,
-    $completedAt_greater: FuzzyDateInt,
-    $completedAt_lesser: FuzzyDateInt,
-    $completedAt_like: String,
+    $userIdIn: [Int],
+    $statusIn: [MediaListStatus],
+    $statusNotIn: [MediaListStatus],
+    $statusNot: MediaListStatus,
+    $mediaIdIn: [Int],
+    $mediaIdNotIn: [Int],
+    $notesLike: String,
+    $startedAtGreater: FuzzyDateInt,
+    $startedAtLesser: FuzzyDateInt,
+    $startedAtLike: String,
+    $completedAtGreater: FuzzyDateInt,
+    $completedAtLesser: FuzzyDateInt,
+    $completedAtLike: String,
     $sort: [MediaListSort],
     $page: Int,
     $perPage: Int
@@ -31,9 +32,10 @@ query FetchMedialist(
             hasNextPage
         }
         mediaList(
+            id: $id
             userId: $userId
             userName: $userName
-            type: $type
+            type: $mediaType
             status: $status
             mediaId: $mediaId
             isFollowing: $isFollowing
@@ -41,19 +43,19 @@ query FetchMedialist(
             startedAt: $startedAt
             completedAt: $completedAt
             compareWithAuthList: $compareWithAuthList
-            userId_in: $userId_in
-            status_in: $status_in
-            status_not_in: $status_not_in
-            status_not: $status_not
-            mediaId_in: $mediaId_in
-            mediaId_not_in: $mediaId_not_in
-            notes_like: $notes_like
-            startedAt_greater: $startedAt_greater
-            startedAt_lesser: $startedAt_lesser
-            startedAt_like: $startedAt_like
-            completedAt_greater: $completedAt_greater
-            completedAt_lesser: $completedAt_lesser
-            completedAt_like: $completedAt_like
+            userId_in: $userIdIn
+            status_in: $statusIn
+            status_not_in: $statusNotIn
+            status_not: $statusNot
+            mediaId_in: $mediaIdIn
+            mediaId_not_in: $mediaIdNotIn
+            notes_like: $notesLike
+            startedAt_greater: $startedAtGreater
+            startedAt_lesser: $startedAtLesser
+            startedAt_like: $startedAtLike
+            completedAt_greater: $completedAtGreater
+            completedAt_lesser: $completedAtLesser
+            completedAt_like: $completedAtLike
             sort: $sort
         ) {
             id

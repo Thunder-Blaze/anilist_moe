@@ -1,11 +1,29 @@
 query FetchThread(
     $id: Int!
-    $body_as_html: Boolean = false
+    $userId: Int
+    $replyUserId: Int
+    $subscribed: Boolean
+    $categoryId: Int
+    $mediaCategoryId: Int
+    $search: String
+    $idIn: [Int]
+    $sort: [ThreadSort]
+    $bodyAsHtml: Boolean = false
 ) {
-    Thread(id: $id) {
+    Thread(
+        id: $id
+        userId: $userId
+        replyUserId: $replyUserId
+        subscribed: $subscribed
+        categoryId: $categoryId
+        mediaCategoryId: $mediaCategoryId
+        search: $search
+        id_in: $idIn
+        sort: $sort
+    ) {
         id
         title
-        body(asHtml: $body_as_html)
+        body(asHtml: $bodyAsHtml)
         userId
         replyUserId
         replyCount

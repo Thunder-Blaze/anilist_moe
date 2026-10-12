@@ -1,0 +1,109 @@
+query FetchMediaListCollection(
+    $userId: Int
+    $userName: String
+    $mediaType: MediaType
+    $status: MediaListStatus
+    $statusIn: [MediaListStatus]
+    $statusNot: MediaListStatus
+    $statusNotIn: [MediaListStatus]
+    $notes: String
+    $notesLike: String
+    $startedAt: FuzzyDateInt
+    $startedAtGreater: FuzzyDateInt
+    $startedAtLesser: FuzzyDateInt
+    $startedAtLike: String
+    $completedAt: FuzzyDateInt
+    $completedAtGreater: FuzzyDateInt
+    $completedAtLesser: FuzzyDateInt
+    $completedAtLike: String
+    $forceSingleCompletedList: Boolean
+    $chunk: Int
+    $perChunk: Int
+    $sort: [MediaListSort]
+) {
+    MediaListCollection(
+        userId: $userId
+        userName: $userName
+        type: $mediaType
+        status: $status
+        status_in: $statusIn
+        status_not: $statusNot
+        status_not_in: $statusNotIn
+        notes: $notes
+        notes_like: $notesLike
+        startedAt: $startedAt
+        startedAt_greater: $startedAtGreater
+        startedAt_lesser: $startedAtLesser
+        startedAt_like: $startedAtLike
+        completedAt: $completedAt
+        completedAt_greater: $completedAtGreater
+        completedAt_lesser: $completedAtLesser
+        completedAt_like: $completedAtLike
+        forceSingleCompletedList: $forceSingleCompletedList
+        chunk: $chunk
+        perChunk: $perChunk
+        sort: $sort
+    ) {
+        hasNextChunk
+        user {
+            id
+            name
+            avatar {
+                large
+            }
+        }
+        lists {
+            name
+            isCustomList
+            isSplitCompletedList
+            status
+            entries {
+
+            id
+            userId
+            mediaId
+            status
+            score
+            progress
+            progressVolumes
+            repeat
+            priority
+            private
+            notes
+            hiddenFromStatusLists
+            customLists
+            advancedScores
+            startedAt {
+                year
+                month
+                day
+            }
+            completedAt {
+                year
+                month
+                day
+            }
+            updatedAt
+            createdAt
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                }
+                type
+                format
+                status
+                description
+                episodes
+                chapters
+                volumes
+                coverImage {
+                    large
+                }
+            }
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+mutation DeleteCustomList($customList: String, $mediaType: MediaType) {
+    DeleteCustomList(customList: $customList, type: $mediaType) {
+        deleted
+    }
+}

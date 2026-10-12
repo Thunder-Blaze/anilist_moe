@@ -4,8 +4,8 @@ query SearchRecommendations(
     $mediaRecommendationId: Int
     $userId: Int
     $rating: Int
-    $rating_greater: Int
-    $rating_lesser: Int
+    $ratingGreater: Int
+    $ratingLesser: Int
     $onList: Boolean
     $sort: [RecommendationSort]
     $page: Int = 1
@@ -21,8 +21,8 @@ query SearchRecommendations(
             mediaRecommendationId: $mediaRecommendationId
             userId: $userId
             rating: $rating
-            rating_greater: $rating_greater
-            rating_lesser: $rating_lesser
+            rating_greater: $ratingGreater
+            rating_lesser: $ratingLesser
             onList: $onList
             sort: $sort
         ) {

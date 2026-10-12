@@ -1,8 +1,15 @@
-query GetUserById($id: Int!, $about_as_html: Boolean = false) {
-    User(id: $id) {
+query GetUserById(
+    $id: Int!
+    $name: String
+    $search: String
+    $isModerator: Boolean
+    $sort: [UserSort]
+    $aboutAsHtml: Boolean = false
+) {
+    User(id: $id, name: $name, search: $search, isModerator: $isModerator, sort: $sort) {
         id
         name
-        about(asHtml: $about_as_html)
+        about(asHtml: $aboutAsHtml)
         avatar {
             large
             medium

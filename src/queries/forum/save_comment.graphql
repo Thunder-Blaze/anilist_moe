@@ -6,7 +6,7 @@ mutation SaveThreadComment(
     $locked: Boolean
 
     # HTML rendering options
-    $comment_as_html: Boolean = false
+    $commentAsHtml: Boolean = false
 ) {
     SaveThreadComment(
         id: $id
@@ -18,7 +18,7 @@ mutation SaveThreadComment(
         id
         userId
         threadId
-        comment(asHtml: $comment_as_html)
+        comment(asHtml: $commentAsHtml)
         likeCount
         isLiked
         siteUrl

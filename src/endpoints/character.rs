@@ -14,10 +14,10 @@ use std::borrow::Cow;
 /// Options for fetching multiple characters with pagination and filters.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchCharacterOptions<'a> {
     pub page: Option<i32>,
     pub id: Option<u32>,
-    #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub search: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
@@ -27,31 +27,25 @@ pub struct FetchCharacterOptions<'a> {
         skip_serializing_if = "crate::options::skip_never"
     )]
     pub sort: Option<Cow<'a, [CharacterSort]>>,
-    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub id_not: Option<u32>,
     pub id_in: Option<Cow<'a, [u32]>>,
     pub id_not_in: Option<Cow<'a, [u32]>>,
     // Extra
-    #[serde(rename = "includeMedia")]
     pub include_media: Option<bool>,
-    #[serde(rename = "includeModNotes")]
     pub include_mod_notes: Option<bool>,
     // Sub-pagination variables
-    #[serde(rename = "mediaSort")]
     pub media_sort: Option<Cow<'a, [MediaSort]>>,
-    #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage")]
     pub media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single character.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FetchCharacterOneOptions<'a> {
     pub id: Option<u32>,
-    #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub search: Option<Cow<'a, str>>,
     pub id_not: Option<u32>,
@@ -64,15 +58,9 @@ pub struct FetchCharacterOneOptions<'a> {
         skip_serializing_if = "crate::options::skip_never"
     )]
     pub sort: Option<Cow<'a, [CharacterSort]>>,
-    pub page: Option<i32>,
-    #[serde(rename = "perPage")]
-    pub per_page: Option<i32>,
     // Sub-pagination variables
-    #[serde(rename = "mediaSort")]
     pub media_sort: Option<Cow<'a, [MediaSort]>>,
-    #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
-    #[serde(rename = "mediaPerPage")]
     pub media_per_page: Option<i32>,
 }
 

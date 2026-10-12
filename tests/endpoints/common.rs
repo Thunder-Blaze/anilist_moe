@@ -101,3 +101,73 @@ async fn test_toggle_favourite() {
         }
     }
 }
+
+#[tokio::test]
+async fn test_genres() {
+    let h = crate::test_harness::TestHarness::new();
+    let client = h.client();
+
+    let result = h.run(|| async { client.common().genres().await }).await;
+    assert!(
+        result.is_ok(),
+        "Should fetch the genre list: {:?}",
+        result.err()
+    );
+
+    let genres = result.unwrap();
+    assert!(
+        genres.iter().any(|genre| genre == "Action"),
+        "Action should be one of the genres, got {:?}",
+        genres
+    );
+}
+
+#[tokio::test]
+async fn test_media_tags() {
+    let h = crate::test_harness::TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async { client.common().media_tags(None).await })
+        .await;
+    assert!(
+        result.is_ok(),
+        "Should fetch the media tags: {:?}",
+        result.err()
+    );
+
+    let tags = result.unwrap();
+    assert!(!tags.is_empty(), "There should be media tags");
+    assert!(
+        tags.iter()
+            .any(|tag| tag.name.as_deref() == Some("Female Harem")),
+        "a known tag should be in the list"
+    );
+}
+
+#[tokio::test]
+async fn test_likes() {
+    let h = crate::test_harness::TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = LikesOptions {
+                likeable_id: 870493538,
+                like_type: LikeableType::Activity,
+                page: Some(1),
+                per_page: Some(5),
+            };
+            client.common().likes(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should list the users who liked an activity: {:?}",
+        result.err()
+    );
+    for user in &result.unwrap().data {
+        assert!(user.id > 0, "every user should have an id");
+    }
+}

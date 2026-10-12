@@ -1,9 +1,9 @@
 query FetchStudio(
     $id: Int
     $search: String
-    $id_not: Int
-    $id_in: [Int]
-    $id_not_in: [Int]
+    $idNot: Int
+    $idIn: [Int]
+    $idNotIn: [Int]
     $sort: [StudioSort]
     # Sub-pagination variables
     $mediaPage: Int = 1
@@ -12,9 +12,9 @@ query FetchStudio(
     Studio(
         id: $id
         search: $search
-        id_not: $id_not
-        id_in: $id_in
-        id_not_in: $id_not_in
+        id_not: $idNot
+        id_in: $idIn
+        id_not_in: $idNotIn
         sort: $sort
     ) {
         id

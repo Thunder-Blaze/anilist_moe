@@ -1,5 +1,7 @@
 query (
     $id: Int
+    $idMal: Int
+    $search: String
     # Characters pagination
     $fetchCharacters: Boolean = true
     $charactersPage: Int = 1
@@ -17,7 +19,7 @@ query (
     $recommendationsPage: Int = 1
     $recommendationsPerPage: Int = 10
 ) {
-    Media(id: $id) {
+    Media(id: $id, idMal: $idMal, search: $search) {
         id
         idMal
         title {

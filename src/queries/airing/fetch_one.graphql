@@ -1,0 +1,95 @@
+query FetchAiringScheduleOne(
+    $descriptionAsHtml: Boolean = false
+    $id: Int
+    $mediaId: Int
+    $episode: Int
+    $airingAt: Int
+    $notYetAired: Boolean
+    $idNot: Int
+    $idIn: [Int]
+    $idNotIn: [Int]
+    $mediaIdNot: Int
+    $mediaIdIn: [Int]
+    $mediaIdNotIn: [Int]
+    $episodeNot: Int
+    $episodeIn: [Int]
+    $episodeNotIn: [Int]
+    $episodeGreater: Int
+    $episodeLesser: Int
+    $airingAtGreater: Int
+    $airingAtLesser: Int
+    $sort: [AiringSort]
+) {
+    AiringSchedule(
+        id: $id
+        mediaId: $mediaId
+        episode: $episode
+        airingAt: $airingAt
+        notYetAired: $notYetAired
+        id_not: $idNot
+        id_in: $idIn
+        id_not_in: $idNotIn
+        mediaId_not: $mediaIdNot
+        mediaId_in: $mediaIdIn
+        mediaId_not_in: $mediaIdNotIn
+        episode_not: $episodeNot
+        episode_in: $episodeIn
+        episode_not_in: $episodeNotIn
+        episode_greater: $episodeGreater
+        episode_lesser: $episodeLesser
+        airingAt_greater: $airingAtGreater
+        airingAt_lesser: $airingAtLesser
+        sort: $sort
+    ) {
+
+            id
+            airingAt
+            timeUntilAiring
+            episode
+            mediaId
+            media {
+                id
+                idMal
+                title {
+                    romaji
+                    english
+                    native
+                    userPreferred
+                }
+                type
+                format
+                status
+                description(asHtml: $descriptionAsHtml)
+                season
+                seasonYear
+                episodes
+                duration
+                coverImage {
+                    extraLarge
+                    large
+                    medium
+                    color
+                }
+                bannerImage
+                genres
+                averageScore
+                popularity
+                studios(isMain: true) {
+                    edges {
+                        node {
+                            id
+                            name
+                        }
+                    }
+                }
+                isAdult
+                countryOfOrigin
+                siteUrl
+                nextAiringEpisode {
+                    airingAt
+                    timeUntilAiring
+                    episode
+                }
+            }
+    }
+}

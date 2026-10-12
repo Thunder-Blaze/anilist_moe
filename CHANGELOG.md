@@ -47,6 +47,19 @@ asked for.
   from a query that needs fixing (a `503`, or a body that reads like a notice)
 - `AniListError::UnexpectedStatus` for a status this crate does not map to
   anything more specific (a `405`, a `418`)
+- `CommonEndpoint::genres` and `CommonEndpoint::media_tags`, the lists the filters take their
+  genre and tag names from, and `CommonEndpoint::likes`, the users who liked something
+- `MediaListEndpoint::fetch_collection` returns a whole list grouped the way the site shows it
+  (`MediaListCollection`), and `MediaListEndpoint::fetch_one` fetches a single entry
+- `MediaListEndpoint::delete_custom_list`, `ActivityEndpoint::save_list_activity` and
+  `CommonEndpoint::update_favourite_order` cover the last of the list and activity mutations.
+  The API documents `SaveListActivity` as a moderator mutation and requires a custom list's
+  name and type, so those options say so
+- `AiringEndpoint::fetch_one` and `ActivityEndpoint::fetch_reply` fetch a single row where the
+  API offers one
+- The three submission update notifications (`MediaSubmissionUpdateNotification`,
+  `StaffSubmissionUpdateNotification`, `CharacterSubmissionUpdateNotification`) and their
+  `NotificationUnion` variants, so those notifications no longer land in `Unknown`
 - Every enum that a response can carry has an `Unknown` catch-all variant
   (`#[serde(other)]`), and the three response unions (`ActivityUnion`,
   `LikeableUnion`, `NotificationUnion`) catch an unknown `__typename` the same
@@ -78,6 +91,15 @@ asked for.
   change: match with a trailing `_ =>` arm
 - The MSRV is declared as Rust 1.82, and docs.rs builds every feature so the
   optional APIs are documented
+- Every option struct is `#[serde(rename_all = "camelCase")]` and no field carries a
+  `rename` any more: a GraphQL variable name is the client's to choose, only the argument
+  name is validated, so the serialised names now follow the Rust fields and the queries
+  declare those names. `FetchMediaOptions` alone lost 99 hand written renames
+- `MediaRelation` gained `SAME_UNIVERSE`, `SubmissionStatus::Approved` became
+  `SubmissionStatus::Accepted` (the API never sent `APPROVED`), and `RevisionHistoryAction`
+  stopped renaming `Edit` to a value the API does not use (`EDIT`)
+- `ReviewSort` and `ThreadSort` keep `CREATED_AT` and `CREATED_AT_DESC` but mark them
+  deprecated, as the API does; the four convenience methods that sorted by them use `IdDesc`
 - Every AniList ID is `u32`, in the option structs and in the response objects
   alike (`id`, `user_id`, `media_id`, `id_mal`, `site_id`, …), including
   `media_ids` and `character_ids` as `Vec<u32>` and `id_in`/`id_not_in` as
@@ -110,6 +132,19 @@ asked for.
   `core.hooksPath` instead
 
 ### Fixed
+- Filter options that never reached the API: the serialised name of a field has to match the
+  variable its query declares, and 14 media filters (`id_not`, `status_not_in`, `genre_in`, …),
+  three character filters, four media list filters and `activityId` on a subscription did not.
+  `ActivityEndpoint::toggle_subscription` could not work at all, because the API requires
+  `activityId` and it was sent as `id`
+- `FetchMediaListOptions` sent a `FuzzyDate` object for `startedAt`/`completedAt`, which the API
+  types as `FuzzyDateInt` (`YYYYMMDD`) and rejects
+- `AiringProgression::progress` was the API's `score`, `ListActivityOption`'s type was the wrong
+  field and the wrong enum, and `MediaTagCollection`'s `type`, `MessageActivity::isPinned` and
+  `ThreadLikeNotification::comment` were missing
+- Options that promised something the API cannot do: `FetchCharacterOneOptions` had `page` and
+  `per_page` on a field that takes neither, and `FetchThreadOneOptions` had three comment
+  options for a `Thread` field that has no comments
 - Every sort ends in the unique key of the row: a sort you pass is sent as
   `[yours…, ID]` (or `MEDIA_ID` for media list entries, which have no `ID`), and
   an endpoint you leave unsorted is sent as `[ID]`. Sorting on a non-unique column
