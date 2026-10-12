@@ -265,7 +265,7 @@ pub async fn rate_limit_delay(delay_ms: u64) {
 ///
 /// The client's own retries go through [`RetryConfig`] and its backoff schedule,
 /// so this is here for an application that reads the rate limit headers from
-/// [`AniListError::RateLimit`](crate::errors::AniListError::RateLimit) and waits
+/// [`AniListError::RateLimit`] and waits
 /// on its own.
 #[inline]
 pub fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
