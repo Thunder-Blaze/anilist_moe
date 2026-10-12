@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! # Lean client: only the media and user endpoints.
-//! anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+//! anilist_moe = { version = "0.5", default-features = false, features = ["media", "user"] }
 //! ```
 //!
 //! | Feature          | Endpoint module             | Client accessor                      |
@@ -54,7 +54,7 @@
 //! and compiles to nothing when disabled. The token is never logged.
 //!
 //! ```toml
-//! anilist_moe = { version = "0.3", features = ["tracing"] }
+//! anilist_moe = { version = "0.5", features = ["tracing"] }
 //! ```
 //!
 //! `pagination` adds the page walk: `AniListClient::paginate(options)` gives a
@@ -62,7 +62,7 @@
 //! in no dependency and is off by default.
 //!
 //! ```toml
-//! anilist_moe = { version = "0.3", features = ["pagination"] }
+//! anilist_moe = { version = "0.5", features = ["pagination"] }
 //! ```
 //!
 //! ## Supported Endpoints

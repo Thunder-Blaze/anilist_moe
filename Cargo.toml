@@ -1,6 +1,6 @@
 [package]
 name = "anilist_moe"
-version = "0.3.3"
+version = "0.5.0"
 description = "Anilist_Moe is a Rust Wrapper for the Anilist API. This library allows you to seamlessly interact with Anilist's Public API with and without authentication. This currently supports Anime, Manga, Users, Staff, Forum, Threads, Recommendations, Reviews and User Activities"
 edition = "2021"
 license = "MIT"
@@ -30,7 +30,7 @@ tracing = { version = "0.1", optional = true }
 # client, disable default features and opt in to only what you need:
 #
 # ```toml
-# anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+# anilist_moe = { version = "0.5", default-features = false, features = ["media", "user"] }
 # ```
 #
 # `cargo build --no-default-features` yields a client with no endpoints at all;

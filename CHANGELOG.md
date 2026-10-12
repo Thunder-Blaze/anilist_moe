@@ -9,7 +9,14 @@ This project uses [Semantic Versioning](https://semver.org/):
 - **MINOR** version for new functionality in a backwards compatible manner
 - **PATCH** version for backwards compatible bug fixes
 
-## [Unreleased] (0.3.3)
+## [0.5.0] - 2026-10-12
+
+This release comes from the `critical` line, which implemented several of the
+features 0.4.0 shipped differently. Consumers upgrading from 0.4.0 should read the
+`Changed` list: `use_jitter` became `jitter`, `retry_on_server_error` became
+`retry_transient_errors`, `GraphQLErrorItem` became `GraphQLError`, sort lists went
+from `Vec` to `Cow`, `Media.id` became required, and retries are now off unless
+asked for.
 
 ### Added
 - `options!` macro and the `options` module, for building endpoint options without
@@ -28,6 +35,7 @@ This project uses [Semantic Versioning](https://semver.org/):
 - optional `pagination` feature: `AniListClient::paginate(options)` returns a
   cursor that walks the pages of a list query, yielding pages or single entries,
   capped so a query that never says "no more" cannot spin
+- `AniListError::kind`, a stable label for logs and spans
 
 ### Changed
 - Endpoint option fields take `Cow` instead of a borrowed reference, so the same
@@ -44,18 +52,44 @@ This project uses [Semantic Versioning](https://semver.org/):
   `RetryConfig::for_rate_limits()` / `aggressive()` are how a client opts in
 - `RetryConfig` gained `jitter` and `retry_transient_errors`, so its literals need
   the new values or `..Default::default()`
+- CI runs the offline tests (formatting, clippy, unit, scripted-transport and doc
+  tests) on every push and pull request, and the live API tests only on a
+  schedule, on `workflow_dispatch`, or on a pull request labelled `run-live-tests`
 
 ### Fixed
 - Every sort ends in the unique key of the row: a sort you pass is sent as
   `[yours…, ID]` (or `MEDIA_ID` for media list entries, which have no `ID`), and
   an endpoint you leave unsorted is sent as `[ID]`. Sorting on a non-unique column
   alone let paging repeat or skip rows (issue #19)
-- Media list convenience functions now sort by media id last, so paging a list no
-  longer repeats or skips entries when scores or `updatedAt` values are equal
 - `FetchStudioOptions` sent `null` for unset fields, which made every studio fetch
   fail with a server error
-- Major Mistakes in Documentation
-- Typename fix for notifications and activities
+
+## [0.4.0] - 2026-06-04
+
+### Added
+- **AniListClientBuilder**: Introduced a new builder pattern for configuring client properties (e.g., token, base URL, retry config).
+- **Retry & Backoff Mechanism**: Added configurable `RetryConfig` supporting max retries, exponential backoff, jitter, and rate-limit awareness.
+- **Tracing Support**: Integrated optional `tracing` feature flag along with structured logging.
+- **CI/CD Infrastructure**: Added workflows for PR checks and reviews, and introduced a `rust-toolchain.toml` file.
+- **License**: Added MIT License.
+- **HTML Option**: Added manual option to opt for HTML content.
+
+### Changed
+- **Trace Formatting**: Enhanced request tracing to output request URL, options struct name (e.g., `FetchMediaOptions`), and variables payload, while omitting raw GraphQL query text.
+- **Retry config initialization**: Updated tests to support new fields `use_jitter` and `retry_on_server_error` in `RetryConfig`.
+
+### Fixed
+- **Tracing Concurrency Bug**: Fixed a compilation bug where `!Send` entered span guards were held across `.await` points in async code by leveraging `.instrument(span)`.
+- **GraphQL Error Parsing on HTTP 400**: Enhanced `handle_http_error` to parse structured GraphQL validation errors from HTTP 400 responses instead of returning raw JSON string messages.
+- **Time Panic Safety**: Avoided panic risks in airing convenience methods when the system clock is set to before 1970.
+- **Enums & Tests**: Fixed `NotificationType` enum variants and activity/forum integration tests.
+- **Clippy**: Resolved collapsible match linter warning in `src/utils.rs`.
+
+## [0.3.3] - 2026-03-05
+
+### Fixed
+- **Documentation**: Fixed major mistakes in documentation.
+- **Typename fix**: Typename fix for notifications and activities.
 
 ## [0.3.2] - 2024-01-22
 

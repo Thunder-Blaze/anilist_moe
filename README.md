@@ -51,7 +51,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anilist_moe = "0.3"
+anilist_moe = "0.5"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -63,10 +63,10 @@ need, or adds `tracing` for request spans:
 
 ```toml
 # Only the media and user endpoints.
-anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+anilist_moe = { version = "0.5", default-features = false, features = ["media", "user"] }
 
 # Everything, plus tracing.
-anilist_moe = { version = "0.3", features = ["tracing"] }
+anilist_moe = { version = "0.5", features = ["tracing"] }
 ```
 
 The available groups are `media`, `medialist`, `user`, `character`, `staff`,
