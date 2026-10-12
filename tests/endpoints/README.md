@@ -43,6 +43,31 @@ cargo test --test endpoint_tests character
 cargo test --test endpoint_tests -- --test-threads=1
 ```
 
+### Tuning the Rate Limit
+
+The harness sends at most 80 requests per 60s window by default, which stays
+under AniList's 90 requests per minute. Override any of it for a run:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `ANILIST_TEST_WINDOW_REQUESTS` | 80 | requests allowed per window |
+| `ANILIST_TEST_WINDOW_SECS` | 60 | length of the window |
+| `ANILIST_TEST_PAUSE_SECS` | 61 | pause after a 429 without `Retry-After` |
+| `ANILIST_TEST_MIN_DELAY_MS` | 700 | minimum delay between two requests |
+| `ANILIST_TEST_MAX_RETRIES` | 3 | transient network failures retried per request |
+| `ANILIST_TEST_RETRY_DELAY_MS` | 2000 | delay between those retries |
+
+```bash
+# Slower run that is kind to the API
+ANILIST_TEST_MIN_DELAY_MS=1500 cargo test --test endpoint_tests -- --test-threads=1
+
+# Quick smoke run
+ANILIST_TEST_WINDOW_REQUESTS=20 ANILIST_TEST_MIN_DELAY_MS=100 cargo test --test endpoint_tests
+```
+
+A 429 pauses every thread for the `Retry-After` the API sent, or
+`ANILIST_TEST_PAUSE_SECS` when the response carried no such header.
+
 ## 📝 What Each Test Verifies
 
 ### Data Fetching
