@@ -196,6 +196,10 @@ fn retry_delay(error: &AniListError, attempts: u32, config: &RetryConfig) -> Opt
 
 /// Retry an operation with backoff on rate limits and, when configured,
 /// transient failures.
+///
+/// Every retry is reported through `log`, and through `tracing` as well when the
+/// `tracing` feature is on, so an application that wires one of the two sees it.
+/// Nothing is retried unless [`RetryConfig::max_retries`] says so.
 pub async fn retry_with_backoff<F, Fut, T>(
     mut operation: F,
     config: RetryConfig,
@@ -256,7 +260,13 @@ pub async fn rate_limit_delay(delay_ms: u64) {
     sleep(Duration::from_millis(delay_ms)).await;
 }
 
-/// Calculates an appropriate delay based on remaining rate limit quota.
+/// A delay for a given amount of remaining quota, for callers that pace
+/// themselves.
+///
+/// The client's own retries go through [`RetryConfig`] and its backoff schedule,
+/// so this is here for an application that reads the rate limit headers from
+/// [`AniListError::RateLimit`](crate::errors::AniListError::RateLimit) and waits
+/// on its own.
 #[inline]
 pub fn calculate_delay(remaining: u32, reset_in_seconds: u64) -> Duration {
     match remaining {

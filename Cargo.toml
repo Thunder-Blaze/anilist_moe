@@ -3,6 +3,7 @@ name = "anilist_moe"
 version = "0.5.0"
 description = "Anilist_Moe is a Rust Wrapper for the Anilist API. This library allows you to seamlessly interact with Anilist's Public API with and without authentication. This currently supports Anime, Manga, Users, Staff, Forum, Threads, Recommendations, Reviews and User Activities"
 edition = "2021"
+rust-version = "1.82"
 license = "MIT"
 repository = "https://github.com/Thunder-Blaze/anilist_moe/"
 keywords = ["wrapper", "api", "anilist"]
@@ -112,3 +113,9 @@ common = []
 husky-rs = "0.1.5"
 parking_lot = "0.12"
 tokio-test = "0.4"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Build the optional APIs into the docs on docs.rs, which otherwise only builds
+# the default features.
+[package.metadata.docs.rs]
+all-features = true

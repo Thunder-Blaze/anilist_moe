@@ -194,9 +194,28 @@ pub struct TestHarness {
     last_request: Mutex<Instant>,
 }
 
+/// Starts a `tracing` subscriber once, when the feature is on, so a test run
+/// with `--features tracing` shows the spans the client emits.
+///
+/// The level comes from `RUST_LOG`, defaulting to `info`.
+#[cfg(feature = "tracing")]
+fn init_tracing() {
+    static ONCE: std::sync::Once = std::sync::Once::new();
+
+    ONCE.call_once(|| {
+        use tracing_subscriber::EnvFilter;
+
+        let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
+        let _ = tracing_subscriber::fmt().with_env_filter(filter).try_init();
+    });
+}
+
 impl TestHarness {
     /// Creates a new test harness with an unauthenticated client
     pub fn new() -> Self {
+        #[cfg(feature = "tracing")]
+        init_tracing();
+
         Self {
             client: AniListClient::new(),
             last_request: Mutex::new(Instant::now()),
