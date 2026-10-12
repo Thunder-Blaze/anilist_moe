@@ -114,7 +114,7 @@ async fn completed_anime_is_sorted_deterministically() {
 
     let variables = transport.sent_variables();
     assert_eq!(variables["userName"], "someone");
-    assert_eq!(variables["type"], "ANIME");
+    assert_eq!(variables["mediaType"], "ANIME");
     assert_eq!(variables["status"], "COMPLETED");
     assert_eq!(variables["page"], 2);
     assert_eq!(variables["perPage"], 50);
@@ -186,7 +186,7 @@ async fn media_options_carry_the_include_flags() {
     let variables = transport.sent_variables();
     assert_eq!(variables["includeCharacters"], true);
     assert_eq!(variables["includeStaff"], true);
-    assert_eq!(variables["type"], "ANIME");
+    assert_eq!(variables["mediaType"], "ANIME");
     assert_eq!(
         variables["sort"],
         serde_json::json!(["POPULARITY_DESC", "ID"]),

@@ -187,7 +187,7 @@ async fn the_options_reach_every_request() {
     let _ = client.paginate(options).collect_all().await.unwrap();
 
     let body: Value = serde_json::from_slice(&transport.requests()[0].body).unwrap();
-    assert_eq!(body["variables"]["type"], "ANIME");
+    assert_eq!(body["variables"]["mediaType"], "ANIME");
     assert_eq!(body["variables"]["perPage"], 2);
     assert_eq!(
         body["variables"]["sort"],
