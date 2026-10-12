@@ -47,7 +47,7 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 
 ## Installation
 
-Rust 1.88 or newer.
+Rust 1.82 or newer.
 
 Add this to your `Cargo.toml`:
 

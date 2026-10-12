@@ -75,15 +75,15 @@ asked for.
   optional APIs are documented
 
 ### Dependencies
-- Floors are the current releases: reqwest 0.13, thiserror 2, serde 1.0.229,
-  serde_json 1.0.154, serde_with 3.24, tokio 1.53, chrono 0.4.45, log 0.4.34,
-  tracing 0.1.44, parking_lot 0.12.5, tracing-subscriber 0.3.23, husky-rs 0.4
-- Those floors move the MSRV to **1.88** (`serde_with` needs it, `reqwest` needs
-  1.85), and reqwest 0.13 renamed `rustls-tls` to `rustls`, which now pulls
-  `aws-lc-rs`: building the crate needs a C toolchain and CMake, as reqwest's own
-  default does
-- reqwest 0.13 also verifies certificates against the platform trust store
-  (`rustls-platform-verifier`) instead of the bundled roots it used before
+- Floors are the current release of every dependency: thiserror 2.0.21, serde
+  1.0.229, serde_json 1.0.154, tokio 1.53.2, chrono 0.4.45, log 0.4.34, tracing
+  0.1.44, parking_lot 0.12.5, tracing-subscriber 0.3.23, dotenv 0.15
+- Two are held at the newest release that keeps the MSRV at 1.82, and the reason is
+  written in `Cargo.toml`: `reqwest` stays on 0.12.28, because 0.13 needs Rust 1.85
+  and its `rustls` feature pulls `aws-lc-rs`, which makes every consumer build C
+  code with CMake; `serde_with` stays on 3.17, because 3.18 needs Rust 1.88
+- `husky-rs` is gone: nothing used it, and the pre-commit hook is wired through
+  `core.hooksPath` instead
 
 ### Fixed
 - Every sort ends in the unique key of the row: a sort you pass is sent as
