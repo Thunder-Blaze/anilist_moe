@@ -4,7 +4,7 @@ use serde_with::skip_serializing_none;
 
 use crate::{
     enums::{
-        mods::ModRole,
+        moderators::ModRole,
         user::{UserStaffNameLanguage, UserTitleLanguage},
     },
     objects::{

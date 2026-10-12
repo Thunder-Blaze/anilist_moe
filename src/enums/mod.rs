@@ -18,7 +18,7 @@ pub mod media;
 /// Media list enums
 pub mod media_list;
 /// Moderator-related enums
-pub mod mods;
+pub mod moderators;
 /// Notification enums
 pub mod notification;
 /// Recommendation enums
