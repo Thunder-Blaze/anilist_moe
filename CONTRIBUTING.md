@@ -120,6 +120,34 @@ The suite is split into two groups:
   response handling. See `tests/endpoints/README.md` for the rate-limit tuning
   environment variables.
 
+### When doctests fail with `E0786` / `E0460` / `E0462`
+
+On Windows boxes with a small page file, `cargo test --doc` can fail with errors
+that look like code breakage but are not, for example:
+
+```
+error[E0786]: found invalid metadata files for crate `mio` which `anilist_moe` depends on
+  = note: failed to mmap ... The paging file is too small for this operation to complete. (os error 1455)
+error[E0460]: found possibly newer version of crate `ipnet` which `anilist_moe` depends on
+```
+
+rustdoc compiles every doctest in parallel, and each compile mmaps the crate's
+dependencies; when the page file and free memory cannot back that, the compiler
+dies on random crates and random files — including files the branch never
+touched. The code is fine. Any of these clears it:
+
+```bash
+# Cap the doctest workers (the fastest check)
+cargo test --doc -- --test-threads=2
+
+# Or give the compiler a clean, smaller target directory
+cargo clean && cargo test --doc
+```
+
+Raising the page file (a gigabyte is small) or closing other memory-hungry
+processes fixes it for good. CI runs on Linux with a large page file and has not
+hit this.
+
 ## Making Changes
 
 ### Adding a New Endpoint
