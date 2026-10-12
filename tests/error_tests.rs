@@ -207,3 +207,72 @@ fn test_error_display_maintenance_and_unexpected_status() {
     assert!(unexpected.to_string().contains("418"));
     assert_eq!(unexpected.kind(), "unexpected_status");
 }
+
+/// The reference documents the outage signal as a `403` whose body says the API is
+/// temporarily disabled. Without the phrases below it reads as a permission
+/// problem, which sends a caller looking at the wrong thing.
+#[test]
+fn the_documented_outage_message_reads_as_maintenance() {
+    let documented = "The AniList API has been temporarily disabled due to severe stability issues. Please check the official AniList Discord for more information.";
+    assert!(anilist_moe::errors::detect_maintenance(documented));
+
+    // the older phrasings stay recognised
+    assert!(anilist_moe::errors::detect_maintenance(
+        "AniList is down due to maintenance"
+    ));
+    assert!(anilist_moe::errors::detect_maintenance(
+        "The service is temporarily unavailable"
+    ));
+
+    // and a plain rejection is still not an outage
+    assert!(!anilist_moe::errors::detect_maintenance(
+        "You are not authorized"
+    ));
+    assert!(!anilist_moe::errors::detect_maintenance(
+        "Cannot query field \"nope\" on type \"Media\"."
+    ));
+}
+
+/// A `403` carrying that body has to come back as `Maintenance`, whatever the
+/// status code says.
+#[test]
+fn a_403_with_the_outage_body_is_maintenance() {
+    use anilist_moe::errors::AniListError;
+    use anilist_moe::transport::{HttpResponse, Transport};
+
+    #[derive(Debug)]
+    struct Outage;
+    impl Transport for Outage {
+        fn execute(
+            &self,
+            _request: anilist_moe::transport::HttpRequest,
+        ) -> std::pin::Pin<
+            Box<dyn std::future::Future<Output = Result<HttpResponse, AniListError>> + Send + '_>,
+        > {
+            Box::pin(async move {
+                Ok(HttpResponse::new(
+                    403,
+                    br#"{"errors":[{"message":"The AniList API has been temporarily disabled due to severe stability issues. Please check the official AniList Discord for more information.","status":403}],"data":null}"#.to_vec(),
+                ))
+            })
+        }
+    }
+
+    let client = anilist_moe::AniListClient::builder()
+        .transport(Outage)
+        .build()
+        .expect("a client with a scripted transport");
+
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("a runtime");
+    let error = runtime
+        .block_on(client.user().fetch_basic())
+        .expect_err("the outage should not look like a success");
+
+    assert!(
+        matches!(error, AniListError::Maintenance { .. }),
+        "a 403 saying the API is temporarily disabled is an outage, not a permission problem: {error:?}"
+    );
+}

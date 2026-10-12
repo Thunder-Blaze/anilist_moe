@@ -57,6 +57,8 @@ asked for.
   name and type, so those options say so
 - `AiringEndpoint::fetch_one` and `ActivityEndpoint::fetch_reply` fetch a single row where the
   API offers one
+- The `asMod` argument on `SaveActivityReply`, which the [mutation
+  reference](https://docs.anilist.co/reference/mutation) lists alongside the reply text
 - `CommonEndpoint::markdown` renders markdown the way AniList does,
   `CommonEndpoint::external_link_sources` lists the sites a `MediaExternalLink` can point at,
   `CommonEndpoint::site_statistics` returns the site-wide count series, and
@@ -121,6 +123,15 @@ asked for.
   now agree with each other
 - The endpoint accessors (`client.media()`, `client.anime()`, …) are `#[must_use]`:
   dropping the handle without calling it is a warning instead of silence
+- The options the reference marks "(Mod Only)" say so (`locked`, `sticky`, `asMod`,
+  `MediaTagCollection`'s `status`), and `compareWithAuthList` notes the user id or name the
+  API requires with it
+- The docs and the README say what the [rate limiting page](https://docs.anilist.co/guide/rate-limiting)
+  says: 90 requests per minute, currently 30 while the API recovers
+
+### Documentation
+- `llms.txt`, a single page describing the crate, its conventions and the quirks of the API
+  for coding assistants, linked from the README
 
 ### Dependencies
 - Floors are the current release of every dependency: thiserror 2.0.21, serde
@@ -139,6 +150,10 @@ asked for.
   `core.hooksPath` instead
 
 ### Fixed
+- A `403` whose body says the API is temporarily disabled is an outage, not a permission
+  problem: [the docs](https://docs.anilist.co/guide/considerations) describe exactly that
+  response as the signal that AniList has been taken down, and none of its words matched
+  `detect_maintenance`, so it came back as `AccessDenied`
 - Filter options that never reached the API: the serialised name of a field has to match the
   variable its query declares, and 14 media filters (`id_not`, `status_not_in`, `genre_in`, …),
   three character filters, four media list filters and `activityId` on a subscription did not.

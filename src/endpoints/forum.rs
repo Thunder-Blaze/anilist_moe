@@ -110,7 +110,9 @@ pub struct SaveThreadOptions<'a> {
     body: Option<Cow<'a, str>>,
     categories: Option<Cow<'a, [u32]>>,
     media_categories: Option<Cow<'a, [u32]>>,
+    /// Mod only.
     sticky: Option<bool>,
+    /// Mod only.
     locked: Option<bool>,
     // HTML rendering options
     body_as_html: Option<bool>,
@@ -134,6 +136,7 @@ pub struct SaveThreadCommentOptions<'a> {
     thread_id: Option<u32>,
     parent_comment_id: Option<u32>,
     comment: Option<Cow<'a, str>>,
+    /// Mod only.
     locked: Option<bool>,
     // HTML rendering options
     comment_as_html: Option<bool>,

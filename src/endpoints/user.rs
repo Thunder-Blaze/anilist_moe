@@ -134,6 +134,9 @@ pub struct FetchUserMediaListOptions<'a> {
     media_id_not_in: Option<Cow<'a, [u32]>>,
     user_id_in: Option<Cow<'a, [u32]>>,
     is_following: Option<bool>,
+    /// Limits the answer to entries also on the authenticated user's list.
+    ///
+    /// The API requires a user id or name alongside it.
     compare_with_auth_list: Option<bool>,
     started_at_exact: Option<i32>,
     started_at_greater: Option<i32>,

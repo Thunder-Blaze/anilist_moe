@@ -193,6 +193,11 @@ pub fn detect_maintenance(message: &str) -> bool {
         "service unavailable",
         "down due to",
         "shut down",
+        // The docs describe the outage signal as a `403` reading "The AniList API
+        // has been temporarily disabled due to severe stability issues": without
+        // these it would be reported as a permission problem.
+        "temporarily disabled",
+        "severe stability",
     ]
     .iter()
     .any(|phrase| lower.contains(phrase))

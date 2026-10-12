@@ -163,7 +163,9 @@ pub struct SaveMessageActivityOptions<'a> {
     message: Cow<'a, str>,
     recipient_id: u32,
     private: Option<bool>,
+    /// Mod only.
     locked: Option<bool>,
+    /// Mod only: send it from the moderator account.
     as_mod: Option<bool>,
 }
 
@@ -175,6 +177,7 @@ pub struct SaveMessageActivityOptions<'a> {
 pub struct SaveTextActivityOptions<'a> {
     id: Option<u32>,
     text: Cow<'a, str>,
+    /// Mod only.
     locked: Option<bool>,
 }
 
@@ -187,6 +190,8 @@ pub struct SaveActivityReplyOptions<'a> {
     id: Option<u32>,
     text: Cow<'a, str>,
     activity_id: u32,
+    /// Mod only: send it from the moderator account.
+    as_mod: Option<bool>,
 }
 
 /// Endpoint for activity feed operations.
