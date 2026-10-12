@@ -3,16 +3,18 @@ use crate::errors::AniListError;
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::thread::{Thread, ThreadComment};
+use crate::options;
 use crate::{client::AniListClient, queries::forum};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching forum threads.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchThreadOptions<'a> {
     pub id: Option<i32>,
-    pub search: Option<&'a str>,
+    pub search: Option<Cow<'a, str>>,
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
     #[serde(rename = "replyUserId")]
@@ -23,7 +25,7 @@ pub struct FetchThreadOptions<'a> {
     pub category_id: Option<i32>,
     #[serde(rename = "mediaCategoryId")]
     pub media_category_id: Option<i32>,
-    pub sort: Option<&'a [ThreadSort]>,
+    pub sort: Option<Cow<'a, [ThreadSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -53,7 +55,7 @@ pub struct FetchThreadOneOptions<'a> {
     #[serde(rename = "commentsPerPage")]
     pub comments_per_page: Option<i32>,
     #[serde(rename = "commentsSort")]
-    pub comments_sort: Option<&'a [ThreadCommentSort]>,
+    pub comments_sort: Option<Cow<'a, [ThreadCommentSort]>>,
     // HTML rendering options
     #[serde(rename = "body_as_html")]
     pub body_as_html: Option<bool>,
@@ -68,7 +70,7 @@ pub struct FetchThreadCommentOptions<'a> {
     pub thread_id: Option<i32>,
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    pub sort: Option<&'a [ThreadCommentSort]>,
+    pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -92,11 +94,11 @@ pub struct FetchThreadCommentOneOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct SaveThreadOptions<'a> {
     pub id: Option<i32>,
-    pub title: Option<&'a str>,
-    pub body: Option<&'a str>,
-    pub categories: Option<&'a [i32]>,
+    pub title: Option<Cow<'a, str>>,
+    pub body: Option<Cow<'a, str>>,
+    pub categories: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaCategories")]
-    pub media_categories: Option<&'a [i32]>,
+    pub media_categories: Option<Cow<'a, [i32]>>,
     pub sticky: Option<bool>,
     pub locked: Option<bool>,
     // HTML rendering options
@@ -119,7 +121,7 @@ pub struct SaveThreadCommentOptions<'a> {
     pub thread_id: Option<i32>,
     #[serde(rename = "parentCommentId")]
     pub parent_comment_id: Option<i32>,
-    pub comment: Option<&'a str>,
+    pub comment: Option<Cow<'a, str>>,
     pub locked: Option<bool>,
     // HTML rendering options
     #[serde(rename = "comment_as_html")]
@@ -244,12 +246,12 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&FetchThreadOptions {
+        self.fetch(&options!(
+            FetchThreadOptions,
             sort: Some(&[ThreadSort::CreatedAtDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -259,12 +261,12 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&FetchThreadOptions {
+        self.fetch(&options!(
+            FetchThreadOptions,
             sort: Some(&[ThreadSort::RepliedAtDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -275,13 +277,13 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&FetchThreadOptions {
+        self.fetch(&options!(
+            FetchThreadOptions,
             search: Some(query),
             sort: Some(&[ThreadSort::SearchMatch]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -292,13 +294,13 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&FetchThreadOptions {
+        self.fetch(&options!(
+            FetchThreadOptions,
             category_id: Some(category_id),
             sort: Some(&[ThreadSort::RepliedAtDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -309,13 +311,13 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&FetchThreadOptions {
+        self.fetch(&options!(
+            FetchThreadOptions,
             user_id: Some(user_id),
             sort: Some(&[ThreadSort::CreatedAtDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -325,22 +327,22 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
-        self.fetch(&FetchThreadOptions {
+        self.fetch(&options!(
+            FetchThreadOptions,
             subscribed: Some(true),
             sort: Some(&[ThreadSort::RepliedAtDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get thread by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Thread, AniListError> {
-        self.fetch_one(&FetchThreadOneOptions {
+        self.fetch_one(&options!(
+            FetchThreadOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -351,13 +353,12 @@ impl<'a> ForumEndpoint<'a> {
         body: &str,
         categories: Vec<i32>,
     ) -> Result<Thread, AniListError> {
-        self.save(&SaveThreadOptions {
-            id: None,
+        self.save(&options!(
+            SaveThreadOptions,
             title: Some(title),
             body: Some(body),
             categories: Some(categories.as_slice()),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -368,18 +369,22 @@ impl<'a> ForumEndpoint<'a> {
         title: Option<&str>,
         body: Option<&str>,
     ) -> Result<Thread, AniListError> {
-        self.save(&SaveThreadOptions {
+        self.save(&options!(
+            SaveThreadOptions,
             id: Some(id),
             title,
             body,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Delete a thread
     pub async fn delete_thread(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete(&DeleteThreadOptions { id }).await
+        self.delete(&options!(
+            DeleteThreadOptions,
+            id => id,
+        ))
+        .await
     }
 
     /// Get comments for a thread
@@ -389,22 +394,22 @@ impl<'a> ForumEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
-        self.fetch_comments(&FetchThreadCommentOptions {
+        self.fetch_comments(&options!(
+            FetchThreadCommentOptions,
             thread_id: Some(thread_id),
             sort: Some(&[ThreadCommentSort::Id]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get comment by ID
     pub async fn get_comment_by_id(&self, id: i32) -> Result<ThreadComment, AniListError> {
-        self.fetch_comment_one(&FetchThreadCommentOneOptions {
+        self.fetch_comment_one(&options!(
+            FetchThreadCommentOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -414,12 +419,11 @@ impl<'a> ForumEndpoint<'a> {
         thread_id: i32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
-        self.save_comment(&SaveThreadCommentOptions {
-            id: None,
+        self.save_comment(&options!(
+            SaveThreadCommentOptions,
             thread_id: Some(thread_id),
             comment: Some(comment),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -430,13 +434,12 @@ impl<'a> ForumEndpoint<'a> {
         parent_comment_id: i32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
-        self.save_comment(&SaveThreadCommentOptions {
-            id: None,
+        self.save_comment(&options!(
+            SaveThreadCommentOptions,
             thread_id: Some(thread_id),
             parent_comment_id: Some(parent_comment_id),
             comment: Some(comment),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -446,44 +449,49 @@ impl<'a> ForumEndpoint<'a> {
         id: i32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
-        self.save_comment(&SaveThreadCommentOptions {
+        self.save_comment(&options!(
+            SaveThreadCommentOptions,
             id: Some(id),
             comment: Some(comment),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Delete a comment
     pub async fn delete_thread_comment(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete_comment(&DeleteThreadCommentOptions { id })
-            .await
+        self.delete_comment(&options!(
+            DeleteThreadCommentOptions,
+            id => id,
+        ))
+        .await
     }
 
     /// Subscribe to a thread
     pub async fn subscribe_to_thread(&self, thread_id: i32) -> Result<Thread, AniListError> {
-        self.subscription(&ToggleThreadSubscriptionOptions {
-            thread_id,
+        self.subscription(&options!(
+            ToggleThreadSubscriptionOptions,
+            thread_id => thread_id,
             subscribe: Some(true),
-        })
+        ))
         .await
     }
 
     /// Unsubscribe from a thread
     pub async fn unsubscribe_from_thread(&self, thread_id: i32) -> Result<Thread, AniListError> {
-        self.subscription(&ToggleThreadSubscriptionOptions {
-            thread_id,
+        self.subscription(&options!(
+            ToggleThreadSubscriptionOptions,
+            thread_id => thread_id,
             subscribe: Some(false),
-        })
+        ))
         .await
     }
 
     /// Toggle thread subscription
     pub async fn toggle_thread_subscription(&self, thread_id: i32) -> Result<Thread, AniListError> {
-        self.subscription(&ToggleThreadSubscriptionOptions {
-            thread_id,
-            subscribe: None,
-        })
+        self.subscription(&options!(
+            ToggleThreadSubscriptionOptions,
+            thread_id => thread_id,
+        ))
         .await
     }
 }

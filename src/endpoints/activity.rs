@@ -3,10 +3,12 @@ use crate::errors::AniListError;
 use crate::objects::activity::{ActivityReply, MessageActivity, TextActivity};
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
+use crate::options;
 use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
@@ -40,33 +42,33 @@ pub struct FetchActivityOptions<'a> {
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<&'a [i32]>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "userId_not")]
     pub user_id_not: Option<i32>,
     #[serde(rename = "userId_in")]
-    pub user_id_in: Option<&'a [i32]>,
+    pub user_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "userId_not_in")]
-    pub user_id_not_in: Option<&'a [i32]>,
+    pub user_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "messengerId_not")]
     pub messenger_id_not: Option<i32>,
     #[serde(rename = "messengerId_in")]
-    pub messenger_id_in: Option<&'a [i32]>,
+    pub messenger_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "messengerId_not_in")]
-    pub messenger_id_not_in: Option<&'a [i32]>,
+    pub messenger_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not")]
     pub media_id_not: Option<i32>,
     #[serde(rename = "mediaId_in")]
-    pub media_id_in: Option<&'a [i32]>,
+    pub media_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not_in")]
-    pub media_id_not_in: Option<&'a [i32]>,
+    pub media_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "type_not")]
     pub type_not: Option<ActivityType>,
     #[serde(rename = "type_in")]
-    pub type_in: Option<&'a [ActivityType]>,
+    pub type_in: Option<Cow<'a, [ActivityType]>>,
     #[serde(rename = "type_not_in")]
-    pub type_not_in: Option<&'a [ActivityType]>,
+    pub type_not_in: Option<Cow<'a, [ActivityType]>>,
     #[serde(rename = "createdAt_greater")]
     pub created_at_greater: Option<i32>,
     #[serde(rename = "createdAt_lesser")]
@@ -74,7 +76,7 @@ pub struct FetchActivityOptions<'a> {
 
     // # Sort
     #[serde(rename = "sort")]
-    pub sort: Option<&'a [ActivitySort]>,
+    pub sort: Option<Cow<'a, [ActivitySort]>>,
 
     // # HTML rendering options
     #[serde(rename = "text_as_html")]
@@ -147,7 +149,7 @@ pub struct SubscribeActivityOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct SaveMessageActivityOptions<'a> {
     pub id: Option<i32>,
-    pub message: &'a str,
+    pub message: Cow<'a, str>,
     #[serde(rename = "recipientId")]
     pub recipient_id: i32,
     pub private: Option<bool>,
@@ -160,7 +162,7 @@ pub struct SaveMessageActivityOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct SaveTextActivityOptions<'a> {
     pub id: Option<i32>,
-    pub text: &'a str,
+    pub text: Cow<'a, str>,
     pub locked: Option<bool>,
 }
 
@@ -169,7 +171,7 @@ pub struct SaveTextActivityOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct SaveActivityReplyOptions<'a> {
     pub id: Option<i32>,
-    pub text: &'a str,
+    pub text: Cow<'a, str>,
     #[serde(rename = "activityId")]
     pub activity_id: i32,
 }
@@ -286,12 +288,12 @@ impl<'a> ActivityEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
-        self.fetch(&FetchActivityOptions {
+        self.fetch(&options!(
+            FetchActivityOptions,
             page,
             per_page,
             sort: Some(&[ActivitySort::IdDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -301,32 +303,31 @@ impl<'a> ActivityEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
-        self.fetch(&FetchActivityOptions {
+        self.fetch(&options!(
+            FetchActivityOptions,
             is_following: Some(true),
             page,
             per_page,
             sort: Some(&[ActivitySort::IdDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get activity by ID
     pub async fn get_by_id(&self, id: i32) -> Result<ActivityUnion, AniListError> {
-        self.fetch_one(&FetchActivityOneOptions {
-            id,
-            ..Default::default()
-        })
+        self.fetch_one(&options!(
+            FetchActivityOneOptions,
+            id => id,
+        ))
         .await
     }
 
     /// Create a text activity
     pub async fn create_text_activity(&self, text: &str) -> Result<ActivityUnion, AniListError> {
-        self.save_text_activity(&SaveTextActivityOptions {
-            id: None,
-            text,
-            locked: None,
-        })
+        self.save_text_activity(&options!(
+            SaveTextActivityOptions,
+            text => text,
+        ))
         .await
     }
 
@@ -337,14 +338,12 @@ impl<'a> ActivityEndpoint<'a> {
         message: &str,
         private: Option<bool>,
     ) -> Result<ActivityUnion, AniListError> {
-        self.save_message_activity(&SaveMessageActivityOptions {
-            id: None,
-            message,
-            recipient_id,
+        self.save_message_activity(&options!(
+            SaveMessageActivityOptions,
+            message => message,
+            recipient_id => recipient_id,
             private,
-            locked: None,
-            as_mod: None,
-        })
+        ))
         .await
     }
 
@@ -354,22 +353,30 @@ impl<'a> ActivityEndpoint<'a> {
         activity_id: i32,
         text: &str,
     ) -> Result<ActivityReply, AniListError> {
-        self.save_reply(&SaveActivityReplyOptions {
-            id: None,
-            text,
-            activity_id,
-        })
+        self.save_reply(&options!(
+            SaveActivityReplyOptions,
+            text => text,
+            activity_id => activity_id,
+        ))
         .await
     }
 
     /// Delete an activity
     pub async fn delete_activity(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete(&DeleteActivityOptions { id }).await
+        self.delete(&options!(
+            DeleteActivityOptions,
+            id => id,
+        ))
+        .await
     }
 
     /// Delete an activity reply
     pub async fn delete_activity_reply(&self, id: i32) -> Result<bool, AniListError> {
-        self.delete_reply(&DeleteActivityReplyOptions { id }).await
+        self.delete_reply(&options!(
+            DeleteActivityReplyOptions,
+            id => id,
+        ))
+        .await
     }
 
     /// Toggle activity subscription
@@ -378,12 +385,21 @@ impl<'a> ActivityEndpoint<'a> {
         id: i32,
         subscribe: bool,
     ) -> Result<ActivityUnion, AniListError> {
-        self.subscribe(&SubscribeActivityOptions { id, subscribe })
-            .await
+        self.subscribe(&options!(
+            SubscribeActivityOptions,
+            id => id,
+            subscribe => subscribe,
+        ))
+        .await
     }
 
     /// Toggle activity pin status
     pub async fn toggle_pin(&self, id: i32, pinned: bool) -> Result<ActivityUnion, AniListError> {
-        self.pin(&PinActivityOptions { id, pinned }).await
+        self.pin(&options!(
+            PinActivityOptions,
+            id => id,
+            pinned => pinned,
+        ))
+        .await
     }
 }

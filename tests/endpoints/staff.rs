@@ -2,6 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::staff::*;
+use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -14,10 +15,10 @@ async fn test_fetch_staff_by_search() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOptions {
+            let options = options!(
+                FetchStaffOptions,
                 search: Some("Hayao"),
-                ..Default::default()
-            };
+            );
             client.staff().fetch(&options).await
         })
         .await;
@@ -53,10 +54,10 @@ async fn test_fetch_staff_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOptions {
+            let options = options!(
+                FetchStaffOptions,
                 id: Some(95269), // Hayao Miyazaki
-                ..Default::default()
-            };
+            );
             client.staff().fetch(&options).await
         })
         .await;
@@ -85,10 +86,10 @@ async fn test_fetch_one_staff() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOneOptions {
+            let options = options!(
+                FetchStaffOneOptions,
                 id: Some(95269),
-                ..Default::default()
-            };
+            );
             client.staff().fetch_one(&options).await
         })
         .await;
@@ -112,10 +113,10 @@ async fn test_staff_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOptions {
+            let options = options!(
+                FetchStaffOptions,
                 id: Some(95269),
-                ..Default::default()
-            };
+            );
             client.staff().fetch(&options).await
         })
         .await;
@@ -157,11 +158,11 @@ async fn test_staff_with_popularity() {
     // Fetch popular staff (voice actors are often popular)
     let result = h
         .run(|| async {
-            let options = FetchStaffOptions {
+            let options = options!(
+                FetchStaffOptions,
                 search: Some("Kamiya"), // Common voice actor name
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.staff().fetch(&options).await
         })
         .await;

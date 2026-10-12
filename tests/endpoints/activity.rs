@@ -1,6 +1,7 @@
 //! Tests for Activity endpoint
 
 use crate::test_harness::{delay_between_tests, TestHarness};
+use anilist_moe::options;
 use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion};
 use dotenv::dotenv;
 use std::env;
@@ -23,10 +24,10 @@ async fn test_fetch_activities() {
 
     let result = h
         .run(|| async {
-            let options = FetchActivityOptions {
+            let options = options!(
+                FetchActivityOptions,
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.activity().fetch(&options).await
         })
         .await;
@@ -53,11 +54,11 @@ async fn test_fetch_activities_by_user() {
 
     let result = h
         .run(|| async {
-            let options = FetchActivityOptions {
+            let options = options!(
+                FetchActivityOptions,
                 user_id: Some(5429396),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.activity().fetch(&options).await
         })
         .await;
@@ -103,11 +104,10 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 1: Creating text activity...");
     let create_result = h
         .run(|| async {
-            let save_options = SaveTextActivityOptions {
-                text: "Test activity from anilist_moe library - full lifecycle test",
-                id: None,
-                locked: None,
-            };
+            let save_options = options!(
+                SaveTextActivityOptions,
+                text => "Test activity from anilist_moe library - full lifecycle test",
+            );
             client.activity().save_text_activity(&save_options).await
         })
         .await;
@@ -133,11 +133,11 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 2: Modifying activity...");
     let modify_result = h
         .run(|| async {
-            let modify_options = SaveTextActivityOptions {
+            let modify_options = options!(
+                SaveTextActivityOptions,
                 id: Some(activity_id),
-                text: "Modified test activity from anilist_moe library",
-                locked: None,
-            };
+                text => "Modified test activity from anilist_moe library",
+            );
             client.activity().save_text_activity(&modify_options).await
         })
         .await;
@@ -153,10 +153,10 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 3: Fetching activity...");
     let fetch_result = h
         .run(|| async {
-            let fetch_options = FetchActivityOneOptions {
-                id: activity_id,
-                ..Default::default()
-            };
+            let fetch_options = options!(
+                FetchActivityOneOptions,
+                id => activity_id,
+            );
             client.activity().fetch_one(&fetch_options).await
         })
         .await;
@@ -176,7 +176,10 @@ async fn test_text_activity_full_lifecycle() {
     println!("Step 4: Deleting activity...");
     let delete_result = h
         .run(|| async {
-            let delete_options = DeleteActivityOptions { id: activity_id };
+            let delete_options = options!(
+                DeleteActivityOptions,
+                id => activity_id,
+            );
             client.activity().delete(&delete_options).await
         })
         .await;
@@ -208,14 +211,12 @@ async fn test_message_activity_full_lifecycle() {
     println!("Step 1: Creating message activity...");
     let create_result = h
         .run(|| async {
-            let save_options = SaveMessageActivityOptions {
-                message: "Heya - test from anilist_moe",
-                recipient_id: user_id,
-                id: None,
+            let save_options = options!(
+                SaveMessageActivityOptions,
+                message => "Heya - test from anilist_moe",
+                recipient_id => user_id,
                 private: Some(true),
-                locked: None,
-                as_mod: None,
-            };
+            );
             client.activity().save_message_activity(&save_options).await
         })
         .await;
@@ -241,14 +242,13 @@ async fn test_message_activity_full_lifecycle() {
     println!("Step 2: Modifying message activity...");
     let modify_result = h
         .run(|| async {
-            let modify_options = SaveMessageActivityOptions {
+            let modify_options = options!(
+                SaveMessageActivityOptions,
                 id: Some(activity_id),
-                message: "Modified message from anilist_moe",
-                recipient_id: user_id,
+                message => "Modified message from anilist_moe",
+                recipient_id => user_id,
                 private: Some(true),
-                locked: None,
-                as_mod: None,
-            };
+            );
             client
                 .activity()
                 .save_message_activity(&modify_options)
@@ -267,7 +267,10 @@ async fn test_message_activity_full_lifecycle() {
     println!("Step 3: Deleting message activity...");
     let delete_result = h
         .run(|| async {
-            let delete_options = DeleteActivityOptions { id: activity_id };
+            let delete_options = options!(
+                DeleteActivityOptions,
+                id => activity_id,
+            );
             client.activity().delete(&delete_options).await
         })
         .await;
@@ -296,11 +299,10 @@ async fn test_activity_reply() {
     // First, create a text activity to reply to
     let create_result = h
         .run(|| async {
-            let save_options = SaveTextActivityOptions {
-                text: "Test activity for reply test",
-                id: None,
-                locked: None,
-            };
+            let save_options = options!(
+                SaveTextActivityOptions,
+                text => "Test activity for reply test",
+            );
             client.activity().save_text_activity(&save_options).await
         })
         .await;
@@ -319,11 +321,11 @@ async fn test_activity_reply() {
     println!("Step 1: Creating reply...");
     let reply_result = h
         .run(|| async {
-            let save_reply_options = SaveActivityReplyOptions {
-                text: "Test reply from anilist_moe library",
-                activity_id,
-                id: None,
-            };
+            let save_reply_options = options!(
+                SaveActivityReplyOptions,
+                text => "Test reply from anilist_moe library",
+                activity_id => activity_id,
+            );
             client.activity().save_reply(&save_reply_options).await
         })
         .await;
@@ -338,7 +340,10 @@ async fn test_activity_reply() {
             // Clean up the activity
             let _ = client
                 .activity()
-                .delete(&DeleteActivityOptions { id: activity_id })
+                .delete(&options!(
+                    DeleteActivityOptions,
+                    id => activity_id,
+                ))
                 .await;
             return;
         }
@@ -350,13 +355,12 @@ async fn test_activity_reply() {
     println!("Step 2: Fetching replies...");
     let fetch_result = h
         .run(|| async {
-            let fetch_options = FetchActivityRepliesOptions {
-                activity_id,
+            let fetch_options = options!(
+                FetchActivityRepliesOptions,
+                activity_id => activity_id,
                 page: Some(1),
                 per_page: Some(10),
-                id: None,
-                ..Default::default()
-            };
+            );
             client.activity().fetch_replies(&fetch_options).await
         })
         .await;
@@ -376,7 +380,10 @@ async fn test_activity_reply() {
     println!("Step 3: Deleting reply...");
     let delete_reply_result = h
         .run(|| async {
-            let delete_options = DeleteActivityReplyOptions { id: reply_id };
+            let delete_options = options!(
+                DeleteActivityReplyOptions,
+                id => reply_id,
+            );
             client.activity().delete_reply(&delete_options).await
         })
         .await;
@@ -396,7 +403,10 @@ async fn test_activity_reply() {
         .run(|| async {
             client
                 .activity()
-                .delete(&DeleteActivityOptions { id: activity_id })
+                .delete(&options!(
+                    DeleteActivityOptions,
+                    id => activity_id,
+                ))
                 .await
         })
         .await;

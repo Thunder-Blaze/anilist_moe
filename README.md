@@ -172,7 +172,7 @@ async fn main() -> Result<(), AniListError> {
 ### Conditional Fetching Controls
 
 ```rust
-use anilist_moe::{AniListClient, AniListError};
+use anilist_moe::{options, AniListClient, AniListError};
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::{MediaSort, MediaType};
 
@@ -180,17 +180,17 @@ use anilist_moe::enums::media::{MediaSort, MediaType};
 async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
-    let options = FetchMediaOptions {
-        media_type: Some(MediaType::Anime),
-        sort: Some(vec![MediaSort::PopularityDesc]),
-        page: Some(1),
-        per_page: Some(3),
-        include_characters: Some(true),
-        include_staff: Some(true),
-        include_reviews: Some(true),
-        include_recommendations: Some(true),
-        ..Default::default()
-    };
+    let options = options!(
+        FetchMediaOptions,
+        media_type: MediaType::Anime,
+        sort: &[MediaSort::PopularityDesc],
+        page: 1,
+        per_page: 3,
+        include_characters: true,
+        include_staff: true,
+        include_reviews: true,
+        include_recommendations: true,
+    );
 
     let response = client.media().fetch(&options).await?;
     for media in response.data {

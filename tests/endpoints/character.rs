@@ -2,6 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::character::*;
+use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -14,11 +15,11 @@ async fn test_fetch_character_by_search() {
 
     let result = h
         .run(|| async {
-            let options = FetchCharacterOptions {
+            let options = options!(
+                FetchCharacterOptions,
                 search: Some("Spike"),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.character().fetch(&options).await
         })
         .await;
@@ -66,10 +67,10 @@ async fn test_fetch_character_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchCharacterOptions {
+            let options = options!(
+                FetchCharacterOptions,
                 id: Some(1),
-                ..Default::default()
-            };
+            );
             client.character().fetch(&options).await
         })
         .await;
@@ -94,10 +95,10 @@ async fn test_fetch_one_character() {
 
     let result = h
         .run(|| async {
-            let options = FetchCharacterOneOptions {
+            let options = options!(
+                FetchCharacterOneOptions,
                 id: Some(1),
-                ..Default::default()
-            };
+            );
             client.character().fetch_one(&options).await
         })
         .await;
@@ -121,10 +122,10 @@ async fn test_character_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchCharacterOptions {
+            let options = options!(
+                FetchCharacterOptions,
                 id: Some(1),
-                ..Default::default()
-            };
+            );
             client.character().fetch(&options).await
         })
         .await;
@@ -163,12 +164,12 @@ async fn test_character_search_pagination() {
     // Fetch page 1
     let result1 = h
         .run(|| async {
-            let options = FetchCharacterOptions {
+            let options = options!(
+                FetchCharacterOptions,
                 search: Some("Naruto"),
                 page: Some(1),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.character().fetch(&options).await
         })
         .await;
@@ -180,12 +181,12 @@ async fn test_character_search_pagination() {
     // Fetch page 2
     let result2 = h
         .run(|| async {
-            let options = FetchCharacterOptions {
+            let options = options!(
+                FetchCharacterOptions,
                 search: Some("Naruto"),
                 page: Some(2),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.character().fetch(&options).await
         })
         .await;

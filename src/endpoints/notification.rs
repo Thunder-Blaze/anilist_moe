@@ -1,10 +1,12 @@
 use crate::enums::notification::NotificationType;
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
+use crate::options;
 use crate::unions::notification::NotificationUnion;
 use crate::{client::AniListClient, queries::notification};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for searching and filtering notifications.
 #[skip_serializing_none]
@@ -16,7 +18,7 @@ pub struct NotificationSearchOptions<'a> {
     #[serde(rename = "type")]
     pub notification_type: Option<NotificationType>,
     #[serde(rename = "type_in")]
-    pub type_in: Option<&'a [NotificationType]>,
+    pub type_in: Option<Cow<'a, [NotificationType]>>,
     #[serde(rename = "resetNotificationCount")]
     pub reset_notification_count: Option<bool>,
     // HTML rendering options
@@ -54,12 +56,8 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(&NotificationSearchOptions {
-            page,
-            per_page,
-            ..Default::default()
-        })
-        .await
+        self.fetch(&options!(NotificationSearchOptions, page, per_page,))
+            .await
     }
 
     /// Get unread notifications and mark them as read
@@ -68,12 +66,12 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(&NotificationSearchOptions {
+        self.fetch(&options!(
+            NotificationSearchOptions,
             page,
             per_page,
             reset_notification_count: Some(true),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -84,12 +82,12 @@ impl<'a> NotificationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
-        self.fetch(&NotificationSearchOptions {
+        self.fetch(&options!(
+            NotificationSearchOptions,
             notification_type: Some(notification_type),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

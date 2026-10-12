@@ -1,3 +1,4 @@
+use anilist_moe::options;
 use anilist_moe::{endpoints::media::FetchMediaOptions, AniListClient, AniListError};
 
 #[tokio::main]
@@ -7,12 +8,12 @@ async fn main() -> Result<(), AniListError> {
     // Example usage
     let popular_anime = client
         .media()
-        .fetch(&FetchMediaOptions {
+        .fetch(&options!(
+            FetchMediaOptions,
             sort: Some(&[anilist_moe::enums::media::MediaSort::PopularityDesc]),
             per_page: Some(5),
             page: Some(1),
-            ..Default::default()
-        })
+        ))
         .await?;
     println!("Popular anime: {:#?}", popular_anime);
 

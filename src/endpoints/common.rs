@@ -2,6 +2,7 @@ use crate::enums::likable::LikeableType;
 use crate::errors::AniListError;
 use crate::objects::favourites::Favourites;
 use crate::objects::user::User;
+use crate::options;
 use crate::unions::likeable::LikeableUnion;
 use crate::{client::AniListClient, queries::common};
 use serde::Serialize;
@@ -109,51 +110,55 @@ impl<'a> CommonEndpoint<'a> {
 
     /// Follow or unfollow a user
     pub async fn follow_user(&self, user_id: i32) -> Result<User, AniListError> {
-        self.toggle_follow(&ToggleFollowOptions { user_id }).await
+        self.toggle_follow(&options!(
+            ToggleFollowOptions,
+            user_id => user_id,
+        ))
+        .await
     }
 
     /// Add or remove anime from favorites
     pub async fn favourite_anime(&self, anime_id: i32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&ToggleFavouriteOptions {
+        self.toggle_favourite(&options!(
+            ToggleFavouriteOptions,
             anime_id: Some(anime_id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Add or remove manga from favorites
     pub async fn favourite_manga(&self, manga_id: i32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&ToggleFavouriteOptions {
+        self.toggle_favourite(&options!(
+            ToggleFavouriteOptions,
             manga_id: Some(manga_id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Add or remove character from favorites
     pub async fn favourite_character(&self, character_id: i32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&ToggleFavouriteOptions {
+        self.toggle_favourite(&options!(
+            ToggleFavouriteOptions,
             character_id: Some(character_id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Add or remove staff from favorites
     pub async fn favourite_staff(&self, staff_id: i32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&ToggleFavouriteOptions {
+        self.toggle_favourite(&options!(
+            ToggleFavouriteOptions,
             staff_id: Some(staff_id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Add or remove studio from favorites
     pub async fn favourite_studio(&self, studio_id: i32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(&ToggleFavouriteOptions {
+        self.toggle_favourite(&options!(
+            ToggleFavouriteOptions,
             studio_id: Some(studio_id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

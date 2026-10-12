@@ -2,11 +2,13 @@ use anilist_moe::client::AniListClient;
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::MediaType;
 use anilist_moe::enums::staff::StaffLanguage;
+use anilist_moe::options;
 
 #[tokio::test]
 async fn test_conditional_fetching() {
     let client = AniListClient::new();
-    let options = FetchMediaOptions {
+    let options = options!(
+        FetchMediaOptions,
         media_type: Some(MediaType::Anime),
         page: Some(1),
         per_page: Some(1),
@@ -41,16 +43,12 @@ async fn test_conditional_fetching() {
         include_is_review_blocked: Some(true),
         include_mod_notes: Some(true),
         include_relations: Some(true),
-
         characters_per_page: Some(5),
         staff_per_page: Some(5),
         reviews_per_page: Some(5),
         recommendations_per_page: Some(5),
-
-        // Test voice actor language filtering
         voice_actor_language: Some(StaffLanguage::Japanese),
-        ..Default::default()
-    };
+    );
 
     let result = client.anime().fetch(&options).await;
     assert!(result.is_ok());
@@ -103,15 +101,14 @@ async fn test_conditional_fetching() {
 #[tokio::test]
 async fn test_conditional_fetching_without_includes() {
     let client = AniListClient::new();
-    let options = FetchMediaOptions {
+    let options = options!(
+        FetchMediaOptions,
         media_type: Some(MediaType::Anime),
         page: Some(1),
         per_page: Some(1),
-        // explicitly set to false or None (default)
         include_tags: Some(false),
         include_characters: Some(false),
-        ..Default::default()
-    };
+    );
 
     let result = client.anime().fetch(&options).await;
     assert!(result.is_ok());

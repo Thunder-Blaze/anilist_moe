@@ -2,6 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::user::*;
+use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -14,11 +15,11 @@ async fn test_fetch_user_by_search() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOptions {
+            let options = options!(
+                FetchUserOptions,
                 search: Some("ThunderBlaze"),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.user().fetch(&options).await
         })
         .await;
@@ -53,10 +54,10 @@ async fn test_fetch_user_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOptions {
+            let options = options!(
+                FetchUserOptions,
                 id: Some(5429396),
-                ..Default::default()
-            };
+            );
             client.user().fetch(&options).await
         })
         .await;
@@ -77,10 +78,10 @@ async fn test_fetch_one_user() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOneOptions {
+            let options = options!(
+                FetchUserOneOptions,
                 id: Some(5429396),
-                ..Default::default()
-            };
+            );
             client.user().fetch_one(&options).await
         })
         .await;
@@ -103,10 +104,10 @@ async fn test_user_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOptions {
+            let options = options!(
+                FetchUserOptions,
                 id: Some(3225), // A well-known user with complete profile
-                ..Default::default()
-            };
+            );
             client.user().fetch(&options).await
         })
         .await;
@@ -141,11 +142,11 @@ async fn test_user_search_relevance() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOptions {
+            let options = options!(
+                FetchUserOptions,
                 search: Some("Josh"),
                 per_page: Some(10),
-                ..Default::default()
-            };
+            );
             client.user().fetch(&options).await
         })
         .await;
