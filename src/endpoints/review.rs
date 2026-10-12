@@ -158,7 +158,7 @@ impl<'a> ReviewEndpoint<'a> {
             })
             .await?;
 
-        if response.data.len() == 0 {
+        if response.data.is_empty() {
             return Err(AniListError::NotFound);
         }
 
