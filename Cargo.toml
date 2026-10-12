@@ -3,26 +3,26 @@ name = "anilist_moe"
 version = "0.5.0"
 description = "Anilist_Moe is a Rust Wrapper for the Anilist API. This library allows you to seamlessly interact with Anilist's Public API with and without authentication. This currently supports Anime, Manga, Users, Staff, Forum, Threads, Recommendations, Reviews and User Activities"
 edition = "2021"
-rust-version = "1.82"
+rust-version = "1.88"
 license = "MIT"
 repository = "https://github.com/Thunder-Blaze/anilist_moe/"
 keywords = ["wrapper", "api", "anilist"]
 readme = "README.md"
 
 [dependencies]
-reqwest = { version = "0.12.12", default-features = false, features = [
+reqwest = { version = "0.13.5", default-features = false, features = [
   "json",
-  "rustls-tls",
+  "rustls",
 ] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_with = "3.11"
-tokio = { version = "1.0", features = ["full"] }
-thiserror = "1.0"
-chrono = "0.4.41"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+serde_with = "3.24.0"
+tokio = { version = "1.53.2", features = ["full"] }
+thiserror = "2.0.21"
+chrono = "0.4.45"
 dotenv = "0.15.0"
-log = "0.4.22"
-tracing = { version = "0.1", optional = true }
+log = "0.4.34"
+tracing = { version = "0.1.44", optional = true }
 
 # Endpoint feature flags.
 #
@@ -110,10 +110,10 @@ notification = []
 common = []
 
 [dev-dependencies]
-husky-rs = "0.1.5"
-parking_lot = "0.12"
-tokio-test = "0.4"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+husky-rs = "0.4.0"
+parking_lot = "0.12.5"
+tokio-test = "0.4.6"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 
 # Build the optional APIs into the docs on docs.rs, which otherwise only builds
 # the default features.
