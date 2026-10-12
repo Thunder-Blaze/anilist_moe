@@ -12,6 +12,7 @@
 //! use std::pin::Pin;
 //!
 //! /// Answers every request with a canned body.
+//! #[derive(Debug)]
 //! struct Canned(&'static str);
 //!
 //! impl Transport for Canned {

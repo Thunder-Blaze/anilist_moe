@@ -24,6 +24,11 @@ This directory contains **24 comprehensive integration tests** for all AniList A
 
 ## 🚀 Running Tests
 
+These are the **live tests**: they call the real AniList API, are rate limited,
+and must run one thread at a time. CI skips them on ordinary pushes and only
+runs them on a schedule, on a manual `workflow_dispatch`, or on a pull request
+labelled `run-live-tests`.
+
 ### Run All Endpoint Tests
 ```bash
 cargo test --test endpoint_tests

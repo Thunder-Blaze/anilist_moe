@@ -448,6 +448,11 @@ Run specific endpoint tests:
 cargo test --test endpoint_tests
 ```
 
+The offline tests (formatting, clippy, unit tests, scripted transport tests, and
+doctests) run on every push and pull request. The live endpoint tests call the
+real AniList API and are rate limited, so CI only runs them on a schedule, on a
+manual `workflow_dispatch`, or on a pull request labelled `run-live-tests`.
+
 The library includes comprehensive tests for:
 - All endpoint methods
 - Error handling scenarios

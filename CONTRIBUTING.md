@@ -90,6 +90,36 @@ cargo test --test endpoint_tests
 cargo test --doc
 ```
 
+The suite is split into two groups:
+
+- **Offline tests** are fast and deterministic. They never touch the network and
+  are what CI runs on every push and pull request: formatting, clippy, the
+  library unit tests, the scripted transport tests, and the doctests.
+  ```bash
+  cargo fmt --all --check
+  cargo clippy --locked -- -D warnings
+  cargo test --locked --lib
+  cargo test --locked --test mock_transport_test
+  cargo test --locked --test client_tests --test error_tests --test utils_tests --test test_harness
+  cargo test --locked --doc
+  ```
+
+- **Live tests** call the real AniList GraphQL API, are rate limited, and must
+  run one thread at a time. CI only runs them on a schedule, on a manual
+  `workflow_dispatch`, or on a pull request labelled `run-live-tests`; ordinary
+  pushes skip them so they cannot make every build flaky.
+  ```bash
+  cargo test --locked --test endpoint_tests -- --test-threads=1
+  cargo test --locked --test conditional_fetching_test -- --test-threads=1
+  cargo test --locked --test conditional_fetching_endpoints_test -- --test-threads=1
+  cargo test --locked --test custom_query_test -- --test-threads=1
+  ```
+
+  To have CI run them against a pull request, add the `run-live-tests` label to
+  it. Run them locally the same way before opening a PR that changes request or
+  response handling. See `tests/endpoints/README.md` for the rate-limit tuning
+  environment variables.
+
 ## Making Changes
 
 ### Adding a New Endpoint
