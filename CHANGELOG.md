@@ -14,6 +14,17 @@ This project uses [Semantic Versioning](https://semver.org/):
 ### Added
 - `options!` macro and the `options` module, for building endpoint options without
   spelling out every `Some(..)` wrapper
+- `Transport` trait and `ReqwestTransport`, so requests can go through another
+  HTTP stack or be answered without a network
+- `AniListClientBuilder`, and `AniListClient::builder()`, for token, base URL,
+  timeout, user agent, retry configuration and transport
+- `GraphQLError` with the message, path, locations and extensions of each error
+  the server returned, plus `AniListError::graphql_errors` and
+  `AniListError::graphql_message_contains`
+- `RetryConfig::jitter` (spreads delays by up to 50%) and
+  `RetryConfig::retry_transient_errors` (5xx and transport failures)
+- per-endpoint cargo features, for builds that only need some of the API
+- optional `tracing` feature
 
 ### Changed
 - Endpoint option fields take `Cow` instead of a borrowed reference, so the same
@@ -24,8 +35,14 @@ This project uses [Semantic Versioning](https://semver.org/):
 - `*Options` structs no longer implement `Deserialize` (they are request inputs)
 - `ReviewEndpoint::get_by_id` returns `AniListError::NotFound` instead of panicking
   when the review does not exist
+- `AniListError::GraphQL` carries `errors` and any partial `data` instead of a
+  single joined message, and the client retries `5xx` responses
+- `RetryConfig` gained two fields, so its literals need the new values or
+  `..Default::default()`
 
 ### Fixed
+- Media list convenience functions now sort by media id last, so paging a list no
+  longer repeats or skips entries when scores or `updatedAt` values are equal
 - `FetchStudioOptions` sent `null` for unset fields, which made every studio fetch
   fail with a server error
 - Major Mistakes in Documentation

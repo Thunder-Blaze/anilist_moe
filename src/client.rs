@@ -1,8 +1,29 @@
-use crate::endpoints::{
-    ActivityEndpoint, AiringEndpoint, CharacterEndpoint, CommonEndpoint, ForumEndpoint,
-    MediaEndpoint, MediaListEndpoint, NotificationEndpoint, RecommendationEndpoint, ReviewEndpoint,
-    StaffEndpoint, StudioEndpoint, UserEndpoint,
-};
+#[cfg(feature = "activity")]
+use crate::endpoints::ActivityEndpoint;
+#[cfg(feature = "airing")]
+use crate::endpoints::AiringEndpoint;
+#[cfg(feature = "character")]
+use crate::endpoints::CharacterEndpoint;
+#[cfg(feature = "common")]
+use crate::endpoints::CommonEndpoint;
+#[cfg(feature = "forum")]
+use crate::endpoints::ForumEndpoint;
+#[cfg(feature = "media")]
+use crate::endpoints::MediaEndpoint;
+#[cfg(feature = "medialist")]
+use crate::endpoints::MediaListEndpoint;
+#[cfg(feature = "notification")]
+use crate::endpoints::NotificationEndpoint;
+#[cfg(feature = "recommendation")]
+use crate::endpoints::RecommendationEndpoint;
+#[cfg(feature = "review")]
+use crate::endpoints::ReviewEndpoint;
+#[cfg(feature = "staff")]
+use crate::endpoints::StaffEndpoint;
+#[cfg(feature = "studio")]
+use crate::endpoints::StudioEndpoint;
+#[cfg(feature = "user")]
+use crate::endpoints::UserEndpoint;
 use crate::errors::{AniListError, GraphQLError};
 use crate::objects::responses::GraphQLResponse;
 use crate::transport::{HttpRequest, HttpResponse, ReqwestTransport, Transport};
@@ -12,6 +33,8 @@ use serde_json::{from_value, Value};
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
+#[cfg(feature = "tracing")]
+use tracing::Instrument;
 
 use std::fmt;
 
@@ -361,90 +384,105 @@ impl AniListClient {
     }
 
     /// Returns the media endpoint for anime and manga operations.
+    #[cfg(feature = "media")]
     #[inline]
     pub fn media(&self) -> MediaEndpoint<'_> {
         MediaEndpoint::new(self)
     }
 
     /// Returns the media endpoint for anime operations (alias for media()).
+    #[cfg(feature = "media")]
     #[inline]
     pub fn anime(&self) -> MediaEndpoint<'_> {
         self.media()
     }
 
     /// Returns the media endpoint for manga operations (alias for media()).
+    #[cfg(feature = "media")]
     #[inline]
     pub fn manga(&self) -> MediaEndpoint<'_> {
         self.media()
     }
 
     /// Returns the medialist endpoint for user anime/manga list operations.
+    #[cfg(feature = "medialist")]
     #[inline]
     pub fn medialist(&self) -> MediaListEndpoint<'_> {
         MediaListEndpoint::new(self)
     }
 
     /// Returns the character endpoint for character operations.
+    #[cfg(feature = "character")]
     #[inline]
     pub fn character(&self) -> CharacterEndpoint<'_> {
         CharacterEndpoint::new(self)
     }
 
     /// Returns the common endpoint for likes, follows, and favorites.
+    #[cfg(feature = "common")]
     #[inline]
     pub fn common(&self) -> CommonEndpoint<'_> {
         CommonEndpoint::new(self)
     }
 
     /// Returns the staff endpoint for staff member operations.
+    #[cfg(feature = "staff")]
     #[inline]
     pub fn staff(&self) -> StaffEndpoint<'_> {
         StaffEndpoint::new(self)
     }
 
     /// Returns the user endpoint for user profile operations.
+    #[cfg(feature = "user")]
     #[inline]
     pub fn user(&self) -> UserEndpoint<'_> {
         UserEndpoint::new(self)
     }
 
     /// Returns the studio endpoint for studio operations.
+    #[cfg(feature = "studio")]
     #[inline]
     pub fn studio(&self) -> StudioEndpoint<'_> {
         StudioEndpoint::new(self)
     }
 
     /// Returns the forum endpoint for thread and comment operations.
+    #[cfg(feature = "forum")]
     #[inline]
     pub fn forum(&self) -> ForumEndpoint<'_> {
         ForumEndpoint::new(self)
     }
 
     /// Returns the activity endpoint for activity feed operations.
+    #[cfg(feature = "activity")]
     #[inline]
     pub fn activity(&self) -> ActivityEndpoint<'_> {
         ActivityEndpoint::new(self)
     }
 
     /// Returns the review endpoint for review operations.
+    #[cfg(feature = "review")]
     #[inline]
     pub fn review(&self) -> ReviewEndpoint<'_> {
         ReviewEndpoint::new(self)
     }
 
     /// Returns the recommendation endpoint for recommendation operations.
+    #[cfg(feature = "recommendation")]
     #[inline]
     pub fn recommendation(&self) -> RecommendationEndpoint<'_> {
         RecommendationEndpoint::new(self)
     }
 
     /// Returns the airing endpoint for airing schedule operations.
+    #[cfg(feature = "airing")]
     #[inline]
     pub fn airing(&self) -> AiringEndpoint<'_> {
         AiringEndpoint::new(self)
     }
 
     /// Returns the notification endpoint for notification operations.
+    #[cfg(feature = "notification")]
     #[inline]
     pub fn notification(&self) -> NotificationEndpoint<'_> {
         NotificationEndpoint::new(self)
@@ -512,11 +550,24 @@ impl AniListClient {
         query: &'static str,
         variables: Option<&V>,
     ) -> Result<Value, AniListError> {
-        retry_with_backoff(
+        let request = retry_with_backoff(
             || async { self.raw_query(query, variables).await },
             self.inner.retry_config,
-        )
-        .await
+        );
+
+        // A span covering the whole request, including its retries. The
+        // declared operation is carried in the `operation` field, so a
+        // subscriber sees one span per logical query. `operation_name` borrows
+        // from `query` and never allocates.
+        #[cfg(feature = "tracing")]
+        let request = request.instrument(tracing::debug_span!(
+            target: "anilist_moe::client",
+            "query",
+            operation = operation_name(query),
+            url = %self.inner.base_url,
+        ));
+
+        request.await
     }
 
     async fn raw_query<V: Serialize>(
@@ -541,7 +592,28 @@ impl AniListClient {
             request = request.header("Authorization", auth_header);
         }
 
+        // The token and the Authorization header value are never logged; only
+        // whether the request was sent to which URL. The attempt number is
+        // carried by the enclosing `attempt` span.
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            target: "anilist_moe::client",
+            url = %self.inner.base_url,
+            authenticated = self.inner.token.is_some(),
+            body_bytes = request.body.len(),
+            "sending request",
+        );
+
+        #[cfg(feature = "tracing")]
+        let started = std::time::Instant::now();
         let response = self.inner.transport.execute(request).await?;
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            target: "anilist_moe::client",
+            status = response.status,
+            elapsed_ms = started.elapsed().as_millis() as u64,
+            "received response",
+        );
 
         Self::interpret_response(response)
     }
@@ -628,6 +700,42 @@ impl AniListClient {
             errors: parsed,
             data,
         })
+    }
+}
+
+/// The operation name a GraphQL document declares, for tracing.
+///
+/// Returns the identifier that follows a `query`, `mutation`, or `subscription`
+/// keyword, or `"query"` for an anonymous document such as `{ viewer { id } }`.
+/// The result borrows from `query`, so this allocates nothing and is cheap
+/// enough to call on every request.
+#[cfg(feature = "tracing")]
+fn operation_name(query: &str) -> &str {
+    let trimmed = query.trim_start();
+
+    // Skip a leading operation keyword, if the document has one. The keyword
+    // only counts when a name, a variable list, or a selection set follows.
+    let body = ["query", "mutation", "subscription"]
+        .into_iter()
+        .find_map(|keyword| {
+            trimmed.strip_prefix(keyword).filter(|rest| {
+                rest.starts_with(|c: char| c.is_whitespace() || c == '(' || c == '{')
+            })
+        })
+        .unwrap_or(trimmed);
+
+    // The first word after the keyword, if any; the name ends at the first
+    // space, `(`, or `{`.
+    let name = body
+        .trim_start()
+        .split(|c: char| c.is_whitespace() || c == '(' || c == '{')
+        .next()
+        .unwrap_or("");
+
+    if name.is_empty() {
+        "query"
+    } else {
+        name
     }
 }
 
@@ -1032,5 +1140,23 @@ mod tests {
         let debug = format!("{builder:?}");
         assert!(!debug.contains("super-secret"), "token leaked: {debug}");
         assert!(debug.contains("has_token: true"));
+    }
+
+    #[cfg(feature = "tracing")]
+    #[test]
+    fn operation_names_are_read_from_the_document() {
+        assert_eq!(operation_name("query GetUser { viewer { id } }"), "GetUser");
+        assert_eq!(
+            operation_name("mutation CreatePost($x: Int) { x }"),
+            "CreatePost"
+        );
+        assert_eq!(operation_name("subscription OnUpdate { x }"), "OnUpdate");
+        // Anonymous operations have no name to show.
+        assert_eq!(operation_name("{ viewer { id } }"), "query");
+        assert_eq!(operation_name("query { viewer { id } }"), "query");
+        assert_eq!(operation_name("query($id: Int!) { x }"), "query");
+        // Leading whitespace and newlines are ignored.
+        assert_eq!(operation_name("\n  mutation DoThing { x }"), "DoThing");
+        assert_eq!(operation_name(""), "query");
     }
 }

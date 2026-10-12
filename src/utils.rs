@@ -3,6 +3,8 @@
 use crate::errors::AniListError;
 use std::time::Duration;
 use tokio::time::sleep;
+#[cfg(feature = "tracing")]
+use tracing::Instrument;
 
 /// Retry configuration.
 ///
@@ -182,13 +184,35 @@ where
     let mut attempts = 0u32;
 
     loop {
-        match operation().await {
+        // Each attempt runs inside a span carrying its one-based attempt
+        // number, so the request events emitted by the operation inherit it.
+        #[cfg(feature = "tracing")]
+        let result = operation()
+            .instrument(tracing::debug_span!(
+                target: "anilist_moe::utils",
+                "attempt",
+                attempt = attempts + 1,
+            ))
+            .await;
+        #[cfg(not(feature = "tracing"))]
+        let result = operation().await;
+
+        match result {
             Ok(result) => return Ok(result),
             Err(err) => {
                 let Some(sleep_duration) = retry_delay(&err, attempts, &config) else {
                     return Err(err);
                 };
 
+                #[cfg(feature = "tracing")]
+                tracing::warn!(
+                    target: "anilist_moe::utils",
+                    error = err.kind(),
+                    attempt = attempts + 1,
+                    max_retries = config.max_retries,
+                    delay_ms = sleep_duration.as_millis() as u64,
+                    "retrying after a failed attempt",
+                );
                 log::warn!(
                     "{}. Retrying in {} seconds... (attempt {}/{})",
                     err,

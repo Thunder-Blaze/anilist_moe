@@ -20,6 +20,43 @@
 //! - **Pagination**: Built-in support for paginated results across all endpoints
 //! - **Convenience Functions**: 80+ helper functions for common queries
 //!
+//! ## Feature Flags
+//!
+//! Each endpoint group is behind its own Cargo feature. The `default` feature
+//! enables `full`, which turns on every group, so existing users are unaffected.
+//! Building with `--no-default-features` produces a client with no endpoints
+//! (it still compiles; only the disabled accessor methods disappear).
+//!
+//! ```toml
+//! # Lean client: only the media and user endpoints.
+//! anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+//! ```
+//!
+//! | Feature          | Endpoint module             | Client accessor                      |
+//! |------------------|-----------------------------|--------------------------------------|
+//! | `media`          | `endpoints::media`          | `media()`, `anime()`, `manga()`      |
+//! | `medialist`      | `endpoints::medialist`      | `medialist()`                        |
+//! | `user`           | `endpoints::user`           | `user()`                             |
+//! | `character`      | `endpoints::character`      | `character()`                        |
+//! | `staff`          | `endpoints::staff`          | `staff()`                            |
+//! | `studio`         | `endpoints::studio`         | `studio()`                           |
+//! | `forum`          | `endpoints::forum`          | `forum()`                            |
+//! | `activity`       | `endpoints::activity`       | `activity()`                         |
+//! | `review`         | `endpoints::review`         | `review()`                           |
+//! | `recommendation` | `endpoints::recommendation` | `recommendation()`                   |
+//! | `airing`         | `endpoints::airing`         | `airing()`                           |
+//! | `notification`   | `endpoints::notification`   | `notification()`                     |
+//! | `common`         | `endpoints::common`         | `common()`                           |
+//! | `full`           | all of the above            | all of the above                     |
+//!
+//! `tracing` is separate and off by default: it instruments the request
+//! lifecycle with spans and events (operation, attempt, status, elapsed time)
+//! and compiles to nothing when disabled. The token is never logged.
+//!
+//! ```toml
+//! anilist_moe = { version = "0.3", features = ["tracing"] }
+//! ```
+//!
 //! ## Supported Endpoints
 //!
 //! ### Core Content

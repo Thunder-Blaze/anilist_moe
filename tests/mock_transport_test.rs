@@ -81,6 +81,8 @@ fn client(transport: &ScriptedTransport) -> AniListClient {
             base_delay_ms: 1,
             exponential_backoff: false,
             max_delay_ms: 1,
+            jitter: false,
+            retry_transient_errors: true,
         })
         .build()
         .expect("a supplied transport cannot fail to build")

@@ -95,6 +95,8 @@ fn test_retry_config_equality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let config2 = RetryConfig {
@@ -102,6 +104,8 @@ fn test_retry_config_equality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     assert_eq!(config1, config2);
@@ -114,6 +118,8 @@ fn test_retry_config_inequality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let config2 = RetryConfig {
@@ -121,6 +127,8 @@ fn test_retry_config_inequality() {
         base_delay_ms: 1000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     assert_ne!(config1, config2);
@@ -133,6 +141,8 @@ fn test_retry_config_copy() {
         base_delay_ms: 2000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     // Use copy semantics instead of clone

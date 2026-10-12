@@ -50,6 +50,8 @@ fn test_client_with_retry_config() {
         base_delay_ms: 2000,
         exponential_backoff: true,
         max_delay_ms: 60000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let client = AniListClient::new().with_retry_config(config);
@@ -76,6 +78,8 @@ fn test_client_builder_pattern() {
         base_delay_ms: 1000,
         exponential_backoff: false,
         max_delay_ms: 5000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let client = AniListClient::with_token("test_token")
@@ -162,6 +166,8 @@ fn test_retry_config_custom() {
         base_delay_ms: 500,
         exponential_backoff: false,
         max_delay_ms: 10000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     assert_eq!(config.max_retries, 10);
@@ -177,6 +183,8 @@ fn test_retry_config_copy() {
         base_delay_ms: 2000,
         exponential_backoff: true,
         max_delay_ms: 30000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     // Use copy semantics instead of clone
@@ -198,6 +206,8 @@ fn test_client_retry_config_accessor() {
         base_delay_ms: 1500,
         exponential_backoff: false,
         max_delay_ms: 45000,
+        jitter: false,
+        retry_transient_errors: true,
     };
 
     let client = AniListClient::new().with_retry_config(config);

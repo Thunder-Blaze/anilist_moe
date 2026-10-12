@@ -186,4 +186,80 @@ impl AniListError {
             })
         })
     }
+
+    /// A stable, low-cardinality label for this error's variant.
+    ///
+    /// Useful as a metric or tracing dimension, where the full message would be
+    /// too high-cardinality to group by.
+    ///
+    /// ```rust
+    /// use anilist_moe::errors::AniListError;
+    ///
+    /// assert_eq!(AniListError::NotFound.kind(), "not_found");
+    /// ```
+    #[must_use]
+    pub fn kind(&self) -> &'static str {
+        match self {
+            Self::Network(_) => "network",
+            Self::Transport { .. } => "transport",
+            Self::Json(_) => "json",
+            Self::GraphQL { .. } => "graphql",
+            Self::RateLimit { .. } => "rate_limit",
+            Self::RateLimitSimple => "rate_limit_simple",
+            Self::BurstLimit => "burst_limit",
+            Self::NotFound => "not_found",
+            Self::AuthenticationRequired => "authentication_required",
+            Self::AccessDenied => "access_denied",
+            Self::BadRequest { .. } => "bad_request",
+            Self::ServerError { .. } => "server_error",
+            Self::ParseError { .. } => "parse_error",
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn every_error_variant_has_a_distinct_kind() {
+        let errors = [
+            AniListError::Transport {
+                message: "boom".to_string(),
+            },
+            AniListError::Json(serde_json::from_str::<serde_json::Value>("").unwrap_err()),
+            AniListError::GraphQL {
+                errors: vec![GraphQLError::new("nope")],
+                data: None,
+            },
+            AniListError::RateLimit {
+                limit: 90,
+                remaining: 0,
+                reset_at: 0,
+                retry_after: 1,
+            },
+            AniListError::RateLimitSimple,
+            AniListError::BurstLimit,
+            AniListError::NotFound,
+            AniListError::AuthenticationRequired,
+            AniListError::AccessDenied,
+            AniListError::BadRequest {
+                message: "bad".to_string(),
+            },
+            AniListError::ServerError {
+                status: 500,
+                message: "boom".to_string(),
+            },
+            AniListError::ParseError {
+                message: "boom".to_string(),
+            },
+        ];
+
+        let kinds: Vec<&str> = errors.iter().map(AniListError::kind).collect();
+        for (label, error) in kinds.iter().zip(&errors) {
+            assert!(!label.is_empty(), "{error:?} has an empty kind");
+            assert!(label.chars().all(|c| c.is_ascii_lowercase() || c == '_'));
+        }
+        assert_eq!(AniListError::NotFound.kind(), "not_found");
+    }
 }
