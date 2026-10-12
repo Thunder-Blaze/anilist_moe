@@ -15,11 +15,11 @@ async fn test_fetch_user_by_search() {
     let result = h
         .run(|| async {
             let options = FetchUserOptions {
-                search: Some("ThunderBlaze".to_string()),
+                search: Some("ThunderBlaze"),
                 per_page: Some(5),
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
@@ -57,7 +57,7 @@ async fn test_fetch_user_by_id() {
                 id: Some(5429396),
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
@@ -107,7 +107,7 @@ async fn test_user_data_types() {
                 id: Some(3225), // A well-known user with complete profile
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 
@@ -142,11 +142,11 @@ async fn test_user_search_relevance() {
     let result = h
         .run(|| async {
             let options = FetchUserOptions {
-                search: Some("Josh".to_string()),
+                search: Some("Josh"),
                 per_page: Some(10),
                 ..Default::default()
             };
-            client.user().fetch(options).await
+            client.user().fetch(&options).await
         })
         .await;
 

@@ -15,7 +15,7 @@ async fn test_fetch_character_by_search() {
     let result = h
         .run(|| async {
             let options = FetchCharacterOptions {
-                search: Some("Spike".to_string()),
+                search: Some("Spike"),
                 per_page: Some(5),
                 ..Default::default()
             };
@@ -164,7 +164,7 @@ async fn test_character_search_pagination() {
     let result1 = h
         .run(|| async {
             let options = FetchCharacterOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 page: Some(1),
                 per_page: Some(5),
                 ..Default::default()
@@ -181,7 +181,7 @@ async fn test_character_search_pagination() {
     let result2 = h
         .run(|| async {
             let options = FetchCharacterOptions {
-                search: Some("Naruto".to_string()),
+                search: Some("Naruto"),
                 page: Some(2),
                 per_page: Some(5),
                 ..Default::default()

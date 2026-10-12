@@ -193,92 +193,92 @@ impl AniListClient {
 
     /// Returns the media endpoint for anime and manga operations.
     #[inline]
-    pub fn media(&self) -> MediaEndpoint {
-        MediaEndpoint::new(self.clone())
+    pub fn media(&self) -> MediaEndpoint<'_> {
+        MediaEndpoint::new(self)
     }
 
     /// Returns the media endpoint for anime operations (alias for media()).
     #[inline]
-    pub fn anime(&self) -> MediaEndpoint {
+    pub fn anime(&self) -> MediaEndpoint<'_> {
         self.media()
     }
 
     /// Returns the media endpoint for manga operations (alias for media()).
     #[inline]
-    pub fn manga(&self) -> MediaEndpoint {
+    pub fn manga(&self) -> MediaEndpoint<'_> {
         self.media()
     }
 
     /// Returns the medialist endpoint for user anime/manga list operations.
     #[inline]
-    pub fn medialist(&self) -> MediaListEndpoint {
-        MediaListEndpoint::new(self.clone())
+    pub fn medialist(&self) -> MediaListEndpoint<'_> {
+        MediaListEndpoint::new(self)
     }
 
     /// Returns the character endpoint for character operations.
     #[inline]
-    pub fn character(&self) -> CharacterEndpoint {
-        CharacterEndpoint::new(self.clone())
+    pub fn character(&self) -> CharacterEndpoint<'_> {
+        CharacterEndpoint::new(self)
     }
 
     /// Returns the common endpoint for likes, follows, and favorites.
     #[inline]
-    pub fn common(&self) -> CommonEndpoint {
-        CommonEndpoint::new(self.clone())
+    pub fn common(&self) -> CommonEndpoint<'_> {
+        CommonEndpoint::new(self)
     }
 
     /// Returns the staff endpoint for staff member operations.
     #[inline]
-    pub fn staff(&self) -> StaffEndpoint {
-        StaffEndpoint::new(self.clone())
+    pub fn staff(&self) -> StaffEndpoint<'_> {
+        StaffEndpoint::new(self)
     }
 
     /// Returns the user endpoint for user profile operations.
     #[inline]
-    pub fn user(&self) -> UserEndpoint {
-        UserEndpoint::new(self.clone())
+    pub fn user(&self) -> UserEndpoint<'_> {
+        UserEndpoint::new(self)
     }
 
     /// Returns the studio endpoint for studio operations.
     #[inline]
-    pub fn studio(&self) -> StudioEndpoint {
-        StudioEndpoint::new(self.clone())
+    pub fn studio(&self) -> StudioEndpoint<'_> {
+        StudioEndpoint::new(self)
     }
 
     /// Returns the forum endpoint for thread and comment operations.
     #[inline]
-    pub fn forum(&self) -> ForumEndpoint {
-        ForumEndpoint::new(self.clone())
+    pub fn forum(&self) -> ForumEndpoint<'_> {
+        ForumEndpoint::new(self)
     }
 
     /// Returns the activity endpoint for activity feed operations.
     #[inline]
-    pub fn activity(&self) -> ActivityEndpoint {
-        ActivityEndpoint::new(self.clone())
+    pub fn activity(&self) -> ActivityEndpoint<'_> {
+        ActivityEndpoint::new(self)
     }
 
     /// Returns the review endpoint for review operations.
     #[inline]
-    pub fn review(&self) -> ReviewEndpoint {
-        ReviewEndpoint::new(self.clone())
+    pub fn review(&self) -> ReviewEndpoint<'_> {
+        ReviewEndpoint::new(self)
     }
 
     /// Returns the recommendation endpoint for recommendation operations.
     #[inline]
-    pub fn recommendation(&self) -> RecommendationEndpoint {
-        RecommendationEndpoint::new(self.clone())
+    pub fn recommendation(&self) -> RecommendationEndpoint<'_> {
+        RecommendationEndpoint::new(self)
     }
 
     /// Returns the airing endpoint for airing schedule operations.
     #[inline]
-    pub fn airing(&self) -> AiringEndpoint {
-        AiringEndpoint::new(self.clone())
+    pub fn airing(&self) -> AiringEndpoint<'_> {
+        AiringEndpoint::new(self)
     }
 
     /// Returns the notification endpoint for notification operations.
     #[inline]
-    pub fn notification(&self) -> NotificationEndpoint {
-        NotificationEndpoint::new(self.clone())
+    pub fn notification(&self) -> NotificationEndpoint<'_> {
+        NotificationEndpoint::new(self)
     }
 
     /// Sets the authentication token for this client.

@@ -213,9 +213,9 @@ async fn test_save_forum_thread() {
     let result = h
         .run(|| async {
             let options = SaveThreadOptions {
-                title: Some("Test Thread from anilist_moe".to_string()),
-                body: Some("This is a test thread body.".to_string()),
-                categories: Some(vec![1]),
+                title: Some("Test Thread from anilist_moe"),
+                body: Some("This is a test thread body."),
+                categories: Some(&[1]),
                 id: None,
                 media_categories: None,
                 sticky: None,

@@ -6,8 +6,8 @@ use serde_with::skip_serializing_none;
 #[serde(rename_all = "camelCase")]
 pub struct FuzzyDate {
     pub year: Option<i32>,
-    pub month: Option<i32>,
-    pub day: Option<i32>,
+    pub month: Option<u32>,
+    pub day: Option<u32>,
 }
 
 #[skip_serializing_none]

@@ -13,7 +13,7 @@ async fn test_character_conditional_fetching() {
         id: Some(1), // Spike Spiegel
         include_media: Some(true),
         media_per_page: Some(5),
-        media_sort: Some(vec![MediaSort::PopularityDesc]),
+        media_sort: Some(&[MediaSort::PopularityDesc]),
         include_mod_notes: Some(false),
         ..Default::default()
     };
@@ -92,13 +92,13 @@ async fn test_studio_conditional_fetching() {
 async fn test_user_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchUserOptions {
-        name: Some("Josh".to_string()), // A popular user or generic
+        name: Some("Josh"), // A popular user or generic
         include_statistics: Some(true),
         include_favourites: Some(true),
         ..Default::default()
     };
 
-    let result = client.user().fetch(options).await;
+    let result = client.user().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
@@ -122,7 +122,7 @@ async fn test_forum_conditional_fetching() {
     let client = AniListClient::new();
     // Search for a random popular thread or just by generic search
     let options = FetchThreadOptions {
-        search: Some("Anime".to_string()),
+        search: Some("Anime"),
         per_page: Some(1),
         include_body: Some(true),
         include_user: Some(true),
@@ -146,14 +146,14 @@ async fn test_forum_conditional_fetching() {
 async fn test_user_conditional_fetching_negative() {
     let client = AniListClient::new();
     let options = FetchUserOptions {
-        name: Some("Josh".to_string()),
+        name: Some("Josh"),
         // Explicitly exclude or default
         include_statistics: Some(false),
         include_favourites: Some(false),
         ..Default::default()
     };
 
-    let result = client.user().fetch(options).await;
+    let result = client.user().fetch(&options).await;
     match result {
         Ok(page) => {
             if !page.data.is_empty() {
