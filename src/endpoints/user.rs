@@ -4,18 +4,20 @@ use crate::enums::user::{UserSort, UserStatisticsSort};
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::user::User;
+use crate::options;
 use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching users.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserOptions<'a> {
     pub id: Option<i32>,
-    pub name: Option<&'a str>,
-    pub search: Option<&'a str>,
-    pub sort: Option<&'a [UserSort]>,
+    pub name: Option<Cow<'a, str>>,
+    pub search: Option<Cow<'a, str>>,
+    pub sort: Option<Cow<'a, [UserSort]>>,
     #[serde(rename = "isModerator")]
     pub is_moderator: Option<bool>,
     pub page: Option<i32>,
@@ -36,7 +38,7 @@ pub struct FetchUserOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchUserOneOptions<'a> {
     pub id: Option<i32>,
-    pub name: Option<&'a str>,
+    pub name: Option<Cow<'a, str>>,
     // HTML rendering options
     #[serde(rename = "about_as_html")]
     pub about_as_html: Option<bool>,
@@ -87,14 +89,14 @@ pub struct FetchUserFavoritesOptions<'a> {
     #[serde(rename = "animePerPage")]
     pub anime_per_page: Option<i32>,
     #[serde(rename = "animeSort")]
-    pub anime_sort: Option<&'a [MediaSort]>,
+    pub anime_sort: Option<Cow<'a, [MediaSort]>>,
     // Manga pagination
     #[serde(rename = "mangaPage")]
     pub manga_page: Option<i32>,
     #[serde(rename = "mangaPerPage")]
     pub manga_per_page: Option<i32>,
     #[serde(rename = "mangaSort")]
-    pub manga_sort: Option<&'a [MediaSort]>,
+    pub manga_sort: Option<Cow<'a, [MediaSort]>>,
     // Characters pagination
     #[serde(rename = "charactersPage")]
     pub characters_page: Option<i32>,
@@ -118,16 +120,16 @@ pub struct FetchUserFavoritesOptions<'a> {
 pub struct FetchUserMediaListOptions<'a> {
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
-    pub username: Option<&'a str>,
+    pub username: Option<Cow<'a, str>>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
     pub status: Option<MediaListStatus>,
-    pub notes: Option<&'a str>,
+    pub notes: Option<Cow<'a, str>>,
     #[serde(rename = "startedAt")]
     pub started_at: Option<i32>,
     #[serde(rename = "completedAt")]
     pub completed_at: Option<i32>,
-    pub sort: Option<&'a [MediaSort]>,
+    pub sort: Option<Cow<'a, [MediaSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -139,7 +141,7 @@ pub struct FetchUserMediaListOptions<'a> {
 pub struct FetchUserStatsOptions<'a> {
     #[serde(rename = "userId")]
     pub user_id: i32,
-    pub sort: Option<&'a [UserStatisticsSort]>,
+    pub sort: Option<Cow<'a, [UserStatisticsSort]>>,
 }
 
 /// Endpoint for user profile and statistics operations.
@@ -221,28 +223,28 @@ impl<'a> UserEndpoint<'a> {
     pub async fn get_current_user(&self) -> Result<User, AniListError> {
         let response = self.client.user().fetch_basic().await?;
         let id = response.id;
-        self.fetch_one(&FetchUserOneOptions {
+        self.fetch_one(&options!(
+            FetchUserOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get user by ID
     pub async fn get_by_id(&self, id: i32) -> Result<User, AniListError> {
-        self.fetch_one(&FetchUserOneOptions {
+        self.fetch_one(&options!(
+            FetchUserOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get user by username
     pub async fn get_by_name(&self, name: &str) -> Result<User, AniListError> {
-        self.fetch_one(&FetchUserOneOptions {
+        self.fetch_one(&options!(
+            FetchUserOneOptions,
             name: Some(name),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -253,13 +255,13 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(&FetchUserOptions {
+        self.fetch(&options!(
+            FetchUserOptions,
             search: Some(query),
             page,
             per_page,
             sort: Some(&[UserSort::SearchMatch]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -269,12 +271,12 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(&FetchUserOptions {
+        self.fetch(&options!(
+            FetchUserOptions,
             page,
             per_page,
             sort: Some(&[UserSort::WatchedTimeDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -284,12 +286,12 @@ impl<'a> UserEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<User>>, AniListError> {
-        self.fetch(&FetchUserOptions {
+        self.fetch(&options!(
+            FetchUserOptions,
             page,
             per_page,
             sort: Some(&[UserSort::ChaptersReadDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

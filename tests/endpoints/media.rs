@@ -5,6 +5,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::enums::media::{MediaSort, MediaType};
+use anilist_moe::options;
 use anilist_moe::{endpoints::media::*, AniListError};
 
 /// Helper to create a test harness
@@ -19,12 +20,12 @@ async fn test_fetch_media_with_search() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions {
+            let options = options!(
+                FetchMediaOptions,
                 search: Some("Naruto"),
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.media().fetch(&options).await
         })
         .await;
@@ -80,10 +81,10 @@ async fn test_fetch_media_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions {
+            let options = options!(
+                FetchMediaOptions,
                 id: Some(1), // Cowboy Bebop
-                ..Default::default()
-            };
+            );
             client.media().fetch(&options).await
         })
         .await;
@@ -123,10 +124,10 @@ async fn test_fetch_one_media() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOneOptions {
+            let options = options!(
+                FetchMediaOneOptions,
                 id: Some(1),
-                ..Default::default()
-            };
+            );
             client.media().fetch_one(&options).await
         })
         .await;
@@ -150,10 +151,10 @@ async fn test_media_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions {
+            let options = options!(
+                FetchMediaOptions,
                 id: Some(1),
-                ..Default::default()
-            };
+            );
             client.media().fetch(&options).await
         })
         .await;
@@ -203,13 +204,13 @@ async fn test_fetch_media_pagination() {
     // Fetch page 1
     let result1 = h
         .run(|| async {
-            let options = FetchMediaOptions {
+            let options = options!(
+                FetchMediaOptions,
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(1),
                 sort: Some(&[MediaSort::IdDesc]),
-                ..Default::default()
-            };
+            );
             client.media().fetch(&options).await
         })
         .await;
@@ -221,13 +222,13 @@ async fn test_fetch_media_pagination() {
     // Fetch page 2
     let result2 = h
         .run(|| async {
-            let options = FetchMediaOptions {
+            let options = options!(
+                FetchMediaOptions,
                 media_type: Some(MediaType::Anime),
                 per_page: Some(5),
                 page: Some(2),
                 sort: Some(&[MediaSort::IdDesc]),
-                ..Default::default()
-            };
+            );
             client.media().fetch(&options).await
         })
         .await;
@@ -383,10 +384,10 @@ async fn test_nonexistent_media() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions {
+            let options = options!(
+                FetchMediaOptions,
                 id: Some(999999999), // Very unlikely to exist
-                ..Default::default()
-            };
+            );
             client.media().fetch(&options).await
         })
         .await;

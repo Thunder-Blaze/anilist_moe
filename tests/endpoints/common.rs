@@ -1,6 +1,7 @@
 //! Tests for Common endpoint (likes, follows, favourites)
 
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
+use anilist_moe::options;
 use anilist_moe::{endpoints::common::*, enums::likable::LikeableType};
 
 // All common endpoint functions require authentication
@@ -46,7 +47,10 @@ async fn test_toggle_follow() {
 
     let result = h
         .run(|| async {
-            let options = ToggleFollowOptions { user_id: 5429396 };
+            let options = options!(
+                ToggleFollowOptions,
+                user_id => 5429396,
+            );
             client.common().toggle_follow(&options).await
         })
         .await;
@@ -78,13 +82,10 @@ async fn test_toggle_favourite() {
 
     let result = h
         .run(|| async {
-            let options = ToggleFavouriteOptions {
+            let options = options!(
+                ToggleFavouriteOptions,
                 anime_id: Some(1), // Cowboy Bebop
-                manga_id: None,
-                character_id: None,
-                staff_id: None,
-                studio_id: None,
-            };
+            );
             client.common().toggle_favourite(&options).await
         })
         .await;

@@ -2,9 +2,11 @@ use crate::enums::airing::AiringSort;
 use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::Page;
+use crate::options;
 use crate::{client::AniListClient, queries::airing};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching airing schedule information.
 #[skip_serializing_none]
@@ -21,21 +23,21 @@ pub struct FetchAiringOptions<'a> {
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<&'a [i32]>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not")]
     pub media_id_not: Option<i32>,
     #[serde(rename = "mediaId_in")]
-    pub media_id_in: Option<&'a [i32]>,
+    pub media_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not_in")]
-    pub media_id_not_in: Option<&'a [i32]>,
+    pub media_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "episode_not")]
     pub episode_not: Option<i32>,
     #[serde(rename = "episode_in")]
-    pub episode_in: Option<&'a [i32]>,
+    pub episode_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "episode_not_in")]
-    pub episode_not_in: Option<&'a [i32]>,
+    pub episode_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "episode_greater")]
     pub episode_greater: Option<i32>,
     #[serde(rename = "episode_lesser")]
@@ -44,7 +46,7 @@ pub struct FetchAiringOptions<'a> {
     pub airing_at_greater: Option<i32>,
     #[serde(rename = "airingAt_lesser")]
     pub airing_at_lesser: Option<i32>,
-    pub sort: Option<&'a [AiringSort]>,
+    pub sort: Option<Cow<'a, [AiringSort]>>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub page: Option<i32>,
@@ -84,13 +86,13 @@ impl<'a> AiringEndpoint<'a> {
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(&FetchAiringOptions {
+        self.fetch(&options!(
+            FetchAiringOptions,
             airing_at_greater: Some(now),
             sort: Some(&[AiringSort::Time]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -105,13 +107,13 @@ impl<'a> AiringEndpoint<'a> {
             .unwrap()
             .as_secs() as i32;
 
-        self.fetch(&FetchAiringOptions {
+        self.fetch(&options!(
+            FetchAiringOptions,
             airing_at_lesser: Some(now),
             sort: Some(&[AiringSort::TimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -122,13 +124,13 @@ impl<'a> AiringEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
-        self.fetch(&FetchAiringOptions {
+        self.fetch(&options!(
+            FetchAiringOptions,
             media_id: Some(media_id),
             sort: Some(&[AiringSort::Time]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

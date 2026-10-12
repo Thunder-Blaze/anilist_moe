@@ -2,9 +2,11 @@ use crate::enums::recommendation::{RecommendationRating, RecommendationSort};
 use crate::errors::AniListError;
 use crate::objects::recommendation::Recommendation;
 use crate::objects::responses::Page;
+use crate::options;
 use crate::{client::AniListClient, queries::recommendation};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching media recommendations.
 #[skip_serializing_none]
@@ -27,7 +29,7 @@ pub struct FetchRecommendationOptions<'a> {
     pub rating_lesser: Option<i32>,
     #[serde(rename = "onList")]
     pub on_list: Option<bool>,
-    pub sort: Option<&'a [RecommendationSort]>,
+    pub sort: Option<Cow<'a, [RecommendationSort]>>,
 }
 
 /// Options for saving a recommendation rating.
@@ -75,13 +77,13 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&FetchRecommendationOptions {
+        self.fetch(&options!(
+            FetchRecommendationOptions,
             media_id: Some(media_id),
             page,
             per_page,
             sort: Some(&[RecommendationSort::RatingDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -92,13 +94,13 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&FetchRecommendationOptions {
+        self.fetch(&options!(
+            FetchRecommendationOptions,
             user_id: Some(user_id),
             page,
             per_page,
             sort: Some(&[RecommendationSort::IdDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -108,12 +110,12 @@ impl<'a> RecommendationEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
-        self.fetch(&FetchRecommendationOptions {
+        self.fetch(&options!(
+            FetchRecommendationOptions,
             page,
             per_page,
             sort: Some(&[RecommendationSort::IdDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -124,11 +126,12 @@ impl<'a> RecommendationEndpoint<'a> {
         media_recommendation_id: i32,
         rating: RecommendationRating,
     ) -> Result<Recommendation, AniListError> {
-        self.save(&SaveRecommendationOptions {
-            media_id,
-            media_recommendation_id,
-            rating,
-        })
+        self.save(&options!(
+            SaveRecommendationOptions,
+            media_id => media_id,
+            media_recommendation_id => media_recommendation_id,
+            rating => rating,
+        ))
         .await
     }
 }

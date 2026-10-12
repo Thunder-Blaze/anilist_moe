@@ -2,9 +2,11 @@ use crate::enums::studio::StudioSort;
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::studio::Studio;
+use crate::options;
 use crate::{client::AniListClient, queries::studio};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching studios.
 #[skip_serializing_none]
@@ -14,14 +16,14 @@ pub struct FetchStudioOptions<'a> {
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub id: Option<i32>,
-    pub search: Option<&'a str>,
+    pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<&'a [i32]>,
-    pub sort: Option<&'a [StudioSort]>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub sort: Option<Cow<'a, [StudioSort]>>,
     // Extra
     #[serde(rename = "includeMedia")]
     pub include_media: Option<bool>,
@@ -37,14 +39,14 @@ pub struct FetchStudioOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 pub struct FetchStudioOneOptions<'a> {
     pub id: Option<i32>,
-    pub search: Option<&'a str>,
+    pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<&'a [i32]>,
-    pub sort: Option<&'a [StudioSort]>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub sort: Option<Cow<'a, [StudioSort]>>,
     // Sub-pagination variables
     #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
@@ -86,12 +88,12 @@ impl<'a> StudioEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Studio>>, AniListError> {
-        self.fetch(&FetchStudioOptions {
+        self.fetch(&options!(
+            FetchStudioOptions,
             page,
             per_page,
             sort: Some(&[StudioSort::FavouritesDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -102,22 +104,22 @@ impl<'a> StudioEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Studio>>, AniListError> {
-        self.fetch(&FetchStudioOptions {
+        self.fetch(&options!(
+            FetchStudioOptions,
             search: Some(query),
             page,
             per_page,
             sort: Some(&[StudioSort::SearchMatch]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get studio by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Studio, AniListError> {
-        self.fetch_one(&FetchStudioOneOptions {
+        self.fetch_one(&options!(
+            FetchStudioOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

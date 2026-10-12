@@ -3,9 +3,11 @@ use crate::enums::media::MediaSort;
 use crate::errors::AniListError;
 use crate::objects::character::Character;
 use crate::objects::responses::Page;
+use crate::options;
 use crate::{client::AniListClient, queries::character};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching multiple characters with pagination and filters.
 #[skip_serializing_none]
@@ -15,13 +17,13 @@ pub struct FetchCharacterOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    pub search: Option<&'a str>,
-    pub sort: Option<&'a [CharacterSort]>,
+    pub search: Option<Cow<'a, str>>,
+    pub sort: Option<Cow<'a, [CharacterSort]>>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
     pub id_not: Option<i32>,
-    pub id_in: Option<&'a [i32]>,
-    pub id_not_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
     // Extra
     #[serde(rename = "includeMedia")]
     pub include_media: Option<bool>,
@@ -29,7 +31,7 @@ pub struct FetchCharacterOptions<'a> {
     pub include_mod_notes: Option<bool>,
     // Sub-pagination variables
     #[serde(rename = "mediaSort")]
-    pub media_sort: Option<&'a [MediaSort]>,
+    pub media_sort: Option<Cow<'a, [MediaSort]>>,
     #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
     #[serde(rename = "mediaPerPage")]
@@ -43,17 +45,17 @@ pub struct FetchCharacterOneOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    pub search: Option<&'a str>,
+    pub search: Option<Cow<'a, str>>,
     pub id_not: Option<i32>,
-    pub id_in: Option<&'a [i32]>,
-    pub id_not_in: Option<&'a [i32]>,
-    pub sort: Option<&'a [CharacterSort]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub sort: Option<Cow<'a, [CharacterSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     // Sub-pagination variables
     #[serde(rename = "mediaSort")]
-    pub media_sort: Option<&'a [MediaSort]>,
+    pub media_sort: Option<Cow<'a, [MediaSort]>>,
     #[serde(rename = "mediaPage")]
     pub media_page: Option<i32>,
     #[serde(rename = "mediaPerPage")]
@@ -94,12 +96,12 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(&FetchCharacterOptions {
+        self.fetch(&options!(
+            FetchCharacterOptions,
             page,
             per_page,
             sort: Some(&[CharacterSort::FavouritesDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -119,22 +121,22 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(&FetchCharacterOptions {
+        self.fetch(&options!(
+            FetchCharacterOptions,
             search: Some(query),
             page,
             per_page,
             sort: Some(&[CharacterSort::SearchMatch]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get character by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Character, AniListError> {
-        self.fetch_one(&FetchCharacterOneOptions {
+        self.fetch_one(&options!(
+            FetchCharacterOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -144,13 +146,13 @@ impl<'a> CharacterEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Character>>, AniListError> {
-        self.fetch(&FetchCharacterOptions {
+        self.fetch(&options!(
+            FetchCharacterOptions,
             is_birthday: Some(true),
             page,
             per_page,
             sort: Some(&[CharacterSort::FavouritesDesc]),
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

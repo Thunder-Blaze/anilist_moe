@@ -2,6 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::airing::*;
+use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -14,10 +15,10 @@ async fn test_fetch_airing_schedules() {
 
     let result = h
         .run(|| async {
-            let options = FetchAiringOptions {
+            let options = options!(
+                FetchAiringOptions,
                 per_page: Some(10),
-                ..Default::default()
-            };
+            );
             client.airing().fetch(&options).await
         })
         .await;
@@ -56,11 +57,11 @@ async fn test_fetch_airing_pagination() {
     // Fetch page 1
     let result1 = h
         .run(|| async {
-            let options = FetchAiringOptions {
+            let options = options!(
+                FetchAiringOptions,
                 per_page: Some(5),
                 page: Some(1),
-                ..Default::default()
-            };
+            );
             client.airing().fetch(&options).await
         })
         .await;
@@ -76,11 +77,11 @@ async fn test_fetch_airing_pagination() {
     // Fetch page 2
     let result2 = h
         .run(|| async {
-            let options = FetchAiringOptions {
+            let options = options!(
+                FetchAiringOptions,
                 per_page: Some(5),
                 page: Some(2),
-                ..Default::default()
-            };
+            );
             client.airing().fetch(&options).await
         })
         .await;
@@ -115,10 +116,10 @@ async fn test_airing_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchAiringOptions {
+            let options = options!(
+                FetchAiringOptions,
                 per_page: Some(1),
-                ..Default::default()
-            };
+            );
             client.airing().fetch(&options).await
         })
         .await;

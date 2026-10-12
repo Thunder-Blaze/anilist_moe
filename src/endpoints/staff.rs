@@ -2,9 +2,11 @@ use crate::enums::staff::StaffSort;
 use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::staff::Staff;
+use crate::options;
 use crate::{client::AniListClient, queries::staff};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching staff members.
 #[skip_serializing_none]
@@ -13,14 +15,14 @@ pub struct FetchStaffOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    pub search: Option<&'a str>,
+    pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<&'a [i32]>,
-    pub sort: Option<&'a [StaffSort]>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub sort: Option<Cow<'a, [StaffSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -61,14 +63,14 @@ pub struct FetchStaffOneOptions<'a> {
     pub id: Option<i32>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
-    pub search: Option<&'a str>,
+    pub search: Option<Cow<'a, str>>,
     #[serde(rename = "id_not")]
     pub id_not: Option<i32>,
     #[serde(rename = "id_in")]
-    pub id_in: Option<&'a [i32]>,
+    pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
-    pub id_not_in: Option<&'a [i32]>,
-    pub sort: Option<&'a [StaffSort]>,
+    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub sort: Option<Cow<'a, [StaffSort]>>,
     // Sub-pagination variables
     #[serde(rename = "staffMediaPage")]
     pub staff_media_page: Option<i32>,
@@ -118,12 +120,12 @@ impl<'a> StaffEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
-        self.fetch(&FetchStaffOptions {
+        self.fetch(&options!(
+            FetchStaffOptions,
             sort: Some(&[StaffSort::FavouritesDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -143,22 +145,22 @@ impl<'a> StaffEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
-        self.fetch(&FetchStaffOptions {
+        self.fetch(&options!(
+            FetchStaffOptions,
             search: Some(query),
             sort: Some(&[StaffSort::SearchMatch]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Get staff by ID
     pub async fn get_by_id(&self, id: i32) -> Result<Staff, AniListError> {
-        self.fetch_one(&FetchStaffOneOptions {
+        self.fetch_one(&options!(
+            FetchStaffOneOptions,
             id: Some(id),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -168,13 +170,13 @@ impl<'a> StaffEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Staff>>, AniListError> {
-        self.fetch(&FetchStaffOptions {
+        self.fetch(&options!(
+            FetchStaffOptions,
             is_birthday: Some(true),
             sort: Some(&[StaffSort::FavouritesDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 }

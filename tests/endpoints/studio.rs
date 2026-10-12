@@ -2,6 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::studio::*;
+use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -14,11 +15,11 @@ async fn test_fetch_studio_by_search() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOptions {
+            let options = options!(
+                FetchStudioOptions,
                 search: Some("Kyoto"),
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.studio().fetch(&options).await
         })
         .await;
@@ -49,10 +50,10 @@ async fn test_fetch_studio_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOptions {
+            let options = options!(
+                FetchStudioOptions,
                 id: Some(2), // Kyoto Animation
-                ..Default::default()
-            };
+            );
             client.studio().fetch(&options).await
         })
         .await;
@@ -77,10 +78,10 @@ async fn test_fetch_one_studio() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOneOptions {
+            let options = options!(
+                FetchStudioOneOptions,
                 id: Some(2),
-                ..Default::default()
-            };
+            );
             client.studio().fetch_one(&options).await
         })
         .await;
@@ -103,10 +104,10 @@ async fn test_studio_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOptions {
+            let options = options!(
+                FetchStudioOptions,
                 id: Some(2),
-                ..Default::default()
-            };
+            );
             client.studio().fetch(&options).await
         })
         .await;

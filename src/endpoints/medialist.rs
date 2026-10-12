@@ -4,9 +4,11 @@ use crate::errors::AniListError;
 use crate::objects::common::{Deleted, FuzzyDate};
 use crate::objects::media_list::MediaList;
 use crate::objects::responses::Page;
+use crate::options;
 use crate::{client::AniListClient, queries::medialist};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use std::borrow::Cow;
 
 /// Options for fetching media list entries.
 #[skip_serializing_none]
@@ -15,7 +17,7 @@ pub struct FetchMediaListOptions<'a> {
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
     #[serde(rename = "userName")]
-    pub user_name: Option<&'a str>,
+    pub user_name: Option<Cow<'a, str>>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
     pub status: Option<MediaListStatus>,
@@ -23,7 +25,7 @@ pub struct FetchMediaListOptions<'a> {
     pub media_id: Option<i32>,
     #[serde(rename = "isFollowing")]
     pub is_following: Option<bool>,
-    pub notes: Option<&'a str>,
+    pub notes: Option<Cow<'a, str>>,
     #[serde(rename = "startedAt")]
     pub started_at: Option<FuzzyDate>,
     #[serde(rename = "completedAt")]
@@ -31,32 +33,32 @@ pub struct FetchMediaListOptions<'a> {
     #[serde(rename = "compareWithAuthList")]
     pub compare_with_auth_list: Option<bool>,
     #[serde(rename = "userId_in")]
-    pub user_id_in: Option<&'a [i32]>,
+    pub user_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "status_in")]
-    pub status_in: Option<&'a [MediaListStatus]>,
+    pub status_in: Option<Cow<'a, [MediaListStatus]>>,
     #[serde(rename = "status_not_in")]
-    pub status_not_in: Option<&'a [MediaListStatus]>,
+    pub status_not_in: Option<Cow<'a, [MediaListStatus]>>,
     #[serde(rename = "status_not")]
     pub status_not: Option<MediaListStatus>,
     #[serde(rename = "mediaId_in")]
-    pub media_id_in: Option<&'a [i32]>,
+    pub media_id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "mediaId_not_in")]
-    pub media_id_not_in: Option<&'a [i32]>,
+    pub media_id_not_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "notes_like")]
-    pub notes_like: Option<&'a str>,
+    pub notes_like: Option<Cow<'a, str>>,
     #[serde(rename = "startedAt_greater")]
     pub started_at_greater: Option<FuzzyDate>,
     #[serde(rename = "startedAt_lesser")]
     pub started_at_lesser: Option<FuzzyDate>,
     #[serde(rename = "startedAt_like")]
-    pub started_at_like: Option<&'a str>,
+    pub started_at_like: Option<Cow<'a, str>>,
     #[serde(rename = "completedAt_greater")]
     pub completed_at_greater: Option<FuzzyDate>,
     #[serde(rename = "completedAt_lesser")]
     pub completed_at_lesser: Option<FuzzyDate>,
     #[serde(rename = "completedAt_like")]
-    pub completed_at_like: Option<&'a str>,
-    pub sort: Option<&'a [MediaListSort]>,
+    pub completed_at_like: Option<Cow<'a, str>>,
+    pub sort: Option<Cow<'a, [MediaListSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
@@ -77,10 +79,10 @@ pub struct SaveMediaListOptions<'a> {
     pub repeat: Option<i32>,
     pub priority: Option<i32>,
     pub private: Option<bool>,
-    pub notes: Option<&'a str>,
+    pub notes: Option<Cow<'a, str>>,
     pub hidden_from_status_lists: Option<bool>,
-    pub custom_lists: Option<&'a [&'a str]>,
-    pub advanced_scores: Option<&'a [f64]>,
+    pub custom_lists: Option<Cow<'a, [&'a str]>>,
+    pub advanced_scores: Option<Cow<'a, [f64]>>,
     pub started_at: Option<FuzzyDate>,
     pub completed_at: Option<FuzzyDate>,
 }
@@ -98,12 +100,12 @@ pub struct SaveMediaListMultipleOptions<'a> {
     pub repeat: Option<i32>,
     pub priority: Option<i32>,
     pub private: Option<bool>,
-    pub notes: Option<&'a str>,
+    pub notes: Option<Cow<'a, str>>,
     pub hidden_from_status_lists: Option<bool>,
-    pub advanced_scores: Option<&'a [f64]>,
+    pub advanced_scores: Option<Cow<'a, [f64]>>,
     pub started_at: Option<FuzzyDate>,
     pub completed_at: Option<FuzzyDate>,
-    pub ids: &'a [i32],
+    pub ids: Cow<'a, [i32]>,
 }
 
 /// Options for deleting a media list entry.
@@ -166,15 +168,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name: Some(username),
             media_type: Some(MediaType::Anime),
             status,
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -186,15 +188,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name: Some(username),
             media_type: Some(MediaType::Manga),
             status,
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -205,14 +207,14 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             media_type: Some(MediaType::Anime),
             status,
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -223,14 +225,14 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             media_type: Some(MediaType::Manga),
             status,
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -241,15 +243,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name,
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Current),
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -260,15 +262,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name,
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Current),
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -279,15 +281,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name,
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Completed),
             sort: Some(&[MediaListSort::ScoreDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -298,15 +300,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name,
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Completed),
             sort: Some(&[MediaListSort::ScoreDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -317,15 +319,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name,
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Planning),
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -336,15 +338,15 @@ impl<'a> MediaListEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
-        self.fetch(&FetchMediaListOptions {
+        self.fetch(&options!(
+            FetchMediaListOptions,
             user_name,
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Planning),
             sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -354,11 +356,11 @@ impl<'a> MediaListEndpoint<'a> {
         media_id: i32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
-        self.save(&SaveMediaListOptions {
+        self.save(&options!(
+            SaveMediaListOptions,
             media_id: Some(media_id),
             status: Some(status),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -368,11 +370,11 @@ impl<'a> MediaListEndpoint<'a> {
         media_id: i32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
-        self.save(&SaveMediaListOptions {
+        self.save(&options!(
+            SaveMediaListOptions,
             media_id: Some(media_id),
             status: Some(status),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -382,21 +384,21 @@ impl<'a> MediaListEndpoint<'a> {
         entry_id: i32,
         progress: i32,
     ) -> Result<MediaList, AniListError> {
-        self.save(&SaveMediaListOptions {
+        self.save(&options!(
+            SaveMediaListOptions,
             id: Some(entry_id),
             progress: Some(progress),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Update score for an entry
     pub async fn update_score(&self, entry_id: i32, score: f64) -> Result<MediaList, AniListError> {
-        self.save(&SaveMediaListOptions {
+        self.save(&options!(
+            SaveMediaListOptions,
             id: Some(entry_id),
             score: Some(score),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
@@ -406,16 +408,20 @@ impl<'a> MediaListEndpoint<'a> {
         entry_id: i32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
-        self.save(&SaveMediaListOptions {
+        self.save(&options!(
+            SaveMediaListOptions,
             id: Some(entry_id),
             status: Some(status),
-            ..Default::default()
-        })
+        ))
         .await
     }
 
     /// Delete a media list entry
     pub async fn delete_entry(&self, entry_id: i32) -> Result<bool, AniListError> {
-        self.delete(&DeleteMediaListOptions { id: entry_id }).await
+        self.delete(&options!(
+            DeleteMediaListOptions,
+            id => entry_id,
+        ))
+        .await
     }
 }

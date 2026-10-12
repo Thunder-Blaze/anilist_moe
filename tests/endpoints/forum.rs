@@ -2,6 +2,7 @@
 
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::forum::*;
+use anilist_moe::options;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -14,10 +15,10 @@ async fn test_fetch_forum_threads() {
 
     let result = h
         .run(|| async {
-            let options = FetchThreadOptions {
+            let options = options!(
+                FetchThreadOptions,
                 per_page: Some(5),
-                ..Default::default()
-            };
+            );
             client.forum().fetch(&options).await
         })
         .await;
@@ -42,10 +43,10 @@ async fn test_fetch_one_forum_thread() {
     // First fetch some threads to get a valid ID
     let list_result = h
         .run(|| async {
-            let options = FetchThreadOptions {
+            let options = options!(
+                FetchThreadOptions,
                 per_page: Some(1),
-                ..Default::default()
-            };
+            );
             client.forum().fetch(&options).await
         })
         .await;
@@ -64,13 +65,10 @@ async fn test_fetch_one_forum_thread() {
     let thread_id = threads[0].id;
     let result = h
         .run(|| async {
-            let options = FetchThreadOneOptions {
+            let options = options!(
+                FetchThreadOneOptions,
                 id: Some(thread_id),
-                comments_page: None,
-                comments_per_page: None,
-                comments_sort: None,
-                ..Default::default()
-            };
+            );
             client.forum().fetch_one(&options).await
         })
         .await;
@@ -91,10 +89,10 @@ async fn test_fetch_forum_comments() {
     // First fetch a thread to get a valid thread ID
     let list_result = h
         .run(|| async {
-            let options = FetchThreadOptions {
+            let options = options!(
+                FetchThreadOptions,
                 per_page: Some(1),
-                ..Default::default()
-            };
+            );
             client.forum().fetch(&options).await
         })
         .await;
@@ -107,11 +105,11 @@ async fn test_fetch_forum_comments() {
             let thread_id = threads[0].id;
             let result = h
                 .run(|| async {
-                    let options = FetchThreadCommentOptions {
+                    let options = options!(
+                        FetchThreadCommentOptions,
                         thread_id: Some(thread_id),
                         per_page: Some(5),
-                        ..Default::default()
-                    };
+                    );
                     client.forum().fetch_comments(&options).await
                 })
                 .await;
@@ -133,10 +131,10 @@ async fn test_forum_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchThreadOptions {
+            let options = options!(
+                FetchThreadOptions,
                 per_page: Some(1),
-                ..Default::default()
-            };
+            );
             client.forum().fetch(&options).await
         })
         .await;
@@ -168,10 +166,10 @@ async fn test_fetch_comment_one() {
     // First fetch some comments to get a valid ID
     let list_result = h
         .run(|| async {
-            let options = FetchThreadCommentOptions {
+            let options = options!(
+                FetchThreadCommentOptions,
                 per_page: Some(1),
-                ..Default::default()
-            };
+            );
             client.forum().fetch_comments(&options).await
         })
         .await;
@@ -184,10 +182,10 @@ async fn test_fetch_comment_one() {
             let comment_id = comments[0].id;
             let result = h
                 .run(|| async {
-                    let options = FetchThreadCommentOneOptions {
+                    let options = options!(
+                        FetchThreadCommentOneOptions,
                         id: Some(comment_id),
-                        ..Default::default()
-                    };
+                    );
                     client.forum().fetch_comment_one(&options).await
                 })
                 .await;
@@ -212,16 +210,12 @@ async fn test_save_forum_thread() {
 
     let result = h
         .run(|| async {
-            let options = SaveThreadOptions {
+            let options = options!(
+                SaveThreadOptions,
                 title: Some("Test Thread from anilist_moe"),
                 body: Some("This is a test thread body."),
                 categories: Some(&[1]),
-                id: None,
-                media_categories: None,
-                sticky: None,
-                locked: None,
-                ..Default::default()
-            };
+            );
             client.forum().save(&options).await
         })
         .await;
@@ -233,7 +227,10 @@ async fn test_save_forum_thread() {
             delay_between_tests().await;
             let _ = h
                 .run(|| async {
-                    let delete_options = DeleteThreadOptions { id: response.id };
+                    let delete_options = options!(
+                        DeleteThreadOptions,
+                        id => response.id,
+                    );
                     client.forum().delete(&delete_options).await
                 })
                 .await;
@@ -255,10 +252,10 @@ async fn test_toggle_thread_subscription() {
     // First fetch a thread to subscribe to
     let list_result = h
         .run(|| async {
-            let options = FetchThreadOptions {
+            let options = options!(
+                FetchThreadOptions,
                 per_page: Some(1),
-                ..Default::default()
-            };
+            );
             client.forum().fetch(&options).await
         })
         .await;
@@ -272,10 +269,11 @@ async fn test_toggle_thread_subscription() {
 
             let result = h
                 .run(|| async {
-                    let options = ToggleThreadSubscriptionOptions {
-                        thread_id,
+                    let options = options!(
+                        ToggleThreadSubscriptionOptions,
+                        thread_id => thread_id,
                         subscribe: Some(true),
-                    };
+                    );
                     client.forum().subscription(&options).await
                 })
                 .await;
@@ -287,10 +285,11 @@ async fn test_toggle_thread_subscription() {
                     delay_between_tests().await;
                     let _ = h
                         .run(|| async {
-                            let unsub_options = ToggleThreadSubscriptionOptions {
-                                thread_id,
+                            let unsub_options = options!(
+                                ToggleThreadSubscriptionOptions,
+                                thread_id => thread_id,
                                 subscribe: Some(false),
-                            };
+                            );
                             client.forum().subscription(&unsub_options).await
                         })
                         .await;

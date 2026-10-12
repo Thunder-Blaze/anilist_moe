@@ -12,12 +12,22 @@ This project uses [Semantic Versioning](https://semver.org/):
 ## [Unreleased] (0.3.3)
 
 ### Added
-- TBD
+- `options!` macro and the `options` module, for building endpoint options without
+  spelling out every `Some(..)` wrapper
 
 ### Changed
-- TBD
+- Endpoint option fields take `Cow` instead of a borrowed reference, so the same
+  call can pass literals (no allocation) or owned data (a `'static` value that can
+  be moved into a spawned task)
+- `Media.id` is required (`u32`), `id_mal` is `Option<u32>` and `FuzzyDate` months
+  and days are `u32`
+- `*Options` structs no longer implement `Deserialize` (they are request inputs)
+- `ReviewEndpoint::get_by_id` returns `AniListError::NotFound` instead of panicking
+  when the review does not exist
 
 ### Fixed
+- `FetchStudioOptions` sent `null` for unset fields, which made every studio fetch
+  fail with a server error
 - Major Mistakes in Documentation
 - Typename fix for notifications and activities
 

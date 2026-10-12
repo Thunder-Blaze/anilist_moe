@@ -5,18 +5,19 @@ use anilist_moe::endpoints::staff::FetchStaffOptions;
 use anilist_moe::endpoints::studio::FetchStudioOptions;
 use anilist_moe::endpoints::user::FetchUserOptions;
 use anilist_moe::enums::media::MediaSort;
+use anilist_moe::options;
 
 #[tokio::test]
 async fn test_character_conditional_fetching() {
     let client = AniListClient::new();
-    let options = FetchCharacterOptions {
+    let options = options!(
+        FetchCharacterOptions,
         id: Some(1), // Spike Spiegel
         include_media: Some(true),
         media_per_page: Some(5),
         media_sort: Some(&[MediaSort::PopularityDesc]),
         include_mod_notes: Some(false),
-        ..Default::default()
-    };
+    );
 
     let result = client.character().fetch(&options).await;
     match result {
@@ -43,14 +44,14 @@ async fn test_character_conditional_fetching() {
 #[tokio::test]
 async fn test_staff_conditional_fetching() {
     let client = AniListClient::new();
-    let options = FetchStaffOptions {
+    let options = options!(
+        FetchStaffOptions,
         id: Some(95263), // Akira Toriyama
         include_staff_media: Some(true),
         staff_media_per_page: Some(5),
         include_characters: Some(true),
         characters_per_page: Some(5),
-        ..Default::default()
-    };
+    );
 
     let result = client.staff().fetch(&options).await;
     match result {
@@ -69,12 +70,12 @@ async fn test_staff_conditional_fetching() {
 #[tokio::test]
 async fn test_studio_conditional_fetching() {
     let client = AniListClient::new();
-    let options = FetchStudioOptions {
+    let options = options!(
+        FetchStudioOptions,
         id: Some(1), // Studio Pierrot (or generic ID)
         include_media: Some(true),
         media_per_page: Some(5),
-        ..Default::default()
-    };
+    );
 
     let result = client.studio().fetch(&options).await;
     match result {
@@ -91,12 +92,12 @@ async fn test_studio_conditional_fetching() {
 #[tokio::test]
 async fn test_user_conditional_fetching() {
     let client = AniListClient::new();
-    let options = FetchUserOptions {
+    let options = options!(
+        FetchUserOptions,
         name: Some("Josh"), // A popular user or generic
         include_statistics: Some(true),
         include_favourites: Some(true),
-        ..Default::default()
-    };
+    );
 
     let result = client.user().fetch(&options).await;
     match result {
@@ -121,13 +122,13 @@ async fn test_user_conditional_fetching() {
 async fn test_forum_conditional_fetching() {
     let client = AniListClient::new();
     // Search for a random popular thread or just by generic search
-    let options = FetchThreadOptions {
+    let options = options!(
+        FetchThreadOptions,
         search: Some("Anime"),
         per_page: Some(1),
         include_body: Some(true),
         include_user: Some(true),
-        ..Default::default()
-    };
+    );
 
     let result = client.forum().fetch(&options).await;
     match result {
@@ -145,13 +146,12 @@ async fn test_forum_conditional_fetching() {
 #[tokio::test]
 async fn test_user_conditional_fetching_negative() {
     let client = AniListClient::new();
-    let options = FetchUserOptions {
+    let options = options!(
+        FetchUserOptions,
         name: Some("Josh"),
-        // Explicitly exclude or default
         include_statistics: Some(false),
         include_favourites: Some(false),
-        ..Default::default()
-    };
+    );
 
     let result = client.user().fetch(&options).await;
     match result {
