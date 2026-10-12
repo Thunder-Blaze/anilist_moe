@@ -332,6 +332,36 @@ impl AniListClient {
         &self.inner.transport
     }
 
+    /// Walks the pages of a list query, asking for one page at a time.
+    ///
+    /// Available with the `pagination` feature.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "pagination")]
+    /// # async fn example() -> Result<(), anilist_moe::AniListError> {
+    /// use anilist_moe::endpoints::media::FetchMediaOptions;
+    /// use anilist_moe::enums::media::MediaType;
+    /// use anilist_moe::{options, AniListClient};
+    ///
+    /// let client = AniListClient::new();
+    /// let everything = client
+    ///     .paginate(options!(FetchMediaOptions, media_type: MediaType::Anime, per_page: 50))
+    ///     .collect_all()
+    ///     .await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "pagination")]
+    #[must_use]
+    pub fn paginate<Q: crate::pagination::Paginated>(
+        &self,
+        options: Q,
+    ) -> crate::pagination::Paginator<Q> {
+        crate::pagination::Paginator::new(self.clone(), options)
+    }
+
     /// Configures the retry behavior for failed requests.
     ///
     /// # Arguments

@@ -57,6 +57,14 @@
 //! anilist_moe = { version = "0.3", features = ["tracing"] }
 //! ```
 //!
+//! `pagination` adds the page walk: `AniListClient::paginate(options)` gives a
+//! cursor that asks for one page at a time and yields pages or entries. It pulls
+//! in no dependency and is off by default.
+//!
+//! ```toml
+//! anilist_moe = { version = "0.3", features = ["pagination"] }
+//! ```
+//!
 //! ## Supported Endpoints
 //!
 //! ### Core Content
@@ -197,6 +205,8 @@ pub mod enums;
 pub mod errors;
 pub mod objects;
 pub mod options;
+#[cfg(feature = "pagination")]
+pub mod pagination;
 pub mod queries;
 pub mod transport;
 pub mod unions;

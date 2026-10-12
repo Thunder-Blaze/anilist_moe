@@ -36,20 +36,25 @@ jobs:
       - name: Run clippy
         run: cargo clippy --locked -- -D warnings
 
+      - name: Build with no default features
+        run: cargo build --locked --no-default-features
+
       - name: Run library unit tests
-        run: cargo test --locked --lib
+        run: cargo test --locked --all-features --lib
 
       - name: Run offline test targets
         run: >-
-          cargo test --locked
+          cargo test --locked --all-features
           --test mock_transport_test
+          --test options_serialization_test
+          --test pagination_test
           --test client_tests
           --test error_tests
           --test utils_tests
           --test test_harness
 
       - name: Run doctests
-        run: cargo test --locked --doc
+        run: cargo test --locked --all-features --doc
 
   live:
     name: Live API tests

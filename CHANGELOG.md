@@ -25,6 +25,9 @@ This project uses [Semantic Versioning](https://semver.org/):
   `RetryConfig::retry_transient_errors` (5xx and transport failures)
 - per-endpoint cargo features, for builds that only need some of the API
 - optional `tracing` feature
+- optional `pagination` feature: `AniListClient::paginate(options)` returns a
+  cursor that walks the pages of a list query, yielding pages or single entries,
+  capped so a query that never says "no more" cannot spin
 
 ### Changed
 - Endpoint option fields take `Cow` instead of a borrowed reference, so the same

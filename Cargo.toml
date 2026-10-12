@@ -61,6 +61,9 @@ default = ["full"]
 # Emit `tracing` spans and events for the request lifecycle. Adds no cost when off.
 tracing = ["dep:tracing"]
 
+# Walk the pages of a list query with `Paginator` and `AniListClient::paginate`.
+pagination = []
+
 # Umbrella feature pulling in every endpoint group listed below.
 full = [
   "media",

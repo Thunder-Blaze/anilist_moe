@@ -71,7 +71,7 @@ anilist_moe = { version = "0.3", features = ["tracing"] }
 
 The available groups are `media`, `medialist`, `user`, `character`, `staff`,
 `studio`, `forum`, `activity`, `review`, `recommendation`, `airing`,
-`notification` and `common`; `tracing` is off by default.
+`notification` and `common`; `tracing` and `pagination` are off by default.
 
 ## Quick Start
 
@@ -671,6 +671,54 @@ queries declare their own sort default and keep it, because it is already total:
 the activity feed (`[ID_DESC]`, newest first) and the airing schedule
 (`[TIME, ID]`). `import anilist_moe::options::SortSpec` if you need the tiebreaker
 key for a sort type of your own.
+
+### Walking every page
+
+With the `pagination` feature, `AniListClient::paginate` walks a list for you. It
+asks for one page at a time — nothing is prefetched — and stops when the server
+says there is no next page, when a page comes back empty, or at a cap of 1000
+pages:
+
+```rust
+use anilist_moe::{options, AniListClient, AniListError};
+use anilist_moe::endpoints::media::FetchMediaOptions;
+use anilist_moe::enums::media::MediaType;
+
+#[tokio::main]
+async fn main() -> Result<(), AniListError> {
+    let client = AniListClient::new();
+
+    // Entry by entry.
+    let mut items = client.paginate(options!(
+        FetchMediaOptions,
+        media_type: MediaType::Anime,
+        per_page: 50,
+    ));
+
+    while let Some(anime) = items.next_item().await {
+        let anime = anime?;
+        println!("{:?}", anime.title);
+    }
+
+    // Or page by page, which keeps the page number next to the entries.
+    let mut pages = client.paginate(options!(
+        FetchMediaOptions,
+        media_type: MediaType::Anime,
+        per_page: 50,
+    ));
+
+    while let Some(page) = pages.next_page().await {
+        let page = page?;
+        println!("page of {} entries", page.data.len());
+    }
+
+    Ok(())
+}
+```
+
+Nothing is retried and nothing sleeps between pages, as everywhere else in the
+crate: if a `429` is worth waiting out, that is your loop's decision. The walk is
+cancel-safe — dropping the cursor stops the requests.
 
 ## Contributing
 

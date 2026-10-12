@@ -3,6 +3,8 @@ use crate::errors::AniListError;
 use crate::objects::airing::AiringSchedule;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::airing};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -138,5 +140,21 @@ impl<'a> AiringEndpoint<'a> {
             per_page,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchAiringOptions<'a> {
+    type Item = AiringSchedule;
+
+    async fn fetch(
+        &self,
+        client: &AniListClient,
+    ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
+        client.airing().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

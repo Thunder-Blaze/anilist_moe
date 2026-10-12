@@ -5,6 +5,8 @@ use crate::objects::common::{Deleted, FuzzyDate};
 use crate::objects::media_list::MediaList;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::medialist};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -429,5 +431,18 @@ impl<'a> MediaListEndpoint<'a> {
             id => entry_id,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchMediaListOptions<'a> {
+    type Item = MediaList;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<MediaList>>, AniListError> {
+        client.medialist().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

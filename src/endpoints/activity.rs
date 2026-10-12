@@ -4,6 +4,8 @@ use crate::objects::activity::{ActivityReply, MessageActivity, TextActivity};
 use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::unions::activity::ActivityUnion;
 use crate::{client::AniListClient, queries::activity};
 use serde::Serialize;
@@ -407,5 +409,37 @@ impl<'a> ActivityEndpoint<'a> {
             pinned => pinned,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchActivityOptions<'a> {
+    type Item = ActivityUnion;
+
+    async fn fetch(
+        &self,
+        client: &AniListClient,
+    ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
+        client.activity().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl Paginated for FetchActivityRepliesOptions {
+    type Item = ActivityReply;
+
+    async fn fetch(
+        &self,
+        client: &AniListClient,
+    ) -> Result<Page<Vec<ActivityReply>>, AniListError> {
+        client.activity().fetch_replies(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

@@ -4,6 +4,8 @@ use crate::errors::AniListError;
 use crate::objects::character::Character;
 use crate::objects::responses::Page;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::character};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -166,5 +168,18 @@ impl<'a> CharacterEndpoint<'a> {
             sort: Some(&[CharacterSort::FavouritesDesc]),
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchCharacterOptions<'a> {
+    type Item = Character;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<Character>>, AniListError> {
+        client.character().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

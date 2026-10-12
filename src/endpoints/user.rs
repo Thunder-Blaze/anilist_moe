@@ -5,6 +5,8 @@ use crate::errors::AniListError;
 use crate::objects::responses::Page;
 use crate::objects::user::User;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::user};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -311,5 +313,57 @@ impl<'a> UserEndpoint<'a> {
             sort: Some(&[UserSort::ChaptersReadDesc]),
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchUserOptions<'a> {
+    type Item = User;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<User>>, AniListError> {
+        client.user().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl Paginated for FetchUserFollowersOptions {
+    type Item = User;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<User>>, AniListError> {
+        client.user().followers(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl Paginated for FetchUserFollowingOptions {
+    type Item = User;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<User>>, AniListError> {
+        client.user().following(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchUserMediaListOptions<'a> {
+    type Item = User;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<User>>, AniListError> {
+        client.user().media_list(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }

@@ -5,6 +5,8 @@ use crate::objects::common::Deleted;
 use crate::objects::responses::Page;
 use crate::objects::review::Review;
 use crate::options;
+#[cfg(feature = "pagination")]
+use crate::pagination::Paginated;
 use crate::{client::AniListClient, queries::review};
 use serde::Serialize;
 use serde_with::skip_serializing_none;
@@ -214,5 +216,18 @@ impl<'a> ReviewEndpoint<'a> {
             rating => rating,
         ))
         .await
+    }
+}
+
+#[cfg(feature = "pagination")]
+impl<'a> Paginated for FetchReviewOptions<'a> {
+    type Item = Review;
+
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<Review>>, AniListError> {
+        client.review().fetch(self).await
+    }
+
+    fn set_page(&mut self, page: i32) {
+        self.page = Some(page);
     }
 }
