@@ -97,6 +97,11 @@ impl<T> IntoOption<T> for Option<T> {
 /// Used by [`options!`](crate::options) for `field => value` entries. The
 /// reflexive implementation covers plain fields (`i32`, `bool`, enums) and the
 /// string/slice implementations build a [`Cow`] from borrowed or owned data.
+///
+/// The standard [`Into`] already covers `&str`, `String`, `&[T]` and `Vec<T>` into
+/// a `Cow`; this trait exists for the array forms (`[T; N]`, `&[T; N]`), which
+/// have no standard conversion, and so that both entry forms of the macro go
+/// through one kind of conversion.
 pub trait IntoValue<T> {
     /// Converts `self` into `T`.
     fn into_value(self) -> T;
