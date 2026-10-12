@@ -115,7 +115,9 @@
 //!
 //! ## Rate Limiting
 //!
-//! AniList enforces a rate limit of 90 requests per minute. Be respectful of the API
+//! AniList enforces a rate limit of 90 requests per minute — [the docs note it is
+//! currently 30](https://docs.anilist.co/guide/rate-limiting) while the API recovers —
+//! so be respectful of the API
 //! and implement appropriate delays between requests in production applications.
 //!
 //! ## Examples

@@ -27,6 +27,9 @@ pub struct FetchMediaListOptions<'a> {
     pub notes: Option<Cow<'a, str>>,
     pub started_at: Option<i32>,
     pub completed_at: Option<i32>,
+    /// Limits the answer to entries also on the authenticated user's list.
+    ///
+    /// The API requires a user id or name alongside it.
     pub compare_with_auth_list: Option<bool>,
     pub user_id_in: Option<Cow<'a, [u32]>>,
     pub status_in: Option<Cow<'a, [MediaListStatus]>>,

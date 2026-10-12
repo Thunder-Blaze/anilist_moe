@@ -83,6 +83,7 @@ pub struct UpdateAniChartHighlightsOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTagsOptions {
+    /// Mod only.
     pub status: Option<i32>,
 }
 
@@ -138,6 +139,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Every media tag AniList knows about, newest first.
+    /// The `status` argument is mod only.
     pub async fn media_tags(&self, status: Option<i32>) -> Result<Vec<MediaTag>, AniListError> {
         let query = common::MEDIA_TAGS;
         self.client

@@ -594,7 +594,9 @@ The library includes comprehensive tests for:
 
 ## Rate Limiting
 
-The AniList API has rate limiting (90 requests per minute). The client does not
+The AniList API has rate limiting (90 requests per minute, and the
+[rate limiting page](https://docs.anilist.co/guide/rate-limiting) notes the API is
+currently limited to **30** while it recovers). The client does not
 retry by default: a `429`, a `5xx` or a dropped connection comes back to you as an
 error, and your application decides what to do with it. That keeps the client's
 policy out of the request path, where it cannot know your budget or your
