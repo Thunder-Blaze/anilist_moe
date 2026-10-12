@@ -7,6 +7,7 @@ use serde::Serialize;
 use serde_with::skip_serializing_none;
 
 /// Options for fetching studios.
+#[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchStudioOptions<'a> {
     pub page: Option<i32>,

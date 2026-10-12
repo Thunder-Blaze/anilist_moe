@@ -29,6 +29,9 @@ use crate::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Media {
+    /// The media's AniList ID. Always selected by this crate's queries; a custom
+    /// query deserialized into `Media` must select `id` too, otherwise the whole
+    /// response fails with a `ParseError` (`missing field 'id'`).
     pub id: u32,
     pub id_mal: Option<u32>,
     pub title: Option<MediaTitle>,
