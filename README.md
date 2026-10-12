@@ -765,6 +765,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Resources
 
+- [llms.txt](llms.txt): the same project as one page for coding assistants
 - [AniList API Documentation](https://docs.anilist.co/)
 - [Apollo GraphQL Explorer](https://studio.apollographql.com/sandbox/explorer)
 - [Crates.io Package](https://crates.io/crates/anilist_moe)

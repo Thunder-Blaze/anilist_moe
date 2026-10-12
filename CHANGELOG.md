@@ -129,6 +129,10 @@ asked for.
 - The docs and the README say what the [rate limiting page](https://docs.anilist.co/guide/rate-limiting)
   says: 90 requests per minute, currently 30 while the API recovers
 
+### Documentation
+- `llms.txt`, a single page describing the crate, its conventions and the quirks of the API
+  for coding assistants, linked from the README
+
 ### Dependencies
 - Floors are the current release of every dependency: thiserror 2.0.21, serde
   1.0.229, serde_json 1.0.154, tokio 1.53.2, log 0.4.34, tracing 0.1.44
