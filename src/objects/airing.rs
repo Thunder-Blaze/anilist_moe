@@ -16,11 +16,11 @@ pub struct AiringProgression {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringSchedule {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub airing_at: Option<i32>,
     pub time_until_airing: Option<i32>,
     pub episode: Option<i32>,
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     pub media: Option<Box<Media>>,
 }
 
@@ -37,6 +37,6 @@ pub struct AiringScheduleConnection {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AiringScheduleEdge {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub node: Option<AiringSchedule>,
 }

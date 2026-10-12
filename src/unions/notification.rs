@@ -8,6 +8,7 @@ use crate::objects::notification::{
 };
 use serde::{Deserialize, Serialize};
 
+#[non_exhaustive]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -29,4 +30,9 @@ pub enum NotificationUnion {
     MediaDataChange(MediaDataChangeNotification),
     MediaMerge(MediaMergeNotification),
     MediaDeletion(MediaDeletionNotification),
+    /// A `__typename` this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization.
+    #[serde(other)]
+    Unknown,
 }

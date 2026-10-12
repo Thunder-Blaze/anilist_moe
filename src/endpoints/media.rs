@@ -31,9 +31,9 @@ use std::borrow::Cow;
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchMediaOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "idMal")]
-    pub id_mal: Option<i32>,
+    pub id_mal: Option<u32>,
     pub search: Option<Cow<'a, str>>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
@@ -60,12 +60,12 @@ pub struct FetchMediaOptions<'a> {
     #[serde(rename = "licensedBy")]
     pub licensed_by: Option<Cow<'a, str>>,
     #[serde(rename = "licensedById")]
-    pub licensed_by_id: Option<i32>,
-    pub id_not: Option<i32>,
-    pub id_in: Option<Cow<'a, [i32]>>,
-    pub id_not_in: Option<Cow<'a, [i32]>>,
+    pub licensed_by_id: Option<u32>,
+    pub id_not: Option<u32>,
+    pub id_in: Option<Cow<'a, [u32]>>,
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     #[serde(rename = "idMal_not")]
-    pub id_mal_not: Option<i32>,
+    pub id_mal_not: Option<u32>,
     #[serde(rename = "idMal_in")]
     pub id_mal_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "idMal_not_in")]

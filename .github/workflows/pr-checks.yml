@@ -48,6 +48,7 @@ jobs:
           --test mock_transport_test
           --test options_serialization_test
           --test pagination_test
+          --test response_parsing_test
           --test client_tests
           --test error_tests
           --test utils_tests

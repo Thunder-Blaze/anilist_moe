@@ -11,7 +11,7 @@ use serde_with::skip_serializing_none;
 /// Options for toggling a like on various entities.
 #[derive(Serialize)]
 pub struct ToggleLikeOptions {
-    pub id: i32,
+    pub id: u32,
     #[serde(rename = "type")]
     pub like_type: LikeableType,
 }
@@ -20,7 +20,7 @@ pub struct ToggleLikeOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct ToggleFollowOptions {
     #[serde(rename = "userId")]
-    pub user_id: i32,
+    pub user_id: u32,
 }
 
 /// Options for adding or removing favourites.
@@ -28,15 +28,15 @@ pub struct ToggleFollowOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct ToggleFavouriteOptions {
     #[serde(rename = "animeId")]
-    pub anime_id: Option<i32>,
+    pub anime_id: Option<u32>,
     #[serde(rename = "mangaId")]
-    pub manga_id: Option<i32>,
+    pub manga_id: Option<u32>,
     #[serde(rename = "characterId")]
-    pub character_id: Option<i32>,
+    pub character_id: Option<u32>,
     #[serde(rename = "staffId")]
-    pub staff_id: Option<i32>,
+    pub staff_id: Option<u32>,
     #[serde(rename = "studioId")]
-    pub studio_id: Option<i32>,
+    pub studio_id: Option<u32>,
 }
 
 /// Endpoint for common and general-purpose operations.
@@ -73,7 +73,7 @@ impl<'a> CommonEndpoint<'a> {
     // Convenience functions
 
     /// Like or unlike an activity
-    pub async fn like_activity(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+    pub async fn like_activity(&self, id: u32) -> Result<LikeableUnion, AniListError> {
         self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::Activity,
@@ -82,7 +82,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Like or unlike an activity reply
-    pub async fn like_activity_reply(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+    pub async fn like_activity_reply(&self, id: u32) -> Result<LikeableUnion, AniListError> {
         self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::ActivityReply,
@@ -91,7 +91,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Like or unlike a thread
-    pub async fn like_thread(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+    pub async fn like_thread(&self, id: u32) -> Result<LikeableUnion, AniListError> {
         self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::Thread,
@@ -100,7 +100,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Like or unlike a thread comment
-    pub async fn like_thread_comment(&self, id: i32) -> Result<LikeableUnion, AniListError> {
+    pub async fn like_thread_comment(&self, id: u32) -> Result<LikeableUnion, AniListError> {
         self.toggle_like(&ToggleLikeOptions {
             id,
             like_type: LikeableType::ThreadComment,
@@ -109,7 +109,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Follow or unfollow a user
-    pub async fn follow_user(&self, user_id: i32) -> Result<User, AniListError> {
+    pub async fn follow_user(&self, user_id: u32) -> Result<User, AniListError> {
         self.toggle_follow(&options!(
             ToggleFollowOptions,
             user_id => user_id,
@@ -118,7 +118,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Add or remove anime from favorites
-    pub async fn favourite_anime(&self, anime_id: i32) -> Result<Favourites, AniListError> {
+    pub async fn favourite_anime(&self, anime_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&options!(
             ToggleFavouriteOptions,
             anime_id: Some(anime_id),
@@ -127,7 +127,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Add or remove manga from favorites
-    pub async fn favourite_manga(&self, manga_id: i32) -> Result<Favourites, AniListError> {
+    pub async fn favourite_manga(&self, manga_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&options!(
             ToggleFavouriteOptions,
             manga_id: Some(manga_id),
@@ -136,7 +136,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Add or remove character from favorites
-    pub async fn favourite_character(&self, character_id: i32) -> Result<Favourites, AniListError> {
+    pub async fn favourite_character(&self, character_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&options!(
             ToggleFavouriteOptions,
             character_id: Some(character_id),
@@ -145,7 +145,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Add or remove staff from favorites
-    pub async fn favourite_staff(&self, staff_id: i32) -> Result<Favourites, AniListError> {
+    pub async fn favourite_staff(&self, staff_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&options!(
             ToggleFavouriteOptions,
             staff_id: Some(staff_id),
@@ -154,7 +154,7 @@ impl<'a> CommonEndpoint<'a> {
     }
 
     /// Add or remove studio from favorites
-    pub async fn favourite_studio(&self, studio_id: i32) -> Result<Favourites, AniListError> {
+    pub async fn favourite_studio(&self, studio_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(&options!(
             ToggleFavouriteOptions,
             studio_id: Some(studio_id),

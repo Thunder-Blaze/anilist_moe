@@ -206,11 +206,11 @@ async fn test_character_search_pagination() {
     }
 
     // Verify different pages have different results
-    let ids1: Vec<i32> = response1.data.iter().map(|c| c.id).collect();
-    let ids2: Vec<i32> = response2.data.iter().map(|c| c.id).collect();
+    let ids1: Vec<u32> = response1.data.iter().map(|c| c.id).collect();
+    let ids2: Vec<u32> = response2.data.iter().map(|c| c.id).collect();
 
     // Check for no overlap between pages
-    let overlap: Vec<&i32> = ids1.iter().filter(|id| ids2.contains(id)).collect();
+    let overlap: Vec<&u32> = ids1.iter().filter(|id| ids2.contains(id)).collect();
     assert!(
         overlap.is_empty(),
         "Different pages should not have overlapping results"

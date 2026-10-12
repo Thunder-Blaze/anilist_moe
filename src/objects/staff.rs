@@ -12,7 +12,7 @@ use crate::objects::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Staff {
-    pub id: i32,
+    pub id: u32,
     pub name: Option<StaffName>,
     pub language_v2: Option<String>,
     pub image: Option<StaffImage>,
@@ -54,7 +54,7 @@ pub struct StaffConnection {
 #[serde(rename_all = "camelCase")]
 pub struct StaffEdge {
     pub node: Option<Staff>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub role: Option<String>,
     pub favourite_order: Option<i32>,
 }

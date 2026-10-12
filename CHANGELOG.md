@@ -47,6 +47,11 @@ asked for.
   from a query that needs fixing (a `503`, or a body that reads like a notice)
 - `AniListError::UnexpectedStatus` for a status this crate does not map to
   anything more specific (a `405`, a `418`)
+- Every enum that a response can carry has an `Unknown` catch-all variant
+  (`#[serde(other)]`), and the three response unions (`ActivityUnion`,
+  `LikeableUnion`, `NotificationUnion`) catch an unknown `__typename` the same
+  way: a value AniList adds before this crate knows about it no longer fails the
+  whole response
 
 ### Changed
 - Endpoint option fields take `Cow` instead of a borrowed reference, so the same
@@ -73,15 +78,29 @@ asked for.
   change: match with a trailing `_ =>` arm
 - The MSRV is declared as Rust 1.82, and docs.rs builds every feature so the
   optional APIs are documented
+- Every AniList ID is `u32`, in the option structs and in the response objects
+  alike (`id`, `user_id`, `media_id`, `id_mal`, `site_id`, …), including
+  `media_ids` and `character_ids` as `Vec<u32>` and `id_in`/`id_not_in` as
+  `Cow<[u32]>`. Counters, timestamps and sort orders stay `i32`, which is what the
+  API's signed `Int` maps to, and `FuzzyDate.year` is `u32` like its month and day
+- Every enum is `#[non_exhaustive]` and derives `PartialEq`, `Eq` and `Hash`
+  (before, only some did): a match on one outside this crate needs a trailing `_`
+  arm, which is what makes a new AniList value a non-event rather than a breaking
+  change
 
 ### Dependencies
 - Floors are the current release of every dependency: thiserror 2.0.21, serde
-  1.0.229, serde_json 1.0.154, tokio 1.53.2, chrono 0.4.45, log 0.4.34, tracing
-  0.1.44, parking_lot 0.12.5, tracing-subscriber 0.3.23, dotenv 0.15
+  1.0.229, serde_json 1.0.154, tokio 1.53.2, log 0.4.34, tracing 0.1.44
 - Two are held at the newest release that keeps the MSRV at 1.82, and the reason is
   written in `Cargo.toml`: `reqwest` stays on 0.12.28, because 0.13 needs Rust 1.85
   and its `rustls` feature pulls `aws-lc-rs`, which makes every consumer build C
   code with CMake; `serde_with` stays on 3.17, because 3.18 needs Rust 1.88
+- `chrono` is gone (nothing in the crate used it) and `dotenv` moved to
+  dev-dependencies: a library has no business loading a `.env` into a consumer's
+  process
+- `tokio` asks for its `time` feature alone — retry backoff is the only thing this
+  crate sleeps for — instead of `full`, so a consumer no longer compiles io, net,
+  fs, process and signal support on this crate's behalf
 - `husky-rs` is gone: nothing used it, and the pre-commit hook is wired through
   `core.hooksPath` instead
 
@@ -96,6 +115,13 @@ asked for.
   system clock set before 1970
 - `Page<T>` refused a response with a second unknown top-level key, so a field
   added to AniList's `Page` type would have broken every paginated call
+- The live tests no longer pass when the crate is the problem: an error that is
+  not the environment's fault — a rejected query, an unparseable response, a
+  missing field — fails the test instead of being printed, and an unauthenticated
+  test only tolerates an auth rejection. See `tests/support/mod.rs`
+- The demo binary is `examples/media.rs`, so the published crate no longer carries
+  an `anilist_moe` binary whose only job was printing one response; the scratch
+  file `examples/tmp_serde.rs` went with it
 
 ## [0.4.0] - 2026-06-04
 

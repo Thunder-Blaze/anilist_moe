@@ -17,7 +17,7 @@ use crate::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
-    pub id: i32,
+    pub id: u32,
     pub name: Option<String>,
     pub about: Option<String>,
     pub avatar: Option<UserAvatar>,

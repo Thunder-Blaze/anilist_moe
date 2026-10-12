@@ -10,7 +10,7 @@ use crate::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Report {
-    pub id: i32,
+    pub id: u32,
     pub reporter: Option<User>,
     pub reported: Option<User>,
     pub reason: Option<String>,
@@ -23,9 +23,9 @@ pub struct Report {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Review {
-    pub id: i32,
-    pub user_id: Option<i32>,
-    pub media_id: Option<i32>,
+    pub id: u32,
+    pub user_id: Option<u32>,
+    pub media_id: Option<u32>,
     pub media_type: Option<String>,
     pub summary: Option<String>,
     pub body: Option<String>,

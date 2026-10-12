@@ -96,7 +96,7 @@ pub struct Media {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaCharacter {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub role: Option<CharacterRole>,
     pub role_notes: Option<String>,
     pub dub_group: Option<String>,
@@ -129,7 +129,7 @@ pub struct MediaCoverImage {
 #[serde(rename_all = "camelCase")]
 pub struct MediaEdge {
     pub node: Option<Media>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub relation_type: Option<MediaRelation>,
     pub is_main_studio: Option<bool>,
     pub characters: Option<Vec<Character>>,
@@ -147,10 +147,10 @@ pub struct MediaEdge {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaExternalLink {
-    pub id: i32,
+    pub id: u32,
     pub url: Option<String>,
     pub site: Option<String>,
-    pub site_id: Option<i32>,
+    pub site_id: Option<u32>,
     #[serde(rename = "type")]
     pub link_type: Option<ExternalLinkType>,
     pub language: Option<String>,
@@ -164,7 +164,7 @@ pub struct MediaExternalLink {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaRank {
-    pub id: i32,
+    pub id: u32,
     pub rank: Option<i32>,
     #[serde(rename = "type")]
     pub rank_type: Option<MediaRankType>,
@@ -189,7 +189,7 @@ pub struct MediaStreamingEpisode {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaSubmission {
-    pub id: i32,
+    pub id: u32,
     pub submitter: Option<User>,
     pub assignee: Option<User>,
     pub status: Option<SubmissionStatus>,
@@ -223,7 +223,7 @@ pub struct MediaSubmissionComparison {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaSubmissionEdge {
-    pub id: i32,
+    pub id: u32,
     pub character_role: Option<CharacterRole>,
     pub staff_role: Option<String>,
     pub role_notes: Option<String>,
@@ -245,7 +245,7 @@ pub struct MediaSubmissionEdge {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTag {
-    pub id: i32,
+    pub id: u32,
     pub name: Option<String>,
     pub description: Option<String>,
     pub category: Option<String>,
@@ -253,7 +253,7 @@ pub struct MediaTag {
     pub is_general_spoiler: Option<bool>,
     pub is_media_spoiler: Option<bool>,
     pub is_adult: Option<bool>,
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
 }
 
 #[skip_serializing_none]
@@ -279,7 +279,7 @@ pub struct MediaTrailer {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTrend {
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     pub date: Option<i32>,
     pub trending: Option<i32>,
     pub average_score: Option<i32>,

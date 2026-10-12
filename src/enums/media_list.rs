@@ -1,8 +1,9 @@
 use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaListSort {
     MediaId,
     MediaIdDesc,
@@ -36,8 +37,9 @@ pub enum MediaListSort {
     MediaPopularityDesc,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum MediaListStatus {
     Current,
     Planning,
@@ -45,6 +47,11 @@ pub enum MediaListStatus {
     Dropped,
     Paused,
     Repeating,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
 impl SortSpec for MediaListSort {

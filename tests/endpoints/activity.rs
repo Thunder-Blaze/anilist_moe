@@ -1,5 +1,6 @@
 //! Tests for Activity endpoint
 
+use crate::support::allow_environmental_failure;
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::options;
 use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion};
@@ -85,6 +86,11 @@ async fn test_fetch_activities_by_user() {
                 ActivityUnion::MessageActivity(a) => {
                     assert!(a.id > 0, "Message activity should have valid ID");
                 }
+                other => {
+                    panic!(
+                        "the API returned an activity type this crate does not know yet: {other:?}"
+                    );
+                }
             }
         }
     }
@@ -122,7 +128,7 @@ async fn test_text_activity_full_lifecycle() {
             return;
         }
         Err(e) => {
-            println!("Failed to create activity: {:?}", e);
+            allow_environmental_failure("creating a text activity", &e);
             return;
         }
     };
@@ -144,7 +150,7 @@ async fn test_text_activity_full_lifecycle() {
 
     match modify_result {
         Ok(_) => println!("Modified activity successfully"),
-        Err(e) => println!("Failed to modify activity: {:?}", e),
+        Err(e) => allow_environmental_failure("updating a text activity", &e),
     }
 
     delay_between_tests().await;
@@ -167,7 +173,7 @@ async fn test_text_activity_full_lifecycle() {
             println!("Fetched activity: {:?}", a.text);
         }
         Ok(_) => println!("Got unexpected activity type"),
-        Err(e) => println!("Failed to fetch activity: {:?}", e),
+        Err(e) => allow_environmental_failure("fetching a text activity", &e),
     }
 
     delay_between_tests().await;
@@ -189,7 +195,7 @@ async fn test_text_activity_full_lifecycle() {
             assert!(deleted, "Activity should be marked as deleted");
             println!("Deleted activity successfully");
         }
-        Err(e) => println!("Failed to delete activity: {:?}", e),
+        Err(e) => allow_environmental_failure("deleting a text activity", &e),
     }
 
     println!("=== Activity Lifecycle Test Complete ===\n");
@@ -231,7 +237,7 @@ async fn test_message_activity_full_lifecycle() {
             return;
         }
         Err(e) => {
-            println!("Failed to create message activity: {:?}", e);
+            allow_environmental_failure("creating a message activity", &e);
             return;
         }
     };
@@ -258,7 +264,7 @@ async fn test_message_activity_full_lifecycle() {
 
     match modify_result {
         Ok(_) => println!("Modified message activity successfully"),
-        Err(e) => println!("Failed to modify message activity: {:?}", e),
+        Err(e) => allow_environmental_failure("updating a message activity", &e),
     }
 
     delay_between_tests().await;
@@ -280,7 +286,7 @@ async fn test_message_activity_full_lifecycle() {
             assert!(deleted, "Message activity should be marked as deleted");
             println!("Deleted message activity successfully");
         }
-        Err(e) => println!("Failed to delete message activity: {:?}", e),
+        Err(e) => allow_environmental_failure("deleting a message activity", &e),
     }
 
     println!("=== Message Activity Lifecycle Test Complete ===\n");
@@ -336,7 +342,7 @@ async fn test_activity_reply() {
             reply.id
         }
         Err(e) => {
-            println!("Failed to create reply: {:?}", e);
+            allow_environmental_failure("creating an activity reply", &e);
             // Clean up the activity
             let _ = client
                 .activity()
@@ -371,7 +377,7 @@ async fn test_activity_reply() {
             assert!(found, "Reply should be found in activity replies");
             println!("Found reply in activity");
         }
-        Err(e) => println!("Failed to fetch replies: {:?}", e),
+        Err(e) => allow_environmental_failure("fetching activity replies", &e),
     }
 
     delay_between_tests().await;
@@ -393,7 +399,7 @@ async fn test_activity_reply() {
             assert!(deleted, "Reply should be marked as deleted");
             println!("Deleted reply successfully");
         }
-        Err(e) => println!("Failed to delete reply: {:?}", e),
+        Err(e) => allow_environmental_failure("deleting an activity reply", &e),
     }
 
     delay_between_tests().await;

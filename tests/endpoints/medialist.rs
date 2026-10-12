@@ -1,5 +1,6 @@
 //! Tests for MediaList endpoint
 
+use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness, TestHarness};
 use anilist_moe::endpoints::medialist::*;
 use anilist_moe::enums::media_list::MediaListStatus;
@@ -137,7 +138,7 @@ async fn test_save_media_list() {
             );
         }
         Err(e) => {
-            println!("Expected authentication error or permission issue: {:?}", e);
+            allow_auth_rejection("test_save_media_list", &e);
         }
     }
 }
@@ -186,7 +187,7 @@ async fn test_delete_media_list() {
                 }
             }
             Err(e) => {
-                println!("Expected authentication error or permission issue: {:?}", e);
+                allow_auth_rejection("test_delete_media_list", &e);
             }
         }
     }

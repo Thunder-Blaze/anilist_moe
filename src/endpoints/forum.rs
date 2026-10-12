@@ -15,18 +15,18 @@ use std::borrow::Cow;
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchThreadOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub search: Option<Cow<'a, str>>,
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     #[serde(rename = "replyUserId")]
-    pub reply_user_id: Option<i32>,
+    pub reply_user_id: Option<u32>,
     #[serde(rename = "subscribed")]
     pub subscribed: Option<bool>,
     #[serde(rename = "categoryId")]
-    pub category_id: Option<i32>,
+    pub category_id: Option<u32>,
     #[serde(rename = "mediaCategoryId")]
-    pub media_category_id: Option<i32>,
+    pub media_category_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -57,7 +57,7 @@ pub struct FetchThreadOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchThreadOneOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "commentsPage")]
     pub comments_page: Option<i32>,
     #[serde(rename = "commentsPerPage")]
@@ -73,11 +73,11 @@ pub struct FetchThreadOneOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchThreadCommentOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "threadId")]
-    pub thread_id: Option<i32>,
+    pub thread_id: Option<u32>,
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
@@ -97,7 +97,7 @@ pub struct FetchThreadCommentOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct FetchThreadCommentOneOptions {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     // HTML rendering options
     #[serde(rename = "comment_as_html")]
     pub comment_as_html: Option<bool>,
@@ -107,7 +107,7 @@ pub struct FetchThreadCommentOneOptions {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct SaveThreadOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub title: Option<Cow<'a, str>>,
     pub body: Option<Cow<'a, str>>,
     pub categories: Option<Cow<'a, [i32]>>,
@@ -123,18 +123,18 @@ pub struct SaveThreadOptions<'a> {
 /// Options for deleting a forum thread.
 #[derive(Default, Debug, Serialize)]
 pub struct DeleteThreadOptions {
-    pub id: i32,
+    pub id: u32,
 }
 
 /// Options for creating or updating a thread comment.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct SaveThreadCommentOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "threadId")]
-    pub thread_id: Option<i32>,
+    pub thread_id: Option<u32>,
     #[serde(rename = "parentCommentId")]
-    pub parent_comment_id: Option<i32>,
+    pub parent_comment_id: Option<u32>,
     pub comment: Option<Cow<'a, str>>,
     pub locked: Option<bool>,
     // HTML rendering options
@@ -145,7 +145,7 @@ pub struct SaveThreadCommentOptions<'a> {
 /// Options for deleting a thread comment.
 #[derive(Default, Debug, Serialize)]
 pub struct DeleteThreadCommentOptions {
-    pub id: i32,
+    pub id: u32,
 }
 
 /// Options for subscribing or unsubscribing to a thread.
@@ -153,7 +153,7 @@ pub struct DeleteThreadCommentOptions {
 #[derive(Default, Debug, Serialize)]
 pub struct ToggleThreadSubscriptionOptions {
     #[serde(rename = "threadId")]
-    pub thread_id: i32,
+    pub thread_id: u32,
     pub subscribe: Option<bool>,
 }
 
@@ -304,7 +304,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Get threads by category
     pub async fn get_by_category(
         &self,
-        category_id: i32,
+        category_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
@@ -321,7 +321,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Get threads by user
     pub async fn get_by_user(
         &self,
-        user_id: i32,
+        user_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Thread>>, AniListError> {
@@ -352,7 +352,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Get thread by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<Thread, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<Thread, AniListError> {
         self.fetch_one(&options!(
             FetchThreadOneOptions,
             id: Some(id),
@@ -379,7 +379,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Update an existing thread
     pub async fn update_thread(
         &self,
-        id: i32,
+        id: u32,
         title: Option<&str>,
         body: Option<&str>,
     ) -> Result<Thread, AniListError> {
@@ -393,7 +393,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Delete a thread
-    pub async fn delete_thread(&self, id: i32) -> Result<bool, AniListError> {
+    pub async fn delete_thread(&self, id: u32) -> Result<bool, AniListError> {
         self.delete(&options!(
             DeleteThreadOptions,
             id => id,
@@ -404,7 +404,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Get comments for a thread
     pub async fn get_thread_comments(
         &self,
-        thread_id: i32,
+        thread_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<ThreadComment>>, AniListError> {
@@ -419,7 +419,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Get comment by ID
-    pub async fn get_comment_by_id(&self, id: i32) -> Result<ThreadComment, AniListError> {
+    pub async fn get_comment_by_id(&self, id: u32) -> Result<ThreadComment, AniListError> {
         self.fetch_comment_one(&options!(
             FetchThreadCommentOneOptions,
             id: Some(id),
@@ -430,7 +430,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Create a thread comment (reply)
     pub async fn reply_to_thread(
         &self,
-        thread_id: i32,
+        thread_id: u32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
         self.save_comment(&options!(
@@ -444,8 +444,8 @@ impl<'a> ForumEndpoint<'a> {
     /// Reply to a comment
     pub async fn reply_to_comment(
         &self,
-        thread_id: i32,
-        parent_comment_id: i32,
+        thread_id: u32,
+        parent_comment_id: u32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
         self.save_comment(&options!(
@@ -460,7 +460,7 @@ impl<'a> ForumEndpoint<'a> {
     /// Update a comment
     pub async fn update_comment(
         &self,
-        id: i32,
+        id: u32,
         comment: &str,
     ) -> Result<ThreadComment, AniListError> {
         self.save_comment(&options!(
@@ -472,7 +472,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Delete a comment
-    pub async fn delete_thread_comment(&self, id: i32) -> Result<bool, AniListError> {
+    pub async fn delete_thread_comment(&self, id: u32) -> Result<bool, AniListError> {
         self.delete_comment(&options!(
             DeleteThreadCommentOptions,
             id => id,
@@ -481,7 +481,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Subscribe to a thread
-    pub async fn subscribe_to_thread(&self, thread_id: i32) -> Result<Thread, AniListError> {
+    pub async fn subscribe_to_thread(&self, thread_id: u32) -> Result<Thread, AniListError> {
         self.subscription(&options!(
             ToggleThreadSubscriptionOptions,
             thread_id => thread_id,
@@ -491,7 +491,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Unsubscribe from a thread
-    pub async fn unsubscribe_from_thread(&self, thread_id: i32) -> Result<Thread, AniListError> {
+    pub async fn unsubscribe_from_thread(&self, thread_id: u32) -> Result<Thread, AniListError> {
         self.subscription(&options!(
             ToggleThreadSubscriptionOptions,
             thread_id => thread_id,
@@ -501,7 +501,7 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Toggle thread subscription
-    pub async fn toggle_thread_subscription(&self, thread_id: i32) -> Result<Thread, AniListError> {
+    pub async fn toggle_thread_subscription(&self, thread_id: u32) -> Result<Thread, AniListError> {
         self.subscription(&options!(
             ToggleThreadSubscriptionOptions,
             thread_id => thread_id,

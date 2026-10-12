@@ -7,6 +7,10 @@ use anilist_moe::endpoints::user::FetchUserOptions;
 use anilist_moe::enums::media::MediaSort;
 use anilist_moe::options;
 
+mod support;
+
+use support::allow_environmental_failure;
+
 #[tokio::test]
 async fn test_character_conditional_fetching() {
     let client = AniListClient::new();
@@ -37,7 +41,7 @@ async fn test_character_conditional_fetching() {
                 }
             }
         }
-        Err(e) => println!("Skipping test due to network error: {:?}", e),
+        Err(e) => allow_environmental_failure("test_character_conditional_fetching", &e),
     }
 }
 
@@ -63,7 +67,7 @@ async fn test_staff_conditional_fetching() {
                 assert!(staff.characters.is_some(), "Characters should be present");
             }
         }
-        Err(e) => println!("Skipping test due to network error: {:?}", e),
+        Err(e) => allow_environmental_failure("test_staff_conditional_fetching", &e),
     }
 }
 
@@ -85,7 +89,7 @@ async fn test_studio_conditional_fetching() {
                 assert!(studio.media.is_some(), "Studio media should be present");
             }
         }
-        Err(e) => println!("Skipping test due to network error: {:?}", e),
+        Err(e) => allow_environmental_failure("test_studio_conditional_fetching", &e),
     }
 }
 
@@ -114,7 +118,7 @@ async fn test_user_conditional_fetching() {
                 );
             }
         }
-        Err(e) => println!("Skipping test due to network error: {:?}", e),
+        Err(e) => allow_environmental_failure("test_user_conditional_fetching", &e),
     }
 }
 
@@ -139,7 +143,7 @@ async fn test_forum_conditional_fetching() {
                 assert!(thread.user.is_some(), "Thread user should be present");
             }
         }
-        Err(e) => println!("Skipping test due to network error: {:?}", e),
+        Err(e) => allow_environmental_failure("test_forum_conditional_fetching", &e),
     }
 }
 
@@ -168,6 +172,6 @@ async fn test_user_conditional_fetching_negative() {
                 );
             }
         }
-        Err(e) => println!("Skipping test due to network error: {:?}", e),
+        Err(e) => allow_environmental_failure("test_user_conditional_fetching_negative", &e),
     }
 }

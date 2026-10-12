@@ -7,12 +7,12 @@ use crate::objects::{common::Json, media::Media, user::User};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Thread {
-    pub id: i32,
+    pub id: u32,
     pub title: Option<String>,
     pub body: Option<String>,
-    pub user_id: Option<i32>,
-    pub reply_user_id: Option<i32>,
-    pub reply_comment_id: Option<i32>,
+    pub user_id: Option<u32>,
+    pub reply_user_id: Option<u32>,
+    pub reply_comment_id: Option<u32>,
     pub reply_count: Option<i32>,
     pub view_count: Option<i32>,
     pub is_locked: Option<bool>,
@@ -35,7 +35,7 @@ pub struct Thread {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadCategory {
-    pub id: i32,
+    pub id: u32,
     pub name: Option<String>,
 }
 
@@ -43,9 +43,9 @@ pub struct ThreadCategory {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadComment {
-    pub id: i32,
-    pub user_id: Option<i32>,
-    pub thread_id: Option<i32>,
+    pub id: u32,
+    pub user_id: Option<u32>,
+    pub thread_id: Option<u32>,
     pub comment: Option<String>,
     pub as_html: Option<bool>,
     pub like_count: Option<i32>,

@@ -19,11 +19,11 @@ pub struct FetchReviewOptions<'a> {
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "mediaId")]
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
@@ -44,9 +44,9 @@ pub struct FetchReviewOptions<'a> {
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
 pub struct SaveReviewOptions<'a> {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     #[serde(rename = "mediaId")]
-    pub media_id: i32,
+    pub media_id: u32,
     pub score: Option<i32>,
     pub summary: Option<Cow<'a, str>>,
     pub body: Option<Cow<'a, str>>,
@@ -59,14 +59,14 @@ pub struct SaveReviewOptions<'a> {
 /// Options for deleting a review.
 #[derive(Default, Debug, Serialize)]
 pub struct DeleteReviewOptions {
-    pub id: i32,
+    pub id: u32,
 }
 
 /// Options for rating a review.
 #[derive(Default, Debug, Serialize)]
 pub struct RateReviewOptions {
     #[serde(rename = "reviewId")]
-    pub review_id: i32,
+    pub review_id: u32,
     pub rating: ReviewRating,
 }
 
@@ -113,7 +113,7 @@ impl<'a> ReviewEndpoint<'a> {
     /// Get reviews for a specific media
     pub async fn get_by_media_id(
         &self,
-        media_id: i32,
+        media_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
@@ -130,7 +130,7 @@ impl<'a> ReviewEndpoint<'a> {
     /// Get reviews by a specific user
     pub async fn get_by_user_id(
         &self,
-        user_id: i32,
+        user_id: u32,
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<Review>>, AniListError> {
@@ -160,7 +160,7 @@ impl<'a> ReviewEndpoint<'a> {
     }
 
     /// Get review by ID
-    pub async fn get_by_id(&self, id: i32) -> Result<Review, AniListError> {
+    pub async fn get_by_id(&self, id: u32) -> Result<Review, AniListError> {
         let mut response = self
             .fetch(&options!(
                 FetchReviewOptions,
@@ -178,7 +178,7 @@ impl<'a> ReviewEndpoint<'a> {
     /// Create a new review
     pub async fn create(
         &self,
-        media_id: i32,
+        media_id: u32,
         score: i32,
         summary: &str,
         body: &str,
@@ -196,7 +196,7 @@ impl<'a> ReviewEndpoint<'a> {
     }
 
     /// Delete a review
-    pub async fn delete_review(&self, id: i32) -> Result<bool, AniListError> {
+    pub async fn delete_review(&self, id: u32) -> Result<bool, AniListError> {
         self.delete(&options!(
             DeleteReviewOptions,
             id => id,
@@ -207,7 +207,7 @@ impl<'a> ReviewEndpoint<'a> {
     /// Rate a review
     pub async fn rate_review(
         &self,
-        review_id: i32,
+        review_id: u32,
         rating: ReviewRating,
     ) -> Result<Review, AniListError> {
         self.rate(&options!(

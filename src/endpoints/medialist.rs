@@ -17,14 +17,14 @@ use std::borrow::Cow;
 #[derive(Default, Debug, Serialize)]
 pub struct FetchMediaListOptions<'a> {
     #[serde(rename = "userId")]
-    pub user_id: Option<i32>,
+    pub user_id: Option<u32>,
     #[serde(rename = "userName")]
     pub user_name: Option<Cow<'a, str>>,
     #[serde(rename = "type")]
     pub media_type: Option<MediaType>,
     pub status: Option<MediaListStatus>,
     #[serde(rename = "mediaId")]
-    pub media_id: Option<i32>,
+    pub media_id: Option<u32>,
     #[serde(rename = "isFollowing")]
     pub is_following: Option<bool>,
     pub notes: Option<Cow<'a, str>>,
@@ -77,8 +77,8 @@ pub struct FetchMediaListOptions<'a> {
 #[derive(Default, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListOptions<'a> {
-    pub id: Option<i32>,
-    pub media_id: Option<i32>,
+    pub id: Option<u32>,
+    pub media_id: Option<u32>,
     pub status: Option<MediaListStatus>,
     pub score: Option<f64>,
     pub score_raw: Option<i32>,
@@ -113,13 +113,13 @@ pub struct SaveMediaListMultipleOptions<'a> {
     pub advanced_scores: Option<Cow<'a, [f64]>>,
     pub started_at: Option<FuzzyDate>,
     pub completed_at: Option<FuzzyDate>,
-    pub ids: Cow<'a, [i32]>,
+    pub ids: Cow<'a, [u32]>,
 }
 
 /// Options for deleting a media list entry.
 #[derive(Default, Debug, Serialize)]
 pub struct DeleteMediaListOptions {
-    pub id: i32,
+    pub id: u32,
 }
 
 /// Endpoint for media list operations.
@@ -361,7 +361,7 @@ impl<'a> MediaListEndpoint<'a> {
     /// Add anime to list
     pub async fn add_anime(
         &self,
-        media_id: i32,
+        media_id: u32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
         self.save(&options!(
@@ -375,7 +375,7 @@ impl<'a> MediaListEndpoint<'a> {
     /// Add manga to list
     pub async fn add_manga(
         &self,
-        media_id: i32,
+        media_id: u32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
         self.save(&options!(
@@ -389,7 +389,7 @@ impl<'a> MediaListEndpoint<'a> {
     /// Update progress for an entry
     pub async fn update_progress(
         &self,
-        entry_id: i32,
+        entry_id: u32,
         progress: i32,
     ) -> Result<MediaList, AniListError> {
         self.save(&options!(
@@ -401,7 +401,7 @@ impl<'a> MediaListEndpoint<'a> {
     }
 
     /// Update score for an entry
-    pub async fn update_score(&self, entry_id: i32, score: f64) -> Result<MediaList, AniListError> {
+    pub async fn update_score(&self, entry_id: u32, score: f64) -> Result<MediaList, AniListError> {
         self.save(&options!(
             SaveMediaListOptions,
             id: Some(entry_id),
@@ -413,7 +413,7 @@ impl<'a> MediaListEndpoint<'a> {
     /// Update status for an entry
     pub async fn update_status(
         &self,
-        entry_id: i32,
+        entry_id: u32,
         status: MediaListStatus,
     ) -> Result<MediaList, AniListError> {
         self.save(&options!(
@@ -425,7 +425,7 @@ impl<'a> MediaListEndpoint<'a> {
     }
 
     /// Delete a media list entry
-    pub async fn delete_entry(&self, entry_id: i32) -> Result<bool, AniListError> {
+    pub async fn delete_entry(&self, entry_id: u32) -> Result<bool, AniListError> {
         self.delete(&options!(
             DeleteMediaListOptions,
             id => entry_id,

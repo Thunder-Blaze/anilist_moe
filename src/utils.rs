@@ -12,6 +12,9 @@ use tracing::Instrument;
 /// constructors below enable them. Controls retry count, delay strategy, and
 /// backoff.
 ///
+/// [`max_retries`](Self::max_retries) counts retries, not attempts: with `5` a
+/// request is sent at most six times — the first attempt plus five retries.
+///
 /// Example:
 /// ```rust
 /// use anilist_moe::utils::RetryConfig;
@@ -19,7 +22,11 @@ use tracing::Instrument;
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RetryConfig {
-    /// Maximum number of retry attempts before giving up. `0` disables retries.
+    /// How many extra attempts a failed request gets, after the first one.
+    ///
+    /// `0` disables retries, so the first failure is returned to the caller as
+    /// is. There is no "unlimited" value: a retry loop that cannot end is not a
+    /// useful default for an HTTP client.
     pub max_retries: u32,
     /// Initial delay in milliseconds before the first retry
     pub base_delay_ms: u64,

@@ -1,8 +1,9 @@
 use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum UserSort {
     Id,
     IdDesc,
@@ -15,16 +16,23 @@ pub enum UserSort {
     SearchMatch,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum UserStaffNameLanguage {
     RomajiWestern,
     Romaji,
     Native,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum UserStatisticsSort {
     Id,
     IdDesc,
@@ -38,6 +46,7 @@ pub enum UserStatisticsSort {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum UserTitleLanguage {
     Romaji,
     English,
@@ -45,6 +54,11 @@ pub enum UserTitleLanguage {
     RomajiStylised,
     EnglishStylised,
     NativeStylised,
+    /// A value the API returned that this version of the crate does not know yet.
+    ///
+    /// Only ever produced by deserialization; never send it as input.
+    #[serde(other)]
+    Unknown,
 }
 
 impl SortSpec for UserSort {
