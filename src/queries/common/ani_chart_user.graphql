@@ -1,0 +1,10 @@
+query AniChartUser {
+    AniChartUser {
+        user {
+            id
+            name
+        }
+        settings
+        highlights
+    }
+}

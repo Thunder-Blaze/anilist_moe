@@ -57,6 +57,13 @@ asked for.
   name and type, so those options say so
 - `AiringEndpoint::fetch_one` and `ActivityEndpoint::fetch_reply` fetch a single row where the
   API offers one
+- `CommonEndpoint::markdown` renders markdown the way AniList does,
+  `CommonEndpoint::external_link_sources` lists the sites a `MediaExternalLink` can point at,
+  `CommonEndpoint::site_statistics` returns the site-wide count series, and
+  `CommonEndpoint::ani_chart_user` with `update_ani_chart_settings` /
+  `update_ani_chart_highlights` cover the AniChart tool
+- `MediaEndpoint::fetch_trends` and `fetch_trend_one` read the daily trend history AniList keeps
+  for a title
 - The three submission update notifications (`MediaSubmissionUpdateNotification`,
   `StaffSubmissionUpdateNotification`, `CharacterSubmissionUpdateNotification`) and their
   `NotificationUnion` variants, so those notifications no longer land in `Unknown`
@@ -147,6 +154,9 @@ asked for.
   options for a `Thread` field that has no comments
 - `MediaList::as_array` is gone: the API has no such field, it has an `asArray`
   argument on `customLists`, so the field could only ever be `None`
+- `Query.Like` is not wrapped either: the API answers it with "Page parent query
+  required", so a lookup by `likeableId` goes through `Page.likes`
+  (`CommonEndpoint::likes`), which is the paginated form and works
 - Every sort ends in the unique key of the row: a sort you pass is sent as
   `[yours…, ID]` (or `MEDIA_ID` for media list entries, which have no `ID`), and
   an endpoint you leave unsorted is sent as `[ID]`. Sorting on a non-unique column

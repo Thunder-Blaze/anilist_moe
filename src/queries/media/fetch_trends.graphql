@@ -1,0 +1,75 @@
+query FetchMediaTrends(
+    $mediaId: Int
+    $date: Int
+    $trending: Int
+    $averageScore: Int
+    $popularity: Int
+    $episode: Int
+    $releasing: Boolean
+    $mediaIdNot: Int
+    $mediaIdIn: [Int]
+    $mediaIdNotIn: [Int]
+    $dateGreater: Int
+    $dateLesser: Int
+    $trendingGreater: Int
+    $trendingLesser: Int
+    $trendingNot: Int
+    $averageScoreGreater: Int
+    $averageScoreLesser: Int
+    $averageScoreNot: Int
+    $popularityGreater: Int
+    $popularityLesser: Int
+    $popularityNot: Int
+    $episodeGreater: Int
+    $episodeLesser: Int
+    $episodeNot: Int
+    $sort: [MediaTrendSort]
+    $page: Int
+    $perPage: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+            hasNextPage
+        }
+        mediaTrends(
+        mediaId: $mediaId
+        date: $date
+        trending: $trending
+        averageScore: $averageScore
+        popularity: $popularity
+        episode: $episode
+        releasing: $releasing
+        mediaId_not: $mediaIdNot
+        mediaId_in: $mediaIdIn
+        mediaId_not_in: $mediaIdNotIn
+        date_greater: $dateGreater
+        date_lesser: $dateLesser
+        trending_greater: $trendingGreater
+        trending_lesser: $trendingLesser
+        trending_not: $trendingNot
+        averageScore_greater: $averageScoreGreater
+        averageScore_lesser: $averageScoreLesser
+        averageScore_not: $averageScoreNot
+        popularity_greater: $popularityGreater
+        popularity_lesser: $popularityLesser
+        popularity_not: $popularityNot
+        episode_greater: $episodeGreater
+        episode_lesser: $episodeLesser
+        episode_not: $episodeNot
+        sort: $sort
+        ) {
+            mediaId
+            date
+            trending
+            averageScore
+            popularity
+            inProgress
+            releasing
+            episode
+        }
+    }
+}

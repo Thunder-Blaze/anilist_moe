@@ -409,3 +409,63 @@ async fn test_nonexistent_media() {
         }
     }
 }
+
+#[tokio::test]
+async fn test_fetch_media_trends() {
+    let h = TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = options!(
+                FetchMediaTrendOptions,
+                media_id: Some(16498),
+                per_page: Some(5),
+            );
+            client.media().fetch_trends(&options).await
+        })
+        .await;
+
+    assert!(result.is_ok(), "Should fetch trends: {:?}", result.err());
+
+    let page = result.unwrap();
+    assert!(!page.data.is_empty(), "there should be trend days");
+    assert!(
+        page.data.iter().all(|trend| trend.media_id == Some(16498)),
+        "every trend should belong to the media asked for"
+    );
+    assert!(
+        page.data.iter().all(|trend| trend.date.is_some()),
+        "every trend should carry a date"
+    );
+}
+
+#[tokio::test]
+async fn test_fetch_one_media_trend() {
+    let h = TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = options!(
+                FetchMediaTrendOptions,
+                media_id: Some(16498),
+            );
+            client.media().fetch_trend_one(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should fetch one trend day: {:?}",
+        result.err()
+    );
+
+    let trend = result.unwrap();
+    assert_eq!(
+        trend.media_id,
+        Some(16498),
+        "the trend should belong to the media asked for"
+    );
+    assert!(trend.date.is_some(), "and carry a date");
+}

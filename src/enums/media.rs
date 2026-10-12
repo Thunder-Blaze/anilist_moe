@@ -144,7 +144,7 @@ pub enum MediaSource {
     Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[non_exhaustive]
 pub enum MediaStatus {
@@ -160,7 +160,7 @@ pub enum MediaStatus {
     Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[non_exhaustive]
 pub enum MediaTrendSort {
@@ -180,7 +180,7 @@ pub enum MediaTrendSort {
     EpisodeDesc,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[non_exhaustive]
 pub enum MediaType {
@@ -193,7 +193,7 @@ pub enum MediaType {
     Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[non_exhaustive]
 pub enum CountryCode {
@@ -210,6 +210,12 @@ pub enum CountryCode {
     /// Only ever produced by deserialization; never send it as input.
     #[serde(other)]
     Unknown,
+}
+
+impl SortSpec for MediaTrendSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }
 
 impl SortSpec for MediaSort {

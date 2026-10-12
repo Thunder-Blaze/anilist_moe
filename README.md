@@ -45,7 +45,8 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 
 ### Interactions
 - **Common**: Toggle likes, toggle follows, toggle favourites on various content types, the users
-  who liked something, the genre and tag lists, and favourite ordering
+  who liked something, the genre and tag lists, favourite ordering, markdown rendering, external
+  link sources, site statistics and the AniChart tool
 
 ## Installation
 

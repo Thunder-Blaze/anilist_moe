@@ -3,7 +3,13 @@
 use crate::support::allow_auth_rejection;
 use crate::test_harness::{delay_between_tests, get_authenticated_harness};
 use anilist_moe::options;
-use anilist_moe::{endpoints::common::*, enums::likable::LikeableType};
+use anilist_moe::{
+    endpoints::common::*,
+    enums::{
+        external_link::{ExternalLinkMediaType, ExternalLinkType},
+        likable::LikeableType,
+    },
+};
 
 // All common endpoint functions require authentication
 
@@ -170,4 +176,75 @@ async fn test_likes() {
     for user in &result.unwrap().data {
         assert!(user.id > 0, "every user should have an id");
     }
+}
+
+#[tokio::test]
+async fn test_markdown() {
+    let h = crate::test_harness::TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async { client.common().markdown("# Hello").await })
+        .await;
+
+    assert!(result.is_ok(), "Should render markdown: {:?}", result.err());
+    let html = result.unwrap().html.unwrap_or_default();
+    assert!(
+        html.contains("<h1>Hello</h1>"),
+        "the rendered html should carry the heading, got {html:?}"
+    );
+}
+
+#[tokio::test]
+async fn test_external_link_sources() {
+    let h = crate::test_harness::TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = ExternalLinkSourceOptions {
+                id: None,
+                link_type: Some(ExternalLinkType::Streaming),
+                media_type: Some(ExternalLinkMediaType::Anime),
+            };
+            client.common().external_link_sources(&options).await
+        })
+        .await;
+
+    assert!(
+        result.is_ok(),
+        "Should list the streaming sources: {:?}",
+        result.err()
+    );
+
+    let sources = result.unwrap();
+    assert!(!sources.is_empty(), "there should be streaming sources");
+    assert!(
+        sources.iter().all(|source| source.site.is_some()),
+        "every source should name its site"
+    );
+}
+
+#[tokio::test]
+async fn test_site_statistics() {
+    let h = crate::test_harness::TestHarness::new();
+    let client = h.client();
+
+    let result = h
+        .run(|| async { client.common().site_statistics().await })
+        .await;
+    assert!(
+        result.is_ok(),
+        "Should fetch the site statistics: {:?}",
+        result.err()
+    );
+
+    let stats = result.unwrap();
+    let anime = stats.anime.expect("anime statistics");
+    let nodes = anime.nodes.expect("anime trend nodes");
+    assert!(!nodes.is_empty(), "the anime series should have points");
+    assert!(
+        nodes.iter().all(|node| node.count > 0),
+        "every point should count something"
+    );
 }

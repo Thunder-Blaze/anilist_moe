@@ -1,0 +1,17 @@
+query ExternalLinkSources(
+    $id: Int
+    $type: ExternalLinkType
+    $mediaType: ExternalLinkMediaType
+) {
+    ExternalLinkSourceCollection(id: $id, type: $type, mediaType: $mediaType) {
+        id
+        url
+        site
+        type
+        language
+        color
+        icon
+        notes
+        isDisabled
+    }
+}

@@ -1,8 +1,12 @@
+use crate::enums::external_link::{ExternalLinkMediaType, ExternalLinkType};
 use crate::enums::likable::LikeableType;
 use crate::errors::AniListError;
+use crate::objects::anichart::{AniChartHighlight, AniChartUser};
+use crate::objects::common::ParsedMarkdown;
 use crate::objects::favourites::Favourites;
-use crate::objects::media::MediaTag;
+use crate::objects::media::{MediaExternalLink, MediaTag};
 use crate::objects::responses::Page;
+use crate::objects::stats::SiteStatistics;
 use crate::objects::user::User;
 use crate::options;
 use crate::unions::likeable::LikeableUnion;
@@ -36,6 +40,43 @@ pub struct ToggleFavouriteOptions {
     pub character_id: Option<u32>,
     pub staff_id: Option<u32>,
     pub studio_id: Option<u32>,
+}
+
+/// Options for rendering markdown the way AniList renders it.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MarkdownOptions<'a> {
+    pub markdown: Cow<'a, str>,
+}
+
+/// Options for the external link source list.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExternalLinkSourceOptions {
+    pub id: Option<u32>,
+    #[serde(rename = "type")]
+    pub link_type: Option<ExternalLinkType>,
+    pub media_type: Option<ExternalLinkMediaType>,
+}
+
+/// Options for the AniChart settings.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateAniChartSettingsOptions<'a> {
+    pub title_language: Option<Cow<'a, str>>,
+    pub outgoing_link_provider: Option<Cow<'a, str>>,
+    pub theme: Option<Cow<'a, str>>,
+    pub sort: Option<Cow<'a, str>>,
+}
+
+/// Options for the AniChart highlights.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateAniChartHighlightsOptions<'a> {
+    pub highlights: Option<Cow<'a, [AniChartHighlight]>>,
 }
 
 /// Options for the media tag list. `status` asks for tags above a rank.
@@ -116,6 +157,59 @@ impl<'a> CommonEndpoint<'a> {
         options: &UpdateFavouriteOrderOptions<'_>,
     ) -> Result<Favourites, AniListError> {
         let query = common::UPDATE_FAVOURITE_ORDER;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Render markdown the way AniList does. Requires a token.
+    pub async fn markdown(&self, markdown: &str) -> Result<ParsedMarkdown, AniListError> {
+        let query = common::MARKDOWN;
+        self.client
+            .fetch(
+                query,
+                Some(&MarkdownOptions {
+                    markdown: Cow::Borrowed(markdown),
+                }),
+            )
+            .await
+    }
+
+    /// The external link sources AniList knows about, which is what a
+    /// `MediaExternalLink` refers to by `site`.
+    pub async fn external_link_sources(
+        &self,
+        options: &ExternalLinkSourceOptions,
+    ) -> Result<Vec<MediaExternalLink>, AniListError> {
+        let query = common::EXTERNAL_LINK_SOURCES;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Site-wide counts, as a series per entity type.
+    pub async fn site_statistics(&self) -> Result<SiteStatistics, AniListError> {
+        let query = common::SITE_STATISTICS;
+        self.client.fetch(query, Option::<&()>::None).await
+    }
+
+    /// The authenticated user's AniChart settings and highlights.
+    pub async fn ani_chart_user(&self) -> Result<AniChartUser, AniListError> {
+        let query = common::ANI_CHART_USER;
+        self.client.fetch(query, Option::<&()>::None).await
+    }
+
+    /// Save AniChart settings. Requires a token.
+    pub async fn update_ani_chart_settings(
+        &self,
+        options: &UpdateAniChartSettingsOptions<'_>,
+    ) -> Result<serde_json::Value, AniListError> {
+        let query = common::UPDATE_ANI_CHART_SETTINGS;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Save AniChart highlights. Requires a token.
+    pub async fn update_ani_chart_highlights(
+        &self,
+        options: &UpdateAniChartHighlightsOptions<'_>,
+    ) -> Result<serde_json::Value, AniListError> {
+        let query = common::UPDATE_ANI_CHART_HIGHLIGHTS;
         self.client.fetch(query, Some(&options)).await
     }
 

@@ -1,0 +1,13 @@
+mutation UpdateAniChartSettings(
+    $titleLanguage: String
+    $outgoingLinkProvider: String
+    $theme: String
+    $sort: String
+) {
+    UpdateAniChartSettings(
+        titleLanguage: $titleLanguage
+        outgoingLinkProvider: $outgoingLinkProvider
+        theme: $theme
+        sort: $sort
+    )
+}

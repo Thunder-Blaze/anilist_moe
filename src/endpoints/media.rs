@@ -1,9 +1,9 @@
 use crate::enums::media::{
-    CountryCode, MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaType,
+    CountryCode, MediaFormat, MediaSeason, MediaSort, MediaStatus, MediaTrendSort, MediaType,
 };
 use crate::enums::staff::StaffLanguage;
 use crate::errors::AniListError;
-use crate::objects::media::Media;
+use crate::objects::media::{Media, MediaTrend};
 use crate::objects::responses::Page;
 use crate::options;
 #[cfg(feature = "pagination")]
@@ -201,6 +201,49 @@ pub struct FetchMediaOneOptions<'a> {
 /// # Ok(())
 /// # }
 /// ```
+/// Options for the media trend history of a title.
+///
+/// This is the daily record AniList keeps for a media: its trending score,
+/// average score, popularity and episode count, one row per day.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchMediaTrendOptions<'a> {
+    pub media_id: Option<u32>,
+    pub date: Option<i32>,
+    pub trending: Option<i32>,
+    pub average_score: Option<i32>,
+    pub popularity: Option<i32>,
+    pub episode: Option<i32>,
+    pub releasing: Option<bool>,
+    pub media_id_not: Option<u32>,
+    pub media_id_in: Option<Cow<'a, [u32]>>,
+    pub media_id_not_in: Option<Cow<'a, [u32]>>,
+    pub date_greater: Option<i32>,
+    pub date_lesser: Option<i32>,
+    pub trending_greater: Option<i32>,
+    pub trending_lesser: Option<i32>,
+    pub trending_not: Option<i32>,
+    pub average_score_greater: Option<i32>,
+    pub average_score_lesser: Option<i32>,
+    pub average_score_not: Option<i32>,
+    pub popularity_greater: Option<i32>,
+    pub popularity_lesser: Option<i32>,
+    pub popularity_not: Option<i32>,
+    pub episode_greater: Option<i32>,
+    pub episode_lesser: Option<i32>,
+    pub episode_not: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset keeps the order the query document asks for.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub sort: Option<Cow<'a, [MediaTrendSort]>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+}
+
 pub struct MediaEndpoint<'a> {
     client: &'a AniListClient,
 }
@@ -262,6 +305,28 @@ impl<'a> MediaEndpoint<'a> {
         options: &FetchMediaOneOptions<'_>,
     ) -> Result<Media, AniListError> {
         let query = media::FETCH_ONE;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Fetch the daily trend history of a media, one page at a time.
+    pub async fn fetch_trends(
+        &self,
+        options: &FetchMediaTrendOptions<'_>,
+    ) -> Result<Page<Vec<MediaTrend>>, AniListError> {
+        let query = media::FETCH_TRENDS;
+        self.client.fetch(query, Some(&options)).await
+    }
+
+    /// Fetch one day of a media's trend history.
+    ///
+    /// The options are the ones [`fetch_trends`](Self::fetch_trends) takes;
+    /// `page` and `per_page` are ignored, because the API answers with a single
+    /// day here.
+    pub async fn fetch_trend_one(
+        &self,
+        options: &FetchMediaTrendOptions<'_>,
+    ) -> Result<MediaTrend, AniListError> {
+        let query = media::FETCH_TREND_ONE;
         self.client.fetch(query, Some(&options)).await
     }
 

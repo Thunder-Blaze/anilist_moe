@@ -1,0 +1,53 @@
+query SiteStatistics {
+    SiteStatistics {
+        users {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+        anime {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+        manga {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+        characters {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+        staff {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+        studios {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+        reviews {
+            nodes {
+                date
+                count
+                change
+            }
+        }
+    }
+}

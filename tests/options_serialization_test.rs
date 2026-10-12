@@ -105,13 +105,16 @@ fn every_endpoint_that_sorts_on_its_own_is_total() {
 // suffixes (`id_not`, `status_not_in`, ...), so each group is pinned here.
 
 use anilist_moe::endpoints::activity::{FetchActivityReplyOptions, SubscribeActivityOptions};
-use anilist_moe::endpoints::common::LikesOptions;
+use anilist_moe::endpoints::common::{
+    LikesOptions, MarkdownOptions, UpdateAniChartHighlightsOptions, UpdateAniChartSettingsOptions,
+};
 use anilist_moe::endpoints::forum::FetchThreadOptions;
 use anilist_moe::endpoints::medialist::FetchMediaListOptions;
 use anilist_moe::endpoints::user::{FetchUserMediaListOptions, FetchUserStatsOptions};
 use anilist_moe::enums::likable::LikeableType;
 use anilist_moe::enums::media::{CountryCode, MediaStatus};
 use anilist_moe::enums::media_list::MediaListStatus;
+use anilist_moe::objects::anichart::AniChartHighlight;
 use std::borrow::Cow;
 
 /// The field's value reaches the API only if the query declares the variable.
@@ -247,4 +250,38 @@ fn the_new_endpoint_options_serialise() {
         })["activityId"],
         serde_json::json!(4)
     );
+}
+
+#[test]
+fn the_anichart_and_markdown_options_serialise() {
+    assert_eq!(
+        wire(&MarkdownOptions {
+            markdown: Cow::Borrowed("# Hi"),
+        })["markdown"],
+        serde_json::json!("# Hi")
+    );
+    assert_eq!(
+        wire(&UpdateAniChartSettingsOptions {
+            title_language: Some(Cow::Borrowed("romaji")),
+            outgoing_link_provider: None,
+            theme: Some(Cow::Borrowed("light")),
+            sort: None,
+        })["titleLanguage"],
+        serde_json::json!("romaji")
+    );
+    let highlights = wire(&UpdateAniChartHighlightsOptions {
+        highlights: Some(Cow::Borrowed(&[AniChartHighlight {
+            media_id: Some(16498),
+            highlight: Some("watched".to_string()),
+        }])),
+    });
+    assert_eq!(
+        highlights["highlights"][0]["mediaId"],
+        serde_json::json!(16498)
+    );
+    assert_eq!(
+        highlights["highlights"][0]["highlight"],
+        serde_json::json!("watched")
+    );
+    assert!(anilist_moe::queries::common::UPDATE_ANI_CHART_HIGHLIGHTS.contains("$highlights"));
 }

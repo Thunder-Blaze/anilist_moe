@@ -1,0 +1,5 @@
+query Markdown($markdown: String!) {
+    Markdown(markdown: $markdown) {
+        html
+    }
+}

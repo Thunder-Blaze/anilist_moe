@@ -11,3 +11,12 @@ pub struct AniChartUser {
     pub settings: Option<Json>,
     pub highlights: Option<Json>,
 }
+
+/// One highlight, as `UpdateAniChartHighlights` takes them.
+#[skip_serializing_none]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AniChartHighlight {
+    pub media_id: Option<u32>,
+    pub highlight: Option<String>,
+}
