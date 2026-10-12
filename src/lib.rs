@@ -142,7 +142,9 @@
 //!     match client.media().get_anime_by_id(999999).await {
 //!         Ok(anime) => println!("Found: {:?}", anime),
 //!         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
-//!         Err(AniListError::GraphQL { message, .. }) => eprintln!("API error: {}", message),
+//!         Err(AniListError::GraphQL { errors, .. }) => {
+//!             eprintln!("API error: {}", errors[0].message())
+//!         }
 //!         Err(AniListError::NotFound) => eprintln!("Not found"),
 //!         Err(AniListError::RateLimit { .. }) => eprintln!("Rate limited"),
 //!         Err(AniListError::RateLimitSimple) => eprintln!("Rate limited"),

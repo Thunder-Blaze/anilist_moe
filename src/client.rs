@@ -3,7 +3,7 @@ use crate::endpoints::{
     MediaEndpoint, MediaListEndpoint, NotificationEndpoint, RecommendationEndpoint, ReviewEndpoint,
     StaffEndpoint, StudioEndpoint, UserEndpoint,
 };
-use crate::errors::AniListError;
+use crate::errors::{AniListError, GraphQLError};
 use crate::objects::responses::GraphQLResponse;
 use crate::transport::{HttpRequest, HttpResponse, ReqwestTransport, Transport};
 use crate::utils::{retry_with_backoff, RetryConfig};
@@ -283,6 +283,7 @@ impl AniListClient {
     /// use std::future::Future;
     /// use std::pin::Pin;
     ///
+    /// #[derive(Debug)]
     /// struct Offline;
     ///
     /// impl Transport for Offline {
@@ -324,6 +325,7 @@ impl AniListClient {
     ///     base_delay_ms: 2000,
     ///     exponential_backoff: true,
     ///     max_delay_ms: 60000,
+    ///     ..RetryConfig::default()
     /// };
     ///
     /// let client = AniListClient::new().with_retry_config(config);
@@ -600,47 +602,50 @@ impl AniListClient {
     }
 
     fn handle_graphql_errors(json: Value) -> Result<Value, AniListError> {
-        if let Some(errors) = json.get("errors") {
-            let error_message = if let Some(arr) = errors.as_array() {
-                // Preallocate capacity for the joined string
-                let estimated_size: usize = arr
-                    .iter()
-                    .map(|e| {
-                        e.get("message")
-                            .and_then(|m| m.as_str())
-                            .map(|s| s.len() + 2)
-                            .unwrap_or(15)
-                    })
-                    .sum();
+        let Some(errors) = json.get("errors") else {
+            return Ok(json);
+        };
 
-                let mut result = String::with_capacity(estimated_size);
-                for (i, e) in arr.iter().enumerate() {
-                    if i > 0 {
-                        result.push_str(", ");
-                    }
-                    result.push_str(
-                        e.get("message")
-                            .and_then(|m| m.as_str())
-                            .unwrap_or("Unknown error"),
-                    );
-                }
-                result
-            } else {
-                errors.to_string()
-            };
+        let parsed = match serde_json::from_value::<Vec<GraphQLError>>(errors.clone()) {
+            Ok(parsed) if !parsed.is_empty() => parsed,
+            // The server sent something that is not a well formed error list;
+            // keep whatever it said rather than losing it.
+            _ => vec![GraphQLError::new(describe_errors(errors))],
+        };
 
-            // Use bytes comparison for case-insensitive check to avoid allocation
-            let lower = error_message.to_lowercase();
-            if lower.contains("rate limit") || lower.contains("too many requests") {
-                return Err(AniListError::BurstLimit);
-            }
-
-            Err(AniListError::GraphQL {
-                message: error_message,
-            })
-        } else {
-            Ok(json)
+        // A burst of traffic is reported as a GraphQL error rather than a 429.
+        if parsed.iter().any(|error| {
+            let message = error.message.to_lowercase();
+            message.contains("rate limit") || message.contains("too many requests")
+        }) {
+            return Err(AniListError::BurstLimit);
         }
+
+        // A partial answer carries data for the fields that did resolve.
+        let data = json.get("data").filter(|value| !value.is_null()).cloned();
+
+        Err(AniListError::GraphQL {
+            errors: parsed,
+            data,
+        })
+    }
+}
+
+/// Renders an `errors` value that is not an array of error objects.
+fn describe_errors(errors: &Value) -> String {
+    match errors.as_array() {
+        Some(entries) => entries
+            .iter()
+            .map(|entry| {
+                entry
+                    .get("message")
+                    .and_then(|message| message.as_str())
+                    .unwrap_or("Unknown error")
+                    .to_string()
+            })
+            .collect::<Vec<_>>()
+            .join(", "),
+        None => errors.to_string(),
     }
 }
 
@@ -711,6 +716,8 @@ mod tests {
             base_delay_ms: 1,
             exponential_backoff: false,
             max_delay_ms: 2,
+            jitter: false,
+            retry_transient_errors: true,
         }
     }
 
@@ -734,16 +741,84 @@ mod tests {
     }
 
     #[test]
-    fn graphql_errors_are_joined_into_one_message() {
+    fn graphql_errors_keep_their_structure() {
         let response = json_response(
             200,
-            r#"{"errors":[{"message":"first"},{"message":"second"}]}"#,
+            r#"{
+                "errors": [
+                    {
+                        "message": "Cannot query field \"nope\" on type \"Media\".",
+                        "path": ["Media", "nope"],
+                        "locations": [{"line": 3, "column": 5}],
+                        "extensions": {"code": "GRAPHQL_VALIDATION_FAILED"}
+                    },
+                    {"message": "second"}
+                ],
+                "data": null
+            }"#,
         );
+
         let error = AniListClient::interpret_response(response).expect_err("must fail");
-        assert!(
-            matches!(&error, AniListError::GraphQL { message } if message == "first, second"),
-            "unexpected error: {error:?}"
+        let errors = error.graphql_errors().expect("structured errors");
+        assert_eq!(errors.len(), 2, "every error is kept");
+        assert_eq!(errors[0].path.as_ref().unwrap().len(), 2);
+        assert_eq!(
+            errors[0].locations.as_ref().unwrap()[0],
+            crate::errors::GraphQLLocation { line: 3, column: 5 }
         );
+        assert_eq!(
+            errors[0].extensions.as_ref().unwrap()["code"],
+            "GRAPHQL_VALIDATION_FAILED"
+        );
+        assert_eq!(errors[1].message(), "second");
+        assert!(
+            error.to_string().contains("Cannot query field")
+                && error.to_string().contains("second"),
+            "the display string still carries every message: {error}"
+        );
+    }
+
+    #[test]
+    fn a_partial_answer_keeps_the_data_that_resolved() {
+        let response = json_response(
+            200,
+            r#"{"data":{"Media":{"id":1,"title":null}},"errors":[{"message":"title failed"}]}"#,
+        );
+
+        let error = AniListClient::interpret_response(response).expect_err("must fail");
+        match error {
+            AniListError::GraphQL { errors, data } => {
+                assert_eq!(errors[0].message(), "title failed");
+                assert_eq!(data.expect("partial data")["Media"]["id"], 1);
+            }
+            other => panic!("expected a GraphQL error, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn an_errors_value_that_is_not_a_list_is_still_reported() {
+        let response = json_response(200, r#"{"errors":[{"nope":true}]}"#);
+
+        let error = AniListClient::interpret_response(response).expect_err("must fail");
+        assert_eq!(
+            error.graphql_errors().unwrap()[0].message(),
+            "Unknown error",
+            "a missing message field must not lose the error"
+        );
+
+        let odd = AniListClient::interpret_response(json_response(200, r#"{"errors":"boom"}"#))
+            .expect_err("must fail");
+        assert_eq!(odd.graphql_errors().unwrap()[0].message(), "\"boom\"");
+    }
+
+    #[test]
+    fn graphql_message_lookup_is_case_insensitive() {
+        let error = AniListError::GraphQL {
+            errors: vec![GraphQLError::new("Cannot query field \"nope\".")],
+            data: None,
+        };
+        assert!(error.graphql_message_contains("CANNOT"));
+        assert!(!error.graphql_message_contains("something else"));
     }
 
     #[test]
@@ -829,12 +904,7 @@ mod tests {
             .transport(Arc::clone(&transport))
             .token("secret-token")
             .base_url("https://example.test/graphql")
-            .retry_config(RetryConfig {
-                max_retries: 0,
-                base_delay_ms: 1,
-                exponential_backoff: false,
-                max_delay_ms: 1,
-            })
+            .retry_config(fast_retries(0))
             .build()
             .unwrap();
 
@@ -878,12 +948,7 @@ mod tests {
         ]);
         let client = AniListClient::builder()
             .transport(Arc::clone(&transport))
-            .retry_config(RetryConfig {
-                max_retries: 1,
-                base_delay_ms: 1,
-                exponential_backoff: false,
-                max_delay_ms: 1,
-            })
+            .retry_config(fast_retries(1))
             .build()
             .unwrap();
 
