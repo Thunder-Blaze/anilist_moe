@@ -561,7 +561,11 @@ The library includes comprehensive tests for:
 
 ## Rate Limiting
 
-The AniList API has rate limiting (90 requests per minute). The client handles basic error responses, but you should implement your own rate limiting logic for production applications:
+The AniList API has rate limiting (90 requests per minute). The client does not
+retry by default: a `429`, a `5xx` or a dropped connection comes back to you as an
+error, and your application decides what to do with it. That keeps the client's
+policy out of the request path, where it cannot know your budget or your
+cancellation story.
 
 ```rust
 use anilist_moe::{AniListClient, errors::AniListError};
@@ -596,6 +600,18 @@ async fn main() -> Result<(), AniListError> {
 
     Ok(())
 }
+```
+
+If you would rather have the client retry for you, opt in with a `RetryConfig`:
+
+```rust
+use anilist_moe::{AniListClient, utils::RetryConfig};
+
+// Retries rate limits with a one minute base delay.
+let client = AniListClient::new().with_retry_config(RetryConfig::for_rate_limits());
+
+// Retries rate limits, 5xx responses and transport errors, up to 5 times.
+let client = AniListClient::new().with_retry_config(RetryConfig::aggressive());
 ```
 
 ## Pagination

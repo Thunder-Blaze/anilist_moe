@@ -55,10 +55,14 @@ fn test_calculate_delay_boundary_conditions() {
 #[test]
 fn test_retry_config_default() {
     let config = RetryConfig::default();
-    assert_eq!(config.max_retries, 3);
+    assert_eq!(
+        config.max_retries, 0,
+        "retries are opt-in, so the default retries nothing"
+    );
     assert_eq!(config.base_delay_ms, 1000);
     assert!(config.exponential_backoff);
     assert_eq!(config.max_delay_ms, 30000);
+    assert!(!config.retry_transient_errors);
 }
 
 #[test]

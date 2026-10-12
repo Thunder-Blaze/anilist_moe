@@ -1065,6 +1065,30 @@ mod tests {
         assert_eq!(transport.requests().len(), 2, "the request is sent twice");
     }
 
+    #[tokio::test]
+    async fn a_rate_limited_request_is_not_retried_by_default() {
+        let transport = RecordingTransport::with_responses(vec![
+            json_response(429, "").header("Retry-After", "0"),
+            json_response(200, r#"{"data":{"ok":true}}"#),
+        ]);
+        let client = AniListClient::builder()
+            .transport(Arc::clone(&transport))
+            .build()
+            .unwrap();
+
+        let error = client
+            .query("query { ok }", None::<&()>)
+            .await
+            .expect_err("the 429 is handed back to the caller");
+
+        assert!(matches!(error, AniListError::RateLimitSimple));
+        assert_eq!(
+            transport.requests().len(),
+            1,
+            "the default configuration does not retry"
+        );
+    }
+
     #[test]
     fn token_helpers_round_trip() {
         let mut client = AniListClient::new();

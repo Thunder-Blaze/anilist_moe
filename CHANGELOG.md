@@ -36,9 +36,11 @@ This project uses [Semantic Versioning](https://semver.org/):
 - `ReviewEndpoint::get_by_id` returns `AniListError::NotFound` instead of panicking
   when the review does not exist
 - `AniListError::GraphQL` carries `errors` and any partial `data` instead of a
-  single joined message, and the client retries `5xx` responses
-- `RetryConfig` gained two fields, so its literals need the new values or
-  `..Default::default()`
+  single joined message
+- Retries are off by default: `RetryConfig::default()` retries nothing, and
+  `RetryConfig::for_rate_limits()` / `aggressive()` are how a client opts in
+- `RetryConfig` gained `jitter` and `retry_transient_errors`, so its literals need
+  the new values or `..Default::default()`
 
 ### Fixed
 - Media list convenience functions now sort by media id last, so paging a list no

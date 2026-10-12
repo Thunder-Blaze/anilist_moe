@@ -153,10 +153,21 @@ fn test_endpoint_accessors() {
 #[test]
 fn test_retry_config_default() {
     let config = RetryConfig::default();
-    assert_eq!(config.max_retries, 3);
+    assert_eq!(
+        config.max_retries, 0,
+        "the client does not retry unless asked to"
+    );
     assert_eq!(config.base_delay_ms, 1000);
     assert!(config.exponential_backoff);
     assert_eq!(config.max_delay_ms, 30000);
+    assert!(config.jitter);
+    assert!(!config.retry_transient_errors);
+}
+
+#[test]
+fn test_new_client_does_not_retry_by_default() {
+    let client = AniListClient::new();
+    assert_eq!(client.retry_config().max_retries, 0);
 }
 
 #[test]

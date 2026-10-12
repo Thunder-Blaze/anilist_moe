@@ -8,7 +8,9 @@ use tracing::Instrument;
 
 /// Retry configuration.
 ///
-/// Controls retry count, delay strategy, and backoff.
+/// Retries are opt-in: [`RetryConfig::default`] retries nothing, and the
+/// constructors below enable them. Controls retry count, delay strategy, and
+/// backoff.
 ///
 /// Example:
 /// ```rust
@@ -17,7 +19,7 @@ use tracing::Instrument;
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RetryConfig {
-    /// Maximum number of retry attempts before giving up
+    /// Maximum number of retry attempts before giving up. `0` disables retries.
     pub max_retries: u32,
     /// Initial delay in milliseconds before the first retry
     pub base_delay_ms: u64,
@@ -32,18 +34,39 @@ pub struct RetryConfig {
     pub jitter: bool,
     /// Retries transient failures as well as rate limits: `5xx` responses and
     /// transport errors, which usually succeed on a second attempt.
+    ///
+    /// Off in [`RetryConfig::default`], on in the presets below, and ignored when
+    /// `max_retries` is `0`.
     pub retry_transient_errors: bool,
 }
 
 impl Default for RetryConfig {
+    /// Retries are off: a failed request is returned to the caller as is.
+    ///
+    /// Which failures are worth another attempt depends on the caller — its rate
+    /// limit budget, how it cancels work, whether the request is idempotent — so
+    /// the client does not guess. Opt in with [`RetryConfig::for_rate_limits`] or
+    /// [`RetryConfig::aggressive`], or with a configuration of your own.
+    ///
+    /// ```rust
+    /// use anilist_moe::{AniListClient, utils::RetryConfig};
+    ///
+    /// // No retries: a 429 comes straight back to the caller.
+    /// let client = AniListClient::new();
+    /// assert_eq!(client.retry_config().max_retries, 0);
+    ///
+    /// // Retry rate limits and transient failures.
+    /// let client = AniListClient::new().with_retry_config(RetryConfig::aggressive());
+    /// assert_eq!(client.retry_config().max_retries, 5);
+    /// ```
     fn default() -> Self {
         Self {
-            max_retries: 3,
+            max_retries: 0,
             base_delay_ms: 1000,
             exponential_backoff: true,
             max_delay_ms: 30000,
             jitter: true,
-            retry_transient_errors: true,
+            retry_transient_errors: false,
         }
     }
 }
