@@ -87,6 +87,11 @@ asked for.
   (before, only some did): a match on one outside this crate needs a trailing `_`
   arm, which is what makes a new AniList value a non-event rather than a breaking
   change
+- The `mods` modules are `moderators` (`anilist_moe::enums::moderators`,
+  `anilist_moe::objects::moderators`), because that is what they hold, and the two
+  now agree with each other
+- The endpoint accessors (`client.media()`, `client.anime()`, …) are `#[must_use]`:
+  dropping the handle without calling it is a warning instead of silence
 
 ### Dependencies
 - Floors are the current release of every dependency: thiserror 2.0.21, serde

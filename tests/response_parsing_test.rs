@@ -20,7 +20,7 @@ use anilist_moe::enums::activity::ActivityType;
 use anilist_moe::enums::character::CharacterRole;
 use anilist_moe::enums::media::{MediaFormat, MediaStatus, MediaType};
 use anilist_moe::enums::media_list::MediaListStatus;
-use anilist_moe::enums::mods::ModRole;
+use anilist_moe::enums::moderators::ModRole;
 use anilist_moe::enums::recommendation::RecommendationRating;
 use anilist_moe::options;
 use anilist_moe::transport::{HttpRequest, HttpResponse, Transport};

@@ -20,7 +20,7 @@ pub mod media;
 /// Media list data models
 pub mod media_list;
 /// Moderator-related data models
-pub mod mods;
+pub mod moderators;
 /// Notification data models
 pub mod notification;
 /// Recommendation data models

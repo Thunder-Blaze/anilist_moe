@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
-use crate::{enums::mods::ModActionType, objects::user::User};
+use crate::{enums::moderators::ModActionType, objects::user::User};
 
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -503,6 +503,7 @@ impl AniListClient {
     /// Returns the media endpoint for anime and manga operations.
     #[cfg(feature = "media")]
     #[inline]
+    #[must_use]
     pub fn media(&self) -> MediaEndpoint<'_> {
         MediaEndpoint::new(self)
     }
@@ -510,6 +511,7 @@ impl AniListClient {
     /// Returns the media endpoint for anime operations (alias for media()).
     #[cfg(feature = "media")]
     #[inline]
+    #[must_use]
     pub fn anime(&self) -> MediaEndpoint<'_> {
         self.media()
     }
@@ -517,6 +519,7 @@ impl AniListClient {
     /// Returns the media endpoint for manga operations (alias for media()).
     #[cfg(feature = "media")]
     #[inline]
+    #[must_use]
     pub fn manga(&self) -> MediaEndpoint<'_> {
         self.media()
     }
@@ -524,6 +527,7 @@ impl AniListClient {
     /// Returns the medialist endpoint for user anime/manga list operations.
     #[cfg(feature = "medialist")]
     #[inline]
+    #[must_use]
     pub fn medialist(&self) -> MediaListEndpoint<'_> {
         MediaListEndpoint::new(self)
     }
@@ -531,6 +535,7 @@ impl AniListClient {
     /// Returns the character endpoint for character operations.
     #[cfg(feature = "character")]
     #[inline]
+    #[must_use]
     pub fn character(&self) -> CharacterEndpoint<'_> {
         CharacterEndpoint::new(self)
     }
@@ -538,6 +543,7 @@ impl AniListClient {
     /// Returns the common endpoint for likes, follows, and favorites.
     #[cfg(feature = "common")]
     #[inline]
+    #[must_use]
     pub fn common(&self) -> CommonEndpoint<'_> {
         CommonEndpoint::new(self)
     }
@@ -545,6 +551,7 @@ impl AniListClient {
     /// Returns the staff endpoint for staff member operations.
     #[cfg(feature = "staff")]
     #[inline]
+    #[must_use]
     pub fn staff(&self) -> StaffEndpoint<'_> {
         StaffEndpoint::new(self)
     }
@@ -552,6 +559,7 @@ impl AniListClient {
     /// Returns the user endpoint for user profile operations.
     #[cfg(feature = "user")]
     #[inline]
+    #[must_use]
     pub fn user(&self) -> UserEndpoint<'_> {
         UserEndpoint::new(self)
     }
@@ -559,6 +567,7 @@ impl AniListClient {
     /// Returns the studio endpoint for studio operations.
     #[cfg(feature = "studio")]
     #[inline]
+    #[must_use]
     pub fn studio(&self) -> StudioEndpoint<'_> {
         StudioEndpoint::new(self)
     }
@@ -566,6 +575,7 @@ impl AniListClient {
     /// Returns the forum endpoint for thread and comment operations.
     #[cfg(feature = "forum")]
     #[inline]
+    #[must_use]
     pub fn forum(&self) -> ForumEndpoint<'_> {
         ForumEndpoint::new(self)
     }
@@ -573,6 +583,7 @@ impl AniListClient {
     /// Returns the activity endpoint for activity feed operations.
     #[cfg(feature = "activity")]
     #[inline]
+    #[must_use]
     pub fn activity(&self) -> ActivityEndpoint<'_> {
         ActivityEndpoint::new(self)
     }
@@ -580,6 +591,7 @@ impl AniListClient {
     /// Returns the review endpoint for review operations.
     #[cfg(feature = "review")]
     #[inline]
+    #[must_use]
     pub fn review(&self) -> ReviewEndpoint<'_> {
         ReviewEndpoint::new(self)
     }
@@ -587,6 +599,7 @@ impl AniListClient {
     /// Returns the recommendation endpoint for recommendation operations.
     #[cfg(feature = "recommendation")]
     #[inline]
+    #[must_use]
     pub fn recommendation(&self) -> RecommendationEndpoint<'_> {
         RecommendationEndpoint::new(self)
     }
@@ -594,6 +607,7 @@ impl AniListClient {
     /// Returns the airing endpoint for airing schedule operations.
     #[cfg(feature = "airing")]
     #[inline]
+    #[must_use]
     pub fn airing(&self) -> AiringEndpoint<'_> {
         AiringEndpoint::new(self)
     }
@@ -601,6 +615,7 @@ impl AniListClient {
     /// Returns the notification endpoint for notification operations.
     #[cfg(feature = "notification")]
     #[inline]
+    #[must_use]
     pub fn notification(&self) -> NotificationEndpoint<'_> {
         NotificationEndpoint::new(self)
     }
