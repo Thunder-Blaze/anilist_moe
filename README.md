@@ -55,6 +55,24 @@ anilist_moe = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
+### Feature Flags
+
+Every endpoint group is a cargo feature, and `default` enables `full`, so the
+default build has everything. A leaner build opts out of the groups it does not
+need, or adds `tracing` for request spans:
+
+```toml
+# Only the media and user endpoints.
+anilist_moe = { version = "0.3", default-features = false, features = ["media", "user"] }
+
+# Everything, plus tracing.
+anilist_moe = { version = "0.3", features = ["tracing"] }
+```
+
+The available groups are `media`, `medialist`, `user`, `character`, `staff`,
+`studio`, `forum`, `activity`, `review`, `recommendation`, `airing`,
+`notification` and `common`; `tracing` is off by default.
+
 ## Quick Start
 
 ### Example 1: Get Trending Anime
@@ -160,13 +178,64 @@ async fn main() -> Result<(), AniListError> {
 
     let page: Page<Vec<Media>> = client.fetch(query, Some(&variables)).await?;
     for media in page.data {
-        if let (Some(id), Some(title)) = (media.id, media.title.as_ref()) {
-            println!("{} - {:?}", id, title.romaji);
+        if let Some(title) = media.title.as_ref() {
+            println!("{} - {:?}", media.id, title.romaji);
         }
     }
 
     Ok(())
 }
+```
+
+### Client Configuration
+
+`AniListClient::new()` and `with_token(..)` cover the common cases. Anything else
+goes through the builder:
+
+```rust
+use anilist_moe::{AniListClient, AniListError};
+use anilist_moe::utils::RetryConfig;
+use std::time::Duration;
+
+#[tokio::main]
+async fn main() -> Result<(), AniListError> {
+    let client = AniListClient::builder()
+        .token("your_access_token")
+        .timeout(Duration::from_secs(60))
+        .user_agent("my-app/1.0")
+        .retry_config(RetryConfig {
+            max_retries: 5,
+            jitter: true,
+            ..RetryConfig::default()
+        })
+        .build()?;
+
+    Ok(())
+}
+```
+
+Requests go through a `Transport`. The default one uses `reqwest`; supply your own
+to route them through another HTTP stack, or to answer them from memory in tests:
+
+```rust
+use anilist_moe::transport::{HttpRequest, HttpResponse, Transport};
+use anilist_moe::{AniListClient, AniListError};
+use std::future::Future;
+use std::pin::Pin;
+
+#[derive(Debug)]
+struct Scripted;
+
+impl Transport for Scripted {
+    fn execute(
+        &self,
+        _request: HttpRequest,
+    ) -> Pin<Box<dyn Future<Output = Result<HttpResponse, AniListError>> + Send + '_>> {
+        Box::pin(async { Ok(HttpResponse::new(200, r#"{"data":{"Page":{"media":[],"pageInfo":{}}}}"#)) })
+    }
+}
+
+let client = AniListClient::builder().transport(Scripted).build().unwrap();
 ```
 
 ### Conditional Fetching Controls
@@ -384,7 +453,12 @@ async fn main() {
     match client.media().get_anime_by_id(999999).await {
         Ok(anime) => println!("Found anime: {:?}", anime),
         Err(AniListError::Network(e)) => eprintln!("Network error: {}", e),
-        Err(AniListError::GraphQL { message }) => eprintln!("GraphQL error: {}", message),
+        Err(AniListError::GraphQL { errors, data }) => {
+            eprintln!("GraphQL error: {}", errors[0].message());
+            if let Some(partial) = data {
+                eprintln!("Partial data: {:?}", partial);
+            }
+        }
         Err(AniListError::Json(e)) => eprintln!("JSON parsing error: {}", e),
         Err(AniListError::RateLimit { limit, remaining, reset_at, retry_after }) => {
             eprintln!("Rate limited - retry after {} seconds", retry_after);
@@ -395,6 +469,32 @@ async fn main() {
         Err(AniListError::AuthenticationRequired) => eprintln!("Authentication required"),
         Err(AniListError::AccessDenied) => eprintln!("Access denied"),
         Err(e) => eprintln!("Error: {:?}", e),
+    }
+}
+```
+
+Each GraphQL error keeps the details the server sent, so callers can branch on a
+field path or an extension code instead of matching on a string:
+
+```rust
+use anilist_moe::{AniListClient, errors::AniListError};
+
+#[tokio::main]
+async fn main() {
+    let client = AniListClient::new();
+
+    if let Err(error) = client.media().fetch_one(&anilist_moe::options!(
+        anilist_moe::endpoints::media::FetchMediaOneOptions,
+        id: 999_999_999,
+    )).await {
+        if let Some(errors) = error.graphql_errors() {
+            for entry in errors {
+                eprintln!("{} at {:?}", entry.message(), entry.path);
+            }
+        }
+        if error.graphql_message_contains("cannot query field") {
+            eprintln!("the query asked for a field that does not exist");
+        }
     }
 }
 ```

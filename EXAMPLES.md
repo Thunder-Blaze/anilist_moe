@@ -650,13 +650,12 @@ async fn main() {
         Err(AniListError::Network(e)) => {
             eprintln!("Network error: {}", e);
         }
-        Err(AniListError::GraphQL { message, status, errors }) => {
-            eprintln!("GraphQL error: {}", message);
-            if let Some(code) = status {
-                eprintln!("Status code: {}", code);
-            }
-            if let Some(errs) = errors {
-                eprintln!("Errors: {:?}", errs);
+        Err(AniListError::GraphQL { errors, .. }) => {
+            eprintln!("GraphQL error: {}", errors[0].message());
+            for error in &errors {
+                if let Some(path) = &error.path {
+                    eprintln!("  at {:?}", path);
+                }
             }
         }
         Err(AniListError::Json(e)) => {
