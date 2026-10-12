@@ -1,4 +1,8 @@
 #!/bin/sh
+# Wired up by `git config core.hooksPath .husky/hooks`; see CONTRIBUTING.md.
+# CI runs the same two checks, so this is a convenience, not the only gate.
+set -e
+
 echo "Running pre-commit hook"
-cargo fmt -- --check
-cargo clippy -- -D warnings
+cargo fmt --all --check
+cargo clippy --locked -- -D warnings

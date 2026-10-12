@@ -47,7 +47,13 @@ Be respectful and constructive in all interactions. We aim to maintain a welcomi
 - Use `cargo fmt` to format your code before committing
 - Run `cargo clippy -- -D warnings` to catch common mistakes and ensure no warnings
 - Write clear, descriptive commit messages
-- Pre-commit hooks (husky-rs) will automatically run formatting and linting checks for contributors with a local clone
+- A pre-commit hook runs `cargo fmt --all --check` and `cargo clippy --locked -- -D warnings` for you. It lives in `.husky/hooks/pre-commit`, so point git at it once per clone:
+
+  ```bash
+  git config core.hooksPath .husky/hooks
+  ```
+
+  CI runs the same two checks, so the hook is a convenience rather than the only gate — skipping it never gets a pull request merged with a lint failure.
 
 ### Type Safety
 
