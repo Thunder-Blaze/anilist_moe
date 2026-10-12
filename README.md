@@ -47,6 +47,8 @@ A comprehensive, type-safe Rust wrapper for the [AniList GraphQL API](https://an
 
 ## Installation
 
+Rust 1.82 or newer.
+
 Add this to your `Cargo.toml`:
 
 ```toml
@@ -203,6 +205,7 @@ async fn main() -> Result<(), AniListError> {
         .token("your_access_token")
         .timeout(Duration::from_secs(60))
         .user_agent("my-app/1.0")
+        .header("X-Client", "my-app")
         .retry_config(RetryConfig {
             max_retries: 5,
             jitter: true,
@@ -472,6 +475,11 @@ async fn main() {
     }
 }
 ```
+
+An outage is its own variant, so an application can say "AniList is down" instead
+of showing a raw failure: a `503`, or a body that reads like a maintenance notice,
+becomes `AniListError::Maintenance`. A status this crate does not map to anything
+more specific becomes `AniListError::UnexpectedStatus` with the code in it.
 
 Each GraphQL error keeps the details the server sent, so callers can branch on a
 field path or an extension code instead of matching on a string:

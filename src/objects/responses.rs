@@ -95,13 +95,16 @@ where
                             // Ignore extensions field if present
                             let _ = map.next_value::<de::IgnoredAny>()?;
                         }
-                        // Any other key is treated as the data field.
+                        // Any other key is treated as the data field; further
+                        // keys are ignored, so a field AniList adds later does
+                        // not break every paginated call.
                         _ => {
                             if data.is_some() {
-                                return Err(de::Error::custom("found more than one data field"));
+                                let _ = map.next_value::<de::IgnoredAny>()?;
+                            } else {
+                                // Deserialize the value directly into the generic type T.
+                                data = Some(map.next_value()?);
                             }
-                            // Deserialize the value directly into the generic type T.
-                            data = Some(map.next_value()?);
                         }
                     }
                 }

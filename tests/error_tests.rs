@@ -180,3 +180,30 @@ fn test_error_is_send_and_sync() {
     fn assert_send_sync<T: Send + Sync>() {}
     assert_send_sync::<AniListError>();
 }
+
+#[test]
+fn test_detect_maintenance() {
+    use anilist_moe::errors::detect_maintenance;
+
+    assert!(detect_maintenance("AniList is down due to maintenance"));
+    assert!(detect_maintenance("SERVICE UNAVAILABLE"));
+    assert!(detect_maintenance("we will be back soon"));
+    assert!(!detect_maintenance("Cannot query field \"nope\"."));
+    assert!(!detect_maintenance(""));
+}
+
+#[test]
+fn test_error_display_maintenance_and_unexpected_status() {
+    let maintenance = AniListError::Maintenance {
+        message: "down for maintenance".to_string(),
+    };
+    assert!(maintenance.to_string().contains("unavailable"));
+    assert_eq!(maintenance.kind(), "maintenance");
+
+    let unexpected = AniListError::UnexpectedStatus {
+        status: 418,
+        message: "teapot".to_string(),
+    };
+    assert!(unexpected.to_string().contains("418"));
+    assert_eq!(unexpected.kind(), "unexpected_status");
+}

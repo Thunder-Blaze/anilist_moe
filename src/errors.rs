@@ -67,7 +67,8 @@ pub struct GraphQLLocation {
 }
 
 /// Joins the messages of a GraphQL error list for display.
-fn format_messages(errors: &[GraphQLError]) -> String {
+#[must_use]
+pub fn format_messages(errors: &[GraphQLError]) -> String {
     if errors.is_empty() {
         return "unknown error".to_string();
     }
@@ -83,7 +84,11 @@ fn format_messages(errors: &[GraphQLError]) -> String {
 }
 
 /// Errors that can occur when interacting with the AniList API.
+///
+/// The enum is `#[non_exhaustive]`, so a new variant is not a breaking change for
+/// callers: match with a trailing `_ =>` arm.
 #[derive(Error, Debug)]
+#[non_exhaustive]
 pub enum AniListError {
     /// Network-level error (connection failed, timeout, etc.)
     #[error("Network error: {0}")]
@@ -148,9 +153,49 @@ pub enum AniListError {
     #[error("Server error: {status} - {message}")]
     ServerError { status: u16, message: String },
 
+    /// AniList is down for maintenance, or said so in a response.
+    ///
+    /// AniList answers with a `503`, or with a body that reads like a maintenance
+    /// notice; both end up here so a caller can tell "come back later" apart from
+    /// a query that needs fixing. See [`detect_maintenance`].
+    #[error("AniList is unavailable: {message}")]
+    Maintenance { message: String },
+
+    /// A status code this crate does not map to anything more specific.
+    #[error("Unexpected status {status}: {message}")]
+    UnexpectedStatus { status: u16, message: String },
+
     /// Failed to parse API response
     #[error("Parse error: {message}")]
     ParseError { message: String },
+}
+
+/// Whether a message reads like AniList saying it is down.
+///
+/// Used on a `503`, and on the messages of a GraphQL error, so that an outage is
+/// reported as [`AniListError::Maintenance`] rather than as a bad query.
+///
+/// ```rust
+/// use anilist_moe::errors::detect_maintenance;
+///
+/// assert!(detect_maintenance("AniList is down due to maintenance"));
+/// assert!(!detect_maintenance("Cannot query field \"nope\"."));
+/// ```
+#[must_use]
+pub fn detect_maintenance(message: &str) -> bool {
+    let lower = message.to_lowercase();
+
+    [
+        "api is down",
+        "maintenance",
+        "will be back",
+        "temporarily unavailable",
+        "service unavailable",
+        "down due to",
+        "shut down",
+    ]
+    .iter()
+    .any(|phrase| lower.contains(phrase))
 }
 
 impl AniListError {
@@ -212,6 +257,8 @@ impl AniListError {
             Self::AccessDenied => "access_denied",
             Self::BadRequest { .. } => "bad_request",
             Self::ServerError { .. } => "server_error",
+            Self::Maintenance { .. } => "maintenance",
+            Self::UnexpectedStatus { .. } => "unexpected_status",
             Self::ParseError { .. } => "parse_error",
         }
     }

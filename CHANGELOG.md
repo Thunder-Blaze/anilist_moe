@@ -36,6 +36,14 @@ asked for.
   cursor that walks the pages of a list query, yielding pages or single entries,
   capped so a query that never says "no more" cannot spin
 - `AniListError::kind`, a stable label for logs and spans
+- `AniListClientBuilder::header` / `headers`, for extra headers on every request,
+  handed to whichever transport is in use
+- `AniListClient::try_new` and `try_with_token`, so a client can be built without
+  the panicking shorthand
+- `AniListError::Maintenance` and `detect_maintenance`, so an outage is told apart
+  from a query that needs fixing (a `503`, or a body that reads like a notice)
+- `AniListError::UnexpectedStatus` for a status this crate does not map to
+  anything more specific (a `405`, a `418`)
 
 ### Changed
 - Endpoint option fields take `Cow` instead of a borrowed reference, so the same
@@ -55,6 +63,13 @@ asked for.
 - CI runs the offline tests (formatting, clippy, unit, scripted-transport and doc
   tests) on every push and pull request, and the live API tests only on a
   schedule, on `workflow_dispatch`, or on a pull request labelled `run-live-tests`
+- A `400` whose body carries a GraphQL `errors` array is reported as
+  `AniListError::GraphQL` with its structure, instead of as a raw body in
+  `BadRequest`
+- `AniListError` is `#[non_exhaustive]`, so a future variant is not a breaking
+  change: match with a trailing `_ =>` arm
+- The MSRV is declared as Rust 1.82, and docs.rs builds every feature so the
+  optional APIs are documented
 
 ### Fixed
 - Every sort ends in the unique key of the row: a sort you pass is sent as
@@ -63,6 +78,10 @@ asked for.
   alone let paging repeat or skip rows (issue #19)
 - `FetchStudioOptions` sent `null` for unset fields, which made every studio fetch
   fail with a server error
+- The airing convenience methods read the clock with `unwrap`, which panicked on a
+  system clock set before 1970
+- `Page<T>` refused a response with a second unknown top-level key, so a field
+  added to AniList's `Page` type would have broken every paginated call
 
 ## [0.4.0] - 2026-06-04
 

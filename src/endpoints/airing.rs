@@ -89,10 +89,11 @@ impl<'a> AiringEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
+        // A clock set before 1970 is not worth a panic: fall back to zero.
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i32;
+            .map(|since_epoch| since_epoch.as_secs() as i32)
+            .unwrap_or(0);
 
         self.fetch(&options!(
             FetchAiringOptions,
@@ -110,10 +111,11 @@ impl<'a> AiringEndpoint<'a> {
         page: Option<i32>,
         per_page: Option<i32>,
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
+        // A clock set before 1970 is not worth a panic: fall back to zero.
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i32;
+            .map(|since_epoch| since_epoch.as_secs() as i32)
+            .unwrap_or(0);
 
         self.fetch(&options!(
             FetchAiringOptions,

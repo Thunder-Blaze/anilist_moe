@@ -24,7 +24,7 @@ use crate::endpoints::StaffEndpoint;
 use crate::endpoints::StudioEndpoint;
 #[cfg(feature = "user")]
 use crate::endpoints::UserEndpoint;
-use crate::errors::{AniListError, GraphQLError};
+use crate::errors::{detect_maintenance, format_messages, AniListError, GraphQLError};
 use crate::objects::responses::GraphQLResponse;
 use crate::transport::{HttpRequest, HttpResponse, ReqwestTransport, Transport};
 use crate::utils::{retry_with_backoff, RetryConfig};
@@ -53,6 +53,7 @@ struct ClientInner {
     token: Option<String>,
     retry_config: RetryConfig,
     base_url: Cow<'static, str>,
+    headers: Vec<(String, String)>,
 }
 
 /// Builds an [`AniListClient`].
@@ -80,6 +81,7 @@ pub struct AniListClientBuilder {
     retry_config: RetryConfig,
     timeout: Option<Duration>,
     user_agent: Option<String>,
+    headers: Vec<(String, String)>,
     transport: Option<Arc<dyn Transport>>,
 }
 
@@ -92,6 +94,14 @@ impl fmt::Debug for AniListClientBuilder {
             .field("retry_config", &self.retry_config)
             .field("timeout", &self.timeout)
             .field("user_agent", &self.user_agent)
+            .field(
+                "headers",
+                &self
+                    .headers
+                    .iter()
+                    .map(|(name, _)| name.as_str())
+                    .collect::<Vec<_>>(),
+            )
             .field("has_custom_transport", &self.transport.is_some())
             .finish()
     }
@@ -108,6 +118,7 @@ impl AniListClientBuilder {
             retry_config: RetryConfig::default(),
             timeout: None,
             user_agent: None,
+            headers: Vec::new(),
             transport: None,
         }
     }
@@ -120,6 +131,7 @@ impl AniListClientBuilder {
             retry_config: inner.retry_config,
             timeout: None,
             user_agent: None,
+            headers: inner.headers.clone(),
             transport: Some(Arc::clone(&inner.transport)),
         }
     }
@@ -170,6 +182,51 @@ impl AniListClientBuilder {
         self
     }
 
+    /// Sends an extra header with every request, replacing one of the same name.
+    ///
+    /// Headers set here are handed to whichever transport is in use, so a custom
+    /// transport sees them in [`HttpRequest::headers`].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use anilist_moe::AniListClient;
+    ///
+    /// let client = AniListClient::builder()
+    ///     .header("X-Client", "my-app")
+    ///     .header("X-Proxy-Token", "secret")
+    ///     .build()?;
+    /// # Ok::<(), anilist_moe::AniListError>(())
+    /// ```
+    #[must_use]
+    pub fn header(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+        let name = name.into();
+        let value = value.into();
+
+        match self
+            .headers
+            .iter_mut()
+            .find(|(existing, _)| existing.eq_ignore_ascii_case(&name))
+        {
+            Some((_, existing)) => *existing = value,
+            None => self.headers.push((name, value)),
+        }
+        self
+    }
+
+    /// Sends several extra headers with every request.
+    #[must_use]
+    pub fn headers<I, N, V>(self, headers: I) -> Self
+    where
+        I: IntoIterator<Item = (N, V)>,
+        N: Into<String>,
+        V: Into<String>,
+    {
+        headers
+            .into_iter()
+            .fold(self, |builder, (name, value)| builder.header(name, value))
+    }
+
     /// Sends requests through `transport` instead of `reqwest`.
     ///
     /// Use this to route requests through your own HTTP stack, or to answer them
@@ -201,6 +258,7 @@ impl AniListClientBuilder {
                 token: self.token,
                 retry_config: self.retry_config,
                 base_url: self.base_url,
+                headers: self.headers,
             }),
         })
     }
@@ -324,6 +382,35 @@ impl AniListClient {
     #[must_use]
     pub fn builder() -> AniListClientBuilder {
         AniListClientBuilder::new()
+    }
+
+    /// Creates a client without authentication, reporting a failure instead of
+    /// panicking.
+    ///
+    /// # Errors
+    ///
+    /// [`AniListError::Transport`] when the default HTTP client cannot be built.
+    /// [`AniListClient::new`] is the panicking shorthand.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use anilist_moe::AniListClient;
+    ///
+    /// let client = AniListClient::try_new()?;
+    /// # Ok::<(), anilist_moe::AniListError>(())
+    /// ```
+    pub fn try_new() -> Result<Self, AniListError> {
+        Self::builder().build()
+    }
+
+    /// Creates an authenticated client, reporting a failure instead of panicking.
+    ///
+    /// # Errors
+    ///
+    /// [`AniListError::Transport`] when the default HTTP client cannot be built.
+    pub fn try_with_token(token: impl Into<String>) -> Result<Self, AniListError> {
+        Self::builder().token(token).build()
     }
 
     /// The transport this client sends requests through.
@@ -614,6 +701,10 @@ impl AniListClient {
         let mut request = HttpRequest::new(self.inner.base_url.as_ref(), body)
             .header("Content-Type", CONTENT_TYPE_JSON);
 
+        for (name, value) in &self.inner.headers {
+            request = request.header(name, value);
+        }
+
         if let Some(token) = &self.inner.token {
             // Preallocate the authorization header to avoid repeated allocations
             let mut auth_header = String::with_capacity(BEARER_PREFIX.len() + token.len());
@@ -625,6 +716,15 @@ impl AniListClient {
         // The token and the Authorization header value are never logged; only
         // whether the request was sent to which URL. The attempt number is
         // carried by the enclosing `attempt` span.
+        // The body carries the query and the variables, so it is logged at the
+        // trace level only, where a subscriber has to ask for it.
+        #[cfg(feature = "tracing")]
+        tracing::trace!(
+            target: "anilist_moe::client",
+            body = %String::from_utf8_lossy(&request.body),
+            "request body",
+        );
+
         #[cfg(feature = "tracing")]
         tracing::debug!(
             target: "anilist_moe::client",
@@ -660,21 +760,43 @@ impl AniListClient {
 
     /// Maps a non-2xx response onto an error, reading the rate limit headers.
     fn error_from_status(response: &HttpResponse) -> AniListError {
+        // The rate limit headers are authoritative, so they win over the body.
+        if response.status == 429 {
+            return Self::parse_rate_limit_error(response);
+        }
+
+        let body = response.text();
+
+        // AniList reports an outage as a 503, and sometimes only in the body.
+        if response.status == 503 || detect_maintenance(&body) {
+            return AniListError::Maintenance {
+                message: body.into_owned(),
+            };
+        }
+
         match response.status {
-            400 => AniListError::BadRequest {
-                message: response.text().into_owned(),
+            // A malformed query comes back as 400 with a GraphQL `errors` array,
+            // so keep the structure instead of handing over raw JSON.
+            400 => match serde_json::from_str::<Value>(&body) {
+                Ok(json) if json.get("errors").is_some() => Self::handle_graphql_errors(json)
+                    .err()
+                    .unwrap_or_else(|| AniListError::BadRequest {
+                        message: body.into_owned(),
+                    }),
+                _ => AniListError::BadRequest {
+                    message: body.into_owned(),
+                },
             },
             401 => AniListError::AuthenticationRequired,
             403 => AniListError::AccessDenied,
             404 => AniListError::NotFound,
-            429 => Self::parse_rate_limit_error(response),
             500..=599 => AniListError::ServerError {
                 status: response.status,
-                message: response.text().into_owned(),
+                message: body.into_owned(),
             },
-            status => AniListError::ServerError {
+            status => AniListError::UnexpectedStatus {
                 status,
-                message: response.text().into_owned(),
+                message: body.into_owned(),
             },
         }
     }
@@ -721,6 +843,16 @@ impl AniListClient {
             message.contains("rate limit") || message.contains("too many requests")
         }) {
             return Err(AniListError::BurstLimit);
+        }
+
+        // An outage can arrive as a 200 with the notice in the errors.
+        if parsed
+            .iter()
+            .any(|error| detect_maintenance(&error.message))
+        {
+            return Err(AniListError::Maintenance {
+                message: format_messages(&parsed),
+            });
         }
 
         // A partial answer carries data for the fields that did resolve.
@@ -960,6 +1092,68 @@ mod tests {
     }
 
     #[test]
+    fn a_400_with_graphql_errors_keeps_the_structure() {
+        let response = json_response(
+            400,
+            r#"{"errors":[{"message":"Cannot query field \"nope\" on type \"Media\".","locations":[{"line":2,"column":3}]}]}"#,
+        );
+
+        let error = AniListClient::interpret_response(response).expect_err("must fail");
+        let errors = error.graphql_errors().expect("structured errors");
+        assert_eq!(errors[0].locations.as_ref().unwrap()[0].line, 2);
+        assert!(
+            error.graphql_message_contains("cannot query field"),
+            "a validation error should not arrive as a raw body: {error}"
+        );
+    }
+
+    #[test]
+    fn a_400_without_graphql_errors_stays_a_bad_request() {
+        let error =
+            AniListClient::interpret_response(json_response(400, "plain text")).expect_err("fails");
+        assert!(matches!(&error, AniListError::BadRequest { message } if message == "plain text"));
+    }
+
+    #[test]
+    fn an_outage_is_reported_as_maintenance() {
+        let down = AniListClient::interpret_response(json_response(503, "service unavailable"))
+            .expect_err("must fail");
+        assert!(
+            matches!(down, AniListError::Maintenance { .. }),
+            "got {down:?}"
+        );
+
+        // The notice can also arrive in a 200 with the errors.
+        let notice = AniListClient::interpret_response(json_response(
+            200,
+            r#"{"errors":[{"message":"AniList is down due to maintenance"}]}"#,
+        ))
+        .expect_err("must fail");
+        assert!(
+            matches!(notice, AniListError::Maintenance { .. }),
+            "got {notice:?}"
+        );
+
+        // A 5xx that is not an outage stays a server error.
+        let other =
+            AniListClient::interpret_response(json_response(500, "boom")).expect_err("must fail");
+        assert!(matches!(
+            other,
+            AniListError::ServerError { status: 500, .. }
+        ));
+    }
+
+    #[test]
+    fn an_unmapped_status_says_so() {
+        let error =
+            AniListClient::interpret_response(json_response(418, "teapot")).expect_err("must fail");
+        assert!(
+            matches!(&error, AniListError::UnexpectedStatus { status: 418, message } if message == "teapot"),
+            "got {error:?}"
+        );
+    }
+
+    #[test]
     fn a_rate_limit_message_becomes_a_burst_limit_error() {
         let response = json_response(200, r#"{"errors":[{"message":"Too Many Requests"}]}"#);
         assert!(matches!(
@@ -1015,6 +1209,7 @@ mod tests {
             (401, "unauthenticated"),
             (403, "forbidden"),
             (404, "missing"),
+            (500, "boom"),
             (503, "unavailable"),
         ];
 
@@ -1026,6 +1221,8 @@ mod tests {
                 401 => matches!(error, AniListError::AuthenticationRequired),
                 403 => matches!(error, AniListError::AccessDenied),
                 404 => matches!(error, AniListError::NotFound),
+                // A 503 reads as an outage; other 5xx stay server errors.
+                503 => matches!(&error, AniListError::Maintenance { message } if message == body),
                 _ => {
                     matches!(&error, AniListError::ServerError { status: s, message } if *s == status && message == body)
                 }
@@ -1117,6 +1314,51 @@ mod tests {
             1,
             "the default configuration does not retry"
         );
+    }
+
+    #[tokio::test]
+    async fn builder_headers_reach_the_request() {
+        let transport =
+            RecordingTransport::with_responses(vec![json_response(200, r#"{"data":null}"#)]);
+        let client = AniListClient::builder()
+            .transport(Arc::clone(&transport))
+            .header("X-Client", "my-app")
+            .headers([("X-Trace", "abc"), ("x-client", "replaced")])
+            .retry_config(fast_retries(0))
+            .build()
+            .unwrap();
+
+        client.query("query { ok }", None::<&()>).await.unwrap();
+
+        let request = &transport.requests()[0];
+        assert_eq!(request.header_value("X-Client"), Some("replaced"));
+        assert_eq!(request.header_value("x-trace"), Some("abc"));
+        assert_eq!(
+            request.header_value("Content-Type"),
+            Some("application/json")
+        );
+    }
+
+    #[test]
+    fn builder_debug_lists_header_names_without_values() {
+        let builder = AniListClientBuilder::new().header("X-Proxy-Token", "super-secret");
+        let debug = format!("{builder:?}");
+
+        assert!(
+            debug.contains("X-Proxy-Token"),
+            "the name is useful: {debug}"
+        );
+        assert!(
+            !debug.contains("super-secret"),
+            "the value must not leak: {debug}"
+        );
+    }
+
+    #[test]
+    fn the_fallible_constructors_work() {
+        assert!(AniListClient::try_new().is_ok());
+        assert!(AniListClient::try_with_token("token").is_ok());
+        assert!(AniListClient::try_with_token("token").unwrap().has_token());
     }
 
     #[test]
