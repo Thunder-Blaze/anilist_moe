@@ -157,6 +157,7 @@ pub mod endpoints;
 pub mod enums;
 pub mod errors;
 pub mod objects;
+pub mod options;
 pub mod queries;
 pub mod unions;
 pub mod utils;
