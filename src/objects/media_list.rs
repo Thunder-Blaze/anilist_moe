@@ -24,7 +24,6 @@ pub struct MediaList {
     pub notes: Option<String>,
     pub hidden_from_status_lists: Option<bool>,
     pub custom_lists: Option<Json>,
-    pub as_array: Option<bool>,
     pub advanced_scores: Option<Json>,
     pub started_at: Option<FuzzyDate>,
     pub completed_at: Option<FuzzyDate>,

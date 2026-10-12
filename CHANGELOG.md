@@ -145,6 +145,8 @@ asked for.
 - Options that promised something the API cannot do: `FetchCharacterOneOptions` had `page` and
   `per_page` on a field that takes neither, and `FetchThreadOneOptions` had three comment
   options for a `Thread` field that has no comments
+- `MediaList::as_array` is gone: the API has no such field, it has an `asArray`
+  argument on `customLists`, so the field could only ever be `None`
 - Every sort ends in the unique key of the row: a sort you pass is sent as
   `[yours…, ID]` (or `MEDIA_ID` for media list entries, which have no `ID`), and
   an endpoint you leave unsorted is sent as `[ID]`. Sorting on a non-unique column
