@@ -120,7 +120,7 @@ async fn completed_anime_is_sorted_deterministically() {
     assert_eq!(variables["perPage"], 50);
     assert_eq!(
         variables["sort"],
-        serde_json::json!(["SCORE_DESC", "MEDIA_ID_DESC"]),
+        serde_json::json!(["SCORE_DESC", "MEDIA_ID"]),
         "score alone is not unique, so the media id breaks ties (issue #19)"
     );
 }
@@ -140,7 +140,7 @@ async fn a_watch_list_is_sorted_deterministically() {
     assert_eq!(variables["status"], "CURRENT");
     assert_eq!(
         variables["sort"],
-        serde_json::json!(["UPDATED_TIME_DESC", "MEDIA_ID_DESC"]),
+        serde_json::json!(["UPDATED_TIME_DESC", "MEDIA_ID"]),
         "updated time alone is not unique, so the media id breaks ties (issue #19)"
     );
 }
@@ -187,7 +187,11 @@ async fn media_options_carry_the_include_flags() {
     assert_eq!(variables["includeCharacters"], true);
     assert_eq!(variables["includeStaff"], true);
     assert_eq!(variables["type"], "ANIME");
-    assert_eq!(variables["sort"], serde_json::json!(["POPULARITY_DESC"]));
+    assert_eq!(
+        variables["sort"],
+        serde_json::json!(["POPULARITY_DESC", "ID"]),
+        "the id is appended so paging stays stable"
+    );
     assert_eq!(
         variables.get("includeReviews"),
         None,

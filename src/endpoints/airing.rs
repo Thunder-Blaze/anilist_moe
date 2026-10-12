@@ -46,6 +46,12 @@ pub struct FetchAiringOptions<'a> {
     pub airing_at_greater: Option<i32>,
     #[serde(rename = "airingAt_lesser")]
     pub airing_at_lesser: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset keeps the order the query document asks for.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub sort: Option<Cow<'a, [AiringSort]>>,
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,

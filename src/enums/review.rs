@@ -1,3 +1,4 @@
+use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
@@ -9,7 +10,7 @@ pub enum ReviewRating {
     DownVote,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ReviewSort {
     Id,
@@ -22,4 +23,10 @@ pub enum ReviewSort {
     CreatedAtDesc,
     UpdatedAt,
     UpdatedAtDesc,
+}
+
+impl SortSpec for ReviewSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }

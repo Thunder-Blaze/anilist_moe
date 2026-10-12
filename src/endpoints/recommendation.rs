@@ -29,6 +29,12 @@ pub struct FetchRecommendationOptions<'a> {
     pub rating_lesser: Option<i32>,
     #[serde(rename = "onList")]
     pub on_list: Option<bool>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [RecommendationSort]>>,
 }
 

@@ -138,6 +138,12 @@ pub struct FetchMediaOptions<'a> {
     pub volumes_greater: Option<i32>,
     #[serde(rename = "volumes_lesser")]
     pub volumes_lesser: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [MediaSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]

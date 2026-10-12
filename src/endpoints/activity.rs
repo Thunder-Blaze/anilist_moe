@@ -75,7 +75,13 @@ pub struct FetchActivityOptions<'a> {
     pub created_at_lesser: Option<i32>,
 
     // # Sort
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset keeps the order the query document asks for.
     #[serde(rename = "sort")]
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub sort: Option<Cow<'a, [ActivitySort]>>,
 
     // # HTML rendering options

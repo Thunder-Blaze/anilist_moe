@@ -1,3 +1,4 @@
+use crate::options::SortSpec;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -49,7 +50,7 @@ pub enum MediaSeason {
     Fall,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum MediaSort {
     Id,
@@ -158,4 +159,10 @@ pub enum CountryCode {
     Japan,
     #[serde(rename = "KR")]
     SouthKorea,
+}
+
+impl SortSpec for MediaSort {
+    fn id_tiebreaker() -> Self {
+        Self::Id
+    }
 }

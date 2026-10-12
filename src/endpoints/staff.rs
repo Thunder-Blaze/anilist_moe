@@ -22,6 +22,12 @@ pub struct FetchStaffOptions<'a> {
     pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [i32]>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [StaffSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -70,6 +76,12 @@ pub struct FetchStaffOneOptions<'a> {
     pub id_in: Option<Cow<'a, [i32]>>,
     #[serde(rename = "id_not_in")]
     pub id_not_in: Option<Cow<'a, [i32]>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [StaffSort]>>,
     // Sub-pagination variables
     #[serde(rename = "staffMediaPage")]

@@ -24,6 +24,12 @@ pub struct FetchReviewOptions<'a> {
     pub user_id: Option<i32>,
     #[serde(rename = "mediaType")]
     pub media_type: Option<MediaType>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [ReviewSort]>>,
     // HTML rendering options
     #[serde(rename = "body_as_html")]

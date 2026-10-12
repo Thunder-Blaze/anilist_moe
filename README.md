@@ -652,6 +652,26 @@ async fn main() -> Result<(), AniListError> {
 }
 ```
 
+### Stable paging
+
+AniList sorts on its database columns as they are, so two rows that share the
+sorted value have no defined order between them — and an order that changes
+between requests makes a walk repeat some rows and miss others. The client
+therefore appends the row's unique key to every sort:
+
+| You pass | Sent to AniList |
+|---|---|
+| nothing | `[ID]` |
+| `&[MediaSort::ScoreDesc]` | `[SCORE_DESC, ID]` |
+| `&[MediaSort::ScoreDesc, MediaSort::StartDateDesc]` | `[SCORE_DESC, START_DATE_DESC, ID]` |
+| `&[MediaSort::ScoreDesc, MediaSort::Id]` | `[SCORE_DESC, ID]` (no duplicate) |
+
+Media list entries have no `ID` of their own, so they are tied by `MEDIA_ID`. Two
+queries declare their own sort default and keep it, because it is already total:
+the activity feed (`[ID_DESC]`, newest first) and the airing schedule
+(`[TIME, ID]`). `import anilist_moe::options::SortSpec` if you need the tiebreaker
+key for a sort type of your own.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.

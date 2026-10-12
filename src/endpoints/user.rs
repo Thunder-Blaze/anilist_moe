@@ -17,6 +17,12 @@ pub struct FetchUserOptions<'a> {
     pub id: Option<i32>,
     pub name: Option<Cow<'a, str>>,
     pub search: Option<Cow<'a, str>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [UserSort]>>,
     #[serde(rename = "isModerator")]
     pub is_moderator: Option<bool>,
@@ -129,6 +135,12 @@ pub struct FetchUserMediaListOptions<'a> {
     pub started_at: Option<i32>,
     #[serde(rename = "completedAt")]
     pub completed_at: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [MediaSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -141,6 +153,12 @@ pub struct FetchUserMediaListOptions<'a> {
 pub struct FetchUserStatsOptions<'a> {
     #[serde(rename = "userId")]
     pub user_id: i32,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [UserStatisticsSort]>>,
 }
 

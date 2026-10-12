@@ -10,15 +10,6 @@ use serde::Serialize;
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
 
-/// Secondary sort key for the convenience functions.
-///
-/// `score` and `updatedAt` are not unique: a list can hold many entries with the
-/// same score, and bulk imports from MyAnimeList share `updatedAt == 0`. AniList
-/// sorts on the database columns directly, so equal keys come back in an order
-/// that can differ between requests, which makes a paginated walk repeat or skip
-/// entries (issue #19). Sorting by the media id last keeps the order stable.
-const PAGINATION_TIEBREAKER: MediaListSort = MediaListSort::MediaIdDesc;
-
 /// Options for fetching media list entries.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize)]
@@ -67,6 +58,12 @@ pub struct FetchMediaListOptions<'a> {
     pub completed_at_lesser: Option<FuzzyDate>,
     #[serde(rename = "completedAt_like")]
     pub completed_at_like: Option<Cow<'a, str>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [MediaListSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -182,7 +179,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name: Some(username),
             media_type: Some(MediaType::Anime),
             status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -202,7 +199,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name: Some(username),
             media_type: Some(MediaType::Manga),
             status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -220,7 +217,7 @@ impl<'a> MediaListEndpoint<'a> {
             FetchMediaListOptions,
             media_type: Some(MediaType::Anime),
             status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -238,7 +235,7 @@ impl<'a> MediaListEndpoint<'a> {
             FetchMediaListOptions,
             media_type: Some(MediaType::Manga),
             status,
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -257,7 +254,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name,
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Current),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -276,7 +273,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name,
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Current),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -295,7 +292,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name,
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Completed),
-            sort: Some(&[MediaListSort::ScoreDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::ScoreDesc]),
             page,
             per_page,
         ))
@@ -314,7 +311,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name,
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Completed),
-            sort: Some(&[MediaListSort::ScoreDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::ScoreDesc]),
             page,
             per_page,
         ))
@@ -333,7 +330,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name,
             media_type: Some(MediaType::Anime),
             status: Some(MediaListStatus::Planning),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))
@@ -352,7 +349,7 @@ impl<'a> MediaListEndpoint<'a> {
             user_name,
             media_type: Some(MediaType::Manga),
             status: Some(MediaListStatus::Planning),
-            sort: Some(&[MediaListSort::UpdatedTimeDesc, PAGINATION_TIEBREAKER]),
+            sort: Some(&[MediaListSort::UpdatedTimeDesc]),
             page,
             per_page,
         ))

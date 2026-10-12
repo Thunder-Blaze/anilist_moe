@@ -18,6 +18,12 @@ pub struct FetchCharacterOptions<'a> {
     #[serde(rename = "perPage")]
     pub per_page: Option<i32>,
     pub search: Option<Cow<'a, str>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [CharacterSort]>>,
     #[serde(rename = "isBirthday")]
     pub is_birthday: Option<bool>,
@@ -49,6 +55,12 @@ pub struct FetchCharacterOneOptions<'a> {
     pub id_not: Option<i32>,
     pub id_in: Option<Cow<'a, [i32]>>,
     pub id_not_in: Option<Cow<'a, [i32]>>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [CharacterSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]

@@ -25,6 +25,12 @@ pub struct FetchThreadOptions<'a> {
     pub category_id: Option<i32>,
     #[serde(rename = "mediaCategoryId")]
     pub media_category_id: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [ThreadSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]
@@ -70,6 +76,12 @@ pub struct FetchThreadCommentOptions<'a> {
     pub thread_id: Option<i32>,
     #[serde(rename = "userId")]
     pub user_id: Option<i32>,
+    /// Sort order. The unique key (id) is appended, so paging stays stable;
+    /// leaving this unset sorts by the same key alone.
+    #[serde(
+        serialize_with = "crate::options::serialize_sort",
+        skip_serializing_if = "crate::options::skip_never"
+    )]
     pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
     pub page: Option<i32>,
     #[serde(rename = "perPage")]

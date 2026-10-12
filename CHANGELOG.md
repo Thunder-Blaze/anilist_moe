@@ -43,6 +43,10 @@ This project uses [Semantic Versioning](https://semver.org/):
   the new values or `..Default::default()`
 
 ### Fixed
+- Every sort ends in the unique key of the row: a sort you pass is sent as
+  `[yours…, ID]` (or `MEDIA_ID` for media list entries, which have no `ID`), and
+  an endpoint you leave unsorted is sent as `[ID]`. Sorting on a non-unique column
+  alone let paging repeat or skip rows (issue #19)
 - Media list convenience functions now sort by media id last, so paging a list no
   longer repeats or skips entries when scores or `updatedAt` values are equal
 - `FetchStudioOptions` sent `null` for unset fields, which made every studio fetch
