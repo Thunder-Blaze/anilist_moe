@@ -123,7 +123,6 @@ impl<'a> StudioEndpoint<'a> {
     }
 
     /// Get studio by ID
-
     pub async fn get_by_id(&self, id: u32) -> Result<Studio, AniListError> {
         self.fetch_one(&FetchStudioOneOptions::builder().id(Some(id)).build())
             .await
