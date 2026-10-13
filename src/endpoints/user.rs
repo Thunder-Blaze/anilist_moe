@@ -1,10 +1,8 @@
-use crate::enums::character::CharacterSort;
-use crate::enums::media::{MediaSort, MediaType};
-use crate::enums::media_list::MediaListStatus;
-use crate::enums::staff::StaffSort;
-use crate::enums::studio::StudioSort;
+use crate::enums::media::MediaType;
+use crate::enums::media_list::{MediaListSort, MediaListStatus};
 use crate::enums::user::{UserSort, UserStatisticsSort};
 use crate::errors::AniListError;
+use crate::objects::media_list::MediaList;
 use crate::objects::responses::Page;
 use crate::objects::user::User;
 #[cfg(feature = "pagination")]
@@ -85,7 +83,8 @@ pub struct FetchUserFollowingOptions<'a> {
 #[derive(Default, Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
-pub struct FetchUserFavoritesOptions<'a> {
+
+pub struct FetchUserFavoritesOptions {
     user_id: u32,
     // Toggle what to fetch
     fetch_anime: Option<bool>,
@@ -94,13 +93,11 @@ pub struct FetchUserFavoritesOptions<'a> {
     fetch_staff: Option<bool>,
     fetch_studios: Option<bool>,
     // Anime pagination
-    anime_page: Option<i32>,
-    anime_per_page: Option<i32>,
-    anime_sort: Option<Cow<'a, [MediaSort]>>,
+    pub anime_page: Option<i32>,
+    pub anime_per_page: Option<i32>,
     // Manga pagination
-    manga_page: Option<i32>,
-    manga_per_page: Option<i32>,
-    manga_sort: Option<Cow<'a, [MediaSort]>>,
+    pub manga_page: Option<i32>,
+    pub manga_per_page: Option<i32>,
     // Characters pagination
     characters_page: Option<i32>,
     characters_per_page: Option<i32>,
@@ -108,11 +105,8 @@ pub struct FetchUserFavoritesOptions<'a> {
     staff_page: Option<i32>,
     staff_per_page: Option<i32>,
     // Studios pagination
-    studios_page: Option<i32>,
-    studios_per_page: Option<i32>,
-    characters_sort: Option<Cow<'a, [CharacterSort]>>,
-    staff_sort: Option<Cow<'a, [StaffSort]>>,
-    studios_sort: Option<Cow<'a, [StudioSort]>>,
+    pub studios_page: Option<i32>,
+    pub studios_per_page: Option<i32>,
 }
 
 /// Options for fetching a user's media list.
@@ -153,7 +147,7 @@ pub struct FetchUserMediaListOptions<'a> {
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [MediaSort]>>,
+    sort: Option<Cow<'a, [MediaListSort]>>,
     page: Option<i32>,
     per_page: Option<i32>,
 }
@@ -226,8 +220,8 @@ impl<'a> UserEndpoint<'a> {
     /// Fetch user favorites with conditional sections and independent pagination
     pub async fn favorites(
         &self,
-        options: &FetchUserFavoritesOptions<'_>,
-    ) -> Result<Page<Vec<User>>, AniListError> {
+        options: &FetchUserFavoritesOptions,
+    ) -> Result<User, AniListError> {
         let query = user::FAVORITES;
         self.client.fetch(query, Some(&options)).await
     }
@@ -236,7 +230,7 @@ impl<'a> UserEndpoint<'a> {
     pub async fn media_list(
         &self,
         options: &FetchUserMediaListOptions<'_>,
-    ) -> Result<Page<Vec<User>>, AniListError> {
+    ) -> Result<Page<Vec<MediaList>>, AniListError> {
         let query = user::MEDIA_LIST;
         self.client.fetch(query, Some(&options)).await
     }
@@ -365,9 +359,9 @@ impl Paginated for FetchUserFollowingOptions<'_> {
 
 #[cfg(feature = "pagination")]
 impl<'a> Paginated for FetchUserMediaListOptions<'a> {
-    type Item = User;
+    type Item = MediaList;
 
-    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<User>>, AniListError> {
+    async fn fetch(&self, client: &AniListClient) -> Result<Page<Vec<MediaList>>, AniListError> {
         client.user().media_list(self).await
     }
 

@@ -480,27 +480,25 @@ async fn main() -> Result<(), AniListError> {
 
 ## Advanced Examples
 
-### Building Filter Options with `options!`
+### Building Filter Options
 
 ```rust,no_run
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::{MediaSeason, MediaSort, MediaType};
-use anilist_moe::options;
 use anilist_moe::{AniListClient, AniListError};
+use std::borrow::Cow;
 
 #[tokio::main]
 async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
-    // The `options!` macro fills the named fields and defaults the rest.
-    let options = options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        season: MediaSeason::Fall,
-        season_year: 2024,
-        sort: &[MediaSort::PopularityDesc],
-        per_page: 5,
-    );
+    let options = FetchMediaOptions::builder()
+        .media_type(Some(MediaType::Anime))
+        .season(Some(MediaSeason::Fall))
+        .season_year(Some(2024))
+        .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
+        .per_page(Some(5))
+        .build();
 
     let page = client.media().fetch(&options).await?;
     for media in &page.data {
@@ -509,7 +507,7 @@ async fn main() -> Result<(), AniListError> {
         }
     }
 
-    Ok(())
+Ok(())
 }
 ```
 

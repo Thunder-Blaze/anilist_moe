@@ -104,6 +104,14 @@ asked for.
   `rename` any more: a GraphQL variable name is the client's to choose, only the argument
   name is validated, so the serialised names now follow the Rust fields and the queries
   declare those names. `FetchMediaOptions` alone lost 99 hand written renames
+- `ToggleThreadSubscriptionOptions::subscribe` is a `bool`, not an `Option<bool>`:
+  the API's validator rejects the request without it, so the type no longer pretends
+  it can be left out
+- `UserEndpoint::favorites` returns `User` instead of `Page<Vec<User>>` (the response
+  has no `Page`), and `UserEndpoint::media_list` returns `Page<Vec<MediaList>>` instead
+  of `Page<Vec<User>>`. `FetchUserFavoritesOptions` lost `anime_sort`, `manga_sort`,
+  `characters_sort`, `staff_sort` and `studios_sort` (and with them its lifetime
+  parameter): `Favourites` takes no sort
 - `MediaRelation` gained `SAME_UNIVERSE`, `SubmissionStatus::Approved` became
   `SubmissionStatus::Accepted` (the API never sent `APPROVED`), and `RevisionHistoryAction`
   stopped renaming `Edit` to a value the API does not use (`EDIT`)
@@ -189,6 +197,33 @@ asked for.
 - The demo binary is `examples/media.rs`, so the published crate no longer carries
   an `anilist_moe` binary whose only job was printing one response; the scratch
   file `examples/tmp_serde.rs` went with it
+- `UserEndpoint::favorites` never worked: its document asked `Favourites.anime`,
+  `.manga`, `.characters`, `.staff` and `.studios` to `sort` (the type takes only
+  `page` and `perPage`, which the API rejects as "Unknown argument"), and it
+  selected `isMain` on a `MediaEdge` (the field there is `isMainStudio`). It also
+  returned `Page<Vec<User>>` for a response whose only top-level key is `User`.
+  It now validates, returns `User`, and its options no longer offer the sort fields
+  the API does not accept
+- `UserEndpoint::media_list` sent `MediaSort` values to a `[MediaListSort]`
+  variable, so every call failed with "Variable $sort got invalid value ["ID"]",
+  and it returned `Page<Vec<User>>` for rows that are media list entries — which
+  deserialised into `User` with every field but `id` left `None`. It now sends
+  `MediaListSort` and returns `Page<Vec<MediaList>>`
+- `ActivityEndpoint::pin` never worked: its document selected `id` and `type`
+  directly on `ActivityUnion`, which has no such fields ("Cannot query field \"id\"
+  on type \"ActivityUnion\""), and neither it nor `subscribe` selected
+  `__typename`, which `ActivityUnion`'s tagged deserializer requires
+- `ForumEndpoint::toggle_thread_subscription` sent no `subscribe`
+  value while its document declared `Boolean!`, so the API refused it before doing
+  anything. AniList's validator requires the state to reach it — leaving the
+  argument out and passing `null` both come back as "The subscribe field is
+  required", and only a supplied value (or a variable default) gets through — so
+  `ToggleThreadSubscriptionOptions::subscribe` is now a `bool` and
+  the toggle reads the thread's current state and sends the opposite
+- `ForumEndpoint::update_comment` sent no `threadId` while its document declared
+  `Int!`, so it failed with "Variable $threadId of required type Int! was not
+  provided". The reference types the argument `Int`, an update identifies the
+  comment by `id`, and the API accepts the request without it
 
 ## [0.4.0] - 2026-06-04
 

@@ -144,20 +144,22 @@ pub struct SaveThreadCommentOptions<'a> {
 
 /// Options for deleting a thread comment.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteThreadCommentOptions {
     id: u32,
 }
 
 /// Options for subscribing or unsubscribing to a thread.
-#[skip_serializing_none]
+///
+/// The API's own validator requires `subscribe`, so it is not optional here:
+/// leaving it out fails the request with "The subscribe field is required",
+/// even though the reference lists the argument as nullable.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleThreadSubscriptionOptions {
     thread_id: u32,
-    subscribe: Option<bool>,
+    subscribe: bool,
 }
 
 /// Endpoint for forum thread and comment operations.
@@ -487,7 +489,7 @@ impl<'a> ForumEndpoint<'a> {
         self.subscription(
             &ToggleThreadSubscriptionOptions::builder()
                 .thread_id(thread_id)
-                .subscribe(Some(true))
+                .subscribe(true)
                 .build(),
         )
         .await
@@ -498,17 +500,30 @@ impl<'a> ForumEndpoint<'a> {
         self.subscription(
             &ToggleThreadSubscriptionOptions::builder()
                 .thread_id(thread_id)
-                .subscribe(Some(false))
+                .subscribe(false)
                 .build(),
         )
         .await
     }
 
     /// Toggle thread subscription
+    ///
+    /// `ToggleThreadSubscription` takes the state it should end up in rather than
+    /// flipping it, so this reads the thread first and sends the opposite. Use
+    /// [`Self::subscribe_to_thread`] or [`Self::unsubscribe_from_thread`] when the
+    /// state is already known, and [`Self::subscription`] to set it directly — both
+    /// cost one request instead of two.
     pub async fn toggle_thread_subscription(&self, thread_id: u32) -> Result<Thread, AniListError> {
+        let current = self
+            .get_by_id(thread_id)
+            .await?
+            .is_subscribed
+            .unwrap_or(false);
+
         self.subscription(
             &ToggleThreadSubscriptionOptions::builder()
                 .thread_id(thread_id)
+                .subscribe(!current)
                 .build(),
         )
         .await

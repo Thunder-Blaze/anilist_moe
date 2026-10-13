@@ -3,8 +3,6 @@
 //! Requires the `media` feature (enabled by the default `full` feature set).
 
 #[cfg(feature = "media")]
-use anilist_moe::options;
-#[cfg(feature = "media")]
 use anilist_moe::{endpoints::media::FetchMediaOptions, AniListClient, AniListError};
 use std::borrow::Cow;
 

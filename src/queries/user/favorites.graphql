@@ -9,29 +9,24 @@ query GetUserFavorites(
     # Pagination for anime
     $animePage: Int = 1
     $animePerPage: Int = 25
-    $animeSort: [MediaSort]
     # Pagination for manga
     $mangaPage: Int = 1
     $mangaPerPage: Int = 25
-    $mangaSort: [MediaSort]
     # Pagination for characters
     $charactersPage: Int = 1
     $charactersPerPage: Int = 25
-    $charactersSort: [CharacterSort]
     # Pagination for staff
     $staffPage: Int = 1
     $staffPerPage: Int = 25
-    $staffSort: [StaffSort]
     # Pagination for studios
     $studiosPage: Int = 1
     $studiosPerPage: Int = 25
-    $studiosSort: [StudioSort]
 ) {
     User(id: $userId) {
         id
         name
         favourites {
-            anime(page: $animePage, perPage: $animePerPage, sort: $animeSort) @include(if: $fetchAnime) {
+            anime(page: $animePage, perPage: $animePerPage) @include(if: $fetchAnime) {
                 pageInfo {
                     total
                     currentPage
@@ -108,7 +103,7 @@ query GetUserFavorites(
                     description
                 }
             }
-            manga(page: $mangaPage, perPage: $mangaPerPage, sort: $mangaSort) @include(if: $fetchManga) {
+            manga(page: $mangaPage, perPage: $mangaPerPage) @include(if: $fetchManga) {
                 pageInfo {
                     total
                     currentPage
@@ -176,7 +171,7 @@ query GetUserFavorites(
                     description
                 }
             }
-            characters(page: $charactersPage, perPage: $charactersPerPage, sort: $charactersSort) @include(if: $fetchCharacters) {
+            characters(page: $charactersPage, perPage: $charactersPerPage) @include(if: $fetchCharacters) {
                 pageInfo {
                     total
                     currentPage
@@ -256,7 +251,7 @@ query GetUserFavorites(
                     }
                 }
             }
-            staff(page: $staffPage, perPage: $staffPerPage, sort: $staffSort) @include(if: $fetchStaff) {
+            staff(page: $staffPage, perPage: $staffPerPage) @include(if: $fetchStaff) {
                 pageInfo {
                     total
                     currentPage
@@ -364,7 +359,7 @@ query GetUserFavorites(
                     }
                 }
             }
-            studios(page: $studiosPage, perPage: $studiosPerPage, sort: $studiosSort) @include(if: $fetchStudios) {
+            studios(page: $studiosPage, perPage: $studiosPerPage) @include(if: $fetchStudios) {
                 pageInfo {
                     total
                     currentPage
@@ -420,7 +415,7 @@ query GetUserFavorites(
                                 seasonYear
                                 siteUrl
                             }
-                            isMain
+                            isMainStudio
                         }
                     }
                 }

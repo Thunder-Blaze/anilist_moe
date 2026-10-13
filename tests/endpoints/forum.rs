@@ -247,7 +247,7 @@ async fn test_toggle_thread_subscription() {
                 .run(|| async {
                     let options = ToggleThreadSubscriptionOptions::builder()
                         .thread_id(thread_id)
-                        .subscribe(Some(true))
+                        .subscribe(true)
                         .build();
                     client.forum().subscription(&options).await
                 })
@@ -262,7 +262,7 @@ async fn test_toggle_thread_subscription() {
                         .run(|| async {
                             let unsub_options = ToggleThreadSubscriptionOptions::builder()
                                 .thread_id(thread_id)
-                                .subscribe(Some(false))
+                                .subscribe(false)
                                 .build();
                             client.forum().subscription(&unsub_options).await
                         })
