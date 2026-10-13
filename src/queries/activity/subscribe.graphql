@@ -1,5 +1,6 @@
 mutation ToggleActivitySubscription($activityId: Int!, $subscribe: Boolean!) {
     ToggleActivitySubscription(activityId: $activityId, subscribe: $subscribe) {
+        __typename
         ... on ListActivity {
             id
             isSubscribed

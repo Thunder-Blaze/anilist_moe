@@ -1,6 +1,6 @@
 mutation SaveThreadComment(
     $id: Int
-    $threadId: Int!
+    $threadId: Int
     $parentCommentId: Int
     $comment: String!
     $locked: Boolean

@@ -273,7 +273,7 @@ async fn test_toggle_thread_subscription() {
                     let options = options!(
                         ToggleThreadSubscriptionOptions,
                         thread_id => thread_id,
-                        subscribe: Some(true),
+                        subscribe => true,
                     );
                     client.forum().subscription(&options).await
                 })
@@ -289,7 +289,7 @@ async fn test_toggle_thread_subscription() {
                             let unsub_options = options!(
                                 ToggleThreadSubscriptionOptions,
                                 thread_id => thread_id,
-                                subscribe: Some(false),
+                                subscribe => false,
                             );
                             client.forum().subscription(&unsub_options).await
                         })

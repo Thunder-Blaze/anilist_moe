@@ -143,12 +143,15 @@ pub struct DeleteThreadCommentOptions {
 }
 
 /// Options for subscribing or unsubscribing to a thread.
-#[skip_serializing_none]
+///
+/// The API's own validator requires `subscribe`, so it is not optional here:
+/// leaving it out fails the request with "The subscribe field is required",
+/// even though the reference lists the argument as nullable.
 #[derive(Default, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleThreadSubscriptionOptions {
     pub thread_id: u32,
-    pub subscribe: Option<bool>,
+    pub subscribe: bool,
 }
 
 /// Endpoint for forum thread and comment operations.
@@ -479,7 +482,7 @@ impl<'a> ForumEndpoint<'a> {
         self.subscription(&options!(
             ToggleThreadSubscriptionOptions,
             thread_id => thread_id,
-            subscribe: Some(true),
+            subscribe => true,
         ))
         .await
     }
@@ -489,16 +492,28 @@ impl<'a> ForumEndpoint<'a> {
         self.subscription(&options!(
             ToggleThreadSubscriptionOptions,
             thread_id => thread_id,
-            subscribe: Some(false),
+            subscribe => false,
         ))
         .await
     }
 
     /// Toggle thread subscription
+    ///
+    /// `ToggleThreadSubscription` takes the state it should end up in rather than
+    /// flipping it, so this reads the thread first and sends the opposite. Use
+    /// [`Self::subscribe_to_thread`] or [`Self::unsubscribe_from_thread`] when the
+    /// state is already known, and [`Self::subscription`] to set it directly — both
+    /// cost one request instead of two.
     pub async fn toggle_thread_subscription(&self, thread_id: u32) -> Result<Thread, AniListError> {
+        let current = self
+            .get_by_id(thread_id)
+            .await?
+            .is_subscribed
+            .unwrap_or(false);
         self.subscription(&options!(
             ToggleThreadSubscriptionOptions,
             thread_id => thread_id,
+            subscribe => !current,
         ))
         .await
     }
