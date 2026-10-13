@@ -27,8 +27,8 @@ fn an_unset_sort_asks_for_the_id() {
 #[test]
 fn the_id_is_appended_to_a_given_sort() {
     let options = FetchMediaOptions::builder()
-        .media_type(Some(MediaType::Anime))
-        .sort(Some(std::borrow::Cow::Borrowed(&[MediaSort::ScoreDesc])))
+        .media_type(MediaType::Anime)
+        .sort(std::borrow::Cow::Borrowed(&[MediaSort::ScoreDesc]))
         .build();
     assert_eq!(
         wire(&options)["sort"],
@@ -36,10 +36,10 @@ fn the_id_is_appended_to_a_given_sort() {
     );
 
     let two_keys = FetchMediaOptions::builder()
-        .sort(Some(std::borrow::Cow::Borrowed(&[
+        .sort(std::borrow::Cow::Borrowed(&[
             MediaSort::ScoreDesc,
             MediaSort::StartDateDesc,
-        ])))
+        ]))
         .build();
     assert_eq!(
         wire(&two_keys)["sort"],
@@ -51,10 +51,10 @@ fn the_id_is_appended_to_a_given_sort() {
 #[test]
 fn a_sort_that_already_ends_in_the_id_is_not_duplicated() {
     let options = FetchMediaOptions::builder()
-        .sort(Some(std::borrow::Cow::Borrowed(&[
+        .sort(std::borrow::Cow::Borrowed(&[
             MediaSort::PopularityDesc,
             MediaSort::Id,
-        ])))
+        ]))
         .build();
     assert_eq!(
         wire(&options)["sort"],
@@ -65,7 +65,7 @@ fn a_sort_that_already_ends_in_the_id_is_not_duplicated() {
 #[test]
 fn other_fields_are_still_left_out_when_unset() {
     let options = FetchMediaOptions::builder()
-        .search(Some(std::borrow::Cow::Borrowed("Naruto")))
+        .search(std::borrow::Cow::Borrowed("Naruto"))
         .build();
     let wire = wire(&options);
 
@@ -94,9 +94,9 @@ fn an_endpoint_with_a_meaningful_document_default_keeps_it() {
 
     // A sort that is given is still made total.
     let airing = FetchAiringOptions::builder()
-        .sort(Some(std::borrow::Cow::Borrowed(&[
+        .sort(std::borrow::Cow::Borrowed(&[
             anilist_moe::enums::airing::AiringSort::Time,
-        ])))
+        ]))
         .build();
     assert_eq!(wire(&airing)["sort"], serde_json::json!(["TIME", "ID"]));
 }
@@ -108,7 +108,7 @@ fn every_endpoint_that_sorts_on_its_own_is_total() {
 
     let searched = wire(
         &FetchCharacterOptions::builder()
-            .search(Some(std::borrow::Cow::Borrowed("Spike")))
+            .search(std::borrow::Cow::Borrowed("Spike"))
             .build(),
     );
     assert_eq!(searched["sort"], serde_json::json!(["ID"]));
@@ -151,26 +151,26 @@ fn assert_wired(options: &impl serde::Serialize, keys: &[&str], query: &str) {
 fn the_other_filter_suffixes_reach_their_queries() {
     assert_wired(
         &FetchCharacterOptions::builder()
-            .id_in(Some(Cow::Borrowed(&[1])))
+            .id_in(Cow::Borrowed(&[1]))
             .build(),
         &["idIn"],
         anilist_moe::queries::character::FETCH,
     );
     assert_wired(
         &FetchThreadOptions::builder()
-            .id_in(Some(Cow::Borrowed(&[1])))
+            .id_in(Cow::Borrowed(&[1]))
             .build(),
         &["idIn"],
         anilist_moe::queries::forum::FETCH,
     );
     assert_wired(
         &FetchUserMediaListOptions::builder()
-            .username(Some(Cow::Borrowed("a")))
-            .notes(Some(Cow::Borrowed("b")))
-            .started_at(Some(Cow::Borrowed("c")))
-            .completed_at(Some(Cow::Borrowed("d")))
-            .media_id_in(Some(Cow::Borrowed(&[1])))
-            .status_in(Some(Cow::Borrowed(&[MediaListStatus::Current])))
+            .username(Cow::Borrowed("a"))
+            .notes(Cow::Borrowed("b"))
+            .started_at(Cow::Borrowed("c"))
+            .completed_at(Cow::Borrowed("d"))
+            .media_id_in(Cow::Borrowed(&[1]))
+            .status_in(Cow::Borrowed(&[MediaListStatus::Current]))
             .build(),
         &[
             "username",
@@ -197,7 +197,7 @@ fn a_date_filter_is_the_int_the_api_asks_for() {
     // `startedAt` on a media list is a `FuzzyDateInt` — `YYYYMMDD` — not the
     // `FuzzyDate` object the media objects carry.
     let options = FetchMediaListOptions::builder()
-        .started_at(Some(20200101))
+        .started_at(20200101)
         .build();
     assert_eq!(wire(&options)["startedAt"], serde_json::json!(20200101));
     assert!(anilist_moe::queries::medialist::FETCH.contains("$startedAt"));
@@ -208,9 +208,9 @@ fn the_user_lookup_variables_reach_the_query() {
     assert_wired(
         &FetchUserStatsOptions::builder()
             .user_id(1)
-            .sort(Some(Cow::Borrowed(&[
+            .sort(Cow::Borrowed(&[
                 anilist_moe::enums::user::UserStatisticsSort::CountDesc,
-            ])))
+            ]))
             .build(),
         &["userId", "sort"],
         anilist_moe::queries::user::STATS,
@@ -224,8 +224,7 @@ fn the_new_endpoint_options_serialise() {
             &LikesOptions::builder()
                 .likeable_id(7)
                 .like_type(LikeableType::Activity)
-                .page(None)
-                .per_page(Some(5))
+                .per_page(5)
                 .build()
         )["likeableId"],
         serde_json::json!(7)
@@ -233,9 +232,9 @@ fn the_new_endpoint_options_serialise() {
     assert_eq!(
         wire(
             &FetchActivityReplyOptions::builder()
-                .id(Some(3))
-                .activity_id(Some(4))
-                .text_as_html(Some(true))
+                .id(3)
+                .activity_id(4)
+                .text_as_html(true)
                 .build()
         )["activityId"],
         serde_json::json!(4)
@@ -255,18 +254,18 @@ fn the_anichart_and_markdown_options_serialise() {
     assert_eq!(
         wire(
             &UpdateAniChartSettingsOptions::builder()
-                .title_language(Some(Cow::Borrowed("romaji")))
-                .theme(Some(Cow::Borrowed("light")))
+                .title_language(Cow::Borrowed("romaji"))
+                .theme(Cow::Borrowed("light"))
                 .build()
         )["titleLanguage"],
         serde_json::json!("romaji")
     );
     let highlights = wire(
         &UpdateAniChartHighlightsOptions::builder()
-            .highlights(Some(Cow::Borrowed(&[AniChartHighlight {
+            .highlights(Cow::Borrowed(&[AniChartHighlight {
                 media_id: Some(16498),
                 highlight: Some("watched".to_string()),
-            }])))
+            }]))
             .build(),
     );
     assert_eq!(

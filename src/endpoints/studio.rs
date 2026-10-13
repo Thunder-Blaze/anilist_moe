@@ -13,7 +13,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching studios.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchStudioOptions<'a> {
     page: Option<i32>,
@@ -40,7 +43,10 @@ pub struct FetchStudioOptions<'a> {
 /// Options for fetching a single studio by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchStudioOneOptions<'a> {
     id: Option<u32>,
@@ -96,9 +102,9 @@ impl<'a> StudioEndpoint<'a> {
     ) -> Result<Page<Vec<Studio>>, AniListError> {
         self.fetch(
             &FetchStudioOptions::builder()
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[StudioSort::FavouritesDesc])))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[StudioSort::FavouritesDesc]))
                 .build(),
         )
         .await
@@ -113,10 +119,10 @@ impl<'a> StudioEndpoint<'a> {
     ) -> Result<Page<Vec<Studio>>, AniListError> {
         self.fetch(
             &FetchStudioOptions::builder()
-                .search(Some(Cow::Borrowed(query)))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[StudioSort::SearchMatch])))
+                .search(Cow::Borrowed(query))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[StudioSort::SearchMatch]))
                 .build(),
         )
         .await
@@ -124,7 +130,7 @@ impl<'a> StudioEndpoint<'a> {
 
     /// Get studio by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Studio, AniListError> {
-        self.fetch_one(&FetchStudioOneOptions::builder().id(Some(id)).build())
+        self.fetch_one(&FetchStudioOneOptions::builder().id(id).build())
             .await
     }
 }

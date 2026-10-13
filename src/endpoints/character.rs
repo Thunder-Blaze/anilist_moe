@@ -14,7 +14,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching multiple characters with pagination and filters.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchCharacterOptions<'a> {
     page: Option<i32>,
@@ -44,7 +47,10 @@ pub struct FetchCharacterOptions<'a> {
 /// Options for fetching a single character.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchCharacterOneOptions<'a> {
     id: Option<u32>,
@@ -102,9 +108,9 @@ impl<'a> CharacterEndpoint<'a> {
     ) -> Result<Page<Vec<Character>>, AniListError> {
         self.fetch(
             &FetchCharacterOptions::builder()
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[CharacterSort::FavouritesDesc])))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[CharacterSort::FavouritesDesc]))
                 .build(),
         )
         .await
@@ -128,10 +134,10 @@ impl<'a> CharacterEndpoint<'a> {
     ) -> Result<Page<Vec<Character>>, AniListError> {
         self.fetch(
             &FetchCharacterOptions::builder()
-                .search(Some(Cow::Borrowed(query)))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[CharacterSort::SearchMatch])))
+                .search(Cow::Borrowed(query))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[CharacterSort::SearchMatch]))
                 .build(),
         )
         .await
@@ -139,7 +145,7 @@ impl<'a> CharacterEndpoint<'a> {
 
     /// Get character by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Character, AniListError> {
-        self.fetch_one(&FetchCharacterOneOptions::builder().id(Some(id)).build())
+        self.fetch_one(&FetchCharacterOneOptions::builder().id(id).build())
             .await
     }
 
@@ -151,10 +157,10 @@ impl<'a> CharacterEndpoint<'a> {
     ) -> Result<Page<Vec<Character>>, AniListError> {
         self.fetch(
             &FetchCharacterOptions::builder()
-                .is_birthday(Some(true))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[CharacterSort::FavouritesDesc])))
+                .is_birthday(true)
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[CharacterSort::FavouritesDesc]))
                 .build(),
         )
         .await

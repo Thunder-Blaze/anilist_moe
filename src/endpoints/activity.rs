@@ -15,7 +15,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching one activity reply.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityReplyOptions {
     id: Option<u32>,
@@ -29,7 +32,10 @@ pub struct FetchActivityReplyOptions {
 /// activity's `id` is required, and `locked` decides whether it ends up locked.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveListActivityOptions {
     id: u32,
@@ -39,7 +45,10 @@ pub struct SaveListActivityOptions {
 /// Options for fetching activity feed entries.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityOptions<'a> {
     // # Pagination
@@ -51,6 +60,9 @@ pub struct FetchActivityOptions<'a> {
     user_id: Option<u32>,
     messenger_id: Option<u32>,
     media_id: Option<u32>,
+    // the fallback needs to be changed here, otherwise
+    // we'd have "type__opt" as the setter for this field
+    #[builder(default, setter(!strip_option, strip_option(fallback_suffix = "opt")))]
     type_: Option<ActivityType>,
     is_following: Option<bool>,
     has_replies: Option<bool>,
@@ -91,9 +103,13 @@ pub struct FetchActivityOptions<'a> {
 /// Options for fetching a single activity by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityOneOptions {
+    #[builder(!default)]
     id: u32,
     // # HTML rendering options
     text_as_html: Option<bool>,
@@ -103,7 +119,10 @@ pub struct FetchActivityOneOptions {
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
@@ -112,6 +131,7 @@ pub struct FetchActivityRepliesOptions {
 
     // # Filters
     id: Option<u32>,
+    #[builder(!default)]
     activity_id: u32,
 
     // # HTML rendering options
@@ -120,7 +140,6 @@ pub struct FetchActivityRepliesOptions {
 
 /// Options for deleting an activity.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteActivityOptions {
     id: u32,
@@ -128,7 +147,6 @@ pub struct DeleteActivityOptions {
 
 /// Options for deleting an activity reply.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteActivityReplyOptions {
     id: u32,
@@ -136,7 +154,6 @@ pub struct DeleteActivityReplyOptions {
 
 /// Options for pinning or unpinning an activity.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct PinActivityOptions {
     id: u32,
@@ -145,7 +162,6 @@ pub struct PinActivityOptions {
 
 /// Options for subscribing or unsubscribing to an activity.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeActivityOptions {
     /// The activity to subscribe to or unsubscribe from.
@@ -156,11 +172,16 @@ pub struct SubscribeActivityOptions {
 /// Options for saving a message activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMessageActivityOptions<'a> {
     id: Option<u32>,
+    #[builder(!default)]
     message: Cow<'a, str>,
+    #[builder(!default)]
     recipient_id: u32,
     private: Option<bool>,
     /// Mod only.
@@ -172,10 +193,14 @@ pub struct SaveMessageActivityOptions<'a> {
 /// Options for saving a text activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveTextActivityOptions<'a> {
     id: Option<u32>,
+    #[builder(!default)]
     text: Cow<'a, str>,
     /// Mod only.
     locked: Option<bool>,
@@ -184,11 +209,16 @@ pub struct SaveTextActivityOptions<'a> {
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveActivityReplyOptions<'a> {
     id: Option<u32>,
+    #[builder(!default)]
     text: Cow<'a, str>,
+    #[builder(!default)]
     activity_id: u32,
     /// Mod only: send it from the moderator account.
     as_mod: Option<bool>,
@@ -327,8 +357,8 @@ impl<'a> ActivityEndpoint<'a> {
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
         self.fetch(
             &FetchActivityOptions::builder()
-                .page(page)
-                .per_page(per_page)
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -342,10 +372,10 @@ impl<'a> ActivityEndpoint<'a> {
     ) -> Result<Page<Vec<ActivityUnion>>, AniListError> {
         self.fetch(
             &FetchActivityOptions::builder()
-                .is_following(Some(true))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[ActivitySort::IdDesc])))
+                .is_following(true)
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[ActivitySort::IdDesc]))
                 .build(),
         )
         .await
@@ -378,7 +408,7 @@ impl<'a> ActivityEndpoint<'a> {
             &SaveMessageActivityOptions::builder()
                 .recipient_id(recipient_id)
                 .message(Cow::Borrowed(message))
-                .private(private)
+                .private_opt(private)
                 .build(),
         )
         .await

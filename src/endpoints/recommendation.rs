@@ -14,7 +14,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching media recommendations.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchRecommendationOptions<'a> {
     page: Option<i32>,
@@ -38,7 +41,6 @@ pub struct FetchRecommendationOptions<'a> {
 
 /// Options for saving a recommendation rating.
 #[derive(Default, Debug, Serialize, Deserialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveRecommendationOptions {
     media_id: u32,
@@ -83,10 +85,10 @@ impl<'a> RecommendationEndpoint<'a> {
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
         self.fetch(
             &FetchRecommendationOptions::builder()
-                .media_id(Some(media_id))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[RecommendationSort::RatingDesc])))
+                .media_id(media_id)
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[RecommendationSort::RatingDesc]))
                 .build(),
         )
         .await
@@ -101,10 +103,10 @@ impl<'a> RecommendationEndpoint<'a> {
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
         self.fetch(
             &FetchRecommendationOptions::builder()
-                .user_id(Some(user_id))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[RecommendationSort::IdDesc])))
+                .user_id(user_id)
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[RecommendationSort::IdDesc]))
                 .build(),
         )
         .await
@@ -118,9 +120,9 @@ impl<'a> RecommendationEndpoint<'a> {
     ) -> Result<Page<Vec<Recommendation>>, AniListError> {
         self.fetch(
             &FetchRecommendationOptions::builder()
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[RecommendationSort::IdDesc])))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[RecommendationSort::IdDesc]))
                 .build(),
         )
         .await

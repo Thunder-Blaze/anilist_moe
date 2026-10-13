@@ -19,14 +19,12 @@ use typed_builder::TypedBuilder;
 #[derive(Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleLikeOptions {
-    #[builder(default)]
     id: u32,
     like_type: LikeableType,
 }
 
 /// Options for toggling follow status of a user.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleFollowOptions {
     user_id: u32,
@@ -35,7 +33,10 @@ pub struct ToggleFollowOptions {
 /// Options for adding or removing favourites.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleFavouriteOptions {
     anime_id: Option<u32>,
@@ -47,7 +48,6 @@ pub struct ToggleFavouriteOptions {
 
 /// Options for rendering markdown the way AniList renders it.
 #[derive(Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct MarkdownOptions<'a> {
     markdown: Cow<'a, str>,
@@ -56,7 +56,10 @@ pub struct MarkdownOptions<'a> {
 /// Options for the external link source list.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalLinkSourceOptions {
     id: Option<u32>,
@@ -68,7 +71,10 @@ pub struct ExternalLinkSourceOptions {
 /// Options for the AniChart settings.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAniChartSettingsOptions<'a> {
     title_language: Option<Cow<'a, str>>,
@@ -80,7 +86,10 @@ pub struct UpdateAniChartSettingsOptions<'a> {
 /// Options for the AniChart highlights.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAniChartHighlightsOptions<'a> {
     highlights: Option<Cow<'a, [AniChartHighlight]>>,
@@ -88,7 +97,10 @@ pub struct UpdateAniChartHighlightsOptions<'a> {
 
 /// Options for the media tag list. `status` asks for tags above a rank.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct MediaTagsOptions {
     /// Mod only.
@@ -98,14 +110,17 @@ pub struct MediaTagsOptions {
 /// Options for listing the users who liked something.
 #[skip_serializing_none]
 #[derive(Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct LikesOptions {
-    #[builder(default)]
+    #[builder(!default)]
     likeable_id: u32,
+    #[builder(!default)]
     like_type: LikeableType,
-    #[builder(default)]
     page: Option<i32>,
-    #[builder(default)]
     per_page: Option<i32>,
 }
 
@@ -116,7 +131,10 @@ pub struct LikesOptions {
 /// should be ordered by (ascending)".
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateFavouriteOrderOptions<'a> {
     anime_ids: Option<Cow<'a, [u32]>>,
@@ -294,29 +312,21 @@ impl<'a> CommonEndpoint<'a> {
 
     /// Add or remove anime from favorites
     pub async fn favourite_anime(&self, anime_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(
-            &ToggleFavouriteOptions::builder()
-                .anime_id(Some(anime_id))
-                .build(),
-        )
-        .await
+        self.toggle_favourite(&ToggleFavouriteOptions::builder().anime_id(anime_id).build())
+            .await
     }
 
     /// Add or remove manga from favorites
     pub async fn favourite_manga(&self, manga_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(
-            &ToggleFavouriteOptions::builder()
-                .manga_id(Some(manga_id))
-                .build(),
-        )
-        .await
+        self.toggle_favourite(&ToggleFavouriteOptions::builder().manga_id(manga_id).build())
+            .await
     }
 
     /// Add or remove character from favorites
     pub async fn favourite_character(&self, character_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(
             &ToggleFavouriteOptions::builder()
-                .character_id(Some(character_id))
+                .character_id(character_id)
                 .build(),
         )
         .await
@@ -324,19 +334,15 @@ impl<'a> CommonEndpoint<'a> {
 
     /// Add or remove staff from favorites
     pub async fn favourite_staff(&self, staff_id: u32) -> Result<Favourites, AniListError> {
-        self.toggle_favourite(
-            &ToggleFavouriteOptions::builder()
-                .staff_id(Some(staff_id))
-                .build(),
-        )
-        .await
+        self.toggle_favourite(&ToggleFavouriteOptions::builder().staff_id(staff_id).build())
+            .await
     }
 
     /// Add or remove studio from favorites
     pub async fn favourite_studio(&self, studio_id: u32) -> Result<Favourites, AniListError> {
         self.toggle_favourite(
             &ToggleFavouriteOptions::builder()
-                .studio_id(Some(studio_id))
+                .studio_id(studio_id)
                 .build(),
         )
         .await

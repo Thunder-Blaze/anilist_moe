@@ -16,7 +16,7 @@ async fn test_fetch_staff_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStaffOptions::builder()
-                .search(Some(Cow::Borrowed("Hayao")))
+                .search(Cow::Borrowed("Hayao"))
                 .build();
             client.staff().fetch(&options).await
         })
@@ -53,7 +53,7 @@ async fn test_fetch_staff_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOptions::builder().id(Some(95269)).build(); // Hayao Miyazaki
+            let options = FetchStaffOptions::builder().id(95269).build(); // Hayao Miyazaki
             client.staff().fetch(&options).await
         })
         .await;
@@ -82,7 +82,7 @@ async fn test_fetch_one_staff() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOneOptions::builder().id(Some(95269)).build();
+            let options = FetchStaffOneOptions::builder().id(95269).build();
             client.staff().fetch_one(&options).await
         })
         .await;
@@ -106,7 +106,7 @@ async fn test_staff_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchStaffOptions::builder().id(Some(95269)).build();
+            let options = FetchStaffOptions::builder().id(95269).build();
             client.staff().fetch(&options).await
         })
         .await;
@@ -149,8 +149,8 @@ async fn test_staff_with_popularity() {
     let result = h
         .run(|| async {
             let options = FetchStaffOptions::builder()
-                .search(Some(Cow::Borrowed("Kamiya")))
-                .per_page(Some(5))
+                .search(Cow::Borrowed("Kamiya"))
+                .per_page(5)
                 .build();
             client.staff().fetch(&options).await
         })

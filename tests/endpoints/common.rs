@@ -85,7 +85,7 @@ async fn test_toggle_favourite() {
 
     let result = h
         .run(|| async {
-            let options = ToggleFavouriteOptions::builder().anime_id(Some(1)).build();
+            let options = ToggleFavouriteOptions::builder().anime_id(1).build();
             client.common().toggle_favourite(&options).await
         })
         .await;
@@ -154,8 +154,8 @@ async fn test_likes() {
             let options = LikesOptions::builder()
                 .likeable_id(870493538)
                 .like_type(LikeableType::Activity)
-                .page(Some(1))
-                .per_page(Some(5))
+                .page(1)
+                .per_page(5)
                 .build();
             client.common().likes(&options).await
         })
@@ -196,9 +196,8 @@ async fn test_external_link_sources() {
     let result = h
         .run(|| async {
             let options = ExternalLinkSourceOptions::builder()
-                .id(None)
-                .link_type(Some(ExternalLinkType::Streaming))
-                .media_type(Some(ExternalLinkMediaType::Anime))
+                .link_type(ExternalLinkType::Streaming)
+                .media_type(ExternalLinkMediaType::Anime)
                 .build();
             client.common().external_link_sources(&options).await
         })

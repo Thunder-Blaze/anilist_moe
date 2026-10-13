@@ -15,7 +15,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching reviews.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchReviewOptions<'a> {
     page: Option<i32>,
@@ -39,10 +42,14 @@ pub struct FetchReviewOptions<'a> {
 /// Options for creating or updating a review.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveReviewOptions<'a> {
     id: Option<u32>,
+    #[builder(!default)]
     media_id: u32,
     score: Option<i32>,
     summary: Option<Cow<'a, str>>,
@@ -54,7 +61,6 @@ pub struct SaveReviewOptions<'a> {
 
 /// Options for deleting a review.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteReviewOptions {
     id: u32,
@@ -62,7 +68,6 @@ pub struct DeleteReviewOptions {
 
 /// Options for rating a review.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
 #[serde(rename_all = "camelCase")]
 pub struct RateReviewOptions {
     review_id: u32,
@@ -118,10 +123,10 @@ impl<'a> ReviewEndpoint<'a> {
     ) -> Result<Page<Vec<Review>>, AniListError> {
         self.fetch(
             &FetchReviewOptions::builder()
-                .media_id(Some(media_id))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[ReviewSort::RatingDesc])))
+                .media_id(media_id)
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[ReviewSort::RatingDesc]))
                 .build(),
         )
         .await
@@ -136,10 +141,10 @@ impl<'a> ReviewEndpoint<'a> {
     ) -> Result<Page<Vec<Review>>, AniListError> {
         self.fetch(
             &FetchReviewOptions::builder()
-                .user_id(Some(user_id))
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[ReviewSort::IdDesc])))
+                .user_id(user_id)
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[ReviewSort::IdDesc]))
                 .build(),
         )
         .await
@@ -153,9 +158,9 @@ impl<'a> ReviewEndpoint<'a> {
     ) -> Result<Page<Vec<Review>>, AniListError> {
         self.fetch(
             &FetchReviewOptions::builder()
-                .page(page)
-                .per_page(per_page)
-                .sort(Some(Cow::Borrowed(&[ReviewSort::IdDesc])))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .sort(Cow::Borrowed(&[ReviewSort::IdDesc]))
                 .build(),
         )
         .await
@@ -164,7 +169,7 @@ impl<'a> ReviewEndpoint<'a> {
     /// Get review by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Review, AniListError> {
         let mut response = self
-            .fetch(&FetchReviewOptions::builder().id(Some(id)).build())
+            .fetch(&FetchReviewOptions::builder().id(id).build())
             .await?;
 
         if response.data.is_empty() {
@@ -186,10 +191,10 @@ impl<'a> ReviewEndpoint<'a> {
         self.save(
             &SaveReviewOptions::builder()
                 .media_id(media_id)
-                .score(Some(score))
-                .summary(Some(Cow::Borrowed(summary)))
-                .body(Some(Cow::Borrowed(body)))
-                .private(private)
+                .score(score)
+                .summary(Cow::Borrowed(summary))
+                .body(Cow::Borrowed(body))
+                .private_opt(private)
                 .build(),
         )
         .await

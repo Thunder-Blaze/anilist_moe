@@ -24,7 +24,7 @@ async fn test_fetch_activities() {
 
     let result = h
         .run(|| async {
-            let options = FetchActivityOptions::builder().per_page(Some(5)).build();
+            let options = FetchActivityOptions::builder().per_page(5).build();
             client.activity().fetch(&options).await
         })
         .await;
@@ -52,8 +52,8 @@ async fn test_fetch_activities_by_user() {
     let result = h
         .run(|| async {
             let options = FetchActivityOptions::builder()
-                .user_id(Some(5429396))
-                .per_page(Some(5))
+                .user_id(5429396)
+                .per_page(5)
                 .build();
             client.activity().fetch(&options).await
         })
@@ -134,7 +134,7 @@ async fn test_text_activity_full_lifecycle() {
     let modify_result = h
         .run(|| async {
             let modify_options = SaveTextActivityOptions::builder()
-                .id(Some(activity_id))
+                .id(activity_id)
                 .text("Modified test activity from anilist_moe library".into())
                 .build();
             client.activity().save_text_activity(&modify_options).await
@@ -207,7 +207,7 @@ async fn test_message_activity_full_lifecycle() {
             let save_options = SaveMessageActivityOptions::builder()
                 .message("Heya - test from anilist_moe".into())
                 .recipient_id(user_id)
-                .private(Some(true))
+                .private(true)
                 .build();
             client.activity().save_message_activity(&save_options).await
         })
@@ -235,10 +235,10 @@ async fn test_message_activity_full_lifecycle() {
     let modify_result = h
         .run(|| async {
             let modify_options = SaveMessageActivityOptions::builder()
-                .id(Some(activity_id))
+                .id(activity_id)
                 .message("Modified message from anilist_moe".into())
                 .recipient_id(user_id)
-                .private(Some(true))
+                .private(true)
                 .build();
 
             client
@@ -339,9 +339,7 @@ async fn test_activity_reply() {
     println!("Step 2: Fetching the reply by id...");
     let single = h
         .run(|| async {
-            let options = FetchActivityReplyOptions::builder()
-                .id(Some(reply_id))
-                .build();
+            let options = FetchActivityReplyOptions::builder().id(reply_id).build();
             client.activity().fetch_reply(&options).await
         })
         .await;
@@ -365,8 +363,8 @@ async fn test_activity_reply() {
         .run(|| async {
             let fetch_options = FetchActivityRepliesOptions::builder()
                 .activity_id(activity_id)
-                .page(Some(1))
-                .per_page(Some(10))
+                .page(1)
+                .per_page(10)
                 .build();
             client.activity().fetch_replies(&fetch_options).await
         })

@@ -15,7 +15,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching media list entries.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaListOptions<'a> {
     id: Option<u32>,
@@ -67,7 +70,10 @@ pub struct FetchMediaListOptions<'a> {
 /// even though the schema marks both as optional.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchMediaListCollectionOptions<'a> {
     user_id: Option<u32>,
@@ -109,7 +115,10 @@ pub struct DeleteCustomListOptions<'a> {
 /// Options for creating or updating a media list entry.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListOptions<'a> {
     id: Option<u32>,
@@ -133,7 +142,10 @@ pub struct SaveMediaListOptions<'a> {
 /// Options for bulk updating multiple media list entries.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct SaveMediaListMultipleOptions<'a> {
     status: Option<MediaListStatus>,
@@ -154,7 +166,10 @@ pub struct SaveMediaListMultipleOptions<'a> {
 
 /// Options for deleting a media list entry.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMediaListOptions {
     pub id: u32,
@@ -246,12 +261,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(Some(Cow::Borrowed(username)))
-                .media_type(Some(MediaType::Anime))
-                .status(status)
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name(Cow::Borrowed(username))
+                .media_type(MediaType::Anime)
+                .status_opt(status)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -267,12 +282,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(Some(Cow::Borrowed(username)))
-                .media_type(Some(MediaType::Manga))
-                .status(status)
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name(Cow::Borrowed(username))
+                .media_type(MediaType::Manga)
+                .status_opt(status)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -287,11 +302,11 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .media_type(Some(MediaType::Anime))
-                .status(status)
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .media_type(MediaType::Anime)
+                .status_opt(status)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -306,11 +321,11 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .media_type(Some(MediaType::Manga))
-                .status(status)
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .media_type(MediaType::Manga)
+                .status_opt(status)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -325,12 +340,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(user_name.map(Cow::Borrowed))
-                .media_type(Some(MediaType::Anime))
-                .status(Some(MediaListStatus::Current))
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name_opt(user_name.map(Cow::Borrowed))
+                .media_type(MediaType::Anime)
+                .status(MediaListStatus::Current)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -345,12 +360,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(user_name.map(Cow::Borrowed))
-                .media_type(Some(MediaType::Manga))
-                .status(Some(MediaListStatus::Current))
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name_opt(user_name.map(Cow::Borrowed))
+                .media_type(MediaType::Manga)
+                .status(MediaListStatus::Current)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -365,12 +380,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(user_name.map(Cow::Borrowed))
-                .media_type(Some(MediaType::Anime))
-                .status(Some(MediaListStatus::Completed))
-                .sort(Some(Cow::Borrowed(&[MediaListSort::ScoreDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name_opt(user_name.map(Cow::Borrowed))
+                .media_type(MediaType::Anime)
+                .status(MediaListStatus::Completed)
+                .sort(Cow::Borrowed(&[MediaListSort::ScoreDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -385,12 +400,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(user_name.map(Cow::Borrowed))
-                .media_type(Some(MediaType::Manga))
-                .status(Some(MediaListStatus::Completed))
-                .sort(Some(Cow::Borrowed(&[MediaListSort::ScoreDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name_opt(user_name.map(Cow::Borrowed))
+                .media_type(MediaType::Manga)
+                .status(MediaListStatus::Completed)
+                .sort(Cow::Borrowed(&[MediaListSort::ScoreDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -405,12 +420,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(user_name.map(Cow::Borrowed))
-                .media_type(Some(MediaType::Anime))
-                .status(Some(MediaListStatus::Planning))
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name_opt(user_name.map(Cow::Borrowed))
+                .media_type(MediaType::Anime)
+                .status(MediaListStatus::Planning)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -425,12 +440,12 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<Page<Vec<MediaList>>, AniListError> {
         self.fetch(
             &FetchMediaListOptions::builder()
-                .user_name(user_name.map(Cow::Borrowed))
-                .media_type(Some(MediaType::Manga))
-                .status(Some(MediaListStatus::Planning))
-                .sort(Some(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .user_name_opt(user_name.map(Cow::Borrowed))
+                .media_type(MediaType::Manga)
+                .status(MediaListStatus::Planning)
+                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -444,8 +459,8 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<MediaList, AniListError> {
         self.save(
             &SaveMediaListOptions::builder()
-                .media_id(Some(media_id))
-                .status(Some(status))
+                .media_id(media_id)
+                .status(status)
                 .build(),
         )
         .await
@@ -459,8 +474,8 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<MediaList, AniListError> {
         self.save(
             &SaveMediaListOptions::builder()
-                .media_id(Some(media_id))
-                .status(Some(status))
+                .media_id(media_id)
+                .status(status)
                 .build(),
         )
         .await
@@ -474,8 +489,8 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<MediaList, AniListError> {
         self.save(
             &SaveMediaListOptions::builder()
-                .id(Some(entry_id))
-                .progress(Some(progress))
+                .id(entry_id)
+                .progress(progress)
                 .build(),
         )
         .await
@@ -485,8 +500,8 @@ impl<'a> MediaListEndpoint<'a> {
     pub async fn update_score(&self, entry_id: u32, score: f64) -> Result<MediaList, AniListError> {
         self.save(
             &SaveMediaListOptions::builder()
-                .id(Some(entry_id))
-                .score(Some(score))
+                .id(entry_id)
+                .score(score)
                 .build(),
         )
         .await
@@ -500,8 +515,8 @@ impl<'a> MediaListEndpoint<'a> {
     ) -> Result<MediaList, AniListError> {
         self.save(
             &SaveMediaListOptions::builder()
-                .id(Some(entry_id))
-                .status(Some(status))
+                .id(entry_id)
+                .status(status)
                 .build(),
         )
         .await

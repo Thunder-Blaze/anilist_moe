@@ -22,9 +22,9 @@ async fn test_fetch_media_with_search() {
     let result = h
         .run(|| async {
             let options = FetchMediaOptions::builder()
-                .search(Some("Naruto".into()))
-                .media_type(Some(MediaType::Anime))
-                .per_page(Some(5))
+                .search("Naruto".into())
+                .media_type(MediaType::Anime)
+                .per_page(5)
                 .build();
             client.media().fetch(&options).await
         })
@@ -81,7 +81,7 @@ async fn test_fetch_media_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions::builder().id(Some(1)).build();
+            let options = FetchMediaOptions::builder().id(1).build();
             client.media().fetch(&options).await
         })
         .await;
@@ -121,7 +121,7 @@ async fn test_fetch_one_media() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOneOptions::builder().id(Some(1)).build();
+            let options = FetchMediaOneOptions::builder().id(1).build();
             client.media().fetch_one(&options).await
         })
         .await;
@@ -145,7 +145,7 @@ async fn test_media_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions::builder().id(Some(1)).build();
+            let options = FetchMediaOptions::builder().id(1).build();
             client.media().fetch(&options).await
         })
         .await;
@@ -196,10 +196,10 @@ async fn test_fetch_media_pagination() {
     let result1 = h
         .run(|| async {
             let options = FetchMediaOptions::builder()
-                .media_type(Some(MediaType::Anime))
-                .per_page(Some(5))
-                .page(Some(1))
-                .sort(Some(Cow::Borrowed(&[MediaSort::IdDesc])))
+                .media_type(MediaType::Anime)
+                .per_page(5)
+                .page(1)
+                .sort(Cow::Borrowed(&[MediaSort::IdDesc]))
                 .build();
             client.media().fetch(&options).await
         })
@@ -213,10 +213,10 @@ async fn test_fetch_media_pagination() {
     let result2 = h
         .run(|| async {
             let options = FetchMediaOptions::builder()
-                .media_type(Some(MediaType::Anime))
-                .per_page(Some(5))
-                .page(Some(2))
-                .sort(Some(Cow::Borrowed(&[MediaSort::IdDesc])))
+                .media_type(MediaType::Anime)
+                .per_page(5)
+                .page(2)
+                .sort(Cow::Borrowed(&[MediaSort::IdDesc]))
                 .build();
             client.media().fetch(&options).await
         })
@@ -373,7 +373,7 @@ async fn test_nonexistent_media() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaOptions::builder().id(Some(999999999)).build();
+            let options = FetchMediaOptions::builder().id(999999999).build();
             client.media().fetch(&options).await
         })
         .await;
@@ -404,8 +404,8 @@ async fn test_fetch_media_trends() {
     let result = h
         .run(|| async {
             let options = FetchMediaTrendOptions::builder()
-                .media_id(Some(16498))
-                .per_page(Some(5))
+                .media_id(16498)
+                .per_page(5)
                 .build();
             client.media().fetch_trends(&options).await
         })
@@ -432,9 +432,7 @@ async fn test_fetch_one_media_trend() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaTrendOptions::builder()
-                .media_id(Some(16498))
-                .build();
+            let options = FetchMediaTrendOptions::builder().media_id(16498).build();
             client.media().fetch_trend_one(&options).await
         })
         .await;

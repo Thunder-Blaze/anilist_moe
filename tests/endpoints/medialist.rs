@@ -18,8 +18,8 @@ async fn test_fetch_media_list() {
     let result = h
         .run(|| async {
             let options = FetchMediaListOptions::builder()
-                .user_id(Some(3225))
-                .per_page(Some(5))
+                .user_id(3225)
+                .per_page(5)
                 .build();
             client.medialist().fetch(&options).await
         })
@@ -50,9 +50,9 @@ async fn test_fetch_media_list_by_media() {
     let result = h
         .run(|| async {
             let options = FetchMediaListOptions::builder()
-                .media_id(Some(1)) // Cowboy Bebop
-                .per_page(Some(5))
-                .is_following(Some(true))
+                .media_id(1) // Cowboy Bebop
+                .per_page(5)
+                .is_following(true)
                 .build();
             client.medialist().fetch(&options).await
         })
@@ -84,8 +84,8 @@ async fn test_media_list_data_types() {
     let result = h
         .run(|| async {
             let options = FetchMediaListOptions::builder()
-                .user_id(Some(3225))
-                .per_page(Some(1))
+                .user_id(3225)
+                .per_page(1)
                 .build();
             client.medialist().fetch(&options).await
         })
@@ -119,8 +119,8 @@ async fn test_save_media_list() {
     let result = h
         .run(|| async {
             let options = SaveMediaListOptions::builder()
-                .media_id(Some(1))
-                .status(Some(MediaListStatus::Planning))
+                .media_id(1)
+                .status(MediaListStatus::Planning)
                 .build();
             client.medialist().save(&options).await
         })
@@ -151,8 +151,8 @@ async fn test_delete_media_list() {
     let save_result = h
         .run(|| async {
             let options = SaveMediaListOptions::builder()
-                .media_id(Some(20))
-                .status(Some(MediaListStatus::Planning))
+                .media_id(20)
+                .status(MediaListStatus::Planning)
                 .build();
             client.medialist().save(&options).await
         })
@@ -184,6 +184,7 @@ async fn test_delete_media_list() {
         }
     }
 }
+
 #[tokio::test]
 async fn test_fetch_collection() {
     let h = TestHarness::new();
@@ -192,8 +193,8 @@ async fn test_fetch_collection() {
     let result = h
         .run(|| async {
             let options = FetchMediaListCollectionOptions::builder()
-                .user_id(Some(3225))
-                .media_type(Some(MediaType::Anime))
+                .user_id(3225)
+                .media_type(MediaType::Anime)
                 .build();
             client.medialist().fetch_collection(&options).await
         })
@@ -232,7 +233,7 @@ async fn test_fetch_one_media_list_entry() {
 
     let result = h
         .run(|| async {
-            let options = FetchMediaListOptions::builder().user_id(Some(3225)).build();
+            let options = FetchMediaListOptions::builder().user_id(3225).build();
             client.medialist().fetch_one(&options).await
         })
         .await;

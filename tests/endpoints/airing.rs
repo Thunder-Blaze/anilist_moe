@@ -14,7 +14,7 @@ async fn test_fetch_airing_schedules() {
 
     let result = h
         .run(|| async {
-            let options = FetchAiringOptions::builder().per_page(Some(10)).build();
+            let options = FetchAiringOptions::builder().per_page(10).build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -53,10 +53,7 @@ async fn test_fetch_airing_pagination() {
     // Fetch page 1
     let result1 = h
         .run(|| async {
-            let options = FetchAiringOptions::builder()
-                .per_page(Some(5))
-                .page(Some(1))
-                .build();
+            let options = FetchAiringOptions::builder().per_page(5).page(1).build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -72,10 +69,7 @@ async fn test_fetch_airing_pagination() {
     // Fetch page 2
     let result2 = h
         .run(|| async {
-            let options = FetchAiringOptions::builder()
-                .per_page(Some(5))
-                .page(Some(2))
-                .build();
+            let options = FetchAiringOptions::builder().per_page(5).page(2).build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -110,7 +104,7 @@ async fn test_airing_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchAiringOptions::builder().per_page(Some(1)).build();
+            let options = FetchAiringOptions::builder().per_page(1).build();
             client.airing().fetch(&options).await
         })
         .await;
@@ -155,8 +149,8 @@ async fn test_fetch_one_airing_schedule() {
                 .airing()
                 .fetch(
                     &FetchAiringOptions::builder()
-                        .not_yet_aired(Some(true))
-                        .per_page(Some(1))
+                        .not_yet_aired(true)
+                        .per_page(1)
                         .build(),
                 )
                 .await?;
@@ -164,7 +158,7 @@ async fn test_fetch_one_airing_schedule() {
             let id = listed.id.expect("a schedule id");
             let one = client
                 .airing()
-                .fetch_one(&FetchAiringOptions::builder().id(Some(id)).build())
+                .fetch_one(&FetchAiringOptions::builder().id(id).build())
                 .await?;
             Ok::<_, anilist_moe::AniListError>((id, listed.media_id, one))
         })

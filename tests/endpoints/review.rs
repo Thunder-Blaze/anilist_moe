@@ -16,7 +16,7 @@ async fn test_fetch_reviews() {
 
     let result = h
         .run(|| async {
-            let options = FetchReviewOptions::builder().per_page(Some(5)).build();
+            let options = FetchReviewOptions::builder().per_page(5).build();
             client.review().fetch(&options).await
         })
         .await;
@@ -41,8 +41,8 @@ async fn test_fetch_reviews_by_media() {
     let result = h
         .run(|| async {
             let options = FetchReviewOptions::builder()
-                .media_id(Some(1)) // Cowboy Bebop
-                .per_page(Some(5))
+                .media_id(1) // Cowboy Bebop
+                .per_page(5)
                 .build();
             client.review().fetch(&options).await
         })
@@ -70,7 +70,7 @@ async fn test_review_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchReviewOptions::builder().per_page(Some(1)).build();
+            let options = FetchReviewOptions::builder().per_page(1).build();
             client.review().fetch(&options).await
         })
         .await;
@@ -100,7 +100,7 @@ async fn test_rate_review() {
     // First fetch a review to rate
     let fetch_result = h
         .run(|| async {
-            let options = FetchReviewOptions::builder().per_page(Some(1)).build();
+            let options = FetchReviewOptions::builder().per_page(1).build();
             client.review().fetch(&options).await
         })
         .await;

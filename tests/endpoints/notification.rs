@@ -14,9 +14,7 @@ async fn test_fetch_notifications() {
 
     let result = h
         .run(|| async {
-            let options = NotificationSearchOptions::builder()
-                .per_page(Some(5))
-                .build();
+            let options = NotificationSearchOptions::builder().per_page(5).build();
             client.notification().fetch(&options).await
         })
         .await;
@@ -45,9 +43,7 @@ async fn test_notification_data_types() {
 
     let result = h
         .run(|| async {
-            let options = NotificationSearchOptions::builder()
-                .per_page(Some(1))
-                .build();
+            let options = NotificationSearchOptions::builder().per_page(1).build();
             client.notification().fetch(&options).await
         })
         .await;

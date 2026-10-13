@@ -13,7 +13,10 @@ use typed_builder::TypedBuilder;
 /// Options for searching and filtering notifications.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationSearchOptions<'a> {
     page: Option<i32>,
@@ -55,8 +58,8 @@ impl<'a> NotificationEndpoint<'a> {
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
         self.fetch(
             &NotificationSearchOptions::builder()
-                .page(page)
-                .per_page(per_page)
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -70,9 +73,9 @@ impl<'a> NotificationEndpoint<'a> {
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
         self.fetch(
             &NotificationSearchOptions::builder()
-                .page(page)
-                .per_page(per_page)
-                .reset_notification_count(Some(true))
+                .page_opt(page)
+                .per_page_opt(per_page)
+                .reset_notification_count(true)
                 .build(),
         )
         .await
@@ -87,9 +90,9 @@ impl<'a> NotificationEndpoint<'a> {
     ) -> Result<Page<Vec<NotificationUnion>>, AniListError> {
         self.fetch(
             &NotificationSearchOptions::builder()
-                .notification_type(Some(notification_type))
-                .page(page)
-                .per_page(per_page)
+                .notification_type(notification_type)
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await

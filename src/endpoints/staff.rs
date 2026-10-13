@@ -13,7 +13,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching staff members.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchStaffOptions<'a> {
     id: Option<u32>,
@@ -51,7 +54,10 @@ pub struct FetchStaffOptions<'a> {
 /// Options for fetching a single staff member by ID.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchStaffOneOptions<'a> {
     id: Option<u32>,
@@ -112,9 +118,9 @@ impl<'a> StaffEndpoint<'a> {
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(
             &FetchStaffOptions::builder()
-                .sort(Some(Cow::Borrowed(&[StaffSort::FavouritesDesc])))
-                .page(page)
-                .per_page(per_page)
+                .sort(Cow::Borrowed(&[StaffSort::FavouritesDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -138,10 +144,10 @@ impl<'a> StaffEndpoint<'a> {
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(
             &FetchStaffOptions::builder()
-                .search(Some(Cow::Borrowed(query)))
-                .sort(Some(Cow::Borrowed(&[StaffSort::SearchMatch])))
-                .page(page)
-                .per_page(per_page)
+                .search(Cow::Borrowed(query))
+                .sort(Cow::Borrowed(&[StaffSort::SearchMatch]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -149,7 +155,7 @@ impl<'a> StaffEndpoint<'a> {
 
     /// Get staff by ID
     pub async fn get_by_id(&self, id: u32) -> Result<Staff, AniListError> {
-        self.fetch_one(&FetchStaffOneOptions::builder().id(Some(id)).build())
+        self.fetch_one(&FetchStaffOneOptions::builder().id(id).build())
             .await
     }
 
@@ -161,10 +167,10 @@ impl<'a> StaffEndpoint<'a> {
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(
             &FetchStaffOptions::builder()
-                .is_birthday(Some(true))
-                .sort(Some(Cow::Borrowed(&[StaffSort::FavouritesDesc])))
-                .page(page)
-                .per_page(per_page)
+                .is_birthday(true)
+                .sort(Cow::Borrowed(&[StaffSort::FavouritesDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await

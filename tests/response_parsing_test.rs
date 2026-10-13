@@ -88,9 +88,9 @@ async fn media_page_parses_the_requested_fields() {
         .media()
         .fetch(
             &FetchMediaOptions::builder()
-                .media_type(Some(MediaType::Anime))
-                .page(Some(1))
-                .per_page(Some(2))
+                .media_type(MediaType::Anime)
+                .page(1)
+                .per_page(2)
                 .build(),
         )
         .await
@@ -137,8 +137,8 @@ async fn media_list_page_parses_the_requested_fields() {
         .medialist()
         .fetch(
             &FetchMediaListOptions::builder()
-                .user_name(Some(std::borrow::Cow::Borrowed("someone")))
-                .status(Some(MediaListStatus::Completed))
+                .user_name(std::borrow::Cow::Borrowed("someone"))
+                .status(MediaListStatus::Completed)
                 .build(),
         )
         .await
@@ -186,7 +186,7 @@ async fn user_page_parses_the_requested_fields() {
         .user()
         .fetch(
             &FetchUserOptions::builder()
-                .search(Some(std::borrow::Cow::Borrowed("someone")))
+                .search(std::borrow::Cow::Borrowed("someone"))
                 .build(),
         )
         .await
@@ -234,8 +234,8 @@ async fn character_page_parses_the_requested_fields() {
         .character()
         .fetch(
             &FetchCharacterOptions::builder()
-                .search(Some(std::borrow::Cow::Borrowed("spike")))
-                .include_media(Some(true))
+                .search(std::borrow::Cow::Borrowed("spike"))
+                .include_media(true)
                 .build(),
         )
         .await
@@ -292,8 +292,8 @@ async fn staff_page_parses_the_requested_fields() {
         .staff()
         .fetch(
             &FetchStaffOptions::builder()
-                .search(Some(std::borrow::Cow::Borrowed("watanabe")))
-                .include_staff_media(Some(true))
+                .search(std::borrow::Cow::Borrowed("watanabe"))
+                .include_staff_media(true)
                 .build(),
         )
         .await
@@ -344,8 +344,8 @@ async fn studio_page_parses_the_requested_fields() {
         .studio()
         .fetch(
             &FetchStudioOptions::builder()
-                .search(Some(std::borrow::Cow::Borrowed("bones")))
-                .include_media(Some(true))
+                .search(std::borrow::Cow::Borrowed("bones"))
+                .include_media(true)
                 .build(),
         )
         .await
@@ -391,9 +391,9 @@ async fn forum_thread_page_parses_the_requested_fields() {
         .forum()
         .fetch(
             &FetchThreadOptions::builder()
-                .search(Some(std::borrow::Cow::Borrowed("discussion")))
-                .include_body(Some(true))
-                .include_user(Some(true))
+                .search(std::borrow::Cow::Borrowed("discussion"))
+                .include_body(true)
+                .include_user(true)
                 .build(),
         )
         .await
@@ -431,11 +431,7 @@ async fn forum_comment_page_parses_the_requested_fields() {
 
     let page = client
         .forum()
-        .fetch_comments(
-            &FetchThreadCommentOptions::builder()
-                .thread_id(Some(50))
-                .build(),
-        )
+        .fetch_comments(&FetchThreadCommentOptions::builder().thread_id(50).build())
         .await
         .expect("the scripted response parses");
 
@@ -470,12 +466,7 @@ async fn activity_page_parses_the_requested_fields() {
 
     let page = client
         .activity()
-        .fetch(
-            &FetchActivityOptions::builder()
-                .page(Some(1))
-                .per_page(Some(2))
-                .build(),
-        )
+        .fetch(&FetchActivityOptions::builder().page(1).per_page(2).build())
         .await
         .expect("the scripted response parses");
 
@@ -524,7 +515,7 @@ async fn airing_page_parses_the_requested_fields() {
 
     let page = client
         .airing()
-        .fetch(&FetchAiringOptions::builder().media_id(Some(101)).build())
+        .fetch(&FetchAiringOptions::builder().media_id(101).build())
         .await
         .expect("the scripted response parses");
 
@@ -565,7 +556,7 @@ async fn review_page_parses_the_requested_fields() {
 
     let page = client
         .review()
-        .fetch(&FetchReviewOptions::builder().media_id(Some(101)).build())
+        .fetch(&FetchReviewOptions::builder().media_id(101).build())
         .await
         .expect("the scripted response parses");
 
@@ -608,11 +599,7 @@ async fn recommendation_page_parses_the_requested_fields() {
 
     let page = client
         .recommendation()
-        .fetch(
-            &FetchRecommendationOptions::builder()
-                .media_id(Some(101))
-                .build(),
-        )
+        .fetch(&FetchRecommendationOptions::builder().media_id(101).build())
         .await
         .expect("the scripted response parses");
 
@@ -663,8 +650,8 @@ async fn notification_page_parses_the_requested_fields() {
         .notification()
         .fetch(
             &NotificationSearchOptions::builder()
-                .page(Some(1))
-                .per_page(Some(2))
+                .page(1)
+                .per_page(2)
                 .build(),
         )
         .await

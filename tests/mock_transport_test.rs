@@ -175,14 +175,12 @@ async fn media_options_carry_the_include_flags() {
     let client = client(&transport);
 
     let options = FetchMediaOptions::builder()
-        .media_type(Some(MediaType::Anime))
-        .sort(Some(std::borrow::Cow::Borrowed(&[
-            MediaSort::PopularityDesc,
-        ])))
-        .include_characters(Some(true))
-        .include_staff(Some(true))
-        .page(Some(1))
-        .per_page(Some(5))
+        .media_type(MediaType::Anime)
+        .sort(Cow::Borrowed(&[MediaSort::PopularityDesc]))
+        .include_characters(true)
+        .include_staff(true)
+        .page(1)
+        .per_page(5)
         .build();
     let page = client.media().fetch(&options).await.expect("parses");
 
@@ -235,9 +233,7 @@ async fn a_not_found_response_surfaces_as_not_found() {
     let transport = ScriptedTransport::new(vec![HttpResponse::new(404, "missing")]);
     let client = client(&transport);
 
-    let options = FetchMediaOneOptions::builder()
-        .id(Some(999_999_999))
-        .build();
+    let options = FetchMediaOneOptions::builder().id(999_999_999).build();
     let error = client
         .media()
         .fetch_one(&options)
@@ -246,6 +242,7 @@ async fn a_not_found_response_surfaces_as_not_found() {
 
     assert!(matches!(error, AniListError::NotFound), "got {error:?}");
 }
+
 #[tokio::test]
 async fn user_favorites_parses_response_as_user() {
     let transport = ScriptedTransport::new(vec![ScriptedTransport::json(
@@ -255,7 +252,7 @@ async fn user_favorites_parses_response_as_user() {
 
     let options = FetchUserFavoritesOptions::builder()
         .user_id(42)
-        .fetch_anime(Some(true))
+        .fetch_anime(true)
         .build();
 
     let user = client
@@ -277,8 +274,8 @@ async fn user_media_list_sends_media_list_sort_and_returns_media_list_items() {
     let client = client(&transport);
 
     let options = FetchUserMediaListOptions::builder()
-        .user_id(Some(42))
-        .sort(Some(Cow::Borrowed(&[MediaListSort::ScoreDesc])))
+        .user_id(42)
+        .sort(Cow::Borrowed(&[MediaListSort::ScoreDesc]))
         .build();
 
     let page = client

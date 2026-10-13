@@ -16,9 +16,7 @@ async fn test_fetch_recommendations() {
 
     let result = h
         .run(|| async {
-            let options = FetchRecommendationOptions::builder()
-                .per_page(Some(5))
-                .build();
+            let options = FetchRecommendationOptions::builder().per_page(5).build();
             client.recommendation().fetch(&options).await
         })
         .await;
@@ -46,8 +44,8 @@ async fn test_fetch_recommendations_by_media() {
     let result = h
         .run(|| async {
             let options = FetchRecommendationOptions::builder()
-                .media_id(Some(1))
-                .per_page(Some(5))
+                .media_id(1)
+                .per_page(5)
                 .build();
             client.recommendation().fetch(&options).await
         })
@@ -75,9 +73,7 @@ async fn test_recommendation_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchRecommendationOptions::builder()
-                .per_page(Some(1))
-                .build();
+            let options = FetchRecommendationOptions::builder().per_page(1).build();
             client.recommendation().fetch(&options).await
         })
         .await;

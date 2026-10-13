@@ -16,8 +16,8 @@ async fn test_fetch_studio_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStudioOptions::builder()
-                .search(Some(Cow::Borrowed("Kyoto")))
-                .per_page(Some(5))
+                .search(Cow::Borrowed("Kyoto"))
+                .per_page(5)
                 .build();
             client.studio().fetch(&options).await
         })
@@ -49,7 +49,7 @@ async fn test_fetch_studio_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOptions::builder().id(Some(2)).build();
+            let options = FetchStudioOptions::builder().id(2).build();
             client.studio().fetch(&options).await
         })
         .await;
@@ -74,7 +74,7 @@ async fn test_fetch_one_studio() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOneOptions::builder().id(Some(2)).build();
+            let options = FetchStudioOneOptions::builder().id(2).build();
             client.studio().fetch_one(&options).await
         })
         .await;
@@ -97,7 +97,7 @@ async fn test_studio_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchStudioOptions::builder().id(Some(2)).build();
+            let options = FetchStudioOptions::builder().id(2).build();
             client.studio().fetch(&options).await
         })
         .await;

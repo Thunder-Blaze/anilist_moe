@@ -16,8 +16,8 @@ async fn test_fetch_user_by_search() {
     let result = h
         .run(|| async {
             let options = FetchUserOptions::builder()
-                .search(Some(Cow::Borrowed("ThunderBlaze")))
-                .per_page(Some(5))
+                .search(Cow::Borrowed("ThunderBlaze"))
+                .per_page(5)
                 .build();
             client.user().fetch(&options).await
         })
@@ -53,7 +53,7 @@ async fn test_fetch_user_by_id() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOptions::builder().id(Some(5429396)).build();
+            let options = FetchUserOptions::builder().id(5429396).build();
             client.user().fetch(&options).await
         })
         .await;
@@ -74,7 +74,7 @@ async fn test_fetch_one_user() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOneOptions::builder().id(Some(5429396)).build();
+            let options = FetchUserOneOptions::builder().id(5429396).build();
             client.user().fetch_one(&options).await
         })
         .await;
@@ -97,7 +97,7 @@ async fn test_user_data_types() {
 
     let result = h
         .run(|| async {
-            let options = FetchUserOptions::builder().id(Some(3225)).build();
+            let options = FetchUserOptions::builder().id(3225).build();
             client.user().fetch(&options).await
         })
         .await;
@@ -133,8 +133,8 @@ async fn test_user_search_relevance() {
     let result = h
         .run(|| async {
             let options = FetchUserOptions::builder()
-                .search(Some(Cow::Borrowed("Josh")))
-                .per_page(Some(10))
+                .search(Cow::Borrowed("Josh"))
+                .per_page(10)
                 .build();
             client.user().fetch(&options).await
         })

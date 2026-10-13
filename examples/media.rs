@@ -16,11 +16,11 @@ async fn main() -> Result<(), AniListError> {
         .media()
         .fetch(
             &FetchMediaOptions::builder()
-                .sort(Some(Cow::Borrowed(&[
+                .sort(Cow::Borrowed(&[
                     anilist_moe::enums::media::MediaSort::PopularityDesc,
-                ])))
-                .per_page(Some(5))
-                .page(Some(1))
+                ]))
+                .per_page(5)
+                .page(1)
                 .build(),
         )
         .await?;

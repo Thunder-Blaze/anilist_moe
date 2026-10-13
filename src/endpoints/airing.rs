@@ -13,7 +13,10 @@ use typed_builder::TypedBuilder;
 /// Options for fetching airing schedule information.
 #[skip_serializing_none]
 #[derive(Default, Debug, Serialize, TypedBuilder)]
-#[builder(field_defaults(default))]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
 #[serde(rename_all = "camelCase")]
 pub struct FetchAiringOptions<'a> {
     id: Option<u32>,
@@ -93,10 +96,10 @@ impl<'a> AiringEndpoint<'a> {
 
         self.fetch(
             &FetchAiringOptions::builder()
-                .airing_at_greater(Some(now))
-                .sort(Some(Cow::Borrowed(&[AiringSort::Time])))
-                .page(page)
-                .per_page(per_page)
+                .airing_at_greater(now)
+                .sort(Cow::Borrowed(&[AiringSort::Time]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -116,10 +119,10 @@ impl<'a> AiringEndpoint<'a> {
 
         self.fetch(
             &FetchAiringOptions::builder()
-                .airing_at_lesser(Some(now))
-                .sort(Some(Cow::Borrowed(&[AiringSort::TimeDesc])))
-                .page(page)
-                .per_page(per_page)
+                .airing_at_lesser(now)
+                .sort(Cow::Borrowed(&[AiringSort::TimeDesc]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await
@@ -134,10 +137,10 @@ impl<'a> AiringEndpoint<'a> {
     ) -> Result<Page<Vec<AiringSchedule>>, AniListError> {
         self.fetch(
             &FetchAiringOptions::builder()
-                .media_id(Some(media_id))
-                .sort(Some(Cow::Borrowed(&[AiringSort::Time])))
-                .page(page)
-                .per_page(per_page)
+                .media_id(media_id)
+                .sort(Cow::Borrowed(&[AiringSort::Time]))
+                .page_opt(page)
+                .per_page_opt(per_page)
                 .build(),
         )
         .await

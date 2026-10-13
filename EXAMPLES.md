@@ -493,12 +493,12 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     let options = FetchMediaOptions::builder()
-        .media_type(Some(MediaType::Anime))
-        .season(Some(MediaSeason::Fall))
-        .season_year(Some(2024))
-        .sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
-        .per_page(Some(5))
-        .build();
+    	.media_type(MediaType::Anime)
+    	.season(MediaSeason::Fall)
+    	.season_year(2024)
+    	.sort(Cow::Borrowed(&[MediaSort::PopularityDesc]))
+    	.per_page(5)
+    	.build();
 
     let page = client.media().fetch(&options).await?;
     for media in &page.data {

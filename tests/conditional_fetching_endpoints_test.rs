@@ -16,11 +16,11 @@ use support::allow_environmental_failure;
 async fn test_character_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchCharacterOptions::builder()
-        .id(Some(1))
-        .include_media(Some(true))
-        .media_per_page(Some(5))
-        .media_sort(Some(Cow::Borrowed(&[MediaSort::PopularityDesc])))
-        .include_mod_notes(Some(false))
+        .id(1)
+        .include_media(true)
+        .media_per_page(5)
+        .media_sort(Cow::Borrowed(&[MediaSort::PopularityDesc]))
+        .include_mod_notes(false)
         .build();
 
     let result = client.character().fetch(&options).await;
@@ -49,11 +49,11 @@ async fn test_character_conditional_fetching() {
 async fn test_staff_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchStaffOptions::builder()
-        .id(Some(95263)) // Akira Toriyama
-        .include_staff_media(Some(true))
-        .staff_media_per_page(Some(5))
-        .include_characters(Some(true))
-        .characters_per_page(Some(5))
+        .id(95263) // Akira Toriyama
+        .include_staff_media(true)
+        .staff_media_per_page(5)
+        .include_characters(true)
+        .characters_per_page(5)
         .build();
 
     let result = client.staff().fetch(&options).await;
@@ -74,9 +74,9 @@ async fn test_staff_conditional_fetching() {
 async fn test_studio_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchStudioOptions::builder()
-        .id(Some(1))
-        .include_media(Some(true))
-        .media_per_page(Some(5))
+        .id(1)
+        .include_media(true)
+        .media_per_page(5)
         .build();
 
     let result = client.studio().fetch(&options).await;
@@ -95,9 +95,9 @@ async fn test_studio_conditional_fetching() {
 async fn test_user_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchUserOptions::builder()
-        .name(Some(Cow::Borrowed("Josh")))
-        .include_statistics(Some(true))
-        .include_favourites(Some(true))
+        .name(Cow::Borrowed("Josh"))
+        .include_statistics(true)
+        .include_favourites(true)
         .build();
 
     let result = client.user().fetch(&options).await;
@@ -124,10 +124,10 @@ async fn test_forum_conditional_fetching() {
     let client = AniListClient::new();
     // Search for a random popular thread or just by generic search
     let options = FetchThreadOptions::builder()
-        .search(Some(Cow::Borrowed("Anime")))
-        .per_page(Some(1))
-        .include_body(Some(true))
-        .include_user(Some(true))
+        .search(Cow::Borrowed("Anime"))
+        .per_page(1)
+        .include_body(true)
+        .include_user(true)
         .build();
 
     let result = client.forum().fetch(&options).await;
@@ -147,9 +147,9 @@ async fn test_forum_conditional_fetching() {
 async fn test_user_conditional_fetching_negative() {
     let client = AniListClient::new();
     let options = FetchUserOptions::builder()
-        .name(Some(Cow::Borrowed("Josh")))
-        .include_favourites(Some(true))
-        .include_statistics(Some(true))
+        .name(Cow::Borrowed("Josh"))
+        .include_favourites(true)
+        .include_statistics(true)
         .build();
 
     let result = client.user().fetch(&options).await;
