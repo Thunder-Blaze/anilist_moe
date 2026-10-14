@@ -195,10 +195,7 @@ impl ReqwestTransport {
             .timeout(timeout.unwrap_or(DEFAULT_TIMEOUT))
             .pool_max_idle_per_host(10)
             .tcp_nodelay(true)
-            .build()
-            .map_err(|error| AniListError::Transport {
-                message: error.to_string(),
-            })?;
+            .build()?;
 
         Ok(Self { client })
     }
@@ -221,11 +218,7 @@ impl Transport for ReqwestTransport {
                 builder = builder.header(name, value);
             }
 
-            let response = builder.body(request.body).send().await.map_err(|error| {
-                AniListError::Transport {
-                    message: error.to_string(),
-                }
-            })?;
+            let response = builder.body(request.body).send().await?;
 
             let status = response.status().as_u16();
             let headers = response
@@ -238,13 +231,7 @@ impl Transport for ReqwestTransport {
                         .map(|value| (name.as_str().to_string(), value.to_string()))
                 })
                 .collect();
-            let body = response
-                .bytes()
-                .await
-                .map_err(|error| AniListError::Transport {
-                    message: error.to_string(),
-                })?
-                .to_vec();
+            let body = response.bytes().await?.to_vec();
 
             Ok(HttpResponse {
                 status,

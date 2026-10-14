@@ -807,9 +807,24 @@ impl AniListClient {
                     message: body.into_owned(),
                 },
             },
-            401 => AniListError::AuthenticationRequired,
-            403 => AniListError::AccessDenied,
-            404 => AniListError::NotFound,
+            401 => match serde_json::from_str::<Value>(&body) {
+                Ok(json) if json.get("errors").is_some() => Self::handle_graphql_errors(json)
+                    .err()
+                    .unwrap_or(AniListError::AuthenticationRequired),
+                _ => AniListError::AuthenticationRequired,
+            },
+            403 => match serde_json::from_str::<Value>(&body) {
+                Ok(json) if json.get("errors").is_some() => Self::handle_graphql_errors(json)
+                    .err()
+                    .unwrap_or(AniListError::AccessDenied),
+                _ => AniListError::AccessDenied,
+            },
+            404 => match serde_json::from_str::<Value>(&body) {
+                Ok(json) if json.get("errors").is_some() => Self::handle_graphql_errors(json)
+                    .err()
+                    .unwrap_or(AniListError::NotFound),
+                _ => AniListError::NotFound,
+            },
             500..=599 => AniListError::ServerError {
                 status: response.status,
                 message: body.into_owned(),
@@ -1261,6 +1276,24 @@ mod tests {
                 }
             };
             assert!(expected, "status {status} mapped to {error:?}");
+        }
+    }
+    #[test]
+    fn auth_and_not_found_errors_preserve_graphql_errors() {
+        let cases = [
+            (401, "unauthorized with detail"),
+            (403, "forbidden with detail"),
+            (404, "Not Found."),
+        ];
+
+        for (status, message) in cases {
+            let body = format!(r#"{{"errors":[{{"message":"{message}"}}]}}"#);
+            let error = AniListClient::interpret_response(json_response(status, &body))
+                .expect_err("must fail");
+            assert!(
+                error.graphql_message_contains(message),
+                "status {status} should preserve GraphQL error message '{message}', got: {error:?}"
+            );
         }
     }
 

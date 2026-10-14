@@ -28,6 +28,7 @@ use tokio::time::sleep;
 /// | `ANILIST_TEST_MIN_DELAY_MS` | 700 | minimum delay between two requests |
 /// | `ANILIST_TEST_MAX_RETRIES` | 3 | transient network failures retried per request |
 /// | `ANILIST_TEST_RETRY_DELAY_MS` | 2000 | delay between those retries |
+/// | `ANILIST_TEST_MAX_RATE_LIMIT_RETRIES` | 5 | maximum rate limit pauses before failing |
 #[derive(Debug, Clone, Copy)]
 pub struct TestConfig {
     /// Requests allowed inside `window_secs` before the harness waits.
@@ -42,6 +43,8 @@ pub struct TestConfig {
     pub max_network_retries: u32,
     /// Delay between those retries, in milliseconds.
     pub retry_delay_ms: u64,
+    /// Maximum rate limit pauses before failing the test.
+    pub max_rate_limit_retries: u32,
 }
 
 impl TestConfig {
@@ -66,6 +69,7 @@ impl TestConfig {
             min_delay_ms: parse(lookup("ANILIST_TEST_MIN_DELAY_MS"), 700),
             max_network_retries: parse(lookup("ANILIST_TEST_MAX_RETRIES"), 3),
             retry_delay_ms: parse(lookup("ANILIST_TEST_RETRY_DELAY_MS"), 2000),
+            max_rate_limit_retries: parse(lookup("ANILIST_TEST_MAX_RATE_LIMIT_RETRIES"), 5),
         }
     }
 
@@ -253,6 +257,7 @@ impl TestHarness {
     {
         let config = TestConfig::get();
         let mut network_retries = 0u32;
+        let mut rate_limit_retries = 0u32;
 
         loop {
             // Wait for any global pause and enforce pre-request delays
@@ -273,6 +278,18 @@ impl TestHarness {
                     return Ok(result);
                 }
                 Err(e) if e.is_rate_limit_error() => {
+                    if rate_limit_retries >= config.max_rate_limit_retries {
+                        eprintln!(
+                            "❌ Max rate limit retries ({}) reached. Failing test.",
+                            config.max_rate_limit_retries
+                        );
+                        return Err(e);
+                    }
+                    rate_limit_retries += 1;
+                    eprintln!(
+                        "⏳ Rate limit hit ({}/{}), pausing for ALL threads...",
+                        rate_limit_retries, config.max_rate_limit_retries
+                    );
                     // Trigger global pause for ALL threads, honouring Retry-After
                     GLOBAL_RATE_LIMITER
                         .handle_rate_limit(e.retry_after_secs())
@@ -415,6 +432,7 @@ mod tests {
         assert_eq!(config.min_delay_ms, 700);
         assert_eq!(config.max_network_retries, 3);
         assert_eq!(config.retry_delay_ms, 2000);
+        assert_eq!(config.max_rate_limit_retries, 5);
         assert!(
             config.window_requests < 90,
             "the default must stay under the API limit"
@@ -434,6 +452,10 @@ mod tests {
         assert_eq!(
             config.max_network_retries, 5,
             "surrounding space is trimmed"
+        );
+        assert_eq!(
+            config.max_rate_limit_retries, 5,
+            "unset values keep the default"
         );
         assert_eq!(config.pause_secs, 61, "unset values keep the default");
     }

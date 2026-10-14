@@ -47,6 +47,16 @@ checked against the API itself, since production turns introspection off.
   state and sends the opposite rather than sending nothing
 - `SaveRecommendationOptions` no longer derives `Deserialize`: an options struct is a
   request input
+- `ReqwestTransport` maps request and body failures directly onto `AniListError::Network`,
+  preserving the underlying `reqwest::Error` cause chain (timeouts, DNS failures, connection
+  resets) instead of flattening them into a string message
+- Statuses `401`, `403` and `404` preserve structured `GraphQL` errors returned by the
+  server instead of discarding the response body, allowing callers to inspect server error
+  messages via `graphql_errors()` and `graphql_message_contains()` while falling back to
+  unit error variants when no structured errors are present
+- The test harness rate-limiter introduces an explicit safety cap
+  (`ANILIST_TEST_MAX_RATE_LIMIT_RETRIES`, defaulting to 5) preventing unbounded retry loops
+  and test runner hangs on persistent 429 errors
 - CI runs `clippy --all-targets --all-features`, so the `pagination` module and the test
   suite are linted, and a new job builds every feature on the declared MSRV
 
