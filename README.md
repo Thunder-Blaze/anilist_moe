@@ -56,7 +56,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-anilist_moe = "0.5"
+anilist_moe = "0.6"
 # This crate asks tokio only for its `time` feature (retry backoff); the runtime
 # is yours to choose, and `full` is what a typical application wants.
 tokio = { version = "1.0", features = ["full"] }
@@ -70,10 +70,10 @@ need, or adds `tracing` for request spans:
 
 ```toml
 # Only the media and user endpoints.
-anilist_moe = { version = "0.5", default-features = false, features = ["media", "user"] }
+anilist_moe = { version = "0.6", default-features = false, features = ["media", "user"] }
 
 # Everything, plus tracing.
-anilist_moe = { version = "0.5", features = ["tracing"] }
+anilist_moe = { version = "0.6", features = ["tracing"] }
 ```
 
 The available groups are `media`, `medialist`, `user`, `character`, `staff`,

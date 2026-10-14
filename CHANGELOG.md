@@ -9,6 +9,93 @@ This project uses [Semantic Versioning](https://semver.org/):
 - **MINOR** version for new functionality in a backwards compatible manner
 - **PATCH** version for backwards compatible bug fixes
 
+## [0.6.0] - 2026-10-14
+
+Endpoint options are built with the typed builder instead of the `options!` macro, which
+makes the fields the API requires a compile-time error rather than something the server
+rejects. This release also fixes six endpoints that could never have worked — `favorites`,
+`media_list`, `pin`, `subscribe`, `toggle_thread_subscription` and `update_comment` — each
+checked against the API itself, since production turns introspection off.
+
+### Added
+- A typed builder on every options struct (`FetchMediaOptions::builder()…build()`), which
+  replaces the `options!` macro. Setters take the inner value and the `_opt` fallbacks take
+  the `Option` (`.per_page(5)` / `.per_page_opt(maybe_page)`), the string and list fields
+  take `impl Into<Cow<..>>` so a literal, a `&[T]` or a `Vec` all work, and a field the API
+  requires is a compile-time error to leave out
+- `#[builder(!default)]` marks the 25 fields the API insists on, and the structs that have
+  one no longer derive `Default`: `PinActivityOptions::default()` used to compile and send
+  `id: 0, pinned: false`
+- The `asMod` argument on `SaveActivityReply`, which the [mutation
+  reference](https://docs.anilist.co/reference/mutation) lists alongside the reply text
+- `llms.txt`, a single page describing the crate, its conventions and the quirks of the API
+  for coding assistants, linked from the README
+
+### Changed
+- **Breaking**: `options!` is gone, every options struct is `#[non_exhaustive]` with `pub`
+  fields, and struct literals no longer compile outside the crate — a new GraphQL variable
+  is a minor change now, while a built value can still be read and adjusted (a paging loop
+  keeps setting `options.page` instead of rebuilding)
+- **Breaking**: `UserEndpoint::favorites` returns `User`, not `Page<Vec<User>>` (the
+  response has no `Page`), and `UserEndpoint::media_list` returns `Page<Vec<MediaList>>`,
+  because the rows are media list entries. `FetchUserFavoritesOptions` lost `anime_sort`,
+  `manga_sort`, `characters_sort`, `staff_sort` and `studios_sort` — and with them its
+  lifetime parameter — since `Favourites` takes no sort
+- **Breaking**: `ToggleThreadSubscriptionOptions::subscribe` is a `bool`, not an
+  `Option<bool>`. The API's validator rejects the request without it, so the type no longer
+  pretends it can be left out, and `toggle_thread_subscription` reads the thread's current
+  state and sends the opposite rather than sending nothing
+- `SaveRecommendationOptions` no longer derives `Deserialize`: an options struct is a
+  request input
+- CI runs `clippy --all-targets --all-features`, so the `pagination` module and the test
+  suite are linted, and a new job builds every feature on the declared MSRV
+
+### Fixed
+- `UserEndpoint::favorites` never worked: its document asked `Favourites.anime`, `.manga`,
+  `.characters`, `.staff` and `.studios` to `sort` (the type takes only `page` and
+  `perPage`, which the API rejects as "Unknown argument `sort`"), and it selected `isMain`
+  on a `MediaEdge` (the field there is `isMainStudio`). It validates now
+- `UserEndpoint::media_list` sent `MediaSort` values to a `[MediaListSort]` variable, so
+  every call failed with `Variable "$sort" got invalid value ["ID"]`, and it returned
+  `Page<Vec<User>>` for rows that are media list entries — which deserialised into `User`
+  with every field but `id` left `None`. It now sends `MediaListSort`
+- `ActivityEndpoint::pin` never worked: its document selected `id` and `type` directly on
+  `ActivityUnion`, which has no such fields, and neither it nor `subscribe` selected
+  `__typename`, which `ActivityUnion`'s tagged deserializer requires
+- `ForumEndpoint::toggle_thread_subscription` sent no `subscribe` value while its document
+  declared `Boolean!`, so the API refused it before doing anything. AniList's validator
+  requires the state to reach it — leaving the argument out and passing `null` both come
+  back as "The subscribe field is required", and only a supplied value (or a variable
+  default) gets through
+- `ForumEndpoint::update_comment` sent no `threadId` while its document declared `Int!`, so
+  it failed with `Variable "$threadId" of required type "Int!" was not provided`. The
+  reference types the argument `Int`, an update identifies the comment by `id`, and the API
+  accepts the request without it
+- `tests/pagination_test.rs` still used the removed `options!` macro, which is why the
+  offline job was red: the target only compiles behind `--all-features`
+- A `403` whose body says the API is temporarily disabled is an outage, not a permission
+  problem: [the docs](https://docs.anilist.co/guide/considerations) describe exactly that
+  response as the signal that AniList has been taken down, and none of its words matched
+  `detect_maintenance`, so it came back as `AccessDenied`
+- `MediaTagsOptions` had an `Option` field without `#[skip_serializing_none]`, so it sent
+  `status: null` — the same class of bug as the `FetchStudioOptions` one
+
+### Documentation
+- `README.md`, `EXAMPLES.md`, `llms.txt` and `CONTRIBUTING.md` document the builder, the
+  `_opt` fallbacks and the `#[non_exhaustive]` + `pub` field rule, and `CONTRIBUTING.md`
+  has the attribute stack to copy for a new options struct
+- The options the reference marks "(Mod Only)" say so (`locked`, `sticky`, `asMod`,
+  `MediaTagCollection`'s `status`), and `compareWithAuthList` notes the user id or name the
+  API requires with it
+- The docs and the README say what the [rate limiting
+  page](https://docs.anilist.co/guide/rate-limiting) says: 90 requests per minute, currently
+  30 while the API recovers
+
+### Dependencies
+- `typed-builder` 0.22, held below 0.23 on purpose: 0.23 is edition 2024, which needs Rust
+  1.85, and this crate supports 1.82. CI now builds every feature on 1.82, so a dependency
+  that raises the floor fails there rather than for a consumer
+
 ## [0.5.0] - 2026-10-12
 
 This release comes from the `critical` line, which implemented several of the
@@ -19,12 +106,8 @@ from `Vec` to `Cow`, `Media.id` became required, and retries are now off unless
 asked for.
 
 ### Added
-- A typed builder on every options struct (`FetchMediaOptions::builder()…build()`),
-  which replaces the `options!` macro of the earlier `critical` snapshots. Setters take
-  the inner value and the `_opt` fallbacks take the `Option` (`.per_page(5)` /
-  `.per_page_opt(maybe_page)`), the string and list fields take `impl Into<Cow<..>>` so a
-  literal, a `&[T]` or a `Vec` all work, and a field the API requires is a compile-time
-  error to leave out
+- `options!` macro and the `options` module, for building endpoint options without
+  spelling out every `Some(..)` wrapper
 - `Transport` trait and `ReqwestTransport`, so requests can go through another
   HTTP stack or be answered without a network
 - `AniListClientBuilder`, and `AniListClient::builder()`, for token, base URL,
@@ -61,8 +144,6 @@ asked for.
   name and type, so those options say so
 - `AiringEndpoint::fetch_one` and `ActivityEndpoint::fetch_reply` fetch a single row where the
   API offers one
-- The `asMod` argument on `SaveActivityReply`, which the [mutation
-  reference](https://docs.anilist.co/reference/mutation) lists alongside the reply text
 - `CommonEndpoint::markdown` renders markdown the way AniList does,
   `CommonEndpoint::external_link_sources` lists the sites a `MediaExternalLink` can point at,
   `CommonEndpoint::site_statistics` returns the site-wide count series, and
@@ -108,20 +189,6 @@ asked for.
   `rename` any more: a GraphQL variable name is the client's to choose, only the argument
   name is validated, so the serialised names now follow the Rust fields and the queries
   declare those names. `FetchMediaOptions` alone lost 99 hand written renames
-- Options structs are `#[non_exhaustive]` with `pub` fields: the builder is how you build
-  one (a struct literal no longer compiles outside the crate, so a new GraphQL variable is
-  not a breaking change), while a built value can still be read and adjusted — a paging loop
-  keeps setting `options.page` rather than rebuilding
-- An options struct with a required field no longer derives `Default`, so
-  `PinActivityOptions::default()` cannot silently send `id: 0` and `pinned: false`
-- `ToggleThreadSubscriptionOptions::subscribe` is a `bool`, not an `Option<bool>`:
-  the API's validator rejects the request without it, so the type no longer pretends
-  it can be left out
-- `UserEndpoint::favorites` returns `User` instead of `Page<Vec<User>>` (the response
-  has no `Page`), and `UserEndpoint::media_list` returns `Page<Vec<MediaList>>` instead
-  of `Page<Vec<User>>`. `FetchUserFavoritesOptions` lost `anime_sort`, `manga_sort`,
-  `characters_sort`, `staff_sort` and `studios_sort` (and with them its lifetime
-  parameter): `Favourites` takes no sort
 - `MediaRelation` gained `SAME_UNIVERSE`, `SubmissionStatus::Approved` became
   `SubmissionStatus::Accepted` (the API never sent `APPROVED`), and `RevisionHistoryAction`
   stopped renaming `Edit` to a value the API does not use (`EDIT`)
@@ -141,20 +208,6 @@ asked for.
   now agree with each other
 - The endpoint accessors (`client.media()`, `client.anime()`, …) are `#[must_use]`:
   dropping the handle without calling it is a warning instead of silence
-- The options the reference marks "(Mod Only)" say so (`locked`, `sticky`, `asMod`,
-  `MediaTagCollection`'s `status`), and `compareWithAuthList` notes the user id or name the
-  API requires with it
-- The docs and the README say what the [rate limiting page](https://docs.anilist.co/guide/rate-limiting)
-  says: 90 requests per minute, currently 30 while the API recovers
-
-### Documentation
-- `llms.txt`, a single page describing the crate, its conventions and the quirks of the API
-  for coding assistants, linked from the README
-
-### Documentation
-- `README.md`, `EXAMPLES.md`, `llms.txt` and `CONTRIBUTING.md` document the builder, the
-  `_opt` fallbacks and the `#[non_exhaustive]` + `pub` field rule, and `CONTRIBUTING.md`
-  has the attribute stack to copy for a new options struct
 
 ### Dependencies
 - Floors are the current release of every dependency: thiserror 2.0.21, serde
@@ -166,9 +219,6 @@ asked for.
 - `chrono` is gone (nothing in the crate used it) and `dotenv` moved to
   dev-dependencies: a library has no business loading a `.env` into a consumer's
   process
-- `typed-builder` 0.22, held below 0.23 on purpose: 0.23 is edition 2024, which needs
-  Rust 1.85, and this crate supports 1.82. CI now builds every feature on 1.82 so a
-  dependency that raises the floor is caught here rather than by a consumer
 - `tokio` asks for its `time` feature alone — retry backoff is the only thing this
   crate sleeps for — instead of `full`, so a consumer no longer compiles io, net,
   fs, process and signal support on this crate's behalf
@@ -176,10 +226,6 @@ asked for.
   `core.hooksPath` instead
 
 ### Fixed
-- A `403` whose body says the API is temporarily disabled is an outage, not a permission
-  problem: [the docs](https://docs.anilist.co/guide/considerations) describe exactly that
-  response as the signal that AniList has been taken down, and none of its words matched
-  `detect_maintenance`, so it came back as `AccessDenied`
 - Filter options that never reached the API: the serialised name of a field has to match the
   variable its query declares, and 14 media filters (`id_not`, `status_not_in`, `genre_in`, …),
   three character filters, four media list filters and `activityId` on a subscription did not.
@@ -215,33 +261,6 @@ asked for.
 - The demo binary is `examples/media.rs`, so the published crate no longer carries
   an `anilist_moe` binary whose only job was printing one response; the scratch
   file `examples/tmp_serde.rs` went with it
-- `UserEndpoint::favorites` never worked: its document asked `Favourites.anime`,
-  `.manga`, `.characters`, `.staff` and `.studios` to `sort` (the type takes only
-  `page` and `perPage`, which the API rejects as "Unknown argument"), and it
-  selected `isMain` on a `MediaEdge` (the field there is `isMainStudio`). It also
-  returned `Page<Vec<User>>` for a response whose only top-level key is `User`.
-  It now validates, returns `User`, and its options no longer offer the sort fields
-  the API does not accept
-- `UserEndpoint::media_list` sent `MediaSort` values to a `[MediaListSort]`
-  variable, so every call failed with "Variable $sort got invalid value ["ID"]",
-  and it returned `Page<Vec<User>>` for rows that are media list entries — which
-  deserialised into `User` with every field but `id` left `None`. It now sends
-  `MediaListSort` and returns `Page<Vec<MediaList>>`
-- `ActivityEndpoint::pin` never worked: its document selected `id` and `type`
-  directly on `ActivityUnion`, which has no such fields ("Cannot query field \"id\"
-  on type \"ActivityUnion\""), and neither it nor `subscribe` selected
-  `__typename`, which `ActivityUnion`'s tagged deserializer requires
-- `ForumEndpoint::toggle_thread_subscription` sent no `subscribe`
-  value while its document declared `Boolean!`, so the API refused it before doing
-  anything. AniList's validator requires the state to reach it — leaving the
-  argument out and passing `null` both come back as "The subscribe field is
-  required", and only a supplied value (or a variable default) gets through — so
-  `ToggleThreadSubscriptionOptions::subscribe` is now a `bool` and
-  the toggle reads the thread's current state and sends the opposite
-- `ForumEndpoint::update_comment` sent no `threadId` while its document declared
-  `Int!`, so it failed with "Variable $threadId of required type Int! was not
-  provided". The reference types the argument `Int`, an update identifies the
-  comment by `id`, and the API accepts the request without it
 
 ## [0.4.0] - 2026-06-04
 

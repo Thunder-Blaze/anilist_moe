@@ -4,7 +4,7 @@
 > characters, staff, studios, users, media lists, forums, activities, reviews,
 > recommendations, airing schedules and notifications, with or without a token.
 
-Crate `anilist_moe` 0.5.0 · MSRV Rust 1.82 · edition 2021 · MIT · default feature `full`.
+Crate `anilist_moe` 0.6.0 · MSRV Rust 1.82 · edition 2021 · MIT · default feature `full`.
 HTTP through `reqwest` (rustls, ring); the crate asks tokio only for its `time` feature,
 because retry backoff is the one thing it sleeps for — the runtime is the caller's.
 
@@ -12,7 +12,7 @@ because retry backoff is the one thing it sleeps for — the runtime is the call
 
 ```toml
 [dependencies]
-anilist_moe = "0.5"                              # `full` enables every endpoint group
+anilist_moe = "0.6"                              # `full` enables every endpoint group
 tokio = { version = "1", features = ["full"] }   # the runtime, and any feature set you want
 ```
 
