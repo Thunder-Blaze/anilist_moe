@@ -3,8 +3,6 @@
 //! These tests verify that the media endpoint correctly fetches, parses,
 //! and returns data with proper types from the AniList API.
 
-use std::borrow::Cow;
-
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::enums::media::{MediaSort, MediaType};
 use anilist_moe::{endpoints::media::*, AniListError};
@@ -22,7 +20,7 @@ async fn test_fetch_media_with_search() {
     let result = h
         .run(|| async {
             let options = FetchMediaOptions::builder()
-                .search("Naruto".into())
+                .search("Naruto")
                 .media_type(MediaType::Anime)
                 .per_page(5)
                 .build();
@@ -199,7 +197,7 @@ async fn test_fetch_media_pagination() {
                 .media_type(MediaType::Anime)
                 .per_page(5)
                 .page(1)
-                .sort(Cow::Borrowed(&[MediaSort::IdDesc]))
+                .sort(&[MediaSort::IdDesc])
                 .build();
             client.media().fetch(&options).await
         })
@@ -216,7 +214,7 @@ async fn test_fetch_media_pagination() {
                 .media_type(MediaType::Anime)
                 .per_page(5)
                 .page(2)
-                .sort(Cow::Borrowed(&[MediaSort::IdDesc]))
+                .sort(&[MediaSort::IdDesc])
                 .build();
             client.media().fetch(&options).await
         })

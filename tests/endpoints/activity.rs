@@ -106,7 +106,7 @@ async fn test_text_activity_full_lifecycle() {
     let create_result = h
         .run(|| async {
             let save_options = SaveTextActivityOptions::builder()
-                .text("Test activity from anilist_moe library - full lifecycle test".into())
+                .text("Test activity from anilist_moe library - full lifecycle test")
                 .build();
             client.activity().save_text_activity(&save_options).await
         })
@@ -135,7 +135,7 @@ async fn test_text_activity_full_lifecycle() {
         .run(|| async {
             let modify_options = SaveTextActivityOptions::builder()
                 .id(activity_id)
-                .text("Modified test activity from anilist_moe library".into())
+                .text("Modified test activity from anilist_moe library")
                 .build();
             client.activity().save_text_activity(&modify_options).await
         })
@@ -205,7 +205,7 @@ async fn test_message_activity_full_lifecycle() {
     let create_result = h
         .run(|| async {
             let save_options = SaveMessageActivityOptions::builder()
-                .message("Heya - test from anilist_moe".into())
+                .message("Heya - test from anilist_moe")
                 .recipient_id(user_id)
                 .private(true)
                 .build();
@@ -236,7 +236,7 @@ async fn test_message_activity_full_lifecycle() {
         .run(|| async {
             let modify_options = SaveMessageActivityOptions::builder()
                 .id(activity_id)
-                .message("Modified message from anilist_moe".into())
+                .message("Modified message from anilist_moe")
                 .recipient_id(user_id)
                 .private(true)
                 .build();
@@ -289,7 +289,7 @@ async fn test_activity_reply() {
     let create_result = h
         .run(|| async {
             let save_options = SaveTextActivityOptions::builder()
-                .text("Test activity for reply test".into())
+                .text("Test activity for reply test")
                 .build();
             client.activity().save_text_activity(&save_options).await
         })
@@ -310,7 +310,7 @@ async fn test_activity_reply() {
     let reply_result = h
         .run(|| async {
             let save_reply_options = SaveActivityReplyOptions::builder()
-                .text("Test reply from anilist_moe library".into())
+                .text("Test reply from anilist_moe library")
                 .activity_id(activity_id)
                 .build();
             client.activity().save_reply(&save_reply_options).await

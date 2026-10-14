@@ -20,43 +20,55 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchMediaListOptions<'a> {
-    id: Option<u32>,
-    user_id: Option<u32>,
-    user_name: Option<Cow<'a, str>>,
-    media_type: Option<MediaType>,
-    status: Option<MediaListStatus>,
-    media_id: Option<u32>,
-    is_following: Option<bool>,
-    notes: Option<Cow<'a, str>>,
-    started_at: Option<i32>,
-    completed_at: Option<i32>,
+    pub id: Option<u32>,
+    pub user_id: Option<u32>,
+    #[builder(setter(into))]
+    pub user_name: Option<Cow<'a, str>>,
+    pub media_type: Option<MediaType>,
+    pub status: Option<MediaListStatus>,
+    pub media_id: Option<u32>,
+    pub is_following: Option<bool>,
+    #[builder(setter(into))]
+    pub notes: Option<Cow<'a, str>>,
+    pub started_at: Option<i32>,
+    pub completed_at: Option<i32>,
     /// Limits the answer to entries also on the authenticated user's list.
     ///
     /// The API requires a user id or name alongside it.
-    compare_with_auth_list: Option<bool>,
-    user_id_in: Option<Cow<'a, [u32]>>,
-    status_in: Option<Cow<'a, [MediaListStatus]>>,
-    status_not_in: Option<Cow<'a, [MediaListStatus]>>,
-    status_not: Option<MediaListStatus>,
-    media_id_in: Option<Cow<'a, [u32]>>,
-    media_id_not_in: Option<Cow<'a, [u32]>>,
-    notes_like: Option<Cow<'a, str>>,
-    started_at_greater: Option<i32>,
-    started_at_lesser: Option<i32>,
-    started_at_like: Option<Cow<'a, str>>,
-    completed_at_greater: Option<i32>,
-    completed_at_lesser: Option<i32>,
-    completed_at_like: Option<Cow<'a, str>>,
+    pub compare_with_auth_list: Option<bool>,
+    #[builder(setter(into))]
+    pub user_id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub status_in: Option<Cow<'a, [MediaListStatus]>>,
+    #[builder(setter(into))]
+    pub status_not_in: Option<Cow<'a, [MediaListStatus]>>,
+    pub status_not: Option<MediaListStatus>,
+    #[builder(setter(into))]
+    pub media_id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub media_id_not_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub notes_like: Option<Cow<'a, str>>,
+    pub started_at_greater: Option<i32>,
+    pub started_at_lesser: Option<i32>,
+    #[builder(setter(into))]
+    pub started_at_like: Option<Cow<'a, str>>,
+    pub completed_at_greater: Option<i32>,
+    pub completed_at_lesser: Option<i32>,
+    #[builder(setter(into))]
+    pub completed_at_like: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [MediaListSort]>>,
-    page: Option<i32>,
-    per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [MediaListSort]>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
 }
 
 /// Options for fetching a whole list at once, grouped by status.
@@ -75,28 +87,37 @@ pub struct FetchMediaListOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchMediaListCollectionOptions<'a> {
-    user_id: Option<u32>,
-    user_name: Option<Cow<'a, str>>,
-    media_type: Option<MediaType>,
-    status: Option<MediaListStatus>,
-    status_in: Option<Cow<'a, [MediaListStatus]>>,
-    status_not: Option<MediaListStatus>,
-    status_not_in: Option<Cow<'a, [MediaListStatus]>>,
-    notes: Option<Cow<'a, str>>,
-    notes_like: Option<Cow<'a, str>>,
-    started_at: Option<i32>,
-    started_at_greater: Option<i32>,
-    started_at_lesser: Option<i32>,
-    started_at_like: Option<Cow<'a, str>>,
-    completed_at: Option<i32>,
-    completed_at_greater: Option<i32>,
-    completed_at_lesser: Option<i32>,
-    completed_at_like: Option<Cow<'a, str>>,
-    force_single_completed_list: Option<bool>,
-    chunk: Option<i32>,
-    per_chunk: Option<i32>,
-    sort: Option<Cow<'a, [MediaListSort]>>,
+    pub user_id: Option<u32>,
+    #[builder(setter(into))]
+    pub user_name: Option<Cow<'a, str>>,
+    pub media_type: Option<MediaType>,
+    pub status: Option<MediaListStatus>,
+    #[builder(setter(into))]
+    pub status_in: Option<Cow<'a, [MediaListStatus]>>,
+    pub status_not: Option<MediaListStatus>,
+    #[builder(setter(into))]
+    pub status_not_in: Option<Cow<'a, [MediaListStatus]>>,
+    #[builder(setter(into))]
+    pub notes: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub notes_like: Option<Cow<'a, str>>,
+    pub started_at: Option<i32>,
+    pub started_at_greater: Option<i32>,
+    pub started_at_lesser: Option<i32>,
+    #[builder(setter(into))]
+    pub started_at_like: Option<Cow<'a, str>>,
+    pub completed_at: Option<i32>,
+    pub completed_at_greater: Option<i32>,
+    pub completed_at_lesser: Option<i32>,
+    #[builder(setter(into))]
+    pub completed_at_like: Option<Cow<'a, str>>,
+    pub force_single_completed_list: Option<bool>,
+    pub chunk: Option<i32>,
+    pub per_chunk: Option<i32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [MediaListSort]>>,
 }
 
 /// Options for deleting one of your custom lists.
@@ -106,10 +127,13 @@ pub struct FetchMediaListCollectionOptions<'a> {
 #[skip_serializing_none]
 #[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteCustomListOptions<'a> {
-    #[builder(default)]
-    custom_list: Cow<'a, str>,
-    media_type: MediaType,
+    #[builder(setter(into), default)]
+    #[builder(!default)]
+    pub custom_list: Cow<'a, str>,
+    #[builder(!default)]
+    pub media_type: MediaType,
 }
 
 /// Options for creating or updating a media list entry.
@@ -120,58 +144,70 @@ pub struct DeleteCustomListOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveMediaListOptions<'a> {
-    id: Option<u32>,
-    media_id: Option<u32>,
-    status: Option<MediaListStatus>,
-    score: Option<f64>,
-    score_raw: Option<i32>,
-    progress: Option<i32>,
-    progress_volumes: Option<i32>,
-    repeat: Option<i32>,
-    priority: Option<i32>,
-    private: Option<bool>,
-    notes: Option<Cow<'a, str>>,
-    hidden_from_status_lists: Option<bool>,
-    custom_lists: Option<Cow<'a, [&'a str]>>,
-    advanced_scores: Option<Cow<'a, [f64]>>,
-    started_at: Option<FuzzyDate>,
-    completed_at: Option<FuzzyDate>,
+    pub id: Option<u32>,
+    pub media_id: Option<u32>,
+    pub status: Option<MediaListStatus>,
+    pub score: Option<f64>,
+    pub score_raw: Option<i32>,
+    pub progress: Option<i32>,
+    pub progress_volumes: Option<i32>,
+    pub repeat: Option<i32>,
+    pub priority: Option<i32>,
+    pub private: Option<bool>,
+    #[builder(setter(into))]
+    pub notes: Option<Cow<'a, str>>,
+    pub hidden_from_status_lists: Option<bool>,
+    #[builder(setter(into))]
+    pub custom_lists: Option<Cow<'a, [&'a str]>>,
+    #[builder(setter(into))]
+    pub advanced_scores: Option<Cow<'a, [f64]>>,
+    pub started_at: Option<FuzzyDate>,
+    pub completed_at: Option<FuzzyDate>,
 }
 
 /// Options for bulk updating multiple media list entries.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveMediaListMultipleOptions<'a> {
-    status: Option<MediaListStatus>,
-    score: Option<f64>,
-    score_raw: Option<i32>,
-    progress: Option<i32>,
-    progress_volumes: Option<i32>,
-    repeat: Option<i32>,
-    priority: Option<i32>,
-    private: Option<bool>,
-    notes: Option<Cow<'a, str>>,
-    hidden_from_status_lists: Option<bool>,
-    advanced_scores: Option<Cow<'a, [f64]>>,
-    started_at: Option<FuzzyDate>,
-    completed_at: Option<FuzzyDate>,
-    ids: Cow<'a, [u32]>,
+    pub status: Option<MediaListStatus>,
+    pub score: Option<f64>,
+    pub score_raw: Option<i32>,
+    pub progress: Option<i32>,
+    pub progress_volumes: Option<i32>,
+    pub repeat: Option<i32>,
+    pub priority: Option<i32>,
+    pub private: Option<bool>,
+    #[builder(setter(into))]
+    pub notes: Option<Cow<'a, str>>,
+    pub hidden_from_status_lists: Option<bool>,
+    #[builder(setter(into))]
+    pub advanced_scores: Option<Cow<'a, [f64]>>,
+    pub started_at: Option<FuzzyDate>,
+    pub completed_at: Option<FuzzyDate>,
+    #[builder(!default)]
+    #[builder(setter(into))]
+    pub ids: Cow<'a, [u32]>,
 }
 
+#[skip_serializing_none]
 /// Options for deleting a media list entry.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteMediaListOptions {
+    #[builder(!default)]
     pub id: u32,
 }
 
@@ -264,7 +300,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name(Cow::Borrowed(username))
                 .media_type(MediaType::Anime)
                 .status_opt(status)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -285,7 +321,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name(Cow::Borrowed(username))
                 .media_type(MediaType::Manga)
                 .status_opt(status)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -304,7 +340,7 @@ impl<'a> MediaListEndpoint<'a> {
             &FetchMediaListOptions::builder()
                 .media_type(MediaType::Anime)
                 .status_opt(status)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -323,7 +359,7 @@ impl<'a> MediaListEndpoint<'a> {
             &FetchMediaListOptions::builder()
                 .media_type(MediaType::Manga)
                 .status_opt(status)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -343,7 +379,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name_opt(user_name.map(Cow::Borrowed))
                 .media_type(MediaType::Anime)
                 .status(MediaListStatus::Current)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -363,7 +399,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name_opt(user_name.map(Cow::Borrowed))
                 .media_type(MediaType::Manga)
                 .status(MediaListStatus::Current)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -383,7 +419,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name_opt(user_name.map(Cow::Borrowed))
                 .media_type(MediaType::Anime)
                 .status(MediaListStatus::Completed)
-                .sort(Cow::Borrowed(&[MediaListSort::ScoreDesc]))
+                .sort(&[MediaListSort::ScoreDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -403,7 +439,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name_opt(user_name.map(Cow::Borrowed))
                 .media_type(MediaType::Manga)
                 .status(MediaListStatus::Completed)
-                .sort(Cow::Borrowed(&[MediaListSort::ScoreDesc]))
+                .sort(&[MediaListSort::ScoreDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -423,7 +459,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name_opt(user_name.map(Cow::Borrowed))
                 .media_type(MediaType::Anime)
                 .status(MediaListStatus::Planning)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -443,7 +479,7 @@ impl<'a> MediaListEndpoint<'a> {
                 .user_name_opt(user_name.map(Cow::Borrowed))
                 .media_type(MediaType::Manga)
                 .status(MediaListStatus::Planning)
-                .sort(Cow::Borrowed(&[MediaListSort::UpdatedTimeDesc]))
+                .sort(&[MediaListSort::UpdatedTimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),

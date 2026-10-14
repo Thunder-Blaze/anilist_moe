@@ -18,26 +18,31 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchStudioOptions<'a> {
-    page: Option<i32>,
-    per_page: Option<i32>,
-    id: Option<u32>,
-    search: Option<Cow<'a, str>>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+    pub id: Option<u32>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [StudioSort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [StudioSort]>>,
     // Extra
-    include_media: Option<bool>,
+    pub include_media: Option<bool>,
     // Sub-pagination variables
-    media_page: Option<i32>,
-    media_per_page: Option<i32>,
+    pub media_page: Option<i32>,
+    pub media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single studio by ID.
@@ -48,22 +53,27 @@ pub struct FetchStudioOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchStudioOneOptions<'a> {
-    id: Option<u32>,
-    search: Option<Cow<'a, str>>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
+    pub id: Option<u32>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [StudioSort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [StudioSort]>>,
     // Sub-pagination variables
-    media_page: Option<i32>,
-    media_per_page: Option<i32>,
+    pub media_page: Option<i32>,
+    pub media_per_page: Option<i32>,
 }
 
 /// Endpoint for studio operations.
@@ -104,7 +114,7 @@ impl<'a> StudioEndpoint<'a> {
             &FetchStudioOptions::builder()
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[StudioSort::FavouritesDesc]))
+                .sort(&[StudioSort::FavouritesDesc])
                 .build(),
         )
         .await
@@ -122,7 +132,7 @@ impl<'a> StudioEndpoint<'a> {
                 .search(Cow::Borrowed(query))
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[StudioSort::SearchMatch]))
+                .sort(&[StudioSort::SearchMatch])
                 .build(),
         )
         .await

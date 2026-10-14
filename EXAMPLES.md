@@ -496,7 +496,7 @@ async fn main() -> Result<(), AniListError> {
     	.media_type(MediaType::Anime)
     	.season(MediaSeason::Fall)
     	.season_year(2024)
-    	.sort(Cow::Borrowed(&[MediaSort::PopularityDesc]))
+    	.sort(&[MediaSort::PopularityDesc])
     	.per_page(5)
     	.build();
 

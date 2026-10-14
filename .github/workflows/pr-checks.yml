@@ -34,7 +34,7 @@ jobs:
         run: cargo fmt --all --check
 
       - name: Run clippy
-        run: cargo clippy --locked -- -D warnings
+        run: cargo clippy --locked --all-targets --all-features -- -D warnings
 
       - name: Build with no default features
         run: cargo build --locked --no-default-features
@@ -56,6 +56,29 @@ jobs:
 
       - name: Run doctests
         run: cargo test --locked --all-features --doc
+
+  msrv:
+    name: MSRV (1.82)
+    runs-on: ubuntu-latest
+
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install the declared MSRV toolchain
+        uses: dtolnay/rust-toolchain@1.82.0
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      # The dependencies are pinned to keep 1.82 working (reqwest at 0.12 because
+      # 0.13 needs 1.85, typed-builder at 0.22 because 0.23 is edition 2024), so
+      # something has to check that they still resolve and build here.
+      - name: Build every feature on the MSRV
+        run: cargo build --locked --all-features
 
   live:
     name: Live API tests

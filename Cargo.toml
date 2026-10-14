@@ -30,7 +30,10 @@ tokio = { version = "1.53.2", features = ["time"] }
 thiserror = "2.0.21"
 log = "0.4.34"
 tracing = { version = "0.1.44", optional = true }
-typed-builder = "0.23.2"
+# Held at the 0.22 line on purpose: 0.23 is edition 2024, which needs Rust 1.85,
+# and the crate supports 1.82. 0.22 has the setters used here (strip_option with
+# ignore_invalid and fallback_suffix) and the `!default` that marks a field required.
+typed-builder = "0.22"
 
 # Endpoint feature flags.
 #

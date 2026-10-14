@@ -9,16 +9,16 @@
 //! # async fn example() -> Result<(), anilist_moe::AniListError> {
 //! use anilist_moe::endpoints::media::FetchMediaOptions;
 //! use anilist_moe::enums::media::MediaType;
-//! use anilist_moe::{options, AniListClient};
+//! use anilist_moe::AniListClient;
 //!
 //! let client = AniListClient::new();
 //!
 //! // Every entry, page by page.
-//! let mut items = client.paginate(options!(
-//!     FetchMediaOptions,
-//!     media_type: MediaType::Anime,
-//!     per_page: 50,
-//! ));
+//! let options = FetchMediaOptions::builder()
+//!     .media_type(MediaType::Anime)
+//!     .per_page(50)
+//!     .build();
+//! let mut items = client.paginate(options);
 //!
 //! while let Some(anime) = items.next_item().await {
 //!     let anime = anime?;

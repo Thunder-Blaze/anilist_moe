@@ -15,19 +15,26 @@ use serde_with::skip_serializing_none;
 use std::borrow::Cow;
 use typed_builder::TypedBuilder;
 
+#[skip_serializing_none]
 /// Options for toggling a like on various entities.
 #[derive(Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct ToggleLikeOptions {
-    id: u32,
-    like_type: LikeableType,
+    #[builder(!default)]
+    pub id: u32,
+    #[builder(!default)]
+    pub like_type: LikeableType,
 }
 
+#[skip_serializing_none]
 /// Options for toggling follow status of a user.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct ToggleFollowOptions {
-    user_id: u32,
+    #[builder(!default)]
+    pub user_id: u32,
 }
 
 /// Options for adding or removing favourites.
@@ -38,19 +45,24 @@ pub struct ToggleFollowOptions {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct ToggleFavouriteOptions {
-    anime_id: Option<u32>,
-    manga_id: Option<u32>,
-    character_id: Option<u32>,
-    staff_id: Option<u32>,
-    studio_id: Option<u32>,
+    pub anime_id: Option<u32>,
+    pub manga_id: Option<u32>,
+    pub character_id: Option<u32>,
+    pub staff_id: Option<u32>,
+    pub studio_id: Option<u32>,
 }
 
+#[skip_serializing_none]
 /// Options for rendering markdown the way AniList renders it.
 #[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct MarkdownOptions<'a> {
-    markdown: Cow<'a, str>,
+    #[builder(!default)]
+    #[builder(setter(into))]
+    pub markdown: Cow<'a, str>,
 }
 
 /// Options for the external link source list.
@@ -61,11 +73,12 @@ pub struct MarkdownOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct ExternalLinkSourceOptions {
-    id: Option<u32>,
+    pub id: Option<u32>,
     #[serde(rename = "type")]
-    link_type: Option<ExternalLinkType>,
-    media_type: Option<ExternalLinkMediaType>,
+    pub link_type: Option<ExternalLinkType>,
+    pub media_type: Option<ExternalLinkMediaType>,
 }
 
 /// Options for the AniChart settings.
@@ -76,11 +89,16 @@ pub struct ExternalLinkSourceOptions {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UpdateAniChartSettingsOptions<'a> {
-    title_language: Option<Cow<'a, str>>,
-    outgoing_link_provider: Option<Cow<'a, str>>,
-    theme: Option<Cow<'a, str>>,
-    sort: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub title_language: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub outgoing_link_provider: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub theme: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, str>>,
 }
 
 /// Options for the AniChart highlights.
@@ -91,10 +109,13 @@ pub struct UpdateAniChartSettingsOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UpdateAniChartHighlightsOptions<'a> {
-    highlights: Option<Cow<'a, [AniChartHighlight]>>,
+    #[builder(setter(into))]
+    pub highlights: Option<Cow<'a, [AniChartHighlight]>>,
 }
 
+#[skip_serializing_none]
 /// Options for the media tag list. `status` asks for tags above a rank.
 #[derive(Default, Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
@@ -102,9 +123,10 @@ pub struct UpdateAniChartHighlightsOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct MediaTagsOptions {
     /// Mod only.
-    status: Option<i32>,
+    pub status: Option<i32>,
 }
 
 /// Options for listing the users who liked something.
@@ -115,13 +137,14 @@ pub struct MediaTagsOptions {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct LikesOptions {
     #[builder(!default)]
-    likeable_id: u32,
+    pub likeable_id: u32,
     #[builder(!default)]
-    like_type: LikeableType,
-    page: Option<i32>,
-    per_page: Option<i32>,
+    pub like_type: LikeableType,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
 }
 
 /// Options for reordering the entries of a favourites list.
@@ -136,17 +159,28 @@ pub struct LikesOptions {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UpdateFavouriteOrderOptions<'a> {
-    anime_ids: Option<Cow<'a, [u32]>>,
-    manga_ids: Option<Cow<'a, [u32]>>,
-    character_ids: Option<Cow<'a, [u32]>>,
-    staff_ids: Option<Cow<'a, [u32]>>,
-    studio_ids: Option<Cow<'a, [u32]>>,
-    anime_order: Option<Cow<'a, [u32]>>,
-    manga_order: Option<Cow<'a, [u32]>>,
-    character_order: Option<Cow<'a, [u32]>>,
-    staff_order: Option<Cow<'a, [u32]>>,
-    studio_order: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub anime_ids: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub manga_ids: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub character_ids: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub staff_ids: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub studio_ids: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub anime_order: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub manga_order: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub character_order: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub staff_order: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub studio_order: Option<Cow<'a, [u32]>>,
 }
 
 /// Endpoint for common and general-purpose operations.

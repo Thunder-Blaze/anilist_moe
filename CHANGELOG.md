@@ -19,8 +19,12 @@ from `Vec` to `Cow`, `Media.id` became required, and retries are now off unless
 asked for.
 
 ### Added
-- `options!` macro and the `options` module, for building endpoint options without
-  spelling out every `Some(..)` wrapper
+- A typed builder on every options struct (`FetchMediaOptions::builder()…build()`),
+  which replaces the `options!` macro of the earlier `critical` snapshots. Setters take
+  the inner value and the `_opt` fallbacks take the `Option` (`.per_page(5)` /
+  `.per_page_opt(maybe_page)`), the string and list fields take `impl Into<Cow<..>>` so a
+  literal, a `&[T]` or a `Vec` all work, and a field the API requires is a compile-time
+  error to leave out
 - `Transport` trait and `ReqwestTransport`, so requests can go through another
   HTTP stack or be answered without a network
 - `AniListClientBuilder`, and `AniListClient::builder()`, for token, base URL,
@@ -104,6 +108,12 @@ asked for.
   `rename` any more: a GraphQL variable name is the client's to choose, only the argument
   name is validated, so the serialised names now follow the Rust fields and the queries
   declare those names. `FetchMediaOptions` alone lost 99 hand written renames
+- Options structs are `#[non_exhaustive]` with `pub` fields: the builder is how you build
+  one (a struct literal no longer compiles outside the crate, so a new GraphQL variable is
+  not a breaking change), while a built value can still be read and adjusted — a paging loop
+  keeps setting `options.page` rather than rebuilding
+- An options struct with a required field no longer derives `Default`, so
+  `PinActivityOptions::default()` cannot silently send `id: 0` and `pinned: false`
 - `ToggleThreadSubscriptionOptions::subscribe` is a `bool`, not an `Option<bool>`:
   the API's validator rejects the request without it, so the type no longer pretends
   it can be left out
@@ -141,6 +151,11 @@ asked for.
 - `llms.txt`, a single page describing the crate, its conventions and the quirks of the API
   for coding assistants, linked from the README
 
+### Documentation
+- `README.md`, `EXAMPLES.md`, `llms.txt` and `CONTRIBUTING.md` document the builder, the
+  `_opt` fallbacks and the `#[non_exhaustive]` + `pub` field rule, and `CONTRIBUTING.md`
+  has the attribute stack to copy for a new options struct
+
 ### Dependencies
 - Floors are the current release of every dependency: thiserror 2.0.21, serde
   1.0.229, serde_json 1.0.154, tokio 1.53.2, log 0.4.34, tracing 0.1.44
@@ -151,6 +166,9 @@ asked for.
 - `chrono` is gone (nothing in the crate used it) and `dotenv` moved to
   dev-dependencies: a library has no business loading a `.env` into a consumer's
   process
+- `typed-builder` 0.22, held below 0.23 on purpose: 0.23 is edition 2024, which needs
+  Rust 1.85, and this crate supports 1.82. CI now builds every feature on 1.82 so a
+  dependency that raises the floor is caught here rather than by a consumer
 - `tokio` asks for its `time` feature alone — retry backoff is the only thing this
   crate sleeps for — instead of `full`, so a consumer no longer compiles io, net,
   fs, process and signal support on this crate's behalf

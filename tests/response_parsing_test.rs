@@ -137,7 +137,7 @@ async fn media_list_page_parses_the_requested_fields() {
         .medialist()
         .fetch(
             &FetchMediaListOptions::builder()
-                .user_name(std::borrow::Cow::Borrowed("someone"))
+                .user_name("someone")
                 .status(MediaListStatus::Completed)
                 .build(),
         )
@@ -184,11 +184,7 @@ async fn user_page_parses_the_requested_fields() {
 
     let page = client
         .user()
-        .fetch(
-            &FetchUserOptions::builder()
-                .search(std::borrow::Cow::Borrowed("someone"))
-                .build(),
-        )
+        .fetch(&FetchUserOptions::builder().search("someone").build())
         .await
         .expect("the scripted response parses");
 
@@ -234,7 +230,7 @@ async fn character_page_parses_the_requested_fields() {
         .character()
         .fetch(
             &FetchCharacterOptions::builder()
-                .search(std::borrow::Cow::Borrowed("spike"))
+                .search("spike")
                 .include_media(true)
                 .build(),
         )
@@ -292,7 +288,7 @@ async fn staff_page_parses_the_requested_fields() {
         .staff()
         .fetch(
             &FetchStaffOptions::builder()
-                .search(std::borrow::Cow::Borrowed("watanabe"))
+                .search("watanabe")
                 .include_staff_media(true)
                 .build(),
         )
@@ -344,7 +340,7 @@ async fn studio_page_parses_the_requested_fields() {
         .studio()
         .fetch(
             &FetchStudioOptions::builder()
-                .search(std::borrow::Cow::Borrowed("bones"))
+                .search("bones")
                 .include_media(true)
                 .build(),
         )
@@ -391,7 +387,7 @@ async fn forum_thread_page_parses_the_requested_fields() {
         .forum()
         .fetch(
             &FetchThreadOptions::builder()
-                .search(std::borrow::Cow::Borrowed("discussion"))
+                .search("discussion")
                 .include_body(true)
                 .include_user(true)
                 .build(),

@@ -430,11 +430,15 @@ impl AniListClient {
     /// # async fn example() -> Result<(), anilist_moe::AniListError> {
     /// use anilist_moe::endpoints::media::FetchMediaOptions;
     /// use anilist_moe::enums::media::MediaType;
-    /// use anilist_moe::{options, AniListClient};
+    /// use anilist_moe::AniListClient;
     ///
     /// let client = AniListClient::new();
+    /// let options = FetchMediaOptions::builder()
+    ///     .media_type(MediaType::Anime)
+    ///     .per_page(50)
+    ///     .build();
     /// let everything = client
-    ///     .paginate(options!(FetchMediaOptions, media_type: MediaType::Anime, per_page: 50))
+    ///     .paginate(options)
     ///     .collect_all()
     ///     .await?;
     /// # Ok(())

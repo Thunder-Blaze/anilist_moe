@@ -18,37 +18,42 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchStaffOptions<'a> {
-    id: Option<u32>,
-    is_birthday: Option<bool>,
-    search: Option<Cow<'a, str>>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
+    pub id: Option<u32>,
+    pub is_birthday: Option<bool>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [StaffSort]>>,
-    page: Option<i32>,
-    per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [StaffSort]>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
     // Extra
-    include_staff_media: Option<bool>,
-    include_characters: Option<bool>,
-    include_character_media: Option<bool>,
-    include_submitter: Option<bool>,
-    include_submission_status: Option<bool>,
-    include_submission_notes: Option<bool>,
-    include_mod_notes: Option<bool>,
+    pub include_staff_media: Option<bool>,
+    pub include_characters: Option<bool>,
+    pub include_character_media: Option<bool>,
+    pub include_submitter: Option<bool>,
+    pub include_submission_status: Option<bool>,
+    pub include_submission_notes: Option<bool>,
+    pub include_mod_notes: Option<bool>,
     // Sub-pagination variables
-    staff_media_page: Option<i32>,
-    staff_media_per_page: Option<i32>,
-    characters_page: Option<i32>,
-    characters_per_page: Option<i32>,
-    character_media_page: Option<i32>,
-    character_media_per_page: Option<i32>,
+    pub staff_media_page: Option<i32>,
+    pub staff_media_per_page: Option<i32>,
+    pub characters_page: Option<i32>,
+    pub characters_per_page: Option<i32>,
+    pub character_media_page: Option<i32>,
+    pub character_media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single staff member by ID.
@@ -59,27 +64,32 @@ pub struct FetchStaffOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchStaffOneOptions<'a> {
-    id: Option<u32>,
-    is_birthday: Option<bool>,
-    search: Option<Cow<'a, str>>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
+    pub id: Option<u32>,
+    pub is_birthday: Option<bool>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [StaffSort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [StaffSort]>>,
     // Sub-pagination variables
-    staff_media_page: Option<i32>,
-    staff_media_per_page: Option<i32>,
-    characters_page: Option<i32>,
-    characters_per_page: Option<i32>,
-    character_media_page: Option<i32>,
-    character_media_per_page: Option<i32>,
+    pub staff_media_page: Option<i32>,
+    pub staff_media_per_page: Option<i32>,
+    pub characters_page: Option<i32>,
+    pub characters_per_page: Option<i32>,
+    pub character_media_page: Option<i32>,
+    pub character_media_per_page: Option<i32>,
 }
 
 /// Endpoint for staff member operations.
@@ -118,7 +128,7 @@ impl<'a> StaffEndpoint<'a> {
     ) -> Result<Page<Vec<Staff>>, AniListError> {
         self.fetch(
             &FetchStaffOptions::builder()
-                .sort(Cow::Borrowed(&[StaffSort::FavouritesDesc]))
+                .sort(&[StaffSort::FavouritesDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -145,7 +155,7 @@ impl<'a> StaffEndpoint<'a> {
         self.fetch(
             &FetchStaffOptions::builder()
                 .search(Cow::Borrowed(query))
-                .sort(Cow::Borrowed(&[StaffSort::SearchMatch]))
+                .sort(&[StaffSort::SearchMatch])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -168,7 +178,7 @@ impl<'a> StaffEndpoint<'a> {
         self.fetch(
             &FetchStaffOptions::builder()
                 .is_birthday(true)
-                .sort(Cow::Borrowed(&[StaffSort::FavouritesDesc]))
+                .sort(&[StaffSort::FavouritesDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),

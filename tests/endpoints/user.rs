@@ -2,7 +2,6 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::user::*;
-use std::borrow::Cow;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -16,7 +15,7 @@ async fn test_fetch_user_by_search() {
     let result = h
         .run(|| async {
             let options = FetchUserOptions::builder()
-                .search(Cow::Borrowed("ThunderBlaze"))
+                .search("ThunderBlaze")
                 .per_page(5)
                 .build();
             client.user().fetch(&options).await
@@ -133,7 +132,7 @@ async fn test_user_search_relevance() {
     let result = h
         .run(|| async {
             let options = FetchUserOptions::builder()
-                .search(Cow::Borrowed("Josh"))
+                .search("Josh")
                 .per_page(10)
                 .build();
             client.user().fetch(&options).await

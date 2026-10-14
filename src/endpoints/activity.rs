@@ -20,10 +20,11 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchActivityReplyOptions {
-    id: Option<u32>,
-    activity_id: Option<u32>,
-    text_as_html: Option<bool>,
+    pub id: Option<u32>,
+    pub activity_id: Option<u32>,
+    pub text_as_html: Option<bool>,
 }
 
 /// Options for updating a list activity.
@@ -31,15 +32,17 @@ pub struct FetchActivityReplyOptions {
 /// This is a moderator mutation: the API refuses it for an ordinary token. The
 /// activity's `id` is required, and `locked` decides whether it ends up locked.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveListActivityOptions {
-    id: u32,
-    locked: Option<bool>,
+    #[builder(!default)]
+    pub id: u32,
+    pub locked: Option<bool>,
 }
 
 /// Options for fetching activity feed entries.
@@ -50,41 +53,52 @@ pub struct SaveListActivityOptions {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchActivityOptions<'a> {
     // # Pagination
-    page: Option<i32>,
-    per_page: Option<i32>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
 
     // # Filters
-    id: Option<u32>,
-    user_id: Option<u32>,
-    messenger_id: Option<u32>,
-    media_id: Option<u32>,
+    pub id: Option<u32>,
+    pub user_id: Option<u32>,
+    pub messenger_id: Option<u32>,
+    pub media_id: Option<u32>,
     // the fallback needs to be changed here, otherwise
     // we'd have "type__opt" as the setter for this field
     #[builder(default, setter(!strip_option, strip_option(fallback_suffix = "opt")))]
-    type_: Option<ActivityType>,
-    is_following: Option<bool>,
-    has_replies: Option<bool>,
-    has_replies_or_type_text: Option<bool>,
-    created_at: Option<i32>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
-    user_id_not: Option<u32>,
-    user_id_in: Option<Cow<'a, [u32]>>,
-    user_id_not_in: Option<Cow<'a, [u32]>>,
-    messenger_id_not: Option<u32>,
-    messenger_id_in: Option<Cow<'a, [u32]>>,
-    messenger_id_not_in: Option<Cow<'a, [u32]>>,
-    media_id_not: Option<u32>,
-    media_id_in: Option<Cow<'a, [u32]>>,
-    media_id_not_in: Option<Cow<'a, [u32]>>,
-    type_not: Option<ActivityType>,
-    type_in: Option<Cow<'a, [ActivityType]>>,
-    type_not_in: Option<Cow<'a, [ActivityType]>>,
-    created_at_greater: Option<i32>,
-    created_at_lesser: Option<i32>,
+    pub type_: Option<ActivityType>,
+    pub is_following: Option<bool>,
+    pub has_replies: Option<bool>,
+    pub has_replies_or_type_text: Option<bool>,
+    pub created_at: Option<i32>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
+    pub user_id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub user_id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub user_id_not_in: Option<Cow<'a, [u32]>>,
+    pub messenger_id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub messenger_id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub messenger_id_not_in: Option<Cow<'a, [u32]>>,
+    pub media_id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub media_id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub media_id_not_in: Option<Cow<'a, [u32]>>,
+    pub type_not: Option<ActivityType>,
+    #[builder(setter(into))]
+    pub type_in: Option<Cow<'a, [ActivityType]>>,
+    #[builder(setter(into))]
+    pub type_not_in: Option<Cow<'a, [ActivityType]>>,
+    pub created_at_greater: Option<i32>,
+    pub created_at_lesser: Option<i32>,
 
     // # Sort
     /// Sort order. The unique key (id) is appended, so paging stays stable;
@@ -93,135 +107,155 @@ pub struct FetchActivityOptions<'a> {
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "Option::is_none"
     )]
-    sort: Option<Cow<'a, [ActivitySort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [ActivitySort]>>,
 
     // # HTML rendering options
-    text_as_html: Option<bool>,
-    message_as_html: Option<bool>,
+    pub text_as_html: Option<bool>,
+    pub message_as_html: Option<bool>,
 }
 
 /// Options for fetching a single activity by ID.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchActivityOneOptions {
     #[builder(!default)]
-    id: u32,
+    pub id: u32,
     // # HTML rendering options
-    text_as_html: Option<bool>,
-    message_as_html: Option<bool>,
+    pub text_as_html: Option<bool>,
+    pub message_as_html: Option<bool>,
 }
 
 /// Options for fetching replies to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchActivityRepliesOptions {
     // # Pagination
-    page: Option<i32>,
-    per_page: Option<i32>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
 
     // # Filters
-    id: Option<u32>,
+    pub id: Option<u32>,
     #[builder(!default)]
-    activity_id: u32,
+    pub activity_id: u32,
 
     // # HTML rendering options
-    text_as_html: Option<bool>,
+    pub text_as_html: Option<bool>,
 }
 
+#[skip_serializing_none]
 /// Options for deleting an activity.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteActivityOptions {
-    id: u32,
+    #[builder(!default)]
+    pub id: u32,
 }
 
+#[skip_serializing_none]
 /// Options for deleting an activity reply.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteActivityReplyOptions {
-    id: u32,
+    #[builder(!default)]
+    pub id: u32,
 }
 
+#[skip_serializing_none]
 /// Options for pinning or unpinning an activity.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct PinActivityOptions {
-    id: u32,
-    pinned: bool,
+    #[builder(!default)]
+    pub id: u32,
+    #[builder(!default)]
+    pub pinned: bool,
 }
 
+#[skip_serializing_none]
 /// Options for subscribing or unsubscribing to an activity.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SubscribeActivityOptions {
     /// The activity to subscribe to or unsubscribe from.
-    activity_id: u32,
-    subscribe: bool,
+    #[builder(!default)]
+    pub activity_id: u32,
+    #[builder(!default)]
+    pub subscribe: bool,
 }
 
 /// Options for saving a message activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveMessageActivityOptions<'a> {
-    id: Option<u32>,
+    pub id: Option<u32>,
+    #[builder(setter(into), !default)]
+    pub message: Cow<'a, str>,
     #[builder(!default)]
-    message: Cow<'a, str>,
-    #[builder(!default)]
-    recipient_id: u32,
-    private: Option<bool>,
+    pub recipient_id: u32,
+    pub private: Option<bool>,
     /// Mod only.
-    locked: Option<bool>,
+    pub locked: Option<bool>,
     /// Mod only: send it from the moderator account.
-    as_mod: Option<bool>,
+    pub as_mod: Option<bool>,
 }
 
 /// Options for saving a text activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveTextActivityOptions<'a> {
-    id: Option<u32>,
-    #[builder(!default)]
-    text: Cow<'a, str>,
+    pub id: Option<u32>,
+    #[builder(setter(into), !default)]
+    pub text: Cow<'a, str>,
     /// Mod only.
-    locked: Option<bool>,
+    pub locked: Option<bool>,
 }
 
 /// Options for saving a reply to an activity.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveActivityReplyOptions<'a> {
-    id: Option<u32>,
+    pub id: Option<u32>,
+    #[builder(setter(into), !default)]
+    pub text: Cow<'a, str>,
     #[builder(!default)]
-    text: Cow<'a, str>,
-    #[builder(!default)]
-    activity_id: u32,
+    pub activity_id: u32,
     /// Mod only: send it from the moderator account.
-    as_mod: Option<bool>,
+    pub as_mod: Option<bool>,
 }
 
 /// Endpoint for activity feed operations.
@@ -375,7 +409,7 @@ impl<'a> ActivityEndpoint<'a> {
                 .is_following(true)
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[ActivitySort::IdDesc]))
+                .sort(&[ActivitySort::IdDesc])
                 .build(),
         )
         .await

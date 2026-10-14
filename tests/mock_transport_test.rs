@@ -13,7 +13,6 @@ use anilist_moe::utils::RetryConfig;
 use anilist_moe::{AniListClient, AniListError};
 use parking_lot::Mutex;
 use serde_json::Value;
-use std::borrow::Cow;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -176,7 +175,7 @@ async fn media_options_carry_the_include_flags() {
 
     let options = FetchMediaOptions::builder()
         .media_type(MediaType::Anime)
-        .sort(Cow::Borrowed(&[MediaSort::PopularityDesc]))
+        .sort(&[MediaSort::PopularityDesc])
         .include_characters(true)
         .include_staff(true)
         .page(1)
@@ -275,7 +274,7 @@ async fn user_media_list_sends_media_list_sort_and_returns_media_list_items() {
 
     let options = FetchUserMediaListOptions::builder()
         .user_id(42)
-        .sort(Cow::Borrowed(&[MediaListSort::ScoreDesc]))
+        .sort(&[MediaListSort::ScoreDesc])
         .build();
 
     let page = client

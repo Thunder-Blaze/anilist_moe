@@ -18,36 +18,44 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchAiringOptions<'a> {
-    id: Option<u32>,
-    media_id: Option<u32>,
-    episode: Option<i32>,
-    airing_at: Option<i32>,
-    not_yet_aired: Option<bool>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
-    media_id_not: Option<u32>,
-    media_id_in: Option<Cow<'a, [u32]>>,
-    media_id_not_in: Option<Cow<'a, [u32]>>,
-    episode_not: Option<i32>,
-    episode_in: Option<Cow<'a, [i32]>>,
-    episode_not_in: Option<Cow<'a, [i32]>>,
-    episode_greater: Option<i32>,
-    episode_lesser: Option<i32>,
-    airing_at_greater: Option<i32>,
-    airing_at_lesser: Option<i32>,
+    pub id: Option<u32>,
+    pub media_id: Option<u32>,
+    pub episode: Option<i32>,
+    pub airing_at: Option<i32>,
+    pub not_yet_aired: Option<bool>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
+    pub media_id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub media_id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub media_id_not_in: Option<Cow<'a, [u32]>>,
+    pub episode_not: Option<i32>,
+    #[builder(setter(into))]
+    pub episode_in: Option<Cow<'a, [i32]>>,
+    #[builder(setter(into))]
+    pub episode_not_in: Option<Cow<'a, [i32]>>,
+    pub episode_greater: Option<i32>,
+    pub episode_lesser: Option<i32>,
+    pub airing_at_greater: Option<i32>,
+    pub airing_at_lesser: Option<i32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset keeps the order the query document asks for.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "Option::is_none"
     )]
-    sort: Option<Cow<'a, [AiringSort]>>,
-    per_page: Option<i32>,
-    page: Option<i32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [AiringSort]>>,
+    pub per_page: Option<i32>,
+    pub page: Option<i32>,
     // HTML rendering options
-    description_as_html: Option<bool>,
+    pub description_as_html: Option<bool>,
 }
 
 /// Endpoint for airing schedule operations.
@@ -97,7 +105,7 @@ impl<'a> AiringEndpoint<'a> {
         self.fetch(
             &FetchAiringOptions::builder()
                 .airing_at_greater(now)
-                .sort(Cow::Borrowed(&[AiringSort::Time]))
+                .sort(&[AiringSort::Time])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -120,7 +128,7 @@ impl<'a> AiringEndpoint<'a> {
         self.fetch(
             &FetchAiringOptions::builder()
                 .airing_at_lesser(now)
-                .sort(Cow::Borrowed(&[AiringSort::TimeDesc]))
+                .sort(&[AiringSort::TimeDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -138,7 +146,7 @@ impl<'a> AiringEndpoint<'a> {
         self.fetch(
             &FetchAiringOptions::builder()
                 .media_id(media_id)
-                .sort(Cow::Borrowed(&[AiringSort::Time]))
+                .sort(&[AiringSort::Time])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),

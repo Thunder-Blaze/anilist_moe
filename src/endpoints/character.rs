@@ -19,29 +19,35 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchCharacterOptions<'a> {
-    page: Option<i32>,
-    id: Option<u32>,
-    per_page: Option<i32>,
-    search: Option<Cow<'a, str>>,
+    pub page: Option<i32>,
+    pub id: Option<u32>,
+    pub per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [CharacterSort]>>,
-    is_birthday: Option<bool>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [CharacterSort]>>,
+    pub is_birthday: Option<bool>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     // Extra
-    include_media: Option<bool>,
-    include_mod_notes: Option<bool>,
+    pub include_media: Option<bool>,
+    pub include_mod_notes: Option<bool>,
     // Sub-pagination variables
-    media_sort: Option<Cow<'a, [MediaSort]>>,
-    media_page: Option<i32>,
-    media_per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub media_sort: Option<Cow<'a, [MediaSort]>>,
+    pub media_page: Option<i32>,
+    pub media_per_page: Option<i32>,
 }
 
 /// Options for fetching a single character.
@@ -52,24 +58,30 @@ pub struct FetchCharacterOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchCharacterOneOptions<'a> {
-    id: Option<u32>,
-    is_birthday: Option<bool>,
-    search: Option<Cow<'a, str>>,
-    id_not: Option<u32>,
-    id_in: Option<Cow<'a, [u32]>>,
-    id_not_in: Option<Cow<'a, [u32]>>,
+    pub id: Option<u32>,
+    pub is_birthday: Option<bool>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    pub id_not: Option<u32>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub id_not_in: Option<Cow<'a, [u32]>>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [CharacterSort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [CharacterSort]>>,
     // Sub-pagination variables
-    media_sort: Option<Cow<'a, [MediaSort]>>,
-    media_page: Option<i32>,
-    media_per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub media_sort: Option<Cow<'a, [MediaSort]>>,
+    pub media_page: Option<i32>,
+    pub media_per_page: Option<i32>,
 }
 
 /// Endpoint for character operations.
@@ -110,7 +122,7 @@ impl<'a> CharacterEndpoint<'a> {
             &FetchCharacterOptions::builder()
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[CharacterSort::FavouritesDesc]))
+                .sort(&[CharacterSort::FavouritesDesc])
                 .build(),
         )
         .await
@@ -137,7 +149,7 @@ impl<'a> CharacterEndpoint<'a> {
                 .search(Cow::Borrowed(query))
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[CharacterSort::SearchMatch]))
+                .sort(&[CharacterSort::SearchMatch])
                 .build(),
         )
         .await
@@ -160,7 +172,7 @@ impl<'a> CharacterEndpoint<'a> {
                 .is_birthday(true)
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[CharacterSort::FavouritesDesc]))
+                .sort(&[CharacterSort::FavouritesDesc])
                 .build(),
         )
         .await

@@ -4,7 +4,6 @@
 
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::{MediaSort, MediaType};
-use anilist_moe::options;
 use anilist_moe::transport::{HttpRequest, HttpResponse, Transport};
 use anilist_moe::utils::RetryConfig;
 use anilist_moe::{AniListClient, AniListError};
@@ -113,11 +112,10 @@ fn make_client(transport: &ScriptedTransport) -> AniListClient {
 }
 
 fn media_options() -> FetchMediaOptions<'static> {
-    options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        per_page: 2,
-    )
+    FetchMediaOptions::builder()
+        .media_type(MediaType::Anime)
+        .per_page(2)
+        .build()
 }
 
 #[tokio::test]
@@ -178,12 +176,11 @@ async fn the_options_reach_every_request() {
     let transport = ScriptedTransport::new(vec![page(1, 1, false)]);
     let client = make_client(&transport);
 
-    let options = options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        sort: &[MediaSort::PopularityDesc],
-        per_page: 2,
-    );
+    let options = FetchMediaOptions::builder()
+        .media_type(MediaType::Anime)
+        .sort(&[MediaSort::PopularityDesc])
+        .per_page(2)
+        .build();
     let _ = client.paginate(options).collect_all().await.unwrap();
 
     let body: Value = serde_json::from_slice(&transport.requests()[0].body).unwrap();

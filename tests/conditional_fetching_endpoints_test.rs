@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use anilist_moe::client::AniListClient;
 use anilist_moe::endpoints::character::FetchCharacterOptions;
 use anilist_moe::endpoints::forum::FetchThreadOptions;
@@ -19,7 +17,7 @@ async fn test_character_conditional_fetching() {
         .id(1)
         .include_media(true)
         .media_per_page(5)
-        .media_sort(Cow::Borrowed(&[MediaSort::PopularityDesc]))
+        .media_sort(&[MediaSort::PopularityDesc])
         .include_mod_notes(false)
         .build();
 
@@ -95,7 +93,7 @@ async fn test_studio_conditional_fetching() {
 async fn test_user_conditional_fetching() {
     let client = AniListClient::new();
     let options = FetchUserOptions::builder()
-        .name(Cow::Borrowed("Josh"))
+        .name("Josh")
         .include_statistics(true)
         .include_favourites(true)
         .build();
@@ -124,7 +122,7 @@ async fn test_forum_conditional_fetching() {
     let client = AniListClient::new();
     // Search for a random popular thread or just by generic search
     let options = FetchThreadOptions::builder()
-        .search(Cow::Borrowed("Anime"))
+        .search("Anime")
         .per_page(1)
         .include_body(true)
         .include_user(true)
@@ -147,7 +145,7 @@ async fn test_forum_conditional_fetching() {
 async fn test_user_conditional_fetching_negative() {
     let client = AniListClient::new();
     let options = FetchUserOptions::builder()
-        .name(Cow::Borrowed("Josh"))
+        .name("Josh")
         .include_favourites(true)
         .include_statistics(true)
         .build();

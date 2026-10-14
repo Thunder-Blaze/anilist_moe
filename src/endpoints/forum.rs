@@ -19,32 +19,36 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchThreadOptions<'a> {
-    id: Option<u32>,
-    search: Option<Cow<'a, str>>,
-    id_in: Option<Cow<'a, [u32]>>,
-    user_id: Option<u32>,
-    reply_user_id: Option<u32>,
-    subscribed: Option<bool>,
-    category_id: Option<u32>,
-    media_category_id: Option<u32>,
+    pub id: Option<u32>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    pub user_id: Option<u32>,
+    pub reply_user_id: Option<u32>,
+    pub subscribed: Option<bool>,
+    pub category_id: Option<u32>,
+    pub media_category_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [ThreadSort]>>,
-    page: Option<i32>,
-    per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [ThreadSort]>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
     // Extra
-    include_body: Option<bool>,
-    include_user: Option<bool>,
-    include_reply_user: Option<bool>,
-    include_categories: Option<bool>,
-    include_media_categories: Option<bool>,
+    pub include_body: Option<bool>,
+    pub include_user: Option<bool>,
+    pub include_reply_user: Option<bool>,
+    pub include_categories: Option<bool>,
+    pub include_media_categories: Option<bool>,
     // HTML rendering options
-    body_as_html: Option<bool>,
+    pub body_as_html: Option<bool>,
 }
 
 /// Options for fetching a single forum thread by ID.
@@ -55,18 +59,22 @@ pub struct FetchThreadOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchThreadOneOptions<'a> {
-    id: Option<u32>,
-    user_id: Option<u32>,
-    reply_user_id: Option<u32>,
-    subscribed: Option<bool>,
-    category_id: Option<u32>,
-    media_category_id: Option<u32>,
-    search: Option<Cow<'a, str>>,
-    id_in: Option<Cow<'a, [u32]>>,
-    sort: Option<Cow<'a, [ThreadSort]>>,
+    pub id: Option<u32>,
+    pub user_id: Option<u32>,
+    pub reply_user_id: Option<u32>,
+    pub subscribed: Option<bool>,
+    pub category_id: Option<u32>,
+    pub media_category_id: Option<u32>,
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub id_in: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [ThreadSort]>>,
     // HTML rendering options
-    body_as_html: Option<bool>,
+    pub body_as_html: Option<bool>,
 }
 
 /// Options for fetching thread comments.
@@ -77,21 +85,23 @@ pub struct FetchThreadOneOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchThreadCommentOptions<'a> {
-    id: Option<u32>,
-    thread_id: Option<u32>,
-    user_id: Option<u32>,
+    pub id: Option<u32>,
+    pub thread_id: Option<u32>,
+    pub user_id: Option<u32>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [ThreadCommentSort]>>,
-    page: Option<i32>,
-    per_page: Option<i32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
     // HTML rendering options
-    comment_as_html: Option<bool>,
+    pub comment_as_html: Option<bool>,
 }
 
 /// Options for fetching a single thread comment by ID.
@@ -102,13 +112,15 @@ pub struct FetchThreadCommentOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchThreadCommentOneOptions<'a> {
-    id: Option<u32>,
-    thread_id: Option<u32>,
-    user_id: Option<u32>,
-    sort: Option<Cow<'a, [ThreadCommentSort]>>,
+    pub id: Option<u32>,
+    pub thread_id: Option<u32>,
+    pub user_id: Option<u32>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [ThreadCommentSort]>>,
     // HTML rendering options
-    comment_as_html: Option<bool>,
+    pub comment_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a forum thread.
@@ -119,25 +131,33 @@ pub struct FetchThreadCommentOneOptions<'a> {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveThreadOptions<'a> {
-    id: Option<u32>,
-    title: Option<Cow<'a, str>>,
-    body: Option<Cow<'a, str>>,
-    categories: Option<Cow<'a, [u32]>>,
-    media_categories: Option<Cow<'a, [u32]>>,
+    pub id: Option<u32>,
+    #[builder(setter(into))]
+    pub title: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub body: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub categories: Option<Cow<'a, [u32]>>,
+    #[builder(setter(into))]
+    pub media_categories: Option<Cow<'a, [u32]>>,
     /// Mod only.
-    sticky: Option<bool>,
+    pub sticky: Option<bool>,
     /// Mod only.
-    locked: Option<bool>,
+    pub locked: Option<bool>,
     // HTML rendering options
-    body_as_html: Option<bool>,
+    pub body_as_html: Option<bool>,
 }
 
+#[skip_serializing_none]
 /// Options for deleting a forum thread.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteThreadOptions {
-    id: u32,
+    #[builder(!default)]
+    pub id: u32,
 }
 
 /// Options for creating or updating a thread comment.
@@ -148,34 +168,43 @@ pub struct DeleteThreadOptions {
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveThreadCommentOptions<'a> {
-    id: Option<u32>,
-    thread_id: Option<u32>,
-    parent_comment_id: Option<u32>,
-    comment: Option<Cow<'a, str>>,
+    pub id: Option<u32>,
+    pub thread_id: Option<u32>,
+    pub parent_comment_id: Option<u32>,
+    #[builder(setter(into))]
+    pub comment: Option<Cow<'a, str>>,
     /// Mod only.
-    locked: Option<bool>,
+    pub locked: Option<bool>,
     // HTML rendering options
-    comment_as_html: Option<bool>,
+    pub comment_as_html: Option<bool>,
 }
 
+#[skip_serializing_none]
 /// Options for deleting a thread comment.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteThreadCommentOptions {
-    id: u32,
+    #[builder(!default)]
+    pub id: u32,
 }
 
+#[skip_serializing_none]
 /// Options for subscribing or unsubscribing to a thread.
 ///
 /// The API's own validator requires `subscribe`, so it is not optional here:
 /// leaving it out fails the request with "The subscribe field is required",
 /// even though the reference lists the argument as nullable.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct ToggleThreadSubscriptionOptions {
-    thread_id: u32,
-    subscribe: bool,
+    #[builder(!default)]
+    pub thread_id: u32,
+    #[builder(!default)]
+    pub subscribe: bool,
 }
 
 /// Endpoint for forum thread and comment operations.
@@ -283,7 +312,7 @@ impl<'a> ForumEndpoint<'a> {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(
             &FetchThreadOptions::builder()
-                .sort(Cow::Borrowed(&[ThreadSort::IdDesc]))
+                .sort(&[ThreadSort::IdDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -299,7 +328,7 @@ impl<'a> ForumEndpoint<'a> {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(
             &FetchThreadOptions::builder()
-                .sort(Cow::Borrowed(&[ThreadSort::RepliedAtDesc]))
+                .sort(&[ThreadSort::RepliedAtDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -316,7 +345,7 @@ impl<'a> ForumEndpoint<'a> {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(
             &FetchThreadOptions::builder()
-                .sort(Cow::Borrowed(&[ThreadSort::SearchMatch]))
+                .sort(&[ThreadSort::SearchMatch])
                 .search(Cow::Borrowed(query))
                 .page_opt(page)
                 .per_page_opt(per_page)
@@ -351,7 +380,7 @@ impl<'a> ForumEndpoint<'a> {
     ) -> Result<Page<Vec<Thread>>, AniListError> {
         self.fetch(
             &FetchThreadOptions::builder()
-                .sort(Cow::Borrowed(&[ThreadSort::IdDesc]))
+                .sort(&[ThreadSort::IdDesc])
                 .user_id(user_id)
                 .page_opt(page)
                 .per_page_opt(per_page)
@@ -369,7 +398,7 @@ impl<'a> ForumEndpoint<'a> {
         self.fetch(
             &FetchThreadOptions::builder()
                 .subscribed(true)
-                .sort(Cow::Borrowed(&[ThreadSort::RepliedAtDesc]))
+                .sort(&[ThreadSort::RepliedAtDesc])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),
@@ -433,7 +462,7 @@ impl<'a> ForumEndpoint<'a> {
         self.fetch_comments(
             &FetchThreadCommentOptions::builder()
                 .thread_id(thread_id)
-                .sort(Cow::Borrowed(&[ThreadCommentSort::Id]))
+                .sort(&[ThreadCommentSort::Id])
                 .page_opt(page)
                 .per_page_opt(per_page)
                 .build(),

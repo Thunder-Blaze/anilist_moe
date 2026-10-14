@@ -18,16 +18,18 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct NotificationSearchOptions<'a> {
-    page: Option<i32>,
-    per_page: Option<i32>,
-    notification_type: Option<NotificationType>,
-    type_in: Option<Cow<'a, [NotificationType]>>,
-    reset_notification_count: Option<bool>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+    pub notification_type: Option<NotificationType>,
+    #[builder(setter(into))]
+    pub type_in: Option<Cow<'a, [NotificationType]>>,
+    pub reset_notification_count: Option<bool>,
     // HTML rendering options
-    message_as_html: Option<bool>,
-    text_as_html: Option<bool>,
-    comment_as_html: Option<bool>,
+    pub message_as_html: Option<bool>,
+    pub text_as_html: Option<bool>,
+    pub comment_as_html: Option<bool>,
 }
 
 /// Endpoint for notification operations.

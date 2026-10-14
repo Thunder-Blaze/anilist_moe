@@ -20,16 +20,17 @@ tokio = { version = "1", features = ["full"] }   # the runtime, and any feature 
 
 ```rust
 use anilist_moe::endpoints::media::FetchMediaOptions;
-use anilist_moe::options;
 
 #[tokio::main]
 async fn main() -> Result<(), anilist_moe::AniListError> {
     let client = anilist_moe::AniListClient::new(); // or `with_token("…")`
 
-    let page = client
-        .media()
-        .fetch(&options!(FetchMediaOptions, search: "Steins Gate", per_page: 5))
-        .await?;
+    let options = FetchMediaOptions::builder()
+        .search("Steins Gate")
+        .per_page(5)
+        .build();
+
+    let page = client.media().fetch(&options).await?;
 
     for media in &page.data {
         let title = media.title.as_ref().and_then(|title| title.romaji.as_deref());
@@ -51,8 +52,15 @@ async fn main() -> Result<(), anilist_moe::AniListError> {
   `review()`, `recommendation()`, `airing()`, `notification()`.
 - Every call takes `&Options`, where an `*Options` struct **is the GraphQL variable map**:
   fields serialise camelCase (`rename_all`), so `id_not` becomes `$idNot` and the query
-  uses it as `id_not: $idNot`. Build them with the `options!` macro (wraps values in
-  `Some`) or with struct literals.
+  uses it as `id_not: $idNot`. Build them with the typed builder —
+  `FetchMediaOptions::builder().search("Naruto").per_page(5).build()` — which enforces the
+  fields the API requires at compile time and lets a new GraphQL parameter be added without
+  breaking callers. Setters take the inner value; the `_opt` fallback takes the `Option`
+  (`.per_page(5)` or `.per_page_opt(maybe_page)`), and the list/string fields are
+  `impl Into<Cow<..>>`, so a literal, a `&[T]` or a `Vec` all work. The fields are `pub` and
+  the structs are `#[non_exhaustive]`, so a built value can still be read and adjusted
+  (a paging loop can set `options.page`) while literal construction outside the crate stays
+  impossible.
 - `Page<T>` is the paged answer: `.data` (a `Vec<…>`) and `.page_info`.
 - IDs are `u32` throughout; timestamps, counters and sort orders are `i32` (the API's
   signed `Int`).

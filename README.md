@@ -249,7 +249,7 @@ let client = AniListClient::builder().transport(Scripted).build().unwrap();
 ### Conditional Fetching Controls
 
 ```rust
-use anilist_moe::{options, AniListClient, AniListError};
+use anilist_moe::{AniListClient, AniListError};
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::{MediaSort, MediaType};
 
@@ -257,17 +257,16 @@ use anilist_moe::enums::media::{MediaSort, MediaType};
 async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
-    let options = options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        sort: &[MediaSort::PopularityDesc],
-        page: 1,
-        per_page: 3,
-        include_characters: true,
-        include_staff: true,
-        include_reviews: true,
-        include_recommendations: true,
-    );
+    let options = FetchMediaOptions::builder()
+        .media_type(MediaType::Anime)
+        .sort(&[MediaSort::PopularityDesc])
+        .page(1)
+        .per_page(3)
+        .include_characters(true)
+        .include_staff(true)
+        .include_reviews(true)
+        .include_recommendations(true)
+        .build();
 
     let response = client.media().fetch(&options).await?;
     for media in response.data {
@@ -496,10 +495,11 @@ use anilist_moe::{AniListClient, errors::AniListError};
 async fn main() {
     let client = AniListClient::new();
 
-    if let Err(error) = client.media().fetch_one(&anilist_moe::options!(
-        anilist_moe::endpoints::media::FetchMediaOneOptions,
-        id: 999_999_999,
-    )).await {
+    let options = anilist_moe::endpoints::media::FetchMediaOneOptions::builder()
+        .id(999_999_999)
+        .build();
+
+    if let Err(error) = client.media().fetch_one(&options).await {
         if let Some(errors) = error.graphql_errors() {
             for entry in errors {
                 eprintln!("{} at {:?}", entry.message(), entry.path);
@@ -715,7 +715,7 @@ says there is no next page, when a page comes back empty, or at a cap of 1000
 pages:
 
 ```rust
-use anilist_moe::{options, AniListClient, AniListError};
+use anilist_moe::{AniListClient, AniListError};
 use anilist_moe::endpoints::media::FetchMediaOptions;
 use anilist_moe::enums::media::MediaType;
 
@@ -724,11 +724,11 @@ async fn main() -> Result<(), AniListError> {
     let client = AniListClient::new();
 
     // Entry by entry.
-    let mut items = client.paginate(options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        per_page: 50,
-    ));
+    let options = FetchMediaOptions::builder()
+        .media_type(MediaType::Anime)
+        .per_page(50)
+        .build();
+    let mut items = client.paginate(options);
 
     while let Some(anime) = items.next_item().await {
         let anime = anime?;
@@ -736,11 +736,11 @@ async fn main() -> Result<(), AniListError> {
     }
 
     // Or page by page, which keeps the page number next to the entries.
-    let mut pages = client.paginate(options!(
-        FetchMediaOptions,
-        media_type: MediaType::Anime,
-        per_page: 50,
-    ));
+    let options = FetchMediaOptions::builder()
+        .media_type(MediaType::Anime)
+        .per_page(50)
+        .build();
+    let mut pages = client.paginate(options);
 
     while let Some(page) = pages.next_page().await {
         let page = page?;

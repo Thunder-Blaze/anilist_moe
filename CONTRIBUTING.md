@@ -10,7 +10,7 @@ Be respectful and constructive in all interactions. We aim to maintain a welcomi
 
 ### Prerequisites
 
-- Rust 1.70 or higher (with edition 2021 support)
+- Rust 1.82 or higher (the declared MSRV)
 - Git
 - A GitHub account
 
@@ -172,47 +172,93 @@ Example structure:
 use crate::client::AniListClient;
 use crate::errors::AniListError;
 use crate::objects::responses::*;
+use serde::Serialize;
+use serde_with::skip_serializing_none;
+use std::borrow::Cow;
+use typed_builder::TypedBuilder;
 
-pub struct NewEndpoint {
-    client: AniListClient,
+/// Options for fetching items. One field per GraphQL variable.
+#[skip_serializing_none]
+#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(
+    default,
+    setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
+))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct FetchOptions<'a> {
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+    // Cow fields take `impl Into<..>`, so a literal, a &[T] or a Vec all work
+    #[builder(setter(into))]
+    pub search: Option<Cow<'a, str>>,
+    pub sort: Option<Cow<'a, [Sort]>>,
 }
 
-impl NewEndpoint {
-    pub fn new(client: AniListClient) -> Self {
+pub struct NewEndpoint<'a> {
+    client: &'a AniListClient,
+}
+
+impl<'a> NewEndpoint<'a> {
+    pub fn new(client: &'a AniListClient) -> Self {
         Self { client }
     }
 
-    /// Get items with options
-    /// Returns Page<Vec<Item>>
-    pub async fn fetch(&self, options: FetchOptions) -> Result<Page<Vec<Item>>, AniListError> {
+    /// Get items with options.
+    pub async fn fetch(&self, options: &FetchOptions<'_>) -> Result<Page<Vec<Item>>, AniListError> {
         let query = queries::new_endpoint::FETCH;
-        let variables = json!(options);
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        self.client.fetch(query, Some(options)).await
     }
 
-    /// Convenience function - get popular items
-    /// Returns Page<Vec<Item>>
+    /// Convenience function - get popular items.
     pub async fn get_popular(&self, page: Option<i32>, per_page: Option<i32>)
         -> Result<Page<Vec<Item>>, AniListError> {
-        self.fetch(FetchOptions {
-            sort: Some(vec![Sort::Popularity]),
-            page,
-            per_page,
-            ..Default::default()
-        }).await
+        let options = FetchOptions::builder()
+            .sort(&[Sort::Popularity])
+            .page_opt(page)
+            .per_page_opt(per_page)
+            .build();
+        self.fetch(&options).await
     }
 
-    /// Get a single item by ID
-    /// Returns Item directly (not wrapped)
-    pub async fn get_by_id(&self, id: i32) -> Result<Item, AniListError> {
+    /// Get a single item by ID, which the API answers with the object itself.
+    pub async fn get_by_id(&self, id: u32) -> Result<Item, AniListError> {
         let query = queries::new_endpoint::FETCH_ONE;
-        let variables = json!({ "id": id });
-        let variables_map = crate::utils::json_to_hashmap(variables);
-        self.client.query_typed(query, Some(&variables_map)).await
+        let options = FetchOneOptions::builder().id(id).build();
+        self.client.fetch(query, Some(&options)).await
     }
 }
+
+/// Options for fetching one item. `id` is required, so the struct has no `Default`
+/// and the builder refuses to build without it.
+#[skip_serializing_none]
+#[derive(Debug, Serialize, TypedBuilder)]
+#[builder(field_defaults(setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct FetchOneOptions {
+    #[builder(!default)]
+    pub id: u32,
+}
 ```
+
+### How an options struct is written
+
+Every `*Options` struct is a request input, and follows the same shape:
+
+- `#[skip_serializing_none]` on the struct, so an unset field is left out of the
+  variables instead of being sent as `null` (AniList rejects `null` on some arguments).
+- `#[derive(Default, Debug, Serialize, TypedBuilder)]` — but a struct with a required
+  field does **not** derive `Default`, so nothing can build it with `id: 0`.
+- `#[builder(field_defaults(default, setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))))]`,
+  which gives every field two setters: `.page(2)` for the value and `.page_opt(Some(2))`
+  for an `Option`. `ignore_invalid` lets non-`Option` fields use the plain setter.
+- `#[non_exhaustive]`, with `pub` fields: callers cannot use a struct literal (so a new
+  variable can be added in a minor release), but a built value can still be read and
+  adjusted, which is what a paging loop does with `options.page`.
+- `#[builder(!default)]` on a field the API requires, which makes the builder a
+  compile-time error without it, and `#[builder(setter(into))]` on `Cow` fields, so
+  `.search("Naruto")` and `.sort(&[Sort::Popularity])` work without spelling out `Cow`.
 
 ### Adding Response Types
 
@@ -439,7 +485,7 @@ Brief description of the bug
 
 ## Environment
 - anilist_moe version: 0.2.0
-- Rust version: 1.70.0
+- Rust version: 1.82.0
 - OS: Ubuntu 22.04
 
 ## Steps to Reproduce

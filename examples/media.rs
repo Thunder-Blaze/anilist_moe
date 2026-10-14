@@ -4,7 +4,6 @@
 
 #[cfg(feature = "media")]
 use anilist_moe::{endpoints::media::FetchMediaOptions, AniListClient, AniListError};
-use std::borrow::Cow;
 
 #[cfg(feature = "media")]
 #[tokio::main]
@@ -16,9 +15,7 @@ async fn main() -> Result<(), AniListError> {
         .media()
         .fetch(
             &FetchMediaOptions::builder()
-                .sort(Cow::Borrowed(&[
-                    anilist_moe::enums::media::MediaSort::PopularityDesc,
-                ]))
+                .sort(&[anilist_moe::enums::media::MediaSort::PopularityDesc])
                 .per_page(5)
                 .page(1)
                 .build(),

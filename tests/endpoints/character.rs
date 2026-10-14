@@ -15,7 +15,7 @@ async fn test_fetch_character_by_search() {
     let result = h
         .run(|| async {
             let options = FetchCharacterOptions::builder()
-                .search("Spike".into())
+                .search("Spike")
                 .per_page(5)
                 .build();
             client.character().fetch(&options).await
@@ -154,7 +154,7 @@ async fn test_character_search_pagination() {
     let result1 = h
         .run(|| async {
             let options = FetchCharacterOptions::builder()
-                .search("Naruto".into())
+                .search("Naruto")
                 .page(1)
                 .per_page(5)
                 .build();
@@ -170,7 +170,7 @@ async fn test_character_search_pagination() {
     let result2 = h
         .run(|| async {
             let options = FetchCharacterOptions::builder()
-                .search("Naruto".into())
+                .search("Naruto")
                 .page(2)
                 .per_page(5)
                 .build();

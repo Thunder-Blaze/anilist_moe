@@ -2,7 +2,6 @@
 
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::endpoints::studio::*;
-use std::borrow::Cow;
 
 fn harness() -> TestHarness {
     TestHarness::new()
@@ -16,7 +15,7 @@ async fn test_fetch_studio_by_search() {
     let result = h
         .run(|| async {
             let options = FetchStudioOptions::builder()
-                .search(Cow::Borrowed("Kyoto"))
+                .search("Kyoto")
                 .per_page(5)
                 .build();
             client.studio().fetch(&options).await

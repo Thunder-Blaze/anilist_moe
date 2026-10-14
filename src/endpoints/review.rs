@@ -20,58 +20,70 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchReviewOptions<'a> {
-    page: Option<i32>,
-    per_page: Option<i32>,
-    id: Option<u32>,
-    media_id: Option<u32>,
-    user_id: Option<u32>,
-    media_type: Option<MediaType>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+    pub id: Option<u32>,
+    pub media_id: Option<u32>,
+    pub user_id: Option<u32>,
+    pub media_type: Option<MediaType>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [ReviewSort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [ReviewSort]>>,
     // HTML rendering options
-    body_as_html: Option<bool>,
-    description_as_html: Option<bool>,
+    pub body_as_html: Option<bool>,
+    pub description_as_html: Option<bool>,
 }
 
 /// Options for creating or updating a review.
 #[skip_serializing_none]
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[builder(field_defaults(
     default,
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveReviewOptions<'a> {
-    id: Option<u32>,
+    pub id: Option<u32>,
     #[builder(!default)]
-    media_id: u32,
-    score: Option<i32>,
-    summary: Option<Cow<'a, str>>,
-    body: Option<Cow<'a, str>>,
-    private: Option<bool>,
+    pub media_id: u32,
+    pub score: Option<i32>,
+    #[builder(setter(into))]
+    pub summary: Option<Cow<'a, str>>,
+    #[builder(setter(into))]
+    pub body: Option<Cow<'a, str>>,
+    pub private: Option<bool>,
     // HTML rendering options
-    body_as_html: Option<bool>,
+    pub body_as_html: Option<bool>,
 }
 
+#[skip_serializing_none]
 /// Options for deleting a review.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct DeleteReviewOptions {
-    id: u32,
+    #[builder(!default)]
+    pub id: u32,
 }
 
+#[skip_serializing_none]
 /// Options for rating a review.
-#[derive(Default, Debug, Serialize, TypedBuilder)]
+#[derive(Debug, Serialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct RateReviewOptions {
-    review_id: u32,
-    rating: ReviewRating,
+    #[builder(!default)]
+    pub review_id: u32,
+    #[builder(!default)]
+    pub rating: ReviewRating,
 }
 
 /// Endpoint for review operations.
@@ -126,7 +138,7 @@ impl<'a> ReviewEndpoint<'a> {
                 .media_id(media_id)
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[ReviewSort::RatingDesc]))
+                .sort(&[ReviewSort::RatingDesc])
                 .build(),
         )
         .await
@@ -144,7 +156,7 @@ impl<'a> ReviewEndpoint<'a> {
                 .user_id(user_id)
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[ReviewSort::IdDesc]))
+                .sort(&[ReviewSort::IdDesc])
                 .build(),
         )
         .await
@@ -160,7 +172,7 @@ impl<'a> ReviewEndpoint<'a> {
             &FetchReviewOptions::builder()
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[ReviewSort::IdDesc]))
+                .sort(&[ReviewSort::IdDesc])
                 .build(),
         )
         .await

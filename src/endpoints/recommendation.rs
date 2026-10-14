@@ -19,33 +19,40 @@ use typed_builder::TypedBuilder;
     setter(strip_option(ignore_invalid, fallback_suffix = "_opt"))
 ))]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct FetchRecommendationOptions<'a> {
-    page: Option<i32>,
-    per_page: Option<i32>,
-    id: Option<u32>,
-    media_id: Option<u32>,
-    media_recommendation_id: Option<u32>,
-    user_id: Option<u32>,
-    rating: Option<i32>,
-    rating_greater: Option<i32>,
-    rating_lesser: Option<i32>,
-    on_list: Option<bool>,
+    pub page: Option<i32>,
+    pub per_page: Option<i32>,
+    pub id: Option<u32>,
+    pub media_id: Option<u32>,
+    pub media_recommendation_id: Option<u32>,
+    pub user_id: Option<u32>,
+    pub rating: Option<i32>,
+    pub rating_greater: Option<i32>,
+    pub rating_lesser: Option<i32>,
+    pub on_list: Option<bool>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset sorts by the same key alone.
     #[serde(
         serialize_with = "crate::options::serialize_sort",
         skip_serializing_if = "crate::options::skip_never"
     )]
-    sort: Option<Cow<'a, [RecommendationSort]>>,
+    #[builder(setter(into))]
+    pub sort: Option<Cow<'a, [RecommendationSort]>>,
 }
 
+#[skip_serializing_none]
 /// Options for saving a recommendation rating.
-#[derive(Default, Debug, Serialize, Deserialize, TypedBuilder)]
+#[derive(Debug, Serialize, Deserialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct SaveRecommendationOptions {
-    media_id: u32,
-    media_recommendation_id: u32,
-    rating: RecommendationRating,
+    #[builder(!default)]
+    pub media_id: u32,
+    #[builder(!default)]
+    pub media_recommendation_id: u32,
+    #[builder(!default)]
+    pub rating: RecommendationRating,
 }
 
 /// Endpoint for media recommendation operations.
@@ -88,7 +95,7 @@ impl<'a> RecommendationEndpoint<'a> {
                 .media_id(media_id)
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[RecommendationSort::RatingDesc]))
+                .sort(&[RecommendationSort::RatingDesc])
                 .build(),
         )
         .await
@@ -106,7 +113,7 @@ impl<'a> RecommendationEndpoint<'a> {
                 .user_id(user_id)
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[RecommendationSort::IdDesc]))
+                .sort(&[RecommendationSort::IdDesc])
                 .build(),
         )
         .await
@@ -122,7 +129,7 @@ impl<'a> RecommendationEndpoint<'a> {
             &FetchRecommendationOptions::builder()
                 .page_opt(page)
                 .per_page_opt(per_page)
-                .sort(Cow::Borrowed(&[RecommendationSort::IdDesc]))
+                .sort(&[RecommendationSort::IdDesc])
                 .build(),
         )
         .await
