@@ -5,6 +5,7 @@ use anilist_moe::errors::{AniListError, GraphQLError};
 #[test]
 fn test_error_display_graphql() {
     let error = AniListError::GraphQL {
+        operation: None,
         errors: vec![GraphQLError::new("Field 'test' not found")],
         data: None,
     };
@@ -16,16 +17,11 @@ fn test_error_display_graphql() {
 #[test]
 fn test_graphql_errors_expose_the_payload() {
     let error = AniListError::GraphQL {
+        operation: None,
         errors: vec![
-            GraphQLError {
-                message: "Cannot query field \"nope\".".to_string(),
-                path: Some(vec![serde_json::json!("Media")]),
-                locations: Some(vec![anilist_moe::errors::GraphQLLocation {
-                    line: 2,
-                    column: 3,
-                }]),
-                extensions: None,
-            },
+            GraphQLError::new("Cannot query field \"nope\".")
+                .with_path(vec![serde_json::json!("Media")])
+                .with_locations(vec![anilist_moe::errors::GraphQLLocation::new(2, 3)]),
             GraphQLError::new("and another"),
         ],
         data: Some(serde_json::json!({"Media": {"id": 1}})),
@@ -124,6 +120,7 @@ fn test_error_display_server_error() {
 fn test_error_display_parse_error() {
     let error = AniListError::ParseError {
         message: "Failed to parse JSON response".to_string(),
+        source: None,
     };
     let display = format!("{}", error);
     assert!(display.contains("Parse error"));

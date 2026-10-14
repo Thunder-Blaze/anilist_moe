@@ -415,6 +415,7 @@ mod tests {
 
         let transport = AniListError::Transport {
             message: "connection reset".to_string(),
+            source: None,
         };
         assert!(retry_delay(&transport, 0, &config).is_some());
 
@@ -427,6 +428,7 @@ mod tests {
         assert_eq!(
             retry_delay(
                 &AniListError::GraphQL {
+                    operation: None,
                     errors: vec![crate::errors::GraphQLError::new("bad query")],
                     data: None,
                 },

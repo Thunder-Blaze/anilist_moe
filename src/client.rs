@@ -241,7 +241,7 @@ impl AniListClientBuilder {
     ///
     /// # Errors
     ///
-    /// [`AniListError::Transport`] when no transport was supplied and the default
+    /// [`AniListError::Network`] when no transport was supplied and the default
     /// `reqwest` client cannot be created.
     pub fn build(self) -> Result<AniListClient, AniListError> {
         let transport = match self.transport {
@@ -389,7 +389,7 @@ impl AniListClient {
     ///
     /// # Errors
     ///
-    /// [`AniListError::Transport`] when the default HTTP client cannot be built.
+    /// [`AniListError::Network`] when the default HTTP client cannot be built.
     /// [`AniListClient::new`] is the panicking shorthand.
     ///
     /// # Examples
@@ -408,7 +408,7 @@ impl AniListClient {
     ///
     /// # Errors
     ///
-    /// [`AniListError::Transport`] when the default HTTP client cannot be built.
+    /// [`AniListError::Network`] when the default HTTP client cannot be built.
     pub fn try_with_token(token: impl Into<String>) -> Result<Self, AniListError> {
         Self::builder().token(token).build()
     }
@@ -676,7 +676,8 @@ impl AniListClient {
         let response_data = self.execute_query(query, variables).await?;
         let wrapper: GraphQLResponse<T> =
             from_value(response_data).map_err(|e| AniListError::ParseError {
-                message: format!("Failed to deserialize response: {}", e),
+                message: format!("Failed to deserialize response: {e}"),
+                source: Some(Box::new(e)),
             })?;
         Ok(wrapper.data)
     }
@@ -715,6 +716,7 @@ impl AniListClient {
         let body = serde_json::to_vec(&RequestBody { query, variables }).map_err(|error| {
             AniListError::ParseError {
                 message: format!("Failed to serialize request: {error}"),
+                source: Some(Box::new(error)),
             }
         })?;
 
@@ -765,7 +767,8 @@ impl AniListClient {
             "received response",
         );
 
-        Self::interpret_response(response)
+        let op = operation_name(query);
+        Self::interpret_response(response).map_err(|err| err.with_operation(op))
     }
 
     /// Turns an HTTP response into the GraphQL `data` value or an error.
@@ -894,6 +897,7 @@ impl AniListClient {
         let data = json.get("data").filter(|value| !value.is_null()).cloned();
 
         Err(AniListError::GraphQL {
+            operation: None,
             errors: parsed,
             data,
         })
@@ -919,7 +923,6 @@ fn variables_type<V>() -> &'static str {
 /// keyword, or `"query"` for an anonymous document such as `{ viewer { id } }`.
 /// The result borrows from `query`, so this allocates nothing and is cheap
 /// enough to call on every request.
-#[cfg(feature = "tracing")]
 fn operation_name(query: &str) -> &str {
     let trimmed = query.trim_start();
 
@@ -1020,6 +1023,7 @@ mod tests {
                 if responses.is_empty() {
                     return Err(AniListError::Transport {
                         message: "no queued response".to_string(),
+                        source: None,
                     });
                 }
                 Ok(responses.remove(0))
@@ -1082,7 +1086,7 @@ mod tests {
         assert_eq!(errors[0].path.as_ref().unwrap().len(), 2);
         assert_eq!(
             errors[0].locations.as_ref().unwrap()[0],
-            crate::errors::GraphQLLocation { line: 3, column: 5 }
+            crate::errors::GraphQLLocation::new(3, 5)
         );
         assert_eq!(
             errors[0].extensions.as_ref().unwrap()["code"],
@@ -1105,7 +1109,7 @@ mod tests {
 
         let error = AniListClient::interpret_response(response).expect_err("must fail");
         match error {
-            AniListError::GraphQL { errors, data } => {
+            AniListError::GraphQL { errors, data, .. } => {
                 assert_eq!(errors[0].message(), "title failed");
                 assert_eq!(data.expect("partial data")["Media"]["id"], 1);
             }
@@ -1132,6 +1136,7 @@ mod tests {
     #[test]
     fn graphql_message_lookup_is_case_insensitive() {
         let error = AniListError::GraphQL {
+            operation: None,
             errors: vec![GraphQLError::new("Cannot query field \"nope\".")],
             data: None,
         };

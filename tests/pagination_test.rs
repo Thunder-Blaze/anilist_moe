@@ -77,6 +77,7 @@ impl Transport for ScriptedTransport {
                 }
                 return Err(AniListError::Transport {
                     message: "no queued response".to_string(),
+                    source: None,
                 });
             }
 

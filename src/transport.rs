@@ -185,7 +185,7 @@ impl ReqwestTransport {
     ///
     /// # Errors
     ///
-    /// [`AniListError::Transport`] when `reqwest` refuses the configuration.
+    /// [`AniListError::Network`] when `reqwest` refuses the configuration.
     pub fn with_options(
         timeout: Option<std::time::Duration>,
         user_agent: Option<&str>,

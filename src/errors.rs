@@ -14,16 +14,12 @@ use thiserror::Error;
 /// ```rust
 /// use anilist_moe::errors::GraphQLError;
 ///
-/// let error = GraphQLError {
-///     message: "Cannot query field \"nope\" on type \"Media\".".to_string(),
-///     path: Some(vec![serde_json::json!("Media"), serde_json::json!("nope")]),
-///     locations: None,
-///     extensions: None,
-/// };
-///
+/// let error = GraphQLError::new("Cannot query field \"nope\" on type \"Media\".")
+///     .with_path(vec![serde_json::json!("Media"), serde_json::json!("nope")]);
 /// assert!(error.path.unwrap().len() == 2);
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GraphQLError {
     /// Human readable description of what went wrong.
     pub message: String,
@@ -55,15 +51,47 @@ impl GraphQLError {
     pub fn message(&self) -> &str {
         &self.message
     }
+    /// Sets the error path.
+    #[must_use]
+    pub fn with_path(mut self, path: Vec<serde_json::Value>) -> Self {
+        self.path = Some(path);
+        self
+    }
+
+    /// Sets the error locations.
+    #[must_use]
+    pub fn with_locations(mut self, locations: Vec<GraphQLLocation>) -> Self {
+        self.locations = Some(locations);
+        self
+    }
+
+    /// Sets server specific extensions metadata.
+    #[must_use]
+    pub fn with_extensions(
+        mut self,
+        extensions: serde_json::Map<String, serde_json::Value>,
+    ) -> Self {
+        self.extensions = Some(extensions);
+        self
+    }
 }
 
 /// A position inside the query document, as reported by GraphQL errors.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GraphQLLocation {
     /// One-based line number.
     pub line: u32,
     /// One-based column number.
     pub column: u32,
+}
+
+impl GraphQLLocation {
+    /// Creates a new location with 1-based line and column numbers.
+    #[must_use]
+    pub const fn new(line: u32, column: u32) -> Self {
+        Self { line, column }
+    }
 }
 
 /// Joins the messages of a GraphQL error list for display.
@@ -82,6 +110,74 @@ pub fn format_messages(errors: &[GraphQLError]) -> String {
     }
     joined
 }
+/// High-level categorization of an [`AniListError`].
+///
+/// Allows callers to pattern-match on failure classes exhaustively or map them
+/// to metrics dimensions without parsing error strings.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum ErrorKind {
+    /// Underlying connection failure, timeout, or TLS issue.
+    Network,
+    /// Custom or external transport failure.
+    Transport,
+    /// JSON decoding error.
+    Json,
+    /// GraphQL response contained one or more validation or execution errors.
+    GraphQL,
+    /// Rate limit reached with header information.
+    RateLimit,
+    /// Rate limit reached without detailed headers.
+    RateLimitSimple,
+    /// Too many requests sent within a burst window.
+    BurstLimit,
+    /// The requested entity was not found (HTTP 404).
+    NotFound,
+    /// Authentication token required but missing (HTTP 401).
+    AuthenticationRequired,
+    /// Authentication token lacks required permissions (HTTP 403).
+    AccessDenied,
+    /// Malformed request or invalid arguments (HTTP 400).
+    BadRequest,
+    /// Server-side error (HTTP 5xx).
+    ServerError,
+    /// AniList is down for maintenance (HTTP 503 or outage message).
+    Maintenance,
+    /// Unexpected HTTP status code.
+    UnexpectedStatus,
+    /// Failed to parse or serialize response/request payload.
+    ParseError,
+}
+
+impl ErrorKind {
+    /// Returns a stable, lowercase string label suitable for metrics dimensions.
+    #[must_use]
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Network => "network",
+            Self::Transport => "transport",
+            Self::Json => "json",
+            Self::GraphQL => "graphql",
+            Self::RateLimit => "rate_limit",
+            Self::RateLimitSimple => "rate_limit_simple",
+            Self::BurstLimit => "burst_limit",
+            Self::NotFound => "not_found",
+            Self::AuthenticationRequired => "authentication_required",
+            Self::AccessDenied => "access_denied",
+            Self::BadRequest => "bad_request",
+            Self::ServerError => "server_error",
+            Self::Maintenance => "maintenance",
+            Self::UnexpectedStatus => "unexpected_status",
+            Self::ParseError => "parse_error",
+        }
+    }
+}
+
+impl std::fmt::Display for ErrorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
 
 /// Errors that can occur when interacting with the AniList API.
 ///
@@ -96,15 +192,21 @@ pub enum AniListError {
 
     /// The transport failed before an HTTP response was produced.
     #[error("Transport error: {message}")]
-    Transport { message: String },
+    Transport {
+        message: String,
+        #[source]
+        source: Option<Box<dyn std::error::Error + Send + Sync>>,
+    },
 
     /// JSON deserialization error
     #[error("JSON parsing error: {0}")]
     Json(#[from] serde_json::Error),
 
     /// GraphQL API returned one or more errors
-    #[error("GraphQL error: {}", format_messages(.errors))]
+    #[error("GraphQL error{}: {}", match .operation { Some(op) => format!(" on {op}"), None => String::new() }, format_messages(.errors))]
     GraphQL {
+        /// The operation name declared in the GraphQL document, if any.
+        operation: Option<String>,
         /// Every error the server returned, in order.
         errors: Vec<GraphQLError>,
         /// Data the server returned alongside the errors, when it returned any.
@@ -165,9 +267,13 @@ pub enum AniListError {
     #[error("Unexpected status {status}: {message}")]
     UnexpectedStatus { status: u16, message: String },
 
-    /// Failed to parse API response
+    /// Failed to parse API response or serialize request payload.
     #[error("Parse error: {message}")]
-    ParseError { message: String },
+    ParseError {
+        message: String,
+        #[source]
+        source: Option<Box<dyn std::error::Error + Send + Sync>>,
+    },
 }
 
 /// Whether a message reads like AniList saying it is down.
@@ -210,6 +316,7 @@ impl AniListError {
     /// use anilist_moe::errors::{AniListError, GraphQLError};
     ///
     /// let error = AniListError::GraphQL {
+    ///     operation: None,
     ///     errors: vec![GraphQLError::new("Cannot query field \"nope\".")],
     ///     data: None,
     /// };
@@ -249,23 +356,120 @@ impl AniListError {
     /// ```
     #[must_use]
     pub fn kind(&self) -> &'static str {
+        self.error_kind().as_str()
+    }
+
+    /// A typed, high-level [`ErrorKind`] for matching or error classification.
+    ///
+    /// ```rust
+    /// use anilist_moe::errors::{AniListError, ErrorKind};
+    ///
+    /// assert_eq!(AniListError::NotFound.error_kind(), ErrorKind::NotFound);
+    /// ```
+    #[must_use]
+    pub fn error_kind(&self) -> ErrorKind {
         match self {
-            Self::Network(_) => "network",
-            Self::Transport { .. } => "transport",
-            Self::Json(_) => "json",
-            Self::GraphQL { .. } => "graphql",
-            Self::RateLimit { .. } => "rate_limit",
-            Self::RateLimitSimple => "rate_limit_simple",
-            Self::BurstLimit => "burst_limit",
-            Self::NotFound => "not_found",
-            Self::AuthenticationRequired => "authentication_required",
-            Self::AccessDenied => "access_denied",
-            Self::BadRequest { .. } => "bad_request",
-            Self::ServerError { .. } => "server_error",
-            Self::Maintenance { .. } => "maintenance",
-            Self::UnexpectedStatus { .. } => "unexpected_status",
-            Self::ParseError { .. } => "parse_error",
+            Self::Network(_) => ErrorKind::Network,
+            Self::Transport { .. } => ErrorKind::Transport,
+            Self::Json(_) => ErrorKind::Json,
+            Self::GraphQL { .. } => ErrorKind::GraphQL,
+            Self::RateLimit { .. } => ErrorKind::RateLimit,
+            Self::RateLimitSimple => ErrorKind::RateLimitSimple,
+            Self::BurstLimit => ErrorKind::BurstLimit,
+            Self::NotFound => ErrorKind::NotFound,
+            Self::AuthenticationRequired => ErrorKind::AuthenticationRequired,
+            Self::AccessDenied => ErrorKind::AccessDenied,
+            Self::BadRequest { .. } => ErrorKind::BadRequest,
+            Self::ServerError { .. } => ErrorKind::ServerError,
+            Self::Maintenance { .. } => ErrorKind::Maintenance,
+            Self::UnexpectedStatus { .. } => ErrorKind::UnexpectedStatus,
+            Self::ParseError { .. } => ErrorKind::ParseError,
         }
+    }
+
+    /// The HTTP status code returned by the server, if an HTTP response was produced.
+    ///
+    /// Returns `None` for network or client-side transport/serialization errors.
+    ///
+    /// ```rust
+    /// use anilist_moe::errors::AniListError;
+    ///
+    /// assert_eq!(AniListError::NotFound.status(), Some(404));
+    /// assert_eq!(AniListError::AuthenticationRequired.status(), Some(401));
+    /// ```
+    #[must_use]
+    pub fn status(&self) -> Option<u16> {
+        match self {
+            Self::RateLimit { .. } | Self::RateLimitSimple => Some(429),
+            Self::BurstLimit => Some(200),
+            Self::NotFound => Some(404),
+            Self::AuthenticationRequired => Some(401),
+            Self::AccessDenied => Some(403),
+            Self::BadRequest { .. } => Some(400),
+            Self::ServerError { status, .. } | Self::UnexpectedStatus { status, .. } => {
+                Some(*status)
+            }
+            Self::Maintenance { .. } => Some(503),
+            _ => None,
+        }
+    }
+
+    /// Whether this error represents a rate limit condition.
+    #[must_use]
+    pub fn is_rate_limit(&self) -> bool {
+        matches!(
+            self,
+            Self::RateLimit { .. } | Self::RateLimitSimple | Self::BurstLimit
+        )
+    }
+
+    /// Whether this error represents a network or transport-level failure.
+    #[must_use]
+    pub fn is_network(&self) -> bool {
+        matches!(self, Self::Network(_) | Self::Transport { .. })
+    }
+
+    /// How many seconds to wait before retrying, if the error conveyed a delay.
+    #[must_use]
+    pub fn retry_after_secs(&self) -> Option<u64> {
+        match self {
+            Self::RateLimit { retry_after, .. } => Some(u64::from(*retry_after)),
+            _ => None,
+        }
+    }
+
+    /// Whether this error was caused by a transient network failure, rate limit, or server outage
+    /// that is eligible for a retry.
+    #[must_use]
+    pub fn is_retryable(&self) -> bool {
+        match self {
+            Self::RateLimit { .. }
+            | Self::RateLimitSimple
+            | Self::BurstLimit
+            | Self::Network(_)
+            | Self::Transport { .. }
+            | Self::Maintenance { .. } => true,
+            Self::ServerError { status, .. } => (500..=599).contains(status),
+            _ => false,
+        }
+    }
+
+    /// Returns the name of the operation that produced this error, when attached.
+    #[must_use]
+    pub fn operation(&self) -> Option<&str> {
+        match self {
+            Self::GraphQL { operation, .. } => operation.as_deref(),
+            _ => None,
+        }
+    }
+
+    /// Attaches an operation name to this error, if applicable.
+    #[must_use]
+    pub fn with_operation(mut self, op: impl Into<String>) -> Self {
+        if let Self::GraphQL { operation, .. } = &mut self {
+            *operation = Some(op.into());
+        }
+        self
     }
 }
 
@@ -278,9 +482,11 @@ mod tests {
         let errors = [
             AniListError::Transport {
                 message: "boom".to_string(),
+                source: None,
             },
             AniListError::Json(serde_json::from_str::<serde_json::Value>("").unwrap_err()),
             AniListError::GraphQL {
+                operation: None,
                 errors: vec![GraphQLError::new("nope")],
                 data: None,
             },
@@ -304,6 +510,7 @@ mod tests {
             },
             AniListError::ParseError {
                 message: "boom".to_string(),
+                source: None,
             },
         ];
 
@@ -313,5 +520,24 @@ mod tests {
             assert!(label.chars().all(|c| c.is_ascii_lowercase() || c == '_'));
         }
         assert_eq!(AniListError::NotFound.kind(), "not_found");
+        assert_eq!(AniListError::NotFound.error_kind(), ErrorKind::NotFound);
+        assert_eq!(AniListError::NotFound.status(), Some(404));
+        assert_eq!(AniListError::RateLimitSimple.status(), Some(429));
+        assert!(AniListError::RateLimitSimple.is_rate_limit());
+        assert!(AniListError::RateLimitSimple.is_retryable());
+        assert!(!AniListError::NotFound.is_retryable());
+    }
+
+    #[test]
+    fn operation_name_can_be_attached_to_graphql_error() {
+        let error = AniListError::GraphQL {
+            operation: None,
+            errors: vec![GraphQLError::new("nope")],
+            data: None,
+        };
+        assert_eq!(error.operation(), None);
+        let with_op = error.with_operation("GetUser");
+        assert_eq!(with_op.operation(), Some("GetUser"));
+        assert!(with_op.to_string().contains("on GetUser"));
     }
 }

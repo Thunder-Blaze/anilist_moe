@@ -9,6 +9,39 @@ This project uses [Semantic Versioning](https://semver.org/):
 - **MINOR** version for new functionality in a backwards compatible manner
 - **PATCH** version for backwards compatible bug fixes
 
+## [0.7.0] - 2026-10-14
+
+This release elevates error handling to production grade: structured classifications
+and retryability are now first-class library APIs, error sources are preserved throughout
+the chain, and request context is attached to failures.
+
+### Added
+- `ErrorKind` enum (`#[non_exhaustive]`): typed high-level error classification covering
+  all failure modes (`Network`, `Transport`, `Json`, `GraphQL`, `RateLimit`, `NotFound`, etc.)
+  with `as_str()` and `Display`.
+- `AniListError::error_kind(&self) -> ErrorKind` for pattern matching on error classes.
+- `AniListError::is_retryable(&self) -> bool`: centralized source of truth for transient
+  network failures, rate limits, and 5xx outages eligible for retry.
+- `AniListError::is_rate_limit(&self) -> bool` and `AniListError::is_network(&self) -> bool`.
+- `AniListError::retry_after_secs(&self) -> Option<u64>` exposed publicly on error values.
+- `AniListError::status(&self) -> Option<u16>` exposes the HTTP status code across all
+  status-driven error variants (400, 401, 403, 404, 429, 500..=599).
+- `AniListError::operation(&self) -> Option<&str>` and `AniListError::with_operation(…)`:
+  attaches the GraphQL operation name (e.g. `GetUser`, `ToggleActivityPin`) to error context.
+- `GraphQLLocation::new(line, column)` and builder methods on `GraphQLError` (`with_path`,
+  `with_locations`, `with_extensions`).
+
+### Changed
+- **Breaking**: `GraphQLError` and `GraphQLLocation` are now `#[non_exhaustive]` to prevent
+  downstream breaks as AniList adds fields to GraphQL error payloads.
+- **Breaking**: `AniListError::GraphQL` now includes `operation: Option<String>`.
+- **Breaking**: `AniListError::ParseError` and `AniListError::Transport` now include optional
+  `#[source] Box<dyn std::error::Error + Send + Sync>` preserving root error chains.
+- `tests/test_harness.rs` deleted redundant local `IsRetryableError` trait in favor of
+  the library's public error classification API.
+- Fixed stale builder doc comments in `client.rs` and `transport.rs` that referenced `Transport`
+  instead of `Network`.
+
 ## [0.6.0] - 2026-10-14
 
 Endpoint options are built with the typed builder instead of the `options!` macro, which

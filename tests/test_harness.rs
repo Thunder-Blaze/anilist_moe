@@ -249,11 +249,10 @@ impl TestHarness {
     /// 5. Triggers a GLOBAL pause (all threads) when rate limited, for as long as
     ///    the API asked for
     /// 6. Retries the operation after the pause
-    pub async fn run<F, Fut, T, E>(&self, operation: F) -> Result<T, E>
+    pub async fn run<F, Fut, T>(&self, operation: F) -> Result<T, AniListError>
     where
         F: Fn() -> Fut,
-        Fut: Future<Output = Result<T, E>>,
-        E: std::fmt::Debug + IsRetryableError,
+        Fut: Future<Output = Result<T, AniListError>>,
     {
         let config = TestConfig::get();
         let mut network_retries = 0u32;
@@ -277,7 +276,7 @@ impl TestHarness {
                     }
                     return Ok(result);
                 }
-                Err(e) if e.is_rate_limit_error() => {
+                Err(e) if e.is_rate_limit() => {
                     if rate_limit_retries >= config.max_rate_limit_retries {
                         eprintln!(
                             "❌ Max rate limit retries ({}) reached. Failing test.",
@@ -296,7 +295,7 @@ impl TestHarness {
                         .await;
                     // Loop will retry after pause
                 }
-                Err(e) if e.is_network_error() && network_retries < config.max_network_retries => {
+                Err(e) if e.is_network() && network_retries < config.max_network_retries => {
                     network_retries += 1;
                     eprintln!(
                         "🔄 Network error, retrying ({}/{})...: {:?}",
@@ -322,39 +321,6 @@ impl TestHarness {
 impl Default for TestHarness {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-/// Trait to check if an error is retryable
-pub trait IsRetryableError {
-    fn is_rate_limit_error(&self) -> bool;
-    fn is_network_error(&self) -> bool;
-
-    /// The `Retry-After` the API sent for a rate limit error, when it did.
-    fn retry_after_secs(&self) -> Option<u64> {
-        None
-    }
-}
-
-impl IsRetryableError for AniListError {
-    fn is_rate_limit_error(&self) -> bool {
-        matches!(
-            self,
-            AniListError::RateLimit { .. }
-                | AniListError::RateLimitSimple
-                | AniListError::BurstLimit
-        )
-    }
-
-    fn is_network_error(&self) -> bool {
-        matches!(self, AniListError::Network(_))
-    }
-
-    fn retry_after_secs(&self) -> Option<u64> {
-        match self {
-            AniListError::RateLimit { retry_after, .. } => Some(u64::from(*retry_after)),
-            _ => None,
-        }
     }
 }
 
@@ -396,24 +362,24 @@ mod tests {
 
     #[test]
     fn test_is_rate_limit_error() {
-        assert!(AniListError::RateLimitSimple.is_rate_limit_error());
-        assert!(AniListError::BurstLimit.is_rate_limit_error());
+        assert!(AniListError::RateLimitSimple.is_rate_limit());
+        assert!(AniListError::BurstLimit.is_rate_limit());
         assert!(AniListError::RateLimit {
             limit: 90,
             remaining: 0,
             reset_at: 0,
             retry_after: 60,
         }
-        .is_rate_limit_error());
-        assert!(!AniListError::NotFound.is_rate_limit_error());
-        assert!(!AniListError::AuthenticationRequired.is_rate_limit_error());
+        .is_rate_limit());
+        assert!(!AniListError::NotFound.is_rate_limit());
+        assert!(!AniListError::AuthenticationRequired.is_rate_limit());
     }
 
     #[test]
     fn test_is_network_error() {
         // Network errors should be detected
-        assert!(!AniListError::NotFound.is_network_error());
-        assert!(!AniListError::RateLimitSimple.is_network_error());
+        assert!(!AniListError::NotFound.is_network());
+        assert!(!AniListError::RateLimitSimple.is_network());
     }
 
     #[test]
