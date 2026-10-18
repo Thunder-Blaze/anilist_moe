@@ -245,12 +245,20 @@ impl<'a> ForumEndpoint<'a> {
     }
 
     /// Fetch a single thread comment
+    ///
+    /// AniList's `ThreadComment` field answers with a list, so this returns the
+    /// first comment that matches the options.
+    ///
+    /// # Errors
+    ///
+    /// [`AniListError::NotFound`] when nothing matches.
     pub async fn fetch_comment_one(
         &self,
         options: &FetchThreadCommentOneOptions<'_>,
     ) -> Result<ThreadComment, AniListError> {
         let query = forum::FETCH_COMMENT_ONE;
-        self.client.fetch(query, Some(&options)).await
+        let comments: Vec<ThreadComment> = self.client.fetch(query, Some(&options)).await?;
+        comments.into_iter().next().ok_or(AniListError::NotFound)
     }
 
     /// Create or update a thread
