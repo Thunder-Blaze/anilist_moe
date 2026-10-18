@@ -57,6 +57,13 @@ jobs:
       - name: Run doctests
         run: cargo test --locked --all-features --doc
 
+      # docs.rs builds with every feature; a broken intra-doc link should fail here,
+      # not on the published page.
+      - name: Build docs without warnings
+        run: cargo doc --locked --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings
+
   msrv:
     name: MSRV (1.82)
     runs-on: ubuntu-latest

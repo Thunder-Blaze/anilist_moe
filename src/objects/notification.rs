@@ -276,7 +276,7 @@ pub struct MediaDeletionNotification {
 }
 
 /// A submission update about a media entry (AniList sends these under
-/// [`NotificationType::MediaSubmissionUpdate`](crate::enums::notification::NotificationType::MediaSubmissionUpdate)).
+/// [`NotificationType::MediaSubmissionUpdate`]).
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
