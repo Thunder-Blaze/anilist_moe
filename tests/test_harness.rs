@@ -326,7 +326,7 @@ impl Default for TestHarness {
 
 /// Gets an authenticated test harness
 pub fn get_authenticated_harness() -> Option<TestHarness> {
-    use dotenv::dotenv;
+    use dotenvy::dotenv;
     use std::env;
 
     dotenv().ok();

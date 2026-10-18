@@ -1,0 +1,15 @@
+# Keep Cargo.lock buildable on the declared MSRV (rust-version = 1.82).
+#
+# With this, `cargo update` on a newer toolchain (1.84 and later) picks the newest
+# version of each dependency that still supports Rust 1.82, instead of the newest
+# version outright. The CI `msrv` job builds with `--locked`, so a lock entry that
+# needs a newer compiler — or edition 2024, which Cargo 1.82 cannot even parse —
+# fails it.
+#
+# One pin the resolver cannot make on its own: `idna_adapter` is held at 1.1.0
+# (the unicode-rs back end). 1.2 switches to ICU 2, whose `zerovec` needs Rust
+# 1.83 without saying so through `idna_adapter`. After a `cargo update`, restore it:
+#
+#     cargo update -p idna_adapter --precise 1.1.0
+[resolver]
+incompatible-rust-versions = "fallback"

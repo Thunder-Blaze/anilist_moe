@@ -11,6 +11,9 @@ Be respectful and constructive in all interactions. We aim to maintain a welcomi
 ### Prerequisites
 
 - Rust 1.82 or higher (the declared MSRV)
+  - `Cargo.lock` must stay buildable on 1.82. `.cargo/config.toml` makes
+    `cargo update` pick 1.82-compatible versions; read the note there about the
+    one manual pin (`idna_adapter`).
 - Git
 - A GitHub account
 

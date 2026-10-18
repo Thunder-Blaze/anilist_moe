@@ -3,7 +3,7 @@
 use crate::support::allow_environmental_failure;
 use crate::test_harness::{delay_between_tests, TestHarness};
 use anilist_moe::{endpoints::activity::*, unions::activity::ActivityUnion};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use std::env;
 
 fn harness() -> TestHarness {
