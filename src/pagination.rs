@@ -118,7 +118,9 @@ impl<Q: Paginated> Paginator<Q> {
         if self.finished {
             return None;
         }
-        if self.next_page > self.max_pages as i32 {
+        // Compared in i64: `max_pages as i32` turns a cap above `i32::MAX` negative,
+        // which would end the walk before the first page.
+        if i64::from(self.next_page) > i64::from(self.max_pages) {
             self.finished = true;
             return None;
         }
@@ -246,5 +248,69 @@ mod tests {
     #[test]
     fn without_pagination_info_there_is_nothing_to_follow() {
         assert!(!has_more(&page(20, None)));
+    }
+
+    /// Answers every request with one page that says more pages follow.
+    #[derive(Debug)]
+    struct EndlessPages;
+
+    impl crate::transport::Transport for EndlessPages {
+        fn execute(
+            &self,
+            _request: crate::transport::HttpRequest,
+        ) -> std::pin::Pin<
+            Box<
+                dyn Future<Output = Result<crate::transport::HttpResponse, AniListError>>
+                    + Send
+                    + '_,
+            >,
+        > {
+            Box::pin(async {
+                Ok(crate::transport::HttpResponse::new(
+                    200,
+                    r#"{"data":{"Page":{"pageInfo":{"hasNextPage":true},"items":[1]}}}"#,
+                ))
+            })
+        }
+    }
+
+    /// A list query over [`EndlessPages`].
+    struct Numbers;
+
+    impl Paginated for Numbers {
+        type Item = u32;
+
+        fn fetch(
+            &self,
+            client: &AniListClient,
+        ) -> impl Future<Output = Result<Page<Vec<u32>>, AniListError>> + Send {
+            let client = client.clone();
+            async move { client.fetch("query { Page { items } }", None::<&()>).await }
+        }
+
+        fn set_page(&mut self, _page: i32) {}
+    }
+
+    fn endless_client() -> AniListClient {
+        AniListClient::builder()
+            .transport(EndlessPages)
+            .build()
+            .expect("a supplied transport cannot fail to build")
+    }
+
+    #[tokio::test]
+    async fn a_cap_above_i32_max_still_walks() {
+        let mut walk = Paginator::new(endless_client(), Numbers).with_max_pages(u32::MAX);
+        assert!(
+            walk.next_page().await.is_some(),
+            "a large cap must not read as negative and end the walk at once"
+        );
+    }
+
+    #[tokio::test]
+    async fn the_page_cap_ends_an_endless_walk() {
+        let mut walk = Paginator::new(endless_client(), Numbers).with_max_pages(3);
+        assert_eq!(walk.collect_all().await.unwrap(), vec![1, 1, 1]);
+        assert!(walk.is_finished());
     }
 }
