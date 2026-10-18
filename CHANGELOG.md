@@ -9,6 +9,63 @@ This project uses [Semantic Versioning](https://semver.org/):
 - **MINOR** version for new functionality in a backwards compatible manner
 - **PATCH** version for backwards compatible bug fixes
 
+## [0.7.1] - 2026-10-18
+
+A correctness release. Every bundled GraphQL document was validated against AniList's
+live schema, and each options struct was checked against the variables its document
+declares; that audit found the endpoint bugs below. It also makes retries safe for
+mutations. No public API changes.
+
+### Fixed
+- `UserEndpoint::stats` could never succeed: `stats.graphql` carried stray text
+  (`STATS: &s`) since it was added, so AniList rejected the document as a syntax error.
+- `UserEndpoint::get_by_name` always failed with `Variable "$id" of required type
+  "Int!" was not provided`. Five more documents declared a variable required that
+  AniList accepts as optional and the options struct lets you leave out:
+  `GetUserMangaList` (`$userId`, so a list by `username` failed), `FetchThread` and
+  `FetchThreadComment` (`$id`, so a lookup by search, user or thread failed),
+  `SaveThreadComment` (`$comment`) and `SaveReview` (`$body`), so an edit that
+  changed only the lock, score or privacy was rejected.
+- `ForumEndpoint::fetch_comment_one` failed to deserialise every response:
+  AniList's `ThreadComment` field returns a list. It now returns the first match,
+  or `AniListError::NotFound` when nothing matches.
+- Mutations were retried like queries. With transient retries on (the
+  `for_rate_limits` and `aggressive` presets), a `5xx`, an outage or a dropped
+  connection after `ToggleLikeV2` sent it again and undid the like; a
+  `SaveTextActivity` could post twice. A mutation is now retried only when the
+  server provably did not run it: a rate limit, or a connection that was never
+  established. Queries retry exactly as before.
+- A `503` was never retried, despite `retry_transient_errors` promising `5xx`
+  retries: it is reported as `AniListError::Maintenance`, which the retry loop
+  skipped. It is now retried like any other `5xx` (queries only).
+- `Paginator::with_max_pages` above `i32::MAX` (for example `u32::MAX`) ended the
+  walk before the first page.
+- A broken intra-doc link failed `cargo doc` with warnings denied.
+- The MSRV promise (Rust 1.82) did not hold for the repository: `Cargo.lock`
+  pinned `rand 0.10` (through reqwest's `quinn`) and ICU 2, which need edition
+  2024 and Rust 1.83, so the CI `msrv` job could not build. The lockfile is
+  regenerated with the MSRV-aware resolver; this does not affect users of the
+  crate, whose own lockfiles decide.
+
+### Changed
+- `AniListClient::query` and `AniListClient::fetch` take `&str` instead of
+  `&'static str`, so a document built at runtime (for example a batch of aliased
+  fields) can be sent. Existing calls compile unchanged. Both are now documented.
+- `UserEndpoint::get_current_user` makes one request instead of two: it asks for
+  `Viewer` with the full user selection instead of fetching the id first.
+
+### Internal
+- A unit test parses every bundled `.graphql` document, checks that it is
+  classified correctly as a query or a mutation, and pins the list of variables
+  each document requires.
+- Offline tests for the list-shaped `ThreadComment`, a lookup by name, the
+  one-request viewer and the mutation retry rules; live tests for
+  `get_by_name` and `stats`.
+- CI builds the docs with `RUSTDOCFLAGS=-D warnings`.
+- `.cargo/config.toml` keeps `cargo update` on 1.82-compatible versions.
+- The unmaintained `dotenv` dev-dependency (RUSTSEC-2021-0141) is replaced by
+  `dotenvy`; `graphql-parser` is a new dev-dependency.
+
 ## [0.7.0] - 2026-10-14
 
 This release elevates error handling to production grade: structured classifications
