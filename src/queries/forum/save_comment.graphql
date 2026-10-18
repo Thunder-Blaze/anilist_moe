@@ -2,7 +2,7 @@ mutation SaveThreadComment(
     $id: Int
     $threadId: Int
     $parentCommentId: Int
-    $comment: String!
+    $comment: String
     $locked: Boolean
 
     # HTML rendering options

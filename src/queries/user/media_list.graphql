@@ -1,6 +1,6 @@
 query GetUserMangaList(
     $id: Int
-    $userId: Int!
+    $userId: Int
     $username: String
     $page: Int = 1
     $perPage: Int = 25

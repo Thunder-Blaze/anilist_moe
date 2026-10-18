@@ -1,5 +1,5 @@
 query FetchThread(
-    $id: Int!
+    $id: Int
     $userId: Int
     $replyUserId: Int
     $subscribed: Boolean

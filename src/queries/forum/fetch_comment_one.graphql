@@ -1,5 +1,5 @@
 query FetchThreadComment(
-    $id: Int!
+    $id: Int
     $threadId: Int
     $userId: Int
     $sort: [ThreadCommentSort]

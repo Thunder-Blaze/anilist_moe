@@ -1,7 +1,7 @@
 mutation SaveReview(
     $id: Int
     $mediaId: Int!
-    $body: String!
+    $body: String
     $summary: String
     $score: Int
     $private: Boolean

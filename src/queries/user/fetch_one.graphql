@@ -1,5 +1,5 @@
 query GetUserById(
-    $id: Int!
+    $id: Int
     $name: String
     $search: String
     $isModerator: Boolean
