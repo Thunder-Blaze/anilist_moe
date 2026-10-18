@@ -649,6 +649,12 @@ let client = AniListClient::new().with_retry_config(RetryConfig::for_rate_limits
 let client = AniListClient::new().with_retry_config(RetryConfig::aggressive());
 ```
 
+A mutation is the exception: it is retried only when the server provably did not run
+it — a rate limit, or a connection that was never established. After a `5xx`, an
+outage or a dropped connection the write may already have landed, and sending
+`ToggleLikeV2` or `SaveTextActivity` again would undo the like or post twice, so that
+error comes back to you instead.
+
 ## Pagination
 
 All list endpoints support pagination:

@@ -46,7 +46,8 @@ async fn main() -> Result<(), anilist_moe::AniListError> {
 - `AniListClient`: `new()`, `with_token(token)`, `builder()` (timeout, user agent, extra
   headers, retry config, custom transport), `try_new()` / `try_with_token()` for the
   non-panicking pair, `paginate(options)` behind the `pagination` feature, and
-  `query(…)` / `fetch(query, variables)` for GraphQL the crate does not wrap.
+  `query(…)` / `fetch(query, variables)` for GraphQL the crate does not wrap; the
+  document is a `&str`, so it can be built at runtime (aliased batches).
 - Endpoint accessors, one per group: `media()`, `anime()`, `manga()`, `medialist()`,
   `character()`, `staff()`, `studio()`, `user()`, `common()`, `forum()`, `activity()`,
   `review()`, `recommendation()`, `airing()`, `notification()`.
@@ -76,7 +77,9 @@ async fn main() -> Result<(), anilist_moe::AniListError> {
 
 - **Retries are opt-in.** `RetryConfig::default()` retries nothing;
   `RetryConfig::for_rate_limits()` and `aggressive()` are how a client opts in, via
-  `client.with_retry_config(…)` or the builder.
+  `client.with_retry_config(…)` or the builder. A **mutation** is retried only after a
+  rate limit or a connection that never opened; after a `5xx`, an outage or a dropped
+  connection it is not repeated, because the write may have landed.
 - **Rate limits** are handled reactively: a `429` is parsed from `Retry-After`,
   `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset`. The documented
   limit is 90 requests per minute; the API is currently limited to **30** while it

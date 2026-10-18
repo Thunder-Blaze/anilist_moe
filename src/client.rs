@@ -27,7 +27,7 @@ use crate::endpoints::UserEndpoint;
 use crate::errors::{detect_maintenance, format_messages, AniListError, GraphQLError};
 use crate::objects::responses::GraphQLResponse;
 use crate::transport::{HttpRequest, HttpResponse, ReqwestTransport, Transport};
-use crate::utils::{retry_with_backoff, RetryConfig};
+use crate::utils::{retry_with_idempotency, Idempotency, RetryConfig};
 use serde::Serialize;
 use serde_json::{from_value, Value};
 use std::borrow::Cow;
@@ -656,19 +656,61 @@ impl AniListClient {
         self.inner.retry_config
     }
 
+    /// Sends a GraphQL document and returns the whole response body as JSON.
+    ///
+    /// Use this for documents the typed endpoints do not cover. `query` can be
+    /// built at runtime, for example a batch of aliased fields.
+    ///
+    /// A document that declares a `mutation` is retried only when the server
+    /// provably did not run it (a rate limit, or a connection that was never
+    /// made), so a retry cannot apply a write twice.
+    ///
+    /// # Errors
+    ///
+    /// Any [`AniListError`]: a GraphQL `errors` list in the response becomes
+    /// [`AniListError::GraphQL`], with the partial `data` kept.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # async fn example() -> Result<(), anilist_moe::AniListError> {
+    /// use anilist_moe::AniListClient;
+    ///
+    /// let client = AniListClient::new();
+    /// let ids = [1, 20];
+    /// let document = format!(
+    ///     "query {{ {} }}",
+    ///     ids.iter()
+    ///         .map(|id| format!("m{id}: Media(id: {id}) {{ id title {{ romaji }} }}"))
+    ///         .collect::<Vec<_>>()
+    ///         .join(" ")
+    /// );
+    /// let body = client.query(&document, None::<&()>).await?;
+    /// println!("{}", body["data"]["m1"]["title"]["romaji"]);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn query<V: Serialize>(
         &self,
-        query: &'static str,
+        query: &str,
         variables: Option<&V>,
     ) -> Result<Value, AniListError> {
         self.execute_query(query, variables).await
     }
 
-    pub async fn fetch<T, V>(
-        &self,
-        query: &'static str,
-        variables: Option<&V>,
-    ) -> Result<T, AniListError>
+    /// Sends a GraphQL document and deserialises the single root field of its
+    /// `data` into `T`.
+    ///
+    /// This is what every typed endpoint uses. The root field's name is not
+    /// checked, so `T` describes its value: `{"data": {"Media": {...}}}`
+    /// deserialises the `{...}`. Use [`AniListClient::query`] when a document has
+    /// several root fields.
+    ///
+    /// # Errors
+    ///
+    /// As [`AniListClient::query`], plus [`AniListError::ParseError`] when the
+    /// data does not match `T`.
+    pub async fn fetch<T, V>(&self, query: &str, variables: Option<&V>) -> Result<T, AniListError>
     where
         T: serde::de::DeserializeOwned,
         V: Serialize,
@@ -684,12 +726,18 @@ impl AniListClient {
 
     async fn execute_query<V: Serialize>(
         &self,
-        query: &'static str,
+        query: &str,
         variables: Option<&V>,
     ) -> Result<Value, AniListError> {
-        let request = retry_with_backoff(
+        let idempotency = if is_mutation(query) {
+            Idempotency::Unsafe
+        } else {
+            Idempotency::Safe
+        };
+        let request = retry_with_idempotency(
             || async { self.raw_query(query, variables).await },
             self.inner.retry_config,
+            idempotency,
         );
 
         // A span covering the whole request, including its retries. The
@@ -710,7 +758,7 @@ impl AniListClient {
 
     async fn raw_query<V: Serialize>(
         &self,
-        query: &'static str,
+        query: &str,
         variables: Option<&V>,
     ) -> Result<Value, AniListError> {
         let body = serde_json::to_vec(&RequestBody { query, variables }).map_err(|error| {
@@ -970,10 +1018,77 @@ fn describe_errors(errors: &Value) -> String {
     }
 }
 
+/// Whether a GraphQL document declares a `mutation` operation.
+///
+/// Scans the top level of the document — outside every selection set, string
+/// and comment — for the `mutation` keyword, so a fragment defined first, a
+/// leading comment, or a field that happens to be named `mutation` cannot
+/// mislead it. Any mutation in the document counts, which errs on the side of
+/// not repeating a write.
+fn is_mutation(document: &str) -> bool {
+    let bytes = document.as_bytes();
+    let mut depth = 0usize;
+    let mut index = 0;
+
+    while index < bytes.len() {
+        match bytes[index] {
+            b'#' => {
+                while index < bytes.len() && bytes[index] != b'\n' {
+                    index += 1;
+                }
+            }
+            b'"' => {
+                let block = bytes[index..].starts_with(b"\"\"\"");
+                index += if block { 3 } else { 1 };
+                while index < bytes.len() {
+                    if block && bytes[index..].starts_with(b"\"\"\"") {
+                        index += 2;
+                        break;
+                    }
+                    if !block && bytes[index] == b'\\' {
+                        index += 1;
+                    } else if !block && bytes[index] == b'"' {
+                        break;
+                    }
+                    index += 1;
+                }
+            }
+            // `$mutation` and `@mutation` are a variable and a directive, not the keyword.
+            b'$' | b'@' => {
+                index += 1;
+                while index < bytes.len()
+                    && (bytes[index].is_ascii_alphanumeric() || bytes[index] == b'_')
+                {
+                    index += 1;
+                }
+                continue;
+            }
+            b'{' => depth += 1,
+            b'}' => depth = depth.saturating_sub(1),
+            byte if depth == 0 && (byte.is_ascii_alphabetic() || byte == b'_') => {
+                let start = index;
+                while index < bytes.len()
+                    && (bytes[index].is_ascii_alphanumeric() || bytes[index] == b'_')
+                {
+                    index += 1;
+                }
+                if &bytes[start..index] == b"mutation" {
+                    return true;
+                }
+                continue;
+            }
+            _ => {}
+        }
+        index += 1;
+    }
+
+    false
+}
+
 /// Optimized request body structure that avoids HashMap allocation
 #[derive(Serialize)]
 struct RequestBody<'a, V: Serialize> {
-    query: &'static str,
+    query: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
     variables: Option<&'a V>,
 }
@@ -1507,6 +1622,282 @@ mod tests {
         let debug = format!("{builder:?}");
         assert!(!debug.contains("super-secret"), "token leaked: {debug}");
         assert!(debug.contains("has_token: true"));
+    }
+
+    #[test]
+    fn mutations_are_recognised_at_the_top_level_only() {
+        assert!(is_mutation(
+            "mutation ToggleLike($id: Int) { ToggleLikeV2(id: $id) { __typename } }"
+        ));
+        assert!(is_mutation(
+            "\n  # posts a status\n  mutation { SaveTextActivity(text: \"x\") { id } }"
+        ));
+        assert!(
+            is_mutation("fragment F on Media { id }\nmutation M { SaveMediaListEntry(mediaId: 1) { ...F } }"),
+            "a fragment defined before the operation must not hide it"
+        );
+
+        assert!(!is_mutation("query { Media(id: 1) { id } }"));
+        assert!(!is_mutation("{ viewer { id } }"));
+        assert!(
+            !is_mutation("query { Page { mutation: media { id } } }"),
+            "a field or alias named mutation is not an operation"
+        );
+        assert!(
+            !is_mutation("query Q($mutation: Int) @mutation { Media(id: $mutation) { id } }"),
+            "variables and directives are not the keyword"
+        );
+        assert!(
+            !is_mutation("query { Media(search: \"mutation { x }\") { id } }"),
+            "string contents are not code"
+        );
+        assert!(!is_mutation(
+            "query { Media(search: \"\"\"\nmutation\n\"\"\") { id } }"
+        ));
+        assert!(!is_mutation(
+            "# mutation in a comment\nquery { Media { id } }"
+        ));
+        assert!(!is_mutation(""));
+    }
+
+    #[test]
+    fn every_bundled_mutation_is_recognised() {
+        #[cfg(feature = "common")]
+        assert!(is_mutation(crate::queries::common::TOGGLE_LIKE));
+        #[cfg(feature = "activity")]
+        assert!(is_mutation(crate::queries::activity::SAVE_TEXT_ACTIVITY));
+        #[cfg(feature = "medialist")]
+        assert!(is_mutation(crate::queries::medialist::SAVE));
+        #[cfg(feature = "media")]
+        assert!(!is_mutation(crate::queries::media::FETCH));
+    }
+
+    /// Every `.graphql` file under `src/queries`, recursively.
+    fn bundled_documents() -> Vec<std::path::PathBuf> {
+        fn walk(dir: &std::path::Path, found: &mut Vec<std::path::PathBuf>) {
+            for entry in std::fs::read_dir(dir).expect("the queries directory is readable") {
+                let path = entry.expect("a directory entry").path();
+                if path.is_dir() {
+                    walk(&path, found);
+                } else if path.extension().is_some_and(|ext| ext == "graphql") {
+                    found.push(path);
+                }
+            }
+        }
+
+        let mut found = Vec::new();
+        walk(
+            std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/src/queries")),
+            &mut found,
+        );
+        found.sort();
+        found
+    }
+
+    #[test]
+    fn every_bundled_document_parses_and_is_classified_correctly() {
+        use graphql_parser::query::{Definition, OperationDefinition};
+
+        let documents = bundled_documents();
+        assert!(documents.len() > 60, "found {} documents", documents.len());
+
+        for path in documents {
+            let text = std::fs::read_to_string(&path).expect("a readable document");
+            let parsed = graphql_parser::parse_query::<String>(&text)
+                .unwrap_or_else(|error| panic!("{} does not parse: {error}", path.display()));
+
+            let declares_mutation = parsed.definitions.iter().any(|definition| {
+                matches!(
+                    definition,
+                    Definition::Operation(OperationDefinition::Mutation(_))
+                )
+            });
+            assert_eq!(
+                is_mutation(&text),
+                declares_mutation,
+                "{} is classified wrongly, so its retries would be wrong",
+                path.display()
+            );
+        }
+    }
+
+    /// The variables each document requires (`!` with no default), by path below
+    /// `src/queries`.
+    ///
+    /// AniList rejects a request that leaves a required variable out, and an
+    /// options field that is an `Option` can be left out. So a variable belongs
+    /// here only when its options field is required too (a plain type with
+    /// `#[builder(!default)]`). `$id: Int!` on `GetUserById` broke
+    /// `get_by_name` for exactly this reason: AniList itself accepts the name alone.
+    const REQUIRED_VARIABLES: &[(&str, &[&str])] = &[
+        ("activity/delete.graphql", &["id"]),
+        ("activity/delete_reply.graphql", &["id"]),
+        ("activity/pin.graphql", &["id", "pinned"]),
+        (
+            "activity/save_message_activity.graphql",
+            &["message", "recipientId"],
+        ),
+        ("activity/save_reply.graphql", &["activityId", "text"]),
+        ("activity/save_text_activity.graphql", &["text"]),
+        ("activity/subscribe.graphql", &["activityId", "subscribe"]),
+        ("common/markdown.graphql", &["markdown"]),
+        ("common/toggle_follow.graphql", &["userId"]),
+        ("forum/delete.graphql", &["id"]),
+        ("forum/delete_comment.graphql", &["id"]),
+        ("forum/subscription.graphql", &["threadId", "subscribe"]),
+        ("medialist/delete.graphql", &["id"]),
+        ("medialist/save_multiple.graphql", &["ids"]),
+        (
+            "recommendation/save.graphql",
+            &["mediaId", "mediaRecommendationId", "rating"],
+        ),
+        ("review/delete.graphql", &["id"]),
+        ("review/rate.graphql", &["reviewId", "rating"]),
+        ("review/save.graphql", &["mediaId"]),
+        ("user/favorites.graphql", &["userId"]),
+        ("user/followers.graphql", &["userId"]),
+        ("user/following.graphql", &["userId"]),
+        ("user/stats.graphql", &["userId"]),
+    ];
+
+    #[test]
+    fn required_variables_are_exactly_the_reviewed_ones() {
+        use graphql_parser::query::{Definition, OperationDefinition, Type};
+
+        let root = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/src/queries"));
+        let mut found: Vec<(String, Vec<String>)> = Vec::new();
+
+        for path in bundled_documents() {
+            let text = std::fs::read_to_string(&path).expect("a readable document");
+            let parsed = graphql_parser::parse_query::<String>(&text).expect("parses");
+            let mut required = Vec::new();
+            for definition in &parsed.definitions {
+                let variables = match definition {
+                    Definition::Operation(OperationDefinition::Query(query)) => {
+                        &query.variable_definitions
+                    }
+                    Definition::Operation(OperationDefinition::Mutation(mutation)) => {
+                        &mutation.variable_definitions
+                    }
+                    _ => continue,
+                };
+                required.extend(
+                    variables
+                        .iter()
+                        .filter(|variable| {
+                            matches!(variable.var_type, Type::NonNullType(_))
+                                && variable.default_value.is_none()
+                        })
+                        .map(|variable| variable.name.clone()),
+                );
+            }
+            if !required.is_empty() {
+                let relative = path
+                    .strip_prefix(root)
+                    .expect("below src/queries")
+                    .to_string_lossy()
+                    .replace('\\', "/");
+                found.push((relative, required));
+            }
+        }
+
+        let expected: Vec<(String, Vec<String>)> = REQUIRED_VARIABLES
+            .iter()
+            .map(|(path, names)| {
+                (
+                    (*path).to_string(),
+                    names.iter().map(|name| (*name).to_string()).collect(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            found, expected,
+            "a required variable changed; check that its options field is required too"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_mutation_is_not_resent_after_a_server_error() {
+        let transport = RecordingTransport::with_responses(vec![
+            json_response(500, "boom"),
+            json_response(200, r#"{"data":{"ToggleLikeV2":{"id":1}}}"#),
+        ]);
+        let client = AniListClient::builder()
+            .transport(Arc::clone(&transport))
+            .retry_config(fast_retries(3))
+            .build()
+            .unwrap();
+
+        let error = client
+            .query(
+                "mutation { ToggleLikeV2(id: 1, type: ACTIVITY) { __typename } }",
+                None::<&()>,
+            )
+            .await
+            .expect_err("the server error is handed back");
+
+        assert!(matches!(
+            error,
+            AniListError::ServerError { status: 500, .. }
+        ));
+        assert_eq!(
+            transport.requests().len(),
+            1,
+            "a second toggle would undo the first"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_rate_limited_mutation_is_retried() {
+        let transport = RecordingTransport::with_responses(vec![
+            json_response(429, ""),
+            json_response(200, r#"{"data":{"SaveTextActivity":{"id":7}}}"#),
+        ]);
+        let client = AniListClient::builder()
+            .transport(Arc::clone(&transport))
+            .retry_config(fast_retries(1))
+            .build()
+            .unwrap();
+
+        let value = client
+            .query(
+                "mutation { SaveTextActivity(text: \"hi\") { id } }",
+                None::<&()>,
+            )
+            .await
+            .expect("the refused write is sent again");
+        assert_eq!(value["data"]["SaveTextActivity"]["id"], 7);
+        assert_eq!(transport.requests().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn a_query_is_retried_after_an_outage() {
+        let transport = RecordingTransport::with_responses(vec![
+            json_response(503, "service unavailable"),
+            json_response(200, r#"{"data":{"ok":true}}"#),
+        ]);
+        let client = AniListClient::builder()
+            .transport(Arc::clone(&transport))
+            .retry_config(fast_retries(1))
+            .build()
+            .unwrap();
+
+        let value = client.query("query { ok }", None::<&()>).await.unwrap();
+        assert_eq!(value["data"]["ok"], true);
+        assert_eq!(transport.requests().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn a_document_built_at_runtime_can_be_sent() {
+        let transport = RecordingTransport::with_responses(vec![json_response(
+            200,
+            r#"{"data":{"m1":{"id":1}}}"#,
+        )]);
+        let client = client_with(Arc::clone(&transport));
+
+        let document = format!("query {{ m{0}: Media(id: {0}) {{ id }} }}", 1);
+        let value = client.query(&document, None::<&()>).await.unwrap();
+        assert_eq!(value["data"]["m1"]["id"], 1);
     }
 
     #[cfg(feature = "tracing")]

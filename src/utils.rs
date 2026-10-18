@@ -169,9 +169,48 @@ fn random_below(bound: u64) -> u64 {
     hasher.finish() % bound
 }
 
+/// Whether a request may be sent again without the risk of doing its work twice.
+///
+/// A query only reads, so another attempt is always harmless. A mutation is not:
+/// `ToggleLikeV2` sent twice undoes the like, and `SaveTextActivity` sent twice
+/// posts twice.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Idempotency {
+    /// Repeating the request cannot change its outcome.
+    Safe,
+    /// Repeating the request after it reached the server could apply it twice.
+    Unsafe,
+}
+
+/// Whether the server certainly did not act on the request that produced `error`.
+///
+/// A rate limit is a refusal: AniList rejects the request before running it. A
+/// connection that was never established never carried the request. Anything
+/// else — a timeout, a reset connection, a `5xx`, an outage notice — may arrive
+/// after the server applied the change, so it is not proof of a no-op.
+fn rejected_before_execution(error: &AniListError) -> bool {
+    match error {
+        AniListError::RateLimit { .. }
+        | AniListError::RateLimitSimple
+        | AniListError::BurstLimit => true,
+        AniListError::Network(error) => error.is_connect(),
+        _ => false,
+    }
+}
+
 /// How long to wait before retrying `error`, or `None` to give up.
-fn retry_delay(error: &AniListError, attempts: u32, config: &RetryConfig) -> Option<Duration> {
+fn retry_delay(
+    error: &AniListError,
+    attempts: u32,
+    config: &RetryConfig,
+    idempotency: Idempotency,
+) -> Option<Duration> {
     if attempts >= config.max_retries {
+        return None;
+    }
+
+    // A mutation is only sent again when the first attempt provably did nothing.
+    if idempotency == Idempotency::Unsafe && !rejected_before_execution(error) {
         return None;
     }
 
@@ -192,6 +231,11 @@ fn retry_delay(error: &AniListError, attempts: u32, config: &RetryConfig) -> Opt
         {
             Some(config.delay_with_jitter(attempts))
         }
+        // A `503` is reported as an outage, but it is still a 5xx: retry it like
+        // one, bounded by the same budget and delay cap.
+        AniListError::Maintenance { .. } if config.retry_transient_errors => {
+            Some(config.delay_with_jitter(attempts))
+        }
         AniListError::Network(_) | AniListError::Transport { .. }
             if config.retry_transient_errors =>
         {
@@ -207,9 +251,26 @@ fn retry_delay(error: &AniListError, attempts: u32, config: &RetryConfig) -> Opt
 /// Every retry is reported through `log`, and through `tracing` as well when the
 /// `tracing` feature is on, so an application that wires one of the two sees it.
 /// Nothing is retried unless [`RetryConfig::max_retries`] says so.
+///
+/// `operation` is treated as safe to repeat. The client itself retries a
+/// mutation only when the server provably did not run it (a rate limit, or a
+/// connection that was never made).
 pub async fn retry_with_backoff<F, Fut, T>(
+    operation: F,
+    config: RetryConfig,
+) -> Result<T, AniListError>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Result<T, AniListError>>,
+{
+    retry_with_idempotency(operation, config, Idempotency::Safe).await
+}
+
+/// [`retry_with_backoff`], told whether repeating `operation` is safe.
+pub(crate) async fn retry_with_idempotency<F, Fut, T>(
     mut operation: F,
     config: RetryConfig,
+    idempotency: Idempotency,
 ) -> Result<T, AniListError>
 where
     F: FnMut() -> Fut,
@@ -234,7 +295,7 @@ where
         match result {
             Ok(result) => return Ok(result),
             Err(err) => {
-                let Some(sleep_duration) = retry_delay(&err, attempts, &config) else {
+                let Some(sleep_duration) = retry_delay(&err, attempts, &config, idempotency) else {
                     return Err(err);
                 };
 
@@ -367,17 +428,17 @@ mod tests {
         };
 
         assert_eq!(
-            retry_delay(&rate_limited(30), 0, &config),
+            retry_delay(&rate_limited(30), 0, &config, Idempotency::Safe),
             Some(Duration::from_secs(30)),
             "the server asked for 30s and gets it"
         );
         assert_eq!(
-            retry_delay(&rate_limited(0), 0, &config),
+            retry_delay(&rate_limited(0), 0, &config, Idempotency::Safe),
             Some(config.delay_for(0)),
             "no Retry-After falls back to the backoff schedule"
         );
         assert_eq!(
-            retry_delay(&rate_limited(99_999), 0, &config),
+            retry_delay(&rate_limited(99_999), 0, &config, Idempotency::Safe),
             Some(config.delay_for(0)),
             "an implausible Retry-After is ignored"
         );
@@ -387,11 +448,16 @@ mod tests {
     fn burst_limits_wait_a_step_longer() {
         let config = exact();
         assert_eq!(
-            retry_delay(&AniListError::BurstLimit, 0, &config),
+            retry_delay(&AniListError::BurstLimit, 0, &config, Idempotency::Safe),
             Some(config.delay_for(1))
         );
         assert_eq!(
-            retry_delay(&AniListError::RateLimitSimple, 0, &config),
+            retry_delay(
+                &AniListError::RateLimitSimple,
+                0,
+                &config,
+                Idempotency::Safe
+            ),
             Some(config.delay_for(0))
         );
     }
@@ -404,11 +470,16 @@ mod tests {
             message: "down".to_string(),
         };
         assert_eq!(
-            retry_delay(&unavailable, 0, &config),
+            retry_delay(&unavailable, 0, &config, Idempotency::Safe),
             Some(config.delay_for(0))
         );
         assert_eq!(
-            retry_delay(&unavailable, 0, &config.without_transient_retries()),
+            retry_delay(
+                &unavailable,
+                0,
+                &config.without_transient_retries(),
+                Idempotency::Safe
+            ),
             None,
             "opt out stops the retries"
         );
@@ -417,14 +488,20 @@ mod tests {
             message: "connection reset".to_string(),
             source: None,
         };
-        assert!(retry_delay(&transport, 0, &config).is_some());
+        assert!(retry_delay(&transport, 0, &config, Idempotency::Safe).is_some());
 
         // Client mistakes are never retried.
         let bad_request = AniListError::BadRequest {
             message: "nope".to_string(),
         };
-        assert_eq!(retry_delay(&bad_request, 0, &config), None);
-        assert_eq!(retry_delay(&AniListError::NotFound, 0, &config), None);
+        assert_eq!(
+            retry_delay(&bad_request, 0, &config, Idempotency::Safe),
+            None
+        );
+        assert_eq!(
+            retry_delay(&AniListError::NotFound, 0, &config, Idempotency::Safe),
+            None
+        );
         assert_eq!(
             retry_delay(
                 &AniListError::GraphQL {
@@ -433,7 +510,8 @@ mod tests {
                     data: None,
                 },
                 0,
-                &config
+                &config,
+                Idempotency::Safe
             ),
             None
         );
@@ -447,9 +525,107 @@ mod tests {
         };
         let error = AniListError::RateLimitSimple;
 
-        assert!(retry_delay(&error, 0, &config).is_some());
-        assert!(retry_delay(&error, 1, &config).is_some());
-        assert_eq!(retry_delay(&error, 2, &config), None, "budget is spent");
+        assert!(retry_delay(&error, 0, &config, Idempotency::Safe).is_some());
+        assert!(retry_delay(&error, 1, &config, Idempotency::Safe).is_some());
+        assert_eq!(
+            retry_delay(&error, 2, &config, Idempotency::Safe),
+            None,
+            "budget is spent"
+        );
+    }
+
+    #[test]
+    fn an_outage_is_retried_like_any_other_5xx() {
+        let config = exact();
+        let outage = AniListError::Maintenance {
+            message: "service unavailable".to_string(),
+        };
+        assert_eq!(
+            retry_delay(&outage, 0, &config, Idempotency::Safe),
+            Some(config.delay_for(0)),
+            "a 503 is transient and the docs promise 5xx retries"
+        );
+        assert_eq!(
+            retry_delay(
+                &outage,
+                0,
+                &config.without_transient_retries(),
+                Idempotency::Safe
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn a_mutation_is_retried_only_when_the_server_refused_it() {
+        let config = exact();
+
+        // Refusals: the server did not run the mutation, so sending it again is safe.
+        for refused in [
+            AniListError::RateLimitSimple,
+            AniListError::BurstLimit,
+            AniListError::RateLimit {
+                limit: 90,
+                remaining: 0,
+                reset_at: 0,
+                retry_after: 1,
+            },
+        ] {
+            assert!(
+                retry_delay(&refused, 0, &config, Idempotency::Unsafe).is_some(),
+                "{refused:?} is a refusal and may be retried"
+            );
+        }
+
+        // Ambiguous: the mutation may already have been applied.
+        for ambiguous in [
+            AniListError::ServerError {
+                status: 502,
+                message: "bad gateway".to_string(),
+            },
+            AniListError::Maintenance {
+                message: "down".to_string(),
+            },
+            AniListError::Transport {
+                message: "connection reset".to_string(),
+                source: None,
+            },
+        ] {
+            assert_eq!(
+                retry_delay(&ambiguous, 0, &config, Idempotency::Unsafe),
+                None,
+                "{ambiguous:?} may follow a write that landed; it must not be repeated"
+            );
+            assert!(
+                retry_delay(&ambiguous, 0, &config, Idempotency::Safe).is_some(),
+                "a query is still retried after {ambiguous:?}"
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn a_mutation_that_hit_a_server_error_is_sent_once() {
+        let mut calls = 0;
+        let result: Result<(), AniListError> = retry_with_idempotency(
+            || {
+                calls += 1;
+                async {
+                    Err(AniListError::ServerError {
+                        status: 500,
+                        message: "boom".to_string(),
+                    })
+                }
+            },
+            exact(),
+            Idempotency::Unsafe,
+        )
+        .await;
+
+        assert!(matches!(
+            result,
+            Err(AniListError::ServerError { status: 500, .. })
+        ));
+        assert_eq!(calls, 1, "the write may have landed, so it is not repeated");
     }
 
     #[tokio::test]
