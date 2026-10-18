@@ -410,3 +410,74 @@ async fn subscribing_and_unsubscribing_send_an_explicit_state() {
     assert_eq!(first["variables"]["subscribe"], serde_json::json!(true));
     assert_eq!(second["variables"]["subscribe"], serde_json::json!(false));
 }
+
+// ------------------------------------------------------- list-shaped root fields
+
+#[tokio::test]
+async fn a_single_comment_is_read_out_of_the_list_anilist_returns() {
+    use anilist_moe::endpoints::forum::FetchThreadCommentOneOptions;
+
+    // `Query.ThreadComment` is `[ThreadComment]`, even when asked for one.
+    let transport = ScriptedTransport::new(vec![ScriptedTransport::json(
+        r#"{"data":{"ThreadComment":[{"id":11,"threadId":3},{"id":12,"threadId":3}]}}"#,
+    )]);
+    let comment = client(&transport)
+        .forum()
+        .fetch_comment_one(&FetchThreadCommentOneOptions::builder().thread_id(3).build())
+        .await
+        .expect("the list is unwrapped");
+    assert_eq!(comment.id, 11, "the first match is returned");
+    assert_eq!(transport.sent_variables()["threadId"], 3);
+}
+
+#[tokio::test]
+async fn no_matching_comment_is_not_found() {
+    use anilist_moe::endpoints::forum::FetchThreadCommentOneOptions;
+
+    let transport = ScriptedTransport::new(vec![ScriptedTransport::json(
+        r#"{"data":{"ThreadComment":[]}}"#,
+    )]);
+    let error = client(&transport)
+        .forum()
+        .fetch_comment_one(&FetchThreadCommentOneOptions::builder().id(1).build())
+        .await
+        .expect_err("an empty list has nothing to return");
+    assert!(matches!(error, AniListError::NotFound), "got {error:?}");
+}
+
+#[tokio::test]
+async fn a_user_is_looked_up_by_name_without_an_id() {
+    let transport = ScriptedTransport::new(vec![ScriptedTransport::json(
+        r#"{"data":{"User":{"id":5429396,"name":"ThunderBlaze"}}}"#,
+    )]);
+    let user = client(&transport)
+        .user()
+        .get_by_name("ThunderBlaze")
+        .await
+        .expect("a name alone is enough");
+    assert_eq!(user.id, 5429396);
+
+    let variables = transport.sent_variables();
+    assert_eq!(variables["name"], "ThunderBlaze");
+    assert!(variables.get("id").is_none(), "no id is sent: {variables}");
+}
+
+#[tokio::test]
+async fn the_current_user_takes_one_request() {
+    let transport = ScriptedTransport::new(vec![ScriptedTransport::json(
+        r#"{"data":{"Viewer":{"id":5429396,"name":"ThunderBlaze","unreadNotificationCount":2}}}"#,
+    )]);
+    let user = client(&transport)
+        .user()
+        .get_current_user()
+        .await
+        .expect("the viewer is returned");
+    assert_eq!(user.id, 5429396);
+
+    // `sent_request` asserts that exactly one request went out.
+    let body: Value = serde_json::from_slice(&transport.sent_request().body).unwrap();
+    assert!(
+        body["query"].as_str().unwrap().contains("Viewer"),
+        "the viewer is asked for directly"
+    );
+}

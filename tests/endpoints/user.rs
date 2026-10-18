@@ -89,6 +89,41 @@ async fn test_fetch_one_user() {
 }
 
 #[tokio::test]
+async fn test_get_user_by_name() {
+    // The document used to declare `$id: Int!`, so a lookup by name alone was
+    // rejected before it ran.
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
+
+    let result = h
+        .run(|| async { client.user().get_by_name("ThunderBlaze").await })
+        .await;
+
+    let user = result.expect("a user can be fetched by name alone");
+    assert_eq!(user.id, 5429396, "the name resolves to the right user");
+}
+
+#[tokio::test]
+async fn test_fetch_user_stats() {
+    // The stats document used to carry stray text and failed to parse.
+    delay_between_tests().await;
+    let h = harness();
+    let client = h.client();
+
+    let result = h
+        .run(|| async {
+            let options = FetchUserStatsOptions::builder().user_id(5429396).build();
+            client.user().stats(&options).await
+        })
+        .await;
+
+    let user = result.expect("user statistics can be fetched");
+    assert_eq!(user.id, 5429396);
+    assert!(user.statistics.is_some(), "the statistics are returned");
+}
+
+#[tokio::test]
 async fn test_user_data_types() {
     delay_between_tests().await;
     let h = harness();
