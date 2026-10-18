@@ -294,11 +294,12 @@ impl<'a> UserEndpoint<'a> {
     // Convenience functions
 
     /// Get current authenticated user
+    ///
+    /// One request: the `Viewer` field carries the same fields as
+    /// [`UserEndpoint::fetch_one`], so the user does not have to be looked up
+    /// again by id.
     pub async fn get_current_user(&self) -> Result<User, AniListError> {
-        let response = self.client.user().fetch_basic().await?;
-        let id = response.id;
-        self.fetch_one(&FetchUserOneOptions::builder().id(id).build())
-            .await
+        self.client.fetch(user::VIEWER, Option::<&()>::None).await
     }
 
     /// Get user by ID
