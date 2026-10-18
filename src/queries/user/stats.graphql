@@ -80,7 +80,7 @@ query GetUserStats($userId: Int!, $sort: [UserStatisticsSort]) {
                             last
                             full
                             native
-                        }STATS: &s
+                        }
                     }
                     count
                     meanScore
