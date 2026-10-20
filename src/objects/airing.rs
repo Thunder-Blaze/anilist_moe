@@ -18,7 +18,7 @@ pub struct AiringProgression {
 #[serde(rename_all = "camelCase")]
 pub struct AiringSchedule {
     pub id: Option<u32>,
-    pub airing_at: Option<i32>,
+    pub airing_at: Option<u64>,
     pub time_until_airing: Option<i32>,
     pub episode: Option<i32>,
     pub media_id: Option<u32>,
