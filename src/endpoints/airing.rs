@@ -23,7 +23,7 @@ pub struct FetchAiringOptions<'a> {
     pub id: Option<u32>,
     pub media_id: Option<u32>,
     pub episode: Option<i32>,
-    pub airing_at: Option<i32>,
+    pub airing_at: Option<u64>,
     pub not_yet_aired: Option<bool>,
     pub id_not: Option<u32>,
     #[builder(setter(into))]
@@ -42,8 +42,8 @@ pub struct FetchAiringOptions<'a> {
     pub episode_not_in: Option<Cow<'a, [i32]>>,
     pub episode_greater: Option<i32>,
     pub episode_lesser: Option<i32>,
-    pub airing_at_greater: Option<i32>,
-    pub airing_at_lesser: Option<i32>,
+    pub airing_at_greater: Option<u64>,
+    pub airing_at_lesser: Option<u64>,
     /// Sort order. The unique key (id) is appended, so paging stays stable;
     /// leaving this unset keeps the order the query document asks for.
     #[serde(
@@ -99,7 +99,7 @@ impl<'a> AiringEndpoint<'a> {
         // A clock set before 1970 is not worth a panic: fall back to zero.
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .map(|since_epoch| since_epoch.as_secs() as i32)
+            .map(|since_epoch| since_epoch.as_secs())
             .unwrap_or(0);
 
         self.fetch(
@@ -122,7 +122,7 @@ impl<'a> AiringEndpoint<'a> {
         // A clock set before 1970 is not worth a panic: fall back to zero.
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .map(|since_epoch| since_epoch.as_secs() as i32)
+            .map(|since_epoch| since_epoch.as_secs())
             .unwrap_or(0);
 
         self.fetch(
